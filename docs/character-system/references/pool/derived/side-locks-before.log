@@ -1,0 +1,22 @@
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 1115 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 464 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 1970 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 895 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 536 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 109 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 1239 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 577 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 708 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 181 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 1536 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 703 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 337 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 98 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 773 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 377 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 242 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 16 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 719 != 0
+../../home/soon/orca/workspaces/GoldFantasy/tellin/tests/game/testCharacterAssets.cpp:409: CHECK_EQ(covered, 0) failed: 360 != 0
+FAIL game/game_character_parted_curtains_leave_the_lower_face_in_front_of_the_side_locks
+1 tests, 1 failed, 0 skipped

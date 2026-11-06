@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Skin",
+      "color": "#e4e4d7ff"
+    },
+    {
+      "index": 1,
+      "name": "Umber",
+      "color": "#403822ff"
+    },
+    {
+      "index": 2,
+      "name": "Umber 2",
+      "color": "#322a1eff"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gold",
+      "color": "#c39139ff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#1b1104ff"
+    }
+  ]
+}

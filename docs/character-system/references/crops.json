@@ -1,0 +1,952 @@
+[
+  {
+    "index": 0,
+    "id": "sheet-01-row-1",
+    "name": "Side part",
+    "sheet": 1,
+    "row": 0,
+    "source_sha256": "802b10f856a01799d15ec58522908da11897d4bc7ccf357ff368c408b1f66da2",
+    "parts": {
+      "hair": {
+        "box": [
+          47,
+          120,
+          263,
+          269
+        ],
+        "crop": "docs/character-system/references/crops/00-hair.png",
+        "svg": "docs/character-system/references/vectors/00-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          330,
+          179,
+          463,
+          248
+        ],
+        "crop": "docs/character-system/references/crops/00-eyes.png",
+        "svg": "docs/character-system/references/vectors/00-eyes.svg"
+      },
+      "face": {
+        "box": [
+          535,
+          140,
+          710,
+          298
+        ],
+        "crop": "docs/character-system/references/crops/00-face.png",
+        "svg": "docs/character-system/references/vectors/00-face.svg"
+      },
+      "figure": {
+        "box": [
+          796,
+          19,
+          923,
+          426
+        ],
+        "crop": "docs/character-system/references/crops/00-figure.png",
+        "svg": "docs/character-system/references/vectors/00-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 1,
+    "id": "sheet-01-row-2",
+    "name": "Long waves",
+    "sheet": 1,
+    "row": 1,
+    "source_sha256": "802b10f856a01799d15ec58522908da11897d4bc7ccf357ff368c408b1f66da2",
+    "parts": {
+      "hair": {
+        "box": [
+          41,
+          476,
+          271,
+          806
+        ],
+        "crop": "docs/character-system/references/crops/01-hair.png",
+        "svg": "docs/character-system/references/vectors/01-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          325,
+          555,
+          477,
+          625
+        ],
+        "crop": "docs/character-system/references/crops/01-eyes.png",
+        "svg": "docs/character-system/references/vectors/01-eyes.svg"
+      },
+      "face": {
+        "box": [
+          534,
+          531,
+          718,
+          681
+        ],
+        "crop": "docs/character-system/references/crops/01-face.png",
+        "svg": "docs/character-system/references/vectors/01-face.svg"
+      },
+      "figure": {
+        "box": [
+          781,
+          449,
+          954,
+          830
+        ],
+        "crop": "docs/character-system/references/crops/01-figure.png",
+        "svg": "docs/character-system/references/vectors/01-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 2,
+    "id": "sheet-01-row-3",
+    "name": "Side fringe",
+    "sheet": 1,
+    "row": 2,
+    "source_sha256": "802b10f856a01799d15ec58522908da11897d4bc7ccf357ff368c408b1f66da2",
+    "parts": {
+      "hair": {
+        "box": [
+          57,
+          907,
+          265,
+          1062
+        ],
+        "crop": "docs/character-system/references/crops/02-hair.png",
+        "svg": "docs/character-system/references/vectors/02-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          326,
+          956,
+          470,
+          1031
+        ],
+        "crop": "docs/character-system/references/crops/02-eyes.png",
+        "svg": "docs/character-system/references/vectors/02-eyes.svg"
+      },
+      "face": {
+        "box": [
+          531,
+          919,
+          714,
+          1075
+        ],
+        "crop": "docs/character-system/references/crops/02-face.png",
+        "svg": "docs/character-system/references/vectors/02-face.svg"
+      },
+      "figure": {
+        "box": [
+          804,
+          843,
+          923,
+          1169
+        ],
+        "crop": "docs/character-system/references/crops/02-figure.png",
+        "svg": "docs/character-system/references/vectors/02-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 3,
+    "id": "sheet-01-row-4",
+    "name": "Wind swept",
+    "sheet": 1,
+    "row": 3,
+    "source_sha256": "802b10f856a01799d15ec58522908da11897d4bc7ccf357ff368c408b1f66da2",
+    "parts": {
+      "hair": {
+        "box": [
+          38,
+          1247,
+          306,
+          1421
+        ],
+        "crop": "docs/character-system/references/crops/03-hair.png",
+        "svg": "docs/character-system/references/vectors/03-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          336,
+          1321,
+          474,
+          1386
+        ],
+        "crop": "docs/character-system/references/crops/03-eyes.png",
+        "svg": "docs/character-system/references/vectors/03-eyes.svg"
+      },
+      "face": {
+        "box": [
+          532,
+          1282,
+          708,
+          1427
+        ],
+        "crop": "docs/character-system/references/crops/03-face.png",
+        "svg": "docs/character-system/references/vectors/03-face.svg"
+      },
+      "figure": {
+        "box": [
+          784,
+          1187,
+          948,
+          1531
+        ],
+        "crop": "docs/character-system/references/crops/03-figure.png",
+        "svg": "docs/character-system/references/vectors/03-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 4,
+    "id": "sheet-02-row-1",
+    "name": "Curly crown",
+    "sheet": 2,
+    "row": 0,
+    "source_sha256": "9640ea3702f96075a737da01d6318e85cc156b1db96f955b503c803c2e83ddbd",
+    "parts": {
+      "hair": {
+        "box": [
+          29,
+          87,
+          298,
+          294
+        ],
+        "crop": "docs/character-system/references/crops/04-hair.png",
+        "svg": "docs/character-system/references/vectors/04-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          323,
+          176,
+          466,
+          237
+        ],
+        "crop": "docs/character-system/references/crops/04-eyes.png",
+        "svg": "docs/character-system/references/vectors/04-eyes.svg"
+      },
+      "face": {
+        "box": [
+          506,
+          147,
+          687,
+          279
+        ],
+        "crop": "docs/character-system/references/crops/04-face.png",
+        "svg": "docs/character-system/references/vectors/04-face.svg"
+      },
+      "figure": {
+        "box": [
+          756,
+          15,
+          936,
+          427
+        ],
+        "crop": "docs/character-system/references/crops/04-figure.png",
+        "svg": "docs/character-system/references/vectors/04-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 5,
+    "id": "sheet-02-row-2",
+    "name": "Flipped bob",
+    "sheet": 2,
+    "row": 1,
+    "source_sha256": "9640ea3702f96075a737da01d6318e85cc156b1db96f955b503c803c2e83ddbd",
+    "parts": {
+      "hair": {
+        "box": [
+          39,
+          499,
+          285,
+          672
+        ],
+        "crop": "docs/character-system/references/crops/05-hair.png",
+        "svg": "docs/character-system/references/vectors/05-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          329,
+          551,
+          471,
+          633
+        ],
+        "crop": "docs/character-system/references/crops/05-eyes.png",
+        "svg": "docs/character-system/references/vectors/05-eyes.svg"
+      },
+      "face": {
+        "box": [
+          506,
+          524,
+          696,
+          670
+        ],
+        "crop": "docs/character-system/references/crops/05-face.png",
+        "svg": "docs/character-system/references/vectors/05-face.svg"
+      },
+      "figure": {
+        "box": [
+          762,
+          438,
+          908,
+          832
+        ],
+        "crop": "docs/character-system/references/crops/05-figure.png",
+        "svg": "docs/character-system/references/vectors/05-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 6,
+    "id": "sheet-02-row-3",
+    "name": "Long centre part",
+    "sheet": 2,
+    "row": 2,
+    "source_sha256": "9640ea3702f96075a737da01d6318e85cc156b1db96f955b503c803c2e83ddbd",
+    "parts": {
+      "hair": {
+        "box": [
+          37,
+          834,
+          270,
+          1201
+        ],
+        "crop": "docs/character-system/references/crops/06-hair.png",
+        "svg": "docs/character-system/references/vectors/06-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          322,
+          949,
+          469,
+          1025
+        ],
+        "crop": "docs/character-system/references/crops/06-eyes.png",
+        "svg": "docs/character-system/references/vectors/06-eyes.svg"
+      },
+      "face": {
+        "box": [
+          506,
+          924,
+          687,
+          1062
+        ],
+        "crop": "docs/character-system/references/crops/06-face.png",
+        "svg": "docs/character-system/references/vectors/06-face.svg"
+      },
+      "figure": {
+        "box": [
+          751,
+          845,
+          930,
+          1211
+        ],
+        "crop": "docs/character-system/references/crops/06-figure.png",
+        "svg": "docs/character-system/references/vectors/06-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 7,
+    "id": "sheet-02-row-4",
+    "name": "Spiky crop",
+    "sheet": 2,
+    "row": 3,
+    "source_sha256": "9640ea3702f96075a737da01d6318e85cc156b1db96f955b503c803c2e83ddbd",
+    "parts": {
+      "hair": {
+        "box": [
+          38,
+          1271,
+          271,
+          1460
+        ],
+        "crop": "docs/character-system/references/crops/07-hair.png",
+        "svg": "docs/character-system/references/vectors/07-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          324,
+          1353,
+          475,
+          1429
+        ],
+        "crop": "docs/character-system/references/crops/07-eyes.png",
+        "svg": "docs/character-system/references/vectors/07-eyes.svg"
+      },
+      "face": {
+        "box": [
+          509,
+          1324,
+          677,
+          1460
+        ],
+        "crop": "docs/character-system/references/crops/07-face.png",
+        "svg": "docs/character-system/references/vectors/07-face.svg"
+      },
+      "figure": {
+        "box": [
+          772,
+          1219,
+          895,
+          1534
+        ],
+        "crop": "docs/character-system/references/crops/07-figure.png",
+        "svg": "docs/character-system/references/vectors/07-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 8,
+    "id": "sheet-03-row-1",
+    "name": "Soft bob",
+    "sheet": 3,
+    "row": 0,
+    "source_sha256": "2bdea9eebd1bf38e95bed3ed6c80e890185fa4c682e7ad1d81ee73736071dd85",
+    "parts": {
+      "hair": {
+        "box": [
+          67,
+          79,
+          311,
+          264
+        ],
+        "crop": "docs/character-system/references/crops/08-hair.png",
+        "svg": "docs/character-system/references/vectors/08-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          360,
+          134,
+          523,
+          207
+        ],
+        "crop": "docs/character-system/references/crops/08-eyes.png",
+        "svg": "docs/character-system/references/vectors/08-eyes.svg"
+      },
+      "face": {
+        "box": [
+          567,
+          114,
+          747,
+          254
+        ],
+        "crop": "docs/character-system/references/crops/08-face.png",
+        "svg": "docs/character-system/references/vectors/08-face.svg"
+      },
+      "figure": {
+        "box": [
+          833,
+          24,
+          959,
+          370
+        ],
+        "crop": "docs/character-system/references/crops/08-figure.png",
+        "svg": "docs/character-system/references/vectors/08-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 9,
+    "id": "sheet-03-row-2",
+    "name": "Twin loops",
+    "sheet": 3,
+    "row": 1,
+    "source_sha256": "2bdea9eebd1bf38e95bed3ed6c80e890185fa4c682e7ad1d81ee73736071dd85",
+    "parts": {
+      "hair": {
+        "box": [
+          55,
+          422,
+          326,
+          640
+        ],
+        "crop": "docs/character-system/references/crops/09-hair.png",
+        "svg": "docs/character-system/references/vectors/09-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          365,
+          489,
+          525,
+          566
+        ],
+        "crop": "docs/character-system/references/crops/09-eyes.png",
+        "svg": "docs/character-system/references/vectors/09-eyes.svg"
+      },
+      "face": {
+        "box": [
+          563,
+          462,
+          751,
+          608
+        ],
+        "crop": "docs/character-system/references/crops/09-face.png",
+        "svg": "docs/character-system/references/vectors/09-face.svg"
+      },
+      "figure": {
+        "box": [
+          814,
+          381,
+          978,
+          767
+        ],
+        "crop": "docs/character-system/references/crops/09-figure.png",
+        "svg": "docs/character-system/references/vectors/09-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 10,
+    "id": "sheet-03-row-3",
+    "name": "Tousled crop",
+    "sheet": 3,
+    "row": 2,
+    "source_sha256": "2bdea9eebd1bf38e95bed3ed6c80e890185fa4c682e7ad1d81ee73736071dd85",
+    "parts": {
+      "hair": {
+        "box": [
+          78,
+          796,
+          307,
+          1023
+        ],
+        "crop": "docs/character-system/references/crops/10-hair.png",
+        "svg": "docs/character-system/references/vectors/10-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          360,
+          884,
+          521,
+          950
+        ],
+        "crop": "docs/character-system/references/crops/10-eyes.png",
+        "svg": "docs/character-system/references/vectors/10-eyes.svg"
+      },
+      "face": {
+        "box": [
+          559,
+          861,
+          752,
+          1007
+        ],
+        "crop": "docs/character-system/references/crops/10-face.png",
+        "svg": "docs/character-system/references/vectors/10-face.svg"
+      },
+      "figure": {
+        "box": [
+          839,
+          773,
+          951,
+          1121
+        ],
+        "crop": "docs/character-system/references/crops/10-figure.png",
+        "svg": "docs/character-system/references/vectors/10-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 11,
+    "id": "sheet-03-row-4",
+    "name": "Braids",
+    "sheet": 3,
+    "row": 3,
+    "source_sha256": "2bdea9eebd1bf38e95bed3ed6c80e890185fa4c682e7ad1d81ee73736071dd85",
+    "parts": {
+      "hair": {
+        "box": [
+          69,
+          1131,
+          310,
+          1439
+        ],
+        "crop": "docs/character-system/references/crops/11-hair.png",
+        "svg": "docs/character-system/references/vectors/11-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          364,
+          1213,
+          518,
+          1287
+        ],
+        "crop": "docs/character-system/references/crops/11-eyes.png",
+        "svg": "docs/character-system/references/vectors/11-eyes.svg"
+      },
+      "face": {
+        "box": [
+          564,
+          1196,
+          746,
+          1341
+        ],
+        "crop": "docs/character-system/references/crops/11-face.png",
+        "svg": "docs/character-system/references/vectors/11-face.svg"
+      },
+      "figure": {
+        "box": [
+          823,
+          1124,
+          968,
+          1448
+        ],
+        "crop": "docs/character-system/references/crops/11-figure.png",
+        "svg": "docs/character-system/references/vectors/11-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 12,
+    "id": "sheet-04-row-1",
+    "name": "Long locks",
+    "sheet": 4,
+    "row": 0,
+    "source_sha256": "2557b570eb36265b5080d4b1e2c277ed06dd94a2a0fd914fd23980360c906019",
+    "parts": {
+      "hair": {
+        "box": [
+          66,
+          62,
+          278,
+          481
+        ],
+        "crop": "docs/character-system/references/crops/12-hair.png",
+        "svg": "docs/character-system/references/vectors/12-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          324,
+          202,
+          500,
+          270
+        ],
+        "crop": "docs/character-system/references/crops/12-eyes.png",
+        "svg": "docs/character-system/references/vectors/12-eyes.svg"
+      },
+      "face": {
+        "box": [
+          547,
+          170,
+          729,
+          310
+        ],
+        "crop": "docs/character-system/references/crops/12-face.png",
+        "svg": "docs/character-system/references/vectors/12-face.svg"
+      },
+      "figure": {
+        "box": [
+          786,
+          42,
+          956,
+          464
+        ],
+        "crop": "docs/character-system/references/crops/12-figure.png",
+        "svg": "docs/character-system/references/vectors/12-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 13,
+    "id": "sheet-04-row-2",
+    "name": "Short centre part",
+    "sheet": 4,
+    "row": 1,
+    "source_sha256": "2557b570eb36265b5080d4b1e2c277ed06dd94a2a0fd914fd23980360c906019",
+    "parts": {
+      "hair": {
+        "box": [
+          78,
+          568,
+          256,
+          720
+        ],
+        "crop": "docs/character-system/references/crops/13-hair.png",
+        "svg": "docs/character-system/references/vectors/13-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          325,
+          610,
+          491,
+          690
+        ],
+        "crop": "docs/character-system/references/crops/13-eyes.png",
+        "svg": "docs/character-system/references/vectors/13-eyes.svg"
+      },
+      "face": {
+        "box": [
+          540,
+          579,
+          729,
+          735
+        ],
+        "crop": "docs/character-system/references/crops/13-face.png",
+        "svg": "docs/character-system/references/vectors/13-face.svg"
+      },
+      "figure": {
+        "box": [
+          813,
+          495,
+          935,
+          866
+        ],
+        "crop": "docs/character-system/references/crops/13-figure.png",
+        "svg": "docs/character-system/references/vectors/13-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 14,
+    "id": "sheet-04-row-3",
+    "name": "Wild tuft",
+    "sheet": 4,
+    "row": 2,
+    "source_sha256": "2557b570eb36265b5080d4b1e2c277ed06dd94a2a0fd914fd23980360c906019",
+    "parts": {
+      "hair": {
+        "box": [
+          63,
+          931,
+          277,
+          1130
+        ],
+        "crop": "docs/character-system/references/crops/14-hair.png",
+        "svg": "docs/character-system/references/vectors/14-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          330,
+          1024,
+          494,
+          1087
+        ],
+        "crop": "docs/character-system/references/crops/14-eyes.png",
+        "svg": "docs/character-system/references/vectors/14-eyes.svg"
+      },
+      "face": {
+        "box": [
+          554,
+          990,
+          718,
+          1126
+        ],
+        "crop": "docs/character-system/references/crops/14-face.png",
+        "svg": "docs/character-system/references/vectors/14-face.svg"
+      },
+      "figure": {
+        "box": [
+          799,
+          888,
+          930,
+          1249
+        ],
+        "crop": "docs/character-system/references/crops/14-figure.png",
+        "svg": "docs/character-system/references/vectors/14-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 15,
+    "id": "sheet-04-row-4",
+    "name": "Short twin tails",
+    "sheet": 4,
+    "row": 3,
+    "source_sha256": "2557b570eb36265b5080d4b1e2c277ed06dd94a2a0fd914fd23980360c906019",
+    "parts": {
+      "hair": {
+        "box": [
+          43,
+          1315,
+          294,
+          1451
+        ],
+        "crop": "docs/character-system/references/crops/15-hair.png",
+        "svg": "docs/character-system/references/vectors/15-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          336,
+          1355,
+          497,
+          1420
+        ],
+        "crop": "docs/character-system/references/crops/15-eyes.png",
+        "svg": "docs/character-system/references/vectors/15-eyes.svg"
+      },
+      "face": {
+        "box": [
+          548,
+          1328,
+          724,
+          1460
+        ],
+        "crop": "docs/character-system/references/crops/15-face.png",
+        "svg": "docs/character-system/references/vectors/15-face.svg"
+      },
+      "figure": {
+        "box": [
+          789,
+          1271,
+          956,
+          1531
+        ],
+        "crop": "docs/character-system/references/crops/15-figure.png",
+        "svg": "docs/character-system/references/vectors/15-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 16,
+    "id": "sheet-05-row-1",
+    "name": "High bun",
+    "sheet": 5,
+    "row": 0,
+    "source_sha256": "52830a67d2ed3c0ad14c45745a334cdbd7f63b45e30828617663636a732e83d3",
+    "parts": {
+      "hair": {
+        "box": [
+          90,
+          60,
+          307,
+          338
+        ],
+        "crop": "docs/character-system/references/crops/16-hair.png",
+        "svg": "docs/character-system/references/vectors/16-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          368,
+          208,
+          555,
+          293
+        ],
+        "crop": "docs/character-system/references/crops/16-eyes.png",
+        "svg": "docs/character-system/references/vectors/16-eyes.svg"
+      },
+      "face": {
+        "box": [
+          603,
+          159,
+          830,
+          365
+        ],
+        "crop": "docs/character-system/references/crops/16-face.png",
+        "svg": "docs/character-system/references/vectors/16-face.svg"
+      },
+      "figure": {
+        "box": [
+          942,
+          15,
+          1059,
+          466
+        ],
+        "crop": "docs/character-system/references/crops/16-figure.png",
+        "svg": "docs/character-system/references/vectors/16-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 17,
+    "id": "sheet-05-row-2",
+    "name": "Light crop",
+    "sheet": 5,
+    "row": 1,
+    "source_sha256": "52830a67d2ed3c0ad14c45745a334cdbd7f63b45e30828617663636a732e83d3",
+    "parts": {
+      "hair": {
+        "box": [
+          70,
+          528,
+          332,
+          768
+        ],
+        "crop": "docs/character-system/references/crops/17-hair.png",
+        "svg": "docs/character-system/references/vectors/17-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          369,
+          632,
+          568,
+          711
+        ],
+        "crop": "docs/character-system/references/crops/17-eyes.png",
+        "svg": "docs/character-system/references/vectors/17-eyes.svg"
+      },
+      "face": {
+        "box": [
+          599,
+          581,
+          841,
+          779
+        ],
+        "crop": "docs/character-system/references/crops/17-face.png",
+        "svg": "docs/character-system/references/vectors/17-face.svg"
+      },
+      "figure": {
+        "box": [
+          933,
+          489,
+          1062,
+          886
+        ],
+        "crop": "docs/character-system/references/crops/17-figure.png",
+        "svg": "docs/character-system/references/vectors/17-figure.svg"
+      }
+    }
+  },
+  {
+    "index": 18,
+    "id": "sheet-05-row-3",
+    "name": "Twin buns",
+    "sheet": 5,
+    "row": 2,
+    "source_sha256": "52830a67d2ed3c0ad14c45745a334cdbd7f63b45e30828617663636a732e83d3",
+    "parts": {
+      "hair": {
+        "box": [
+          57,
+          978,
+          349,
+          1165
+        ],
+        "crop": "docs/character-system/references/crops/18-hair.png",
+        "svg": "docs/character-system/references/vectors/18-hair.svg"
+      },
+      "eyes": {
+        "box": [
+          383,
+          1042,
+          569,
+          1127
+        ],
+        "crop": "docs/character-system/references/crops/18-eyes.png",
+        "svg": "docs/character-system/references/vectors/18-eyes.svg"
+      },
+      "face": {
+        "box": [
+          610,
+          1003,
+          826,
+          1187
+        ],
+        "crop": "docs/character-system/references/crops/18-face.png",
+        "svg": "docs/character-system/references/vectors/18-face.svg"
+      },
+      "figure": {
+        "box": [
+          924,
+          907,
+          1082,
+          1304
+        ],
+        "crop": "docs/character-system/references/crops/18-figure.png",
+        "svg": "docs/character-system/references/vectors/18-figure.svg"
+      }
+    }
+  }
+]

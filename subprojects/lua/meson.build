@@ -1,0 +1,38 @@
+project('lua', 'c', version: '5.4.8', default_options: ['c_std=c99'])
+cc = meson.get_compiler('c')
+lua_sources = files(
+  'lapi.c',
+  'lauxlib.c',
+  'lbaselib.c',
+  'lcode.c',
+  'lcorolib.c',
+  'lctype.c',
+  'ldblib.c',
+  'ldebug.c',
+  'ldo.c',
+  'ldump.c',
+  'lfunc.c',
+  'lgc.c',
+  'linit.c',
+  'liolib.c',
+  'llex.c',
+  'lmathlib.c',
+  'lmem.c',
+  'loadlib.c',
+  'lobject.c',
+  'lopcodes.c',
+  'loslib.c',
+  'lparser.c',
+  'lstate.c',
+  'lstring.c',
+  'lstrlib.c',
+  'ltable.c',
+  'ltablib.c',
+  'ltm.c',
+  'lundump.c',
+  'lutf8lib.c',
+  'lvm.c',
+  'lzio.c',
+)
+lua_library = static_library('lua', lua_sources, dependencies: cc.find_library('m', required: false), pic: true)
+lua_dep = declare_dependency(link_with: lua_library, include_directories: include_directories('.'))

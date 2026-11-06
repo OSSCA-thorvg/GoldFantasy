@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="193" height="146" viewBox="0 0 193 146">
+<g id="fills">
+<path id="fill-1-s0" fill="#ffffff" d="M37.58 55.08C35.21 69.15 36.24 83.66 42.85 96.65C29.4 97.31 16.65 86.76 10.07 75.61C-3.25 53.05 23.25 54.99 37.58 55.08Z"/>
+<path id="fill-2-s1" fill="#141414" d="M8.23 64.64C8.23 63.71 8.77 63.11 8.77 64.36C8.77 65.29 8.23 65.89 8.23 64.64Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s1" fill="none" stroke="#141414" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="M18.31 67.28C23.96 66.53 29.38 69.28 33.75 72.61"/>
+</g>
+</svg>

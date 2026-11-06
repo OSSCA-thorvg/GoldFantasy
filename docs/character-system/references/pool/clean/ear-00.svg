@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="175" height="158" viewBox="0 0 175 158">
+<g id="fills">
+<path id="fill-1-s0" fill="#ffffff" d="M26.41 72C26.86 70.56 27.4 69.08 28.5 68C30.85 81.34 31.38 96.44 40 108.21C28.71 110.63 16.51 106.7 10.68 96.27C3.33 83.09 7.05 60.09 26.41 72Z"/>
+<path id="fill-2-s1" fill="#141414" d="M26.61 75.51C26.11 75.01 26.53 74.38 27.07 74.93C27.51 75.37 27.07 75.97 26.61 75.51Z"/>
+<path id="fill-3-s1" fill="#141414" d="M30.52 106.78C29.41 106.74 29.38 106.19 30.48 106.22C31.59 106.26 31.62 106.81 30.52 106.78Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s1" fill="none" stroke="#141414" stroke-width="2.14" stroke-linecap="round" stroke-linejoin="round" d="M15.23 81.34C21.65 82.17 25.92 87.58 28.59 93.02"/>
+</g>
+</svg>

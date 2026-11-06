@@ -1,0 +1,8 @@
+{
+  "implementation": "production HairFit::map",
+  "variants": 1083,
+  "samples": 1110075,
+  "domain": {"x": [-12, 12], "y": [-8, 32], "step": 1},
+  "minimumJacobian": 0.705744,
+  "inversions": 0
+}

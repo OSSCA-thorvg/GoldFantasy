@@ -1,0 +1,771 @@
+{
+  "tool": "/home/soon/orca/workspaces/GoldFantasy/logperch/aurum/tools/vectorize/vectorize.py",
+  "options": {
+    "colors": 4,
+    "detail": 0.8,
+    "smooth": 0.55,
+    "lines": "stroke"
+  },
+  "results": [
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/00-hair.palette.json",
+      "paths": 68,
+      "anchors": 258,
+      "seconds": 1.18,
+      "crop": "docs/character-system/references/crops/00-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/01-hair.palette.json",
+      "paths": 166,
+      "anchors": 770,
+      "seconds": 2.22,
+      "crop": "docs/character-system/references/crops/01-hair.png",
+      "warnings": "warning: result has 166 paths and 770 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/02-hair.palette.json",
+      "paths": 87,
+      "anchors": 367,
+      "seconds": 1.23,
+      "crop": "docs/character-system/references/crops/02-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/03-hair.palette.json",
+      "paths": 117,
+      "anchors": 517,
+      "seconds": 1.52,
+      "crop": "docs/character-system/references/crops/03-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/00-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/00-eyes.palette.json",
+      "paths": 26,
+      "anchors": 65,
+      "seconds": 0.78,
+      "crop": "docs/character-system/references/crops/00-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/01-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/01-eyes.palette.json",
+      "paths": 36,
+      "anchors": 87,
+      "seconds": 0.81,
+      "crop": "docs/character-system/references/crops/01-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/02-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/02-eyes.palette.json",
+      "paths": 36,
+      "anchors": 111,
+      "seconds": 0.78,
+      "crop": "docs/character-system/references/crops/02-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/03-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/03-eyes.palette.json",
+      "paths": 30,
+      "anchors": 88,
+      "seconds": 0.91,
+      "crop": "docs/character-system/references/crops/03-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/00-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/00-face.palette.json",
+      "paths": 32,
+      "anchors": 157,
+      "seconds": 0.88,
+      "crop": "docs/character-system/references/crops/00-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/01-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/01-face.palette.json",
+      "paths": 31,
+      "anchors": 154,
+      "seconds": 0.9,
+      "crop": "docs/character-system/references/crops/01-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/02-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/02-face.palette.json",
+      "paths": 92,
+      "anchors": 358,
+      "seconds": 1.26,
+      "crop": "docs/character-system/references/crops/02-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/03-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/03-face.palette.json",
+      "paths": 48,
+      "anchors": 188,
+      "seconds": 1.07,
+      "crop": "docs/character-system/references/crops/03-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/00-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/00-figure.palette.json",
+      "paths": 60,
+      "anchors": 338,
+      "seconds": 1.43,
+      "crop": "docs/character-system/references/crops/00-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/01-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/01-figure.palette.json",
+      "paths": 57,
+      "anchors": 359,
+      "seconds": 1.5,
+      "crop": "docs/character-system/references/crops/01-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/02-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/02-figure.palette.json",
+      "paths": 59,
+      "anchors": 296,
+      "seconds": 1.27,
+      "crop": "docs/character-system/references/crops/02-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/03-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/03-figure.palette.json",
+      "paths": 68,
+      "anchors": 423,
+      "seconds": 1.66,
+      "crop": "docs/character-system/references/crops/03-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/04-hair.palette.json",
+      "paths": 141,
+      "anchors": 570,
+      "seconds": 1.44,
+      "crop": "docs/character-system/references/crops/04-hair.png",
+      "warnings": "warning: result has 141 paths and 570 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/05-hair.palette.json",
+      "paths": 148,
+      "anchors": 633,
+      "seconds": 1.66,
+      "crop": "docs/character-system/references/crops/05-hair.png",
+      "warnings": "warning: result has 148 paths and 633 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/06-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/06-hair.palette.json",
+      "paths": 104,
+      "anchors": 444,
+      "seconds": 1.46,
+      "crop": "docs/character-system/references/crops/06-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/07-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/07-hair.palette.json",
+      "paths": 121,
+      "anchors": 342,
+      "seconds": 1.08,
+      "crop": "docs/character-system/references/crops/07-hair.png",
+      "warnings": "warning: result has 121 paths and 342 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/04-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/04-eyes.palette.json",
+      "paths": 24,
+      "anchors": 70,
+      "seconds": 0.75,
+      "crop": "docs/character-system/references/crops/04-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/05-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/05-eyes.palette.json",
+      "paths": 8,
+      "anchors": 31,
+      "seconds": 0.81,
+      "crop": "docs/character-system/references/crops/05-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/06-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/06-eyes.palette.json",
+      "paths": 41,
+      "anchors": 123,
+      "seconds": 0.88,
+      "crop": "docs/character-system/references/crops/06-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/07-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/07-eyes.palette.json",
+      "paths": 44,
+      "anchors": 109,
+      "seconds": 0.94,
+      "crop": "docs/character-system/references/crops/07-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/04-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/04-face.palette.json",
+      "paths": 30,
+      "anchors": 145,
+      "seconds": 0.96,
+      "crop": "docs/character-system/references/crops/04-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/05-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/05-face.palette.json",
+      "paths": 48,
+      "anchors": 163,
+      "seconds": 0.86,
+      "crop": "docs/character-system/references/crops/05-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/06-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/06-face.palette.json",
+      "paths": 8,
+      "anchors": 35,
+      "seconds": 0.79,
+      "crop": "docs/character-system/references/crops/06-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/07-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/07-face.palette.json",
+      "paths": 33,
+      "anchors": 149,
+      "seconds": 0.77,
+      "crop": "docs/character-system/references/crops/07-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/04-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/04-figure.palette.json",
+      "paths": 55,
+      "anchors": 329,
+      "seconds": 1.5,
+      "crop": "docs/character-system/references/crops/04-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/05-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/05-figure.palette.json",
+      "paths": 71,
+      "anchors": 422,
+      "seconds": 1.54,
+      "crop": "docs/character-system/references/crops/05-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/06-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/06-figure.palette.json",
+      "paths": 47,
+      "anchors": 301,
+      "seconds": 1.56,
+      "crop": "docs/character-system/references/crops/06-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/07-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/07-figure.palette.json",
+      "paths": 48,
+      "anchors": 239,
+      "seconds": 1.16,
+      "crop": "docs/character-system/references/crops/07-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/08-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/08-hair.palette.json",
+      "paths": 125,
+      "anchors": 430,
+      "seconds": 1.46,
+      "crop": "docs/character-system/references/crops/08-hair.png",
+      "warnings": "warning: result has 125 paths and 430 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/09-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/09-hair.palette.json",
+      "paths": 103,
+      "anchors": 483,
+      "seconds": 1.63,
+      "crop": "docs/character-system/references/crops/09-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/10-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/10-hair.palette.json",
+      "paths": 94,
+      "anchors": 381,
+      "seconds": 1.46,
+      "crop": "docs/character-system/references/crops/10-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/11-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/11-hair.palette.json",
+      "paths": 162,
+      "anchors": 638,
+      "seconds": 1.83,
+      "crop": "docs/character-system/references/crops/11-hair.png",
+      "warnings": "warning: result has 162 paths and 638 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/08-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/08-eyes.palette.json",
+      "paths": 45,
+      "anchors": 130,
+      "seconds": 0.9,
+      "crop": "docs/character-system/references/crops/08-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/09-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/09-eyes.palette.json",
+      "paths": 35,
+      "anchors": 107,
+      "seconds": 0.94,
+      "crop": "docs/character-system/references/crops/09-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/10-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/10-eyes.palette.json",
+      "paths": 21,
+      "anchors": 60,
+      "seconds": 0.85,
+      "crop": "docs/character-system/references/crops/10-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/11-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/11-eyes.palette.json",
+      "paths": 13,
+      "anchors": 42,
+      "seconds": 0.77,
+      "crop": "docs/character-system/references/crops/11-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/08-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/08-face.palette.json",
+      "paths": 33,
+      "anchors": 171,
+      "seconds": 1.04,
+      "crop": "docs/character-system/references/crops/08-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/09-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/09-face.palette.json",
+      "paths": 23,
+      "anchors": 130,
+      "seconds": 1.02,
+      "crop": "docs/character-system/references/crops/09-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/10-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/10-face.palette.json",
+      "paths": 52,
+      "anchors": 224,
+      "seconds": 1.09,
+      "crop": "docs/character-system/references/crops/10-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/11-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/11-face.palette.json",
+      "paths": 17,
+      "anchors": 121,
+      "seconds": 0.97,
+      "crop": "docs/character-system/references/crops/11-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/08-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/08-figure.palette.json",
+      "paths": 77,
+      "anchors": 351,
+      "seconds": 1.59,
+      "crop": "docs/character-system/references/crops/08-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/09-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/09-figure.palette.json",
+      "paths": 59,
+      "anchors": 373,
+      "seconds": 1.44,
+      "crop": "docs/character-system/references/crops/09-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/10-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/10-figure.palette.json",
+      "paths": 77,
+      "anchors": 354,
+      "seconds": 1.45,
+      "crop": "docs/character-system/references/crops/10-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/11-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/11-figure.palette.json",
+      "paths": 138,
+      "anchors": 654,
+      "seconds": 1.8,
+      "crop": "docs/character-system/references/crops/11-figure.png",
+      "warnings": "warning: result has 138 paths and 654 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/12-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/12-hair.palette.json",
+      "paths": 63,
+      "anchors": 273,
+      "seconds": 1.29,
+      "crop": "docs/character-system/references/crops/12-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/13-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/13-hair.palette.json",
+      "paths": 15,
+      "anchors": 78,
+      "seconds": 0.87,
+      "crop": "docs/character-system/references/crops/13-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/14-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/14-hair.palette.json",
+      "paths": 163,
+      "anchors": 688,
+      "seconds": 1.77,
+      "crop": "docs/character-system/references/crops/14-hair.png",
+      "warnings": "warning: result has 163 paths and 688 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/15-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/15-hair.palette.json",
+      "paths": 87,
+      "anchors": 370,
+      "seconds": 1.18,
+      "crop": "docs/character-system/references/crops/15-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/12-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/12-eyes.palette.json",
+      "paths": 48,
+      "anchors": 148,
+      "seconds": 0.8,
+      "crop": "docs/character-system/references/crops/12-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/13-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/13-eyes.palette.json",
+      "paths": 42,
+      "anchors": 127,
+      "seconds": 0.75,
+      "crop": "docs/character-system/references/crops/13-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/14-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/14-eyes.palette.json",
+      "paths": 30,
+      "anchors": 82,
+      "seconds": 0.71,
+      "crop": "docs/character-system/references/crops/14-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/15-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/15-eyes.palette.json",
+      "paths": 53,
+      "anchors": 148,
+      "seconds": 0.91,
+      "crop": "docs/character-system/references/crops/15-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/12-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/12-face.palette.json",
+      "paths": 23,
+      "anchors": 71,
+      "seconds": 0.91,
+      "crop": "docs/character-system/references/crops/12-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/13-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/13-face.palette.json",
+      "paths": 49,
+      "anchors": 205,
+      "seconds": 1.08,
+      "crop": "docs/character-system/references/crops/13-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/14-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/14-face.palette.json",
+      "paths": 7,
+      "anchors": 35,
+      "seconds": 0.9,
+      "crop": "docs/character-system/references/crops/14-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/15-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/15-face.palette.json",
+      "paths": 22,
+      "anchors": 74,
+      "seconds": 0.9,
+      "crop": "docs/character-system/references/crops/15-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/12-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/12-figure.palette.json",
+      "paths": 72,
+      "anchors": 395,
+      "seconds": 1.72,
+      "crop": "docs/character-system/references/crops/12-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/13-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/13-figure.palette.json",
+      "paths": 74,
+      "anchors": 367,
+      "seconds": 1.49,
+      "crop": "docs/character-system/references/crops/13-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/14-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/14-figure.palette.json",
+      "paths": 103,
+      "anchors": 418,
+      "seconds": 1.45,
+      "crop": "docs/character-system/references/crops/14-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/15-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/15-figure.palette.json",
+      "paths": 112,
+      "anchors": 459,
+      "seconds": 1.61,
+      "crop": "docs/character-system/references/crops/15-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/16-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/16-hair.palette.json",
+      "paths": 50,
+      "anchors": 202,
+      "seconds": 1.12,
+      "crop": "docs/character-system/references/crops/16-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/17-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/17-hair.palette.json",
+      "paths": 70,
+      "anchors": 293,
+      "seconds": 1.33,
+      "crop": "docs/character-system/references/crops/17-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/18-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/18-hair.palette.json",
+      "paths": 118,
+      "anchors": 512,
+      "seconds": 1.7,
+      "crop": "docs/character-system/references/crops/18-hair.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/16-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/16-eyes.palette.json",
+      "paths": 36,
+      "anchors": 101,
+      "seconds": 0.88,
+      "crop": "docs/character-system/references/crops/16-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/17-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/17-eyes.palette.json",
+      "paths": 36,
+      "anchors": 95,
+      "seconds": 0.83,
+      "crop": "docs/character-system/references/crops/17-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/18-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/18-eyes.palette.json",
+      "paths": 69,
+      "anchors": 201,
+      "seconds": 0.91,
+      "crop": "docs/character-system/references/crops/18-eyes.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/16-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/16-face.palette.json",
+      "paths": 136,
+      "anchors": 609,
+      "seconds": 1.72,
+      "crop": "docs/character-system/references/crops/16-face.png",
+      "warnings": "warning: result has 136 paths and 609 anchors (target: 120 paths, 2000 anchors)"
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/17-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/17-face.palette.json",
+      "paths": 51,
+      "anchors": 227,
+      "seconds": 1.28,
+      "crop": "docs/character-system/references/crops/17-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/18-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/18-face.palette.json",
+      "paths": 57,
+      "anchors": 242,
+      "seconds": 1.1,
+      "crop": "docs/character-system/references/crops/18-face.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/16-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/16-figure.palette.json",
+      "paths": 67,
+      "anchors": 326,
+      "seconds": 1.63,
+      "crop": "docs/character-system/references/crops/16-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/17-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/17-figure.palette.json",
+      "paths": 106,
+      "anchors": 489,
+      "seconds": 1.6,
+      "crop": "docs/character-system/references/crops/17-figure.png",
+      "warnings": ""
+    },
+    {
+      "done": true,
+      "svg": "docs/character-system/references/vectors/18-figure.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/vectors/18-figure.palette.json",
+      "paths": 55,
+      "anchors": 383,
+      "seconds": 1.57,
+      "crop": "docs/character-system/references/crops/18-figure.png",
+      "warnings": ""
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+[
+  {
+    "renderer": "gl",
+    "state": {
+      "dataset": {
+        "ready": "true",
+        "frames": "166",
+        "renderer": "gl",
+        "logicalSize": "1280x767",
+        "pixelSize": "1280x767"
+      },
+      "status": ""
+    },
+    "screenshots": [
+      "/tmp/hearthold-layer-browser-final/gl-initial.png",
+      "/tmp/hearthold-layer-browser-final/gl-static.png",
+      "/tmp/hearthold-layer-browser-final/gl-species.png",
+      "/tmp/hearthold-layer-browser-final/gl-fit.png",
+      "/tmp/hearthold-layer-browser-final/gl-hair.png",
+      "/tmp/hearthold-layer-browser-final/gl-ears.png",
+      "/tmp/hearthold-layer-browser-final/gl-eyes.png",
+      "/tmp/hearthold-layer-browser-final/gl-outfit-before.png",
+      "/tmp/hearthold-layer-browser-final/gl-outfit-after.png"
+    ],
+    "errors": [],
+    "checks": {
+      "static": true,
+      "species": true,
+      "hairKeepsBody": true,
+      "earsKeepHair": true,
+      "earsKeepBody": true,
+      "outfitHead": true,
+      "outfitBody": true
+    }
+  },
+  {
+    "renderer": "wgpu",
+    "state": {
+      "dataset": {
+        "ready": "true",
+        "frames": "152",
+        "renderer": "wgpu",
+        "logicalSize": "1280x767",
+        "pixelSize": "1280x767"
+      },
+      "status": ""
+    },
+    "screenshots": [
+      "/tmp/hearthold-layer-browser-final/wgpu-initial.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-static.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-species.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-fit.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-hair.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-ears.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-eyes.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-outfit-before.png",
+      "/tmp/hearthold-layer-browser-final/wgpu-outfit-after.png"
+    ],
+    "errors": [],
+    "checks": {
+      "static": true,
+      "species": true,
+      "hairKeepsBody": true,
+      "earsKeepHair": true,
+      "earsKeepBody": true,
+      "outfitHead": true,
+      "outfitBody": true
+    }
+  }
+]

@@ -1,0 +1,1173 @@
+{
+  "tool": "/home/soon/orca/workspaces/GoldFantasy/logperch/aurum/tools/vectorize/vectorize.py",
+  "settings": {
+    "detail": 0.55,
+    "smooth": 0.9,
+    "lines": "stroke",
+    "outerStroke": 0.075,
+    "innerStroke": 0.055
+  },
+  "results": {
+    "docs/character-system/references/pool/crops/original-00-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-00-hair.png",
+      "sourceSha256": "034518b1dc7d6ba3a54a01299a81348b0430eb27c1eaca83386ca1596a060712",
+      "input": "docs/character-system/references/pool/clean/original-00-hair.png",
+      "inputSha256": "3e49c0a3c3729a3445e037573b9b0b102cb1bab721b528bab065ba400f028c4f",
+      "svg": "docs/character-system/references/pool/clean/original-00-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/00-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/00-ear-L.png",
+      "sourceSha256": "1a0ece27c80849a1e50b4d076fc26bd0b95a74dbf527f7b7ccbf4a8cacc20df3",
+      "input": "docs/character-system/references/pool/clean/ear-00.png",
+      "inputSha256": "39712a621a450d5a64a76e6ed011dc545409a3f4d3db23b8e9ec86bd8b3af55f",
+      "svg": "docs/character-system/references/pool/clean/ear-00.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/elf-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/elf-hair.png",
+      "sourceSha256": "bfda8b4a1f5380c5401715e7194710533a3f70ff819bd5ef735d238234d0d6f3",
+      "input": "docs/character-system/references/pool/clean/elf-hair.png",
+      "inputSha256": "4a018e7bd2a14cb71692cd2f0e30b5deadbb25aa881c2e555fa380030040923b",
+      "svg": "docs/character-system/references/pool/clean/elf-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-00-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-00-back.png",
+      "sourceSha256": "fe9a48efb152b2c17cbbf04e47b968cde7a17427c183c8a654853db46d5d84bf",
+      "input": "docs/character-system/references/pool/clean/original-00-back.png",
+      "inputSha256": "44994338ebddf3745f6fe2e1ae3e844a56baadf2b00f766ee373da866860a4bc",
+      "svg": "docs/character-system/references/pool/clean/original-00-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-01-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-01-hair.png",
+      "sourceSha256": "e6f538b87ad519b6279d48a8628ef5cf68ec8a0c1a32705c2cc9de06c82e8175",
+      "input": "docs/character-system/references/pool/clean/original-01-hair.png",
+      "inputSha256": "e9cc33c002753c091d1d9981536416b35dd2cd8a49f00eca6ff7427a408be76d",
+      "svg": "docs/character-system/references/pool/clean/original-01-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-01-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-01-back.png",
+      "sourceSha256": "ba1667bbd69c7750153d6c88cf8f32cc743246d4d07eb269de0e1191fbfc3642",
+      "input": "docs/character-system/references/pool/clean/original-01-back.png",
+      "inputSha256": "db9b42eeb40286aedf6a78704f120180e78edc10d8641c051f3ed2ec959052cb",
+      "svg": "docs/character-system/references/pool/clean/original-01-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-02-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-02-hair.png",
+      "sourceSha256": "474ddc1cfa48dd8dc7b7ba8c64d379fb63f6b6bd2e7eb94314113a2a4c35c299",
+      "input": "docs/character-system/references/pool/clean/original-02-hair.png",
+      "inputSha256": "98539f8af0f4359522717bdbcb5a67d3a4b7d341ea518297d8c03581c4df6583",
+      "svg": "docs/character-system/references/pool/clean/original-02-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-02-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-02-back.png",
+      "sourceSha256": "9609709254ec79590b92e145882831affc0be24e37a98400fa0b1f2c28f25d9f",
+      "input": "docs/character-system/references/pool/clean/original-02-back.png",
+      "inputSha256": "409ddac1b7f6cec8f593bb6a6de7f9c94b148f18cb8c26b41bb3fbfef00d5e4f",
+      "svg": "docs/character-system/references/pool/clean/original-02-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-03-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-03-hair.png",
+      "sourceSha256": "6b51d81fd810b5623af7851ca2948efbfdefdd9b6c35831f94158c1319ab2605",
+      "input": "docs/character-system/references/pool/clean/original-03-hair.png",
+      "inputSha256": "5ac9d6751860ac3361c87ff1bc3044a2974c82c79a10fcf1d3ed1a6ea265b557",
+      "svg": "docs/character-system/references/pool/clean/original-03-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-03-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-03-back.png",
+      "sourceSha256": "22408d9d915c0137e91748d658bd1934045f905d141e50f88eb36b769c50537c",
+      "input": "docs/character-system/references/pool/clean/original-03-back.png",
+      "inputSha256": "4ccf3f734a04ec938cad2fa629321e1ddf6d45c280e22005c02916cfa35a1097",
+      "svg": "docs/character-system/references/pool/clean/original-03-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-04-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-04-hair.png",
+      "sourceSha256": "dfc4b1203cf23187629304078009975d6670c266d3944f87f101edfb66b63984",
+      "input": "docs/character-system/references/pool/clean/original-04-hair.png",
+      "inputSha256": "acb6c4309075b28c27b5905d2d4d2e08c5beb3958adc44f269e699220664fbbf",
+      "svg": "docs/character-system/references/pool/clean/original-04-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-04-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-04-back.png",
+      "sourceSha256": "5d9ae0509f974fe8468435b2ab8adb04058c40399f018103b3883ebf28915f1b",
+      "input": "docs/character-system/references/pool/clean/original-04-back.png",
+      "inputSha256": "f202a23d91f71ce62ab523e83f1347506e22e892503e610b22fab223028375b3",
+      "svg": "docs/character-system/references/pool/clean/original-04-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-05-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-05-hair.png",
+      "sourceSha256": "35d269208661d248841e443012e4f95768e0d0a72188b266a89956160796ab30",
+      "input": "docs/character-system/references/pool/clean/original-05-hair.png",
+      "inputSha256": "78acd874ef70122d359e5ce88ee70968066e52d58158743bfa3c456195bac292",
+      "svg": "docs/character-system/references/pool/clean/original-05-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-05-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-05-back.png",
+      "sourceSha256": "2ed3208825ccf04bb4c7bc7970ca00ef4656c947113aed80dd713af8ed5cfa3c",
+      "input": "docs/character-system/references/pool/clean/original-05-back.png",
+      "inputSha256": "e7407ddde64b5f4e57c7afe9f3ff06b2c9125c63659ff0418bb37e89d910b945",
+      "svg": "docs/character-system/references/pool/clean/original-05-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-06-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-06-hair.png",
+      "sourceSha256": "5d203007a587b54f73d15993e9d488125066dd6767349f38eb83f66497569f6f",
+      "input": "docs/character-system/references/pool/clean/original-06-hair.png",
+      "inputSha256": "ff3dd2cbb4c59819bc270a4b718938a7e5d7a86f63df5ad8b35347f7a75f1f94",
+      "svg": "docs/character-system/references/pool/clean/original-06-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-06-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-06-back.png",
+      "sourceSha256": "c8e2829354038e6dbef54f0b645c175f96d4bf8d453f558e7058dfd57cd5922a",
+      "input": "docs/character-system/references/pool/clean/original-06-back.png",
+      "inputSha256": "bd7979b2c49328667a0be5da8404eeba1f7cfdd0991ef486fb05cef91b01dcd9",
+      "svg": "docs/character-system/references/pool/clean/original-06-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-07-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-07-hair.png",
+      "sourceSha256": "328b2b3dc357523d08101f85d7c58c55222aa3256b0aab50397cee38e28575e9",
+      "input": "docs/character-system/references/pool/clean/original-07-hair.png",
+      "inputSha256": "18a56bd284b9bc7a261841ab81b0548f578460026adb547f83f02f76b1c381b4",
+      "svg": "docs/character-system/references/pool/clean/original-07-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-07-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-07-back.png",
+      "sourceSha256": "02538b5c1cbff47cf37025c78e83cd37e9160fda7496a30e0652010e5fb0eb97",
+      "input": "docs/character-system/references/pool/clean/original-07-back.png",
+      "inputSha256": "a7560d5a95b09d7b2c34743a34a9c8e84f6544cdb23eb156dd6206522cf09be6",
+      "svg": "docs/character-system/references/pool/clean/original-07-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-08-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-08-hair.png",
+      "sourceSha256": "5f27cebe00bba9b8483ae6655599960bab79658b9aac8f2797cfed3e4a25676a",
+      "input": "docs/character-system/references/pool/clean/original-08-hair.png",
+      "inputSha256": "1eff854e359c26f5d86ead30248e917cc2166707cef1fbc07a1dc4b647354eff",
+      "svg": "docs/character-system/references/pool/clean/original-08-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-08-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-08-back.png",
+      "sourceSha256": "47f2c3ac8ed6d7c5be0ae2b6561ac29de83a43b8f41c7c709c6064162a0a3043",
+      "input": "docs/character-system/references/pool/clean/original-08-back.png",
+      "inputSha256": "d979b2c43e0cee27717bfbc593914c94baf73a8ed520ec4b9d3fbddccbd8b8ef",
+      "svg": "docs/character-system/references/pool/clean/original-08-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-09-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-09-hair.png",
+      "sourceSha256": "c8dcb0e6793a46ff7c99bf275af23dd40da41c13e797bf4cbbfe247be20fab2a",
+      "input": "docs/character-system/references/pool/clean/original-09-hair.png",
+      "inputSha256": "3e059ae49f6c23c5592d564d11f43cc09fa2690d165d14f3222eb57c6aa4a42a",
+      "svg": "docs/character-system/references/pool/clean/original-09-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-09-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-09-back.png",
+      "sourceSha256": "9ea3a12c1ab632c59572596ea83ad8af26b043595f540ccbe0927b170fba9f9e",
+      "input": "docs/character-system/references/pool/clean/original-09-back.png",
+      "inputSha256": "d6f86a075ee3bb5934e2b80ceaa8f4e858b14e50c0edeb1c2e12e5c715945392",
+      "svg": "docs/character-system/references/pool/clean/original-09-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-10-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-10-hair.png",
+      "sourceSha256": "43ce08cd0e00b4abb96c1b0c118d4e6206896710e4cad1a28df688b62cb9825a",
+      "input": "docs/character-system/references/pool/clean/original-10-hair.png",
+      "inputSha256": "f7355a252fb75e6774b4d19cef5a4c596549b4b31ca571501a10a7e72b14cafd",
+      "svg": "docs/character-system/references/pool/clean/original-10-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-10-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-10-back.png",
+      "sourceSha256": "480ac3575634a0bf74e6495cfd291f9c5bf5f91d404d5a21b3ee510818ce1071",
+      "input": "docs/character-system/references/pool/clean/original-10-back.png",
+      "inputSha256": "31addc17b21e73a12a47468a5f0384f808650db8b9255db58b05e2a8a75c036c",
+      "svg": "docs/character-system/references/pool/clean/original-10-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-11-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-11-hair.png",
+      "sourceSha256": "b7322170412507ac354411498a121a2edaabcb4ab5df9056943d346cdaa97005",
+      "input": "docs/character-system/references/pool/clean/original-11-hair.png",
+      "inputSha256": "6017554af20c42628fde2c6c09f6f06084eb78a8c2cb87aac690dc75380aacd0",
+      "svg": "docs/character-system/references/pool/clean/original-11-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-11-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-11-back.png",
+      "sourceSha256": "93b3ac731ca455a66dc74f7f827e567d7abdb4fc8f4dbc083c4520d84293e2c4",
+      "input": "docs/character-system/references/pool/clean/original-11-back.png",
+      "inputSha256": "6fa95acb3b25e23d08620a8c854a135dc05a8d76519e817370479e634db5e6b6",
+      "svg": "docs/character-system/references/pool/clean/original-11-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-12-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-12-hair.png",
+      "sourceSha256": "27469cd3764c15c462480549acba11467e046b794fbb12e32287049bb2596431",
+      "input": "docs/character-system/references/pool/clean/original-12-hair.png",
+      "inputSha256": "4fc718935532401dd8a83dfefec96cb20642594f7b02335e38bd105d1fad81c0",
+      "svg": "docs/character-system/references/pool/clean/original-12-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-12-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-12-back.png",
+      "sourceSha256": "e287f172154a004feba2b55905e6103511af5b100ea40770b37e8380c9f3dc49",
+      "input": "docs/character-system/references/pool/clean/original-12-back.png",
+      "inputSha256": "c6cbbd73c45d930fe2ff88e94fc52d0fc3d100315d8d721c0f55d809cf03ae2f",
+      "svg": "docs/character-system/references/pool/clean/original-12-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-13-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-13-hair.png",
+      "sourceSha256": "386834c3d7b44d931d9529c40dee7b8f10575903556b0b53b6dec6e10a7759f3",
+      "input": "docs/character-system/references/pool/clean/original-13-hair.png",
+      "inputSha256": "07e4cb4723590e6d04a2c5320ced273efe3d1632c598e47efd0d550eb67a75e1",
+      "svg": "docs/character-system/references/pool/clean/original-13-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-13-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-13-back.png",
+      "sourceSha256": "09b4a25ca7c4f2e9ed4680c93c46da51c8bd9918975864a08ee439aaed655fea",
+      "input": "docs/character-system/references/pool/clean/original-13-back.png",
+      "inputSha256": "cd2cf5d8bd1db0836251aa0c6a4da87b56e3b303256293641d623ca93f065cf2",
+      "svg": "docs/character-system/references/pool/clean/original-13-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-14-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-14-hair.png",
+      "sourceSha256": "69511859d167a0c736e7719038f49b8a62398977961cc1ed0f6cf4894be1039a",
+      "input": "docs/character-system/references/pool/clean/original-14-hair.png",
+      "inputSha256": "bf63a1e71d10313d183122bac014a51ec4175cb2a53e3d39336528f68a21cfee",
+      "svg": "docs/character-system/references/pool/clean/original-14-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-14-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-14-back.png",
+      "sourceSha256": "7c44644394d420610c5b9178acc6350a97f79aa309a67f872d69987e009ff8c0",
+      "input": "docs/character-system/references/pool/clean/original-14-back.png",
+      "inputSha256": "6f506c9944d6c84e9e753bc62eb2d813bcbf27698e0a9f25feeab546006332de",
+      "svg": "docs/character-system/references/pool/clean/original-14-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-15-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-15-hair.png",
+      "sourceSha256": "ecac99ab71d8144a3fa9e5b5ff53ed11a00d19be5ae20e796bf1857ae7d230dd",
+      "input": "docs/character-system/references/pool/clean/original-15-hair.png",
+      "inputSha256": "623e1c030f5081c07c980e678749d217d82ae39a7d95f72e66200e6ab3334f1e",
+      "svg": "docs/character-system/references/pool/clean/original-15-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-15-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-15-back.png",
+      "sourceSha256": "b67766cb731c412c712c32301861e7a39a5ef90c08618ac53e7bfb6844755ffb",
+      "input": "docs/character-system/references/pool/clean/original-15-back.png",
+      "inputSha256": "7d1fe0969cb080b77fc8714a20c6cbfc00bc10b754fc76a6aa000461aac2a521",
+      "svg": "docs/character-system/references/pool/clean/original-15-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-16-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-16-hair.png",
+      "sourceSha256": "5ba15f8974cdd8cff0465bf1dc0c4ebc87b4caf0d9cb85e97dabcb9afc10ef31",
+      "input": "docs/character-system/references/pool/clean/original-16-hair.png",
+      "inputSha256": "e984eb0ac7f9a4fcdc503df55a6028b6c924201a1025c89c79b3d1165af3a09c",
+      "svg": "docs/character-system/references/pool/clean/original-16-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-16-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-16-back.png",
+      "sourceSha256": "b5a6bf8b5416b4285af63354e917a3a0f33ae0160c2dad69cf602419c76ce55d",
+      "input": "docs/character-system/references/pool/clean/original-16-back.png",
+      "inputSha256": "f4c2ca5f845e50f623e4f9aeb149f8c984890355e8ca1e2e0161bf54d9367306",
+      "svg": "docs/character-system/references/pool/clean/original-16-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-17-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-17-hair.png",
+      "sourceSha256": "b81fb0dc46b634a2774775a9c16017d3ef589bfc22c29694576455710f7d74e5",
+      "input": "docs/character-system/references/pool/clean/original-17-hair.png",
+      "inputSha256": "b4febb950ccd04b3a2823046ed1c32a966dfa6e5e14e9422acb26e8f2f7a91a5",
+      "svg": "docs/character-system/references/pool/clean/original-17-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-17-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-17-back.png",
+      "sourceSha256": "e49f8db660ad3b7d2da33be53b191be3be0048641b77410980b5fc1e800bea83",
+      "input": "docs/character-system/references/pool/clean/original-17-back.png",
+      "inputSha256": "131cb62ecacb0e2a2742f44198a4007f2cb8501664778d2fc2b41adbe87a89c4",
+      "svg": "docs/character-system/references/pool/clean/original-17-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-18-hair.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/crops/original-18-hair.png",
+      "sourceSha256": "306e9877437d7f11269900777951d3bce330996d8cd30ebc670891833be264f9",
+      "input": "docs/character-system/references/pool/clean/original-18-hair.png",
+      "inputSha256": "662b5f1c1ee573304dd09f644db0ff0c8f9c15f4f913391839d4e3f342a8bd46",
+      "svg": "docs/character-system/references/pool/clean/original-18-hair.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/original-18-back.png": {
+      "kind": "back",
+      "source": "docs/character-system/references/pool/crops/original-18-back.png",
+      "sourceSha256": "0ca89c421952a6d222f795c90e9d054f0a0eb7b1f2ab6e05a365493815a1f35c",
+      "input": "docs/character-system/references/pool/clean/original-18-back.png",
+      "inputSha256": "9968fe5cde6540c2337c913c89ed16e954f7d15e6460e188462ffe0efe8468bb",
+      "svg": "docs/character-system/references/pool/clean/original-18-back.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/01-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/01-ear-L.png",
+      "sourceSha256": "fe7c7cd71af19bc5f04a8dfb53dcf7c7331f19ba75018b6037e1278915c6d5be",
+      "input": "docs/character-system/references/pool/clean/ear-01.png",
+      "inputSha256": "4b8847842027f9c45cc46a34f22721225ba69242f80ec84d3d6d08d446902a62",
+      "svg": "docs/character-system/references/pool/clean/ear-01.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/02-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/02-ear-L.png",
+      "sourceSha256": "58e2cb48faafe4b00296e1b8046e6d0c8dd99c5d86cd218a3f55d99c817f2967",
+      "input": "docs/character-system/references/pool/clean/ear-02.png",
+      "inputSha256": "e48499c46beb7cd0ece7ff00820944ade3b395ce734f034db0bc3275a91a6e8b",
+      "svg": "docs/character-system/references/pool/clean/ear-02.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/03-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/03-ear-L.png",
+      "sourceSha256": "44ebead70be7017bacfabf26dda0c1baddef7966175de8a5668bf0a62d6460c3",
+      "input": "docs/character-system/references/pool/clean/ear-03.png",
+      "inputSha256": "7d9a2f1909dd4dcf6b240e161f40ca5c770beaed72fb906b6bedffc6a0139c4c",
+      "svg": "docs/character-system/references/pool/clean/ear-03.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/04-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/04-ear-L.png",
+      "sourceSha256": "05edc4c733f2c49fd8baf46f1c96319bc0d00769b64fd39d8f98c4fde6794528",
+      "input": "docs/character-system/references/pool/clean/ear-04.png",
+      "inputSha256": "4c9672706f061d2b28e218d798eeb3a4c04c42a1171a94652cfa195c9f749461",
+      "svg": "docs/character-system/references/pool/clean/ear-04.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/05-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/05-ear-L.png",
+      "sourceSha256": "bcf169c1d2fc72c906ac86a26b02fc5d5afa7c5a35f942fe1c8f813103770809",
+      "input": "docs/character-system/references/pool/clean/ear-05.png",
+      "inputSha256": "a3136e3b44c7368a04f49d81643889b45f9856a1280d2b907a88990b01fe8386",
+      "svg": "docs/character-system/references/pool/clean/ear-05.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/06-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/06-ear-L.png",
+      "sourceSha256": "e3ab49f19954d11aadea67b2611b2e07a35c57be22a0fe6960dba9f763ed3363",
+      "input": "docs/character-system/references/pool/clean/ear-06.png",
+      "inputSha256": "eaa98ddcdf7aaa5c3405a188e2f7d85d34afe747b840c3d2c5f13f81dd493915",
+      "svg": "docs/character-system/references/pool/clean/ear-06.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/07-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/07-ear-L.png",
+      "sourceSha256": "1b3095c8be597f1e4b2c542d7d02d0551ced9a6cab3298355ef24d43531d1237",
+      "input": "docs/character-system/references/pool/clean/ear-07.png",
+      "inputSha256": "c2b476e6702d9205c39aa7196a3c9b0774ce0a45ecd48fe6f746a26ecef7a7ee",
+      "svg": "docs/character-system/references/pool/clean/ear-07.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/08-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/08-ear-L.png",
+      "sourceSha256": "7f35aa5af460270d37c69e26fcf097a7601e1af5e9fd35e1af9f5c2245f40c06",
+      "input": "docs/character-system/references/pool/clean/ear-08.png",
+      "inputSha256": "b5f6070ae95685cb6c29651e7eea12a4601a08be905a839f378f2397d346aa85",
+      "svg": "docs/character-system/references/pool/clean/ear-08.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/09-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/09-ear-L.png",
+      "sourceSha256": "32741505bc1092f7217c35f496b3a78012092ddd26931b063602d014857f322e",
+      "input": "docs/character-system/references/pool/clean/ear-09.png",
+      "inputSha256": "6f28354db5f5bb4032dcb60575e13a2f2c3a51fe34a23cdc0e8b5f598f9e70a5",
+      "svg": "docs/character-system/references/pool/clean/ear-09.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/10-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/10-ear-L.png",
+      "sourceSha256": "7a0f8ffd9675d766d654bbfb8ca6a00b26a8abc90908367c940db711610937bf",
+      "input": "docs/character-system/references/pool/clean/ear-10.png",
+      "inputSha256": "3236421276adc6f9eab4a6220f3c8f9fa7aa762042c0b23f44f5fa95bbf46ca1",
+      "svg": "docs/character-system/references/pool/clean/ear-10.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/11-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/11-ear-L.png",
+      "sourceSha256": "55be281c4073e7780cda62a2cffeb4ac1fd6f7bf077b6daa15015fb0e5617da6",
+      "input": "docs/character-system/references/pool/clean/ear-11.png",
+      "inputSha256": "28f44fde73c4c6a8e158a868ae30ea18291935c7e3be59d5651706a938b4aca6",
+      "svg": "docs/character-system/references/pool/clean/ear-11.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/12-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/12-ear-L.png",
+      "sourceSha256": "64d69269683b4bf69e7f0e019d923a74b67474ea5707c1fc1ac330ad44025446",
+      "input": "docs/character-system/references/pool/clean/ear-12.png",
+      "inputSha256": "4640a6b4b38e4b75133b122c97d5358ae6718160298396d625448bd95bce415b",
+      "svg": "docs/character-system/references/pool/clean/ear-12.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/13-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/13-ear-L.png",
+      "sourceSha256": "2a60b90477cc9519f9c861ee72a6f4b21e7579a642ba58835ff8a559f9c7301f",
+      "input": "docs/character-system/references/pool/clean/ear-13.png",
+      "inputSha256": "0b49e63e456fcfe0eb96a340168d0b9b1e13dcd8a7d5862040681e47ff4d354d",
+      "svg": "docs/character-system/references/pool/clean/ear-13.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/14-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/14-ear-L.png",
+      "sourceSha256": "6dc258a296d30e2a3008857946404f3bfaa6a602e766c5b77541c56e4db17afa",
+      "input": "docs/character-system/references/pool/clean/ear-14.png",
+      "inputSha256": "9fc994d265fdef05f2b01c32052ca9d238f393f9d29738f2efc1ff980d46b2ef",
+      "svg": "docs/character-system/references/pool/clean/ear-14.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/15-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/15-ear-L.png",
+      "sourceSha256": "b39b6fbc8c351d220eca166a2a4e92b96e433b514f4c59815693e85159eb2c29",
+      "input": "docs/character-system/references/pool/clean/ear-15.png",
+      "inputSha256": "360eff6e67d1ccc692b36946c03a0d92b83108817bfb6f2d5399c3f61f6cc4c3",
+      "svg": "docs/character-system/references/pool/clean/ear-15.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/16-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/16-ear-L.png",
+      "sourceSha256": "97a554e69bc4dbfde0e47909f1c62833554b72323782823c0c43bb30e4b5fb79",
+      "input": "docs/character-system/references/pool/clean/ear-16.png",
+      "inputSha256": "b01aaf8fcb4d70454f28abb0e8af7e68fb7e66c9d051e3766038be2f32b3f197",
+      "svg": "docs/character-system/references/pool/clean/ear-16.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/17-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/17-ear-L.png",
+      "sourceSha256": "9a862d9b6caf47ce46efadcb7b22d2a7ee3b1c9790c547c5d4617b7c38f82412",
+      "input": "docs/character-system/references/pool/clean/ear-17.png",
+      "inputSha256": "a43e7a73d1105d0c94eb1f37012f330d50249bd90c465d772c3eaf3ae9f92daf",
+      "svg": "docs/character-system/references/pool/clean/ear-17.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/layers/18-ear-L.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/layers/18-ear-L.png",
+      "sourceSha256": "81dc43bfc0a2705c9cd2978012b917f3e6a5368a8929e4148e6f848674982c8a",
+      "input": "docs/character-system/references/pool/clean/ear-18.png",
+      "inputSha256": "ba63c24ee32eab20cbdcf424a9d702de21aefce11fb9b5ce36e53e76304bb770",
+      "svg": "docs/character-system/references/pool/clean/ear-18.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-00-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-00-ear-0.png",
+      "sourceSha256": "f3faa6b5e62f857f7ebaefb93e04d3a216c1094b43085fcd6d35c7f24ff316ed",
+      "input": "docs/character-system/references/pool/clean/ear-19.png",
+      "inputSha256": "b3f1e802884b1724e630d359c62134da8d7bbdf09df11b383a565aa484b169c8",
+      "svg": "docs/character-system/references/pool/clean/ear-19.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-01-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-01-ear-0.png",
+      "sourceSha256": "a437793b663e7b77d818d4bd1f44ff80eea784df5bed44f18e7d58ca1789cd69",
+      "input": "docs/character-system/references/pool/clean/ear-20.png",
+      "inputSha256": "18973d2589ceb425438008fa1bb60d6bf723ade66c6309171e0a7a76eb2eb95e",
+      "svg": "docs/character-system/references/pool/clean/ear-20.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-02-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-02-ear-0.png",
+      "sourceSha256": "94f55e6ea8cde3fd8cfd82bf227f67795f1aaed596d963b14b9a861531af9954",
+      "input": "docs/character-system/references/pool/clean/ear-21.png",
+      "inputSha256": "156b5439a5fa808ea8a483f928ebeaa0f29df50d20d84ab4e2334a972fcfcb55",
+      "svg": "docs/character-system/references/pool/clean/ear-21.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-03-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-03-ear-0.png",
+      "sourceSha256": "0474f8f5a9a2ba885523089824723288815c99f0afe293a07794df3e94c123f5",
+      "input": "docs/character-system/references/pool/clean/ear-22.png",
+      "inputSha256": "0f188ebe4556943e55f7b9aa4a02be413e0d0e81f0cea376d381532b814b80ba",
+      "svg": "docs/character-system/references/pool/clean/ear-22.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-04-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-04-ear-0.png",
+      "sourceSha256": "d78f7dbce630f25aacd4fac5d032816f0a8616a577cb0d5a55016d265f18e485",
+      "input": "docs/character-system/references/pool/clean/ear-23.png",
+      "inputSha256": "8635fe260b4db8be740b9bbb43c74086ebe9f297456c7a270fdb1f2a762e3332",
+      "svg": "docs/character-system/references/pool/clean/ear-23.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-05-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-05-ear-0.png",
+      "sourceSha256": "91e392a41cf6d1827255b8ac2cc8378c1c469f83ea521ebe2cd2ad6d63d1412b",
+      "input": "docs/character-system/references/pool/clean/ear-24.png",
+      "inputSha256": "7c8e897d67b6132bd520ac640cb6a6dafce5a2238fec39427052ca7976fa6d13",
+      "svg": "docs/character-system/references/pool/clean/ear-24.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-06-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-06-ear-0.png",
+      "sourceSha256": "4447bf68b8bff2076fb7b90932a82e5a170daf0cc642ff158526742e5fa3aeac",
+      "input": "docs/character-system/references/pool/clean/ear-25.png",
+      "inputSha256": "cf4cc22f452a5477b6ab20e13b1f9e2dc1bcdf5baae1ac1941043a4ae8883aa6",
+      "svg": "docs/character-system/references/pool/clean/ear-25.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-07-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-07-ear-0.png",
+      "sourceSha256": "a875de84f320c836c99af14520d2fa6b538abded73913f6f3987cacb861bab9e",
+      "input": "docs/character-system/references/pool/clean/ear-26.png",
+      "inputSha256": "9a9bd823937d538f99af584ca1b0a4ef3e618c1094b9cbfca57f212451b058d0",
+      "svg": "docs/character-system/references/pool/clean/ear-26.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-08-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-08-ear-0.png",
+      "sourceSha256": "f43461dea7c454ba5006c5e812921ffcd18f478d5bdfeecb77760d6bc72aa426",
+      "input": "docs/character-system/references/pool/clean/ear-27.png",
+      "inputSha256": "03d4e0f6879cef9a5cbf0d48f20a21c12ea3ca91856dc162b00cf7d3fd3ccf9a",
+      "svg": "docs/character-system/references/pool/clean/ear-27.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/dot-09-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/dot-09-ear-0.png",
+      "sourceSha256": "e7b69e5ba2a461d811b21e0bb1725a34403e78e7fdedd9c98e1c6885e914870a",
+      "input": "docs/character-system/references/pool/clean/ear-28.png",
+      "inputSha256": "840cf3dbb3f287bad2022cc1c7028c726c18ed89ab03b03f198a41ccd6c41e5a",
+      "svg": "docs/character-system/references/pool/clean/ear-28.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/crops/elf-ear-0.png": {
+      "kind": "ear",
+      "source": "docs/character-system/references/pool/crops/elf-ear-0.png",
+      "sourceSha256": "cf31ba34e605fbb97500756d3cb2fdbe6dd4022f509e0e6482600c027eb6c65d",
+      "input": "docs/character-system/references/pool/clean/ear-29.png",
+      "inputSha256": "a43a3682a885cfbce6a5f0ea4b3e1eed59838c2caa30f7c74b73f1c7ad3f90a2",
+      "svg": "docs/character-system/references/pool/clean/ear-29.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      }
+    },
+    "docs/character-system/references/pool/clean/regions/original-16-cap.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/clean/regions/original-16-cap.png",
+      "sourceSha256": "ef5bee676dc76c745a537622cf0cec06cd7d0b257fd85ebf1df5ef2516c8e068",
+      "input": "docs/character-system/references/pool/clean/original-16-cap.png",
+      "inputSha256": "791080da94791e96333af903755df8f821eea6a96cfa499c429fdcbda134265d",
+      "svg": "docs/character-system/references/pool/clean/original-16-cap.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/original-16-hair.png",
+      "parentSourceSha256": "5ba15f8974cdd8cff0465bf1dc0c4ebc87b4caf0d9cb85e97dabcb9afc10ef31",
+      "segmentation": "source grey regions separated by original ink; nearest-region assignment with hidden overlap"
+    },
+    "docs/character-system/references/pool/clean/regions/original-16-tied.png": {
+      "kind": "hair",
+      "source": "docs/character-system/references/pool/clean/regions/original-16-tied.png",
+      "sourceSha256": "56bc8867cdc52dd1a236535bd5ea529ee1b9fb61a7fa5193f0bdc091a4954e48",
+      "input": "docs/character-system/references/pool/clean/original-16-tied.png",
+      "inputSha256": "a95996248ba3ed55888e85bd1bf48bfaa5dfb708f34872b5e78a601c8e39d0ee",
+      "svg": "docs/character-system/references/pool/clean/original-16-tied.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/original-16-hair.png",
+      "parentSourceSha256": "5ba15f8974cdd8cff0465bf1dc0c4ebc87b4caf0d9cb85e97dabcb9afc10ef31",
+      "segmentation": "source grey regions separated by original ink; nearest-region assignment with hidden overlap"
+    },
+    "docs/character-system/references/pool/clean/regions/original-01-curtain.png": {
+      "kind": "curtain",
+      "source": "docs/character-system/references/pool/clean/regions/original-01-curtain.png",
+      "sourceSha256": "622be3752062d9a14fc027d698e57a8b4b53327703b64b7cf82b7ab48ed03691",
+      "input": "docs/character-system/references/pool/clean/original-01-curtain.png",
+      "inputSha256": "622be3752062d9a14fc027d698e57a8b4b53327703b64b7cf82b7ab48ed03691",
+      "svg": "docs/character-system/references/pool/clean/original-01-curtain.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/original-01-hair.png",
+      "parentSourceSha256": "e6f538b87ad519b6279d48a8628ef5cf68ec8a0c1a32705c2cc9de06c82e8175",
+      "segmentation": "original outer hair silhouette; horizontal rear coverage closes the source face opening without importing a skull contour"
+    },
+    "docs/character-system/references/pool/clean/regions/original-06-curtain.png": {
+      "kind": "curtain",
+      "source": "docs/character-system/references/pool/clean/regions/original-06-curtain.png",
+      "sourceSha256": "bc0dd5c7c1c33fd1fe10834b1159701fbb194111c420c92976c832d496aa3ae0",
+      "input": "docs/character-system/references/pool/clean/original-06-curtain.png",
+      "inputSha256": "bc0dd5c7c1c33fd1fe10834b1159701fbb194111c420c92976c832d496aa3ae0",
+      "svg": "docs/character-system/references/pool/clean/original-06-curtain.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/original-06-hair.png",
+      "parentSourceSha256": "5d203007a587b54f73d15993e9d488125066dd6767349f38eb83f66497569f6f",
+      "segmentation": "original outer hair silhouette; horizontal rear coverage closes the source face opening without importing a skull contour"
+    },
+    "docs/character-system/references/pool/clean/regions/original-11-curtain.png": {
+      "kind": "curtain",
+      "source": "docs/character-system/references/pool/clean/regions/original-11-curtain.png",
+      "sourceSha256": "ff7c9d48d8692130965949b438c064b4680cdd9e9cba31d68262f133d972e224",
+      "input": "docs/character-system/references/pool/clean/original-11-curtain.png",
+      "inputSha256": "ff7c9d48d8692130965949b438c064b4680cdd9e9cba31d68262f133d972e224",
+      "svg": "docs/character-system/references/pool/clean/original-11-curtain.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/original-11-hair.png",
+      "parentSourceSha256": "b7322170412507ac354411498a121a2edaabcb4ab5df9056943d346cdaa97005",
+      "segmentation": "original outer hair silhouette; horizontal rear coverage closes the source face opening without importing a skull contour"
+    },
+    "docs/character-system/references/pool/clean/regions/original-12-curtain.png": {
+      "kind": "curtain",
+      "source": "docs/character-system/references/pool/clean/regions/original-12-curtain.png",
+      "sourceSha256": "6a88e596ab1e33242511923a1fc0cac9b82d7a2e75ecfed361a3215b612dd002",
+      "input": "docs/character-system/references/pool/clean/original-12-curtain.png",
+      "inputSha256": "6a88e596ab1e33242511923a1fc0cac9b82d7a2e75ecfed361a3215b612dd002",
+      "svg": "docs/character-system/references/pool/clean/original-12-curtain.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/original-12-hair.png",
+      "parentSourceSha256": "27469cd3764c15c462480549acba11467e046b794fbb12e32287049bb2596431",
+      "segmentation": "original outer hair silhouette; horizontal rear coverage closes the source face opening without importing a skull contour"
+    },
+    "docs/character-system/references/pool/clean/regions/elf-curtain.png": {
+      "kind": "curtain",
+      "source": "docs/character-system/references/pool/clean/regions/elf-curtain.png",
+      "sourceSha256": "0f8282238f4c6792b486f05e601a317fa797fdbe8417442f70fbf7eecbe44872",
+      "input": "docs/character-system/references/pool/clean/elf-curtain.png",
+      "inputSha256": "0f8282238f4c6792b486f05e601a317fa797fdbe8417442f70fbf7eecbe44872",
+      "svg": "docs/character-system/references/pool/clean/elf-curtain.svg",
+      "settings": {
+        "detail": 0.55,
+        "smooth": 0.9,
+        "lines": "stroke",
+        "outerStroke": 0.075,
+        "innerStroke": 0.055
+      },
+      "parentSource": "docs/character-system/references/pool/crops/elf-hair.png",
+      "parentSourceSha256": "bfda8b4a1f5380c5401715e7194710533a3f70ff819bd5ef735d238234d0d6f3",
+      "segmentation": "original outer hair silhouette; horizontal rear coverage closes the source face opening without importing a skull contour"
+    }
+  }
+}

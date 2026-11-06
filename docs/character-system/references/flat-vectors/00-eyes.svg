@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="133" height="69" viewBox="0 0 133 69">
+<title>00-eyes reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_00_eyes_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#141414" d="M101.65 56.6C91.13 53.83 90.6 37.18 101.09 33.84C108.36 31.53 115.3 40.73 113.59 47.51C112.3 52.63 107.51 58.15 101.65 56.6Z"/>
+<path id="fill-2-s0" fill="#141414" d="M30.99 34.02C40.64 34.25 43.42 46.83 37.91 53.42C34.32 57.72 27.83 57.76 23.79 54.04C16.86 47.67 21.13 33.79 30.99 34.02Z"/>
+<path id="fill-3-s0" fill="#141414" d="M90.15 56.35C99.16 62.99 126.78 60.84 124.8 44.61C122.19 23.3 85.12 28.95 87 50C83.83 38.69 95.49 27.99 106.5 28.01C116.44 28.02 130.99 38.58 125.86 49.73C119.81 62.91 100.29 67.04 90.15 56.35Z"/>
+<path id="fill-4-s0" fill="#141414" d="M47.8 50.7C47.69 32.36 21.5 23.06 11.31 39.39C-0.35 58.06 34.12 65.3 45 55.69C35.93 66.84 14.66 64.05 8.56 51.12C2.87 39.04 16.66 28.15 27.97 28.01C39.22 27.88 50.47 39.47 47.8 50.7Z"/>
+<path id="fill-5-s0" fill="#141414" d="M123.5 22C115.05 15.61 105.99 9.11 95.03 7.53C105.2 3.73 120.1 12.05 123.5 22Z"/>
+<path id="fill-6-s0" fill="#141414" d="M9.15 23.65C11.67 12.95 27.14 5.07 37.89 7.39C27.56 11.04 16.59 14.84 9.15 23.65Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s0" fill="none" stroke="#141414" stroke-width="2.89" stroke-linecap="round" stroke-linejoin="round" d="M96.92 7.67C107.2 7.18 116.4 13.69 122.98 21.05"/>
+<path id="line-2-s0" fill="none" stroke="#141414" stroke-width="2.83" stroke-linecap="round" stroke-linejoin="round" d="M36.11 7.48C25.94 8.74 15.82 13.63 9.83 22.16"/>
+<path id="line-3-s0" fill="none" stroke="#141414" stroke-width="2.14" stroke-linecap="round" stroke-linejoin="round" d="M47.64 49.81C47.74 39.42 39.27 29.58 28.66 29.51C13.04 29.41 -1.35 47.4 16.01 57.82C24.82 63.11 36.24 62.48 44.38 56.06"/>
+<path id="line-4-s0" fill="none" stroke="#141414" stroke-width="2.23" stroke-linecap="round" stroke-linejoin="round" d="M87.03 48.62C86.75 29.1 113.59 22.91 123.53 38.75C134.5 56.24 102.13 68.24 90.78 56.73"/>
+</g>
+</g>
+</svg>

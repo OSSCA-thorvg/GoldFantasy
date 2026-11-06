@@ -1,0 +1,2615 @@
+{
+  "tool": "/home/soon/orca/workspaces/GoldFantasy/logperch/aurum/tools/vectorize/vectorize.py",
+  "settings": {
+    "detail": 0.92,
+    "smooth": 0.35,
+    "lines": "fill"
+  },
+  "results": [
+    {
+      "done": true,
+      "svg": "vectors/original-00-hair.svg",
+      "palette": "/tmp/hearthold-refine-zjbmq6gw/refined.palette.json",
+      "paths": 39,
+      "anchors": 186,
+      "seconds": 1.13,
+      "input": "crops/original-00-hair.png",
+      "input_sha256": "034518b1dc7d6ba3a54a01299a81348b0430eb27c1eaca83386ca1596a060712",
+      "mask_iou": 0.9604189501887712,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9573950091296409
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-00-back.palette.json",
+      "paths": 2,
+      "anchors": 19,
+      "seconds": 0.68,
+      "input": "crops/original-00-back.png",
+      "input_sha256": "fe9a48efb152b2c17cbbf04e47b968cde7a17427c183c8a654853db46d5d84bf",
+      "mask_iou": 0.9938940092165899
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-01-hair.svg",
+      "palette": "/tmp/hearthold-refine-_pushmsu/refined.palette.json",
+      "paths": 28,
+      "anchors": 237,
+      "seconds": 2.12,
+      "input": "crops/original-01-hair.png",
+      "input_sha256": "e6f538b87ad519b6279d48a8628ef5cf68ec8a0c1a32705c2cc9de06c82e8175",
+      "mask_iou": 0.961762114537445,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9617604299748888
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-01-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-01-back.palette.json",
+      "paths": 1,
+      "anchors": 29,
+      "seconds": 0.76,
+      "input": "crops/original-01-back.png",
+      "input_sha256": "ba1667bbd69c7750153d6c88cf8f32cc743246d4d07eb269de0e1191fbfc3642",
+      "mask_iou": 0.9954933635147649
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-02-hair.palette.json",
+      "paths": 27,
+      "anchors": 137,
+      "seconds": 1.03,
+      "input": "crops/original-02-hair.png",
+      "input_sha256": "474ddc1cfa48dd8dc7b7ba8c64d379fb63f6b6bd2e7eb94314113a2a4c35c299",
+      "mask_iou": 0.9767879970396286
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-02-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-02-back.palette.json",
+      "paths": 1,
+      "anchors": 21,
+      "seconds": 0.66,
+      "input": "crops/original-02-back.png",
+      "input_sha256": "9609709254ec79590b92e145882831affc0be24e37a98400fa0b1f2c28f25d9f",
+      "mask_iou": 0.9949632641744837
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-03-hair.palette.json",
+      "paths": 29,
+      "anchors": 133,
+      "seconds": 1.06,
+      "input": "crops/original-03-hair.png",
+      "input_sha256": "6b51d81fd810b5623af7851ca2948efbfdefdd9b6c35831f94158c1319ab2605",
+      "mask_iou": 0.9808482261936516
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-03-back.palette.json",
+      "paths": 1,
+      "anchors": 27,
+      "seconds": 0.68,
+      "input": "crops/original-03-back.png",
+      "input_sha256": "22408d9d915c0137e91748d658bd1934045f905d141e50f88eb36b769c50537c",
+      "mask_iou": 0.9917352088051814
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-04-hair.palette.json",
+      "paths": 40,
+      "anchors": 150,
+      "seconds": 0.89,
+      "input": "crops/original-04-hair.png",
+      "input_sha256": "dfc4b1203cf23187629304078009975d6670c266d3944f87f101edfb66b63984",
+      "mask_iou": 0.9933514761100968
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-04-back.palette.json",
+      "paths": 3,
+      "anchors": 39,
+      "seconds": 0.74,
+      "input": "crops/original-04-back.png",
+      "input_sha256": "5d9ae0509f974fe8468435b2ab8adb04058c40399f018103b3883ebf28915f1b",
+      "mask_iou": 0.995701503011872
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-05-hair.palette.json",
+      "paths": 20,
+      "anchors": 130,
+      "seconds": 1.08,
+      "input": "crops/original-05-hair.png",
+      "input_sha256": "35d269208661d248841e443012e4f95768e0d0a72188b266a89956160796ab30",
+      "mask_iou": 0.9711182718701515
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-05-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-05-back.palette.json",
+      "paths": 1,
+      "anchors": 25,
+      "seconds": 0.68,
+      "input": "crops/original-05-back.png",
+      "input_sha256": "2ed3208825ccf04bb4c7bc7970ca00ef4656c947113aed80dd713af8ed5cfa3c",
+      "mask_iou": 0.9940598201213136
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-06-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-06-hair.palette.json",
+      "paths": 71,
+      "anchors": 282,
+      "seconds": 1.39,
+      "input": "crops/original-06-hair.png",
+      "input_sha256": "5d203007a587b54f73d15993e9d488125066dd6767349f38eb83f66497569f6f",
+      "mask_iou": 0.9829143754909663
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-06-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-06-back.palette.json",
+      "paths": 2,
+      "anchors": 28,
+      "seconds": 0.83,
+      "input": "crops/original-06-back.png",
+      "input_sha256": "c8e2829354038e6dbef54f0b645c175f96d4bf8d453f558e7058dfd57cd5922a",
+      "mask_iou": 0.9959221330381032
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-07-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-07-hair.palette.json",
+      "paths": 29,
+      "anchors": 108,
+      "seconds": 0.76,
+      "input": "crops/original-07-hair.png",
+      "input_sha256": "328b2b3dc357523d08101f85d7c58c55222aa3256b0aab50397cee38e28575e9",
+      "mask_iou": 0.9895490501761072
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-07-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-07-back.palette.json",
+      "paths": 1,
+      "anchors": 26,
+      "seconds": 0.89,
+      "input": "crops/original-07-back.png",
+      "input_sha256": "02538b5c1cbff47cf37025c78e83cd37e9160fda7496a30e0652010e5fb0eb97",
+      "mask_iou": 0.9940051384527547
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-08-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-08-hair.palette.json",
+      "paths": 32,
+      "anchors": 181,
+      "seconds": 1.49,
+      "input": "crops/original-08-hair.png",
+      "input_sha256": "5f27cebe00bba9b8483ae6655599960bab79658b9aac8f2797cfed3e4a25676a",
+      "mask_iou": 0.9756841554819592
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-08-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-08-back.palette.json",
+      "paths": 1,
+      "anchors": 20,
+      "seconds": 0.74,
+      "input": "crops/original-08-back.png",
+      "input_sha256": "47f2c3ac8ed6d7c5be0ae2b6561ac29de83a43b8f41c7c709c6064162a0a3043",
+      "mask_iou": 0.9946082295443797
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-09-hair.svg",
+      "palette": "/tmp/hearthold-refine-ypig1q1u/refined.palette.json",
+      "paths": 23,
+      "anchors": 192,
+      "seconds": 1.65,
+      "input": "crops/original-09-hair.png",
+      "input_sha256": "c8dcb0e6793a46ff7c99bf275af23dd40da41c13e797bf4cbbfe247be20fab2a",
+      "mask_iou": 0.9666545189504373,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9654308617234469
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-09-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-09-back.palette.json",
+      "paths": 1,
+      "anchors": 28,
+      "seconds": 0.97,
+      "input": "crops/original-09-back.png",
+      "input_sha256": "9ea3a12c1ab632c59572596ea83ad8af26b043595f540ccbe0927b170fba9f9e",
+      "mask_iou": 0.9914663768857069
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-10-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-10-hair.palette.json",
+      "paths": 32,
+      "anchors": 198,
+      "seconds": 1.1,
+      "input": "crops/original-10-hair.png",
+      "input_sha256": "43ce08cd0e00b4abb96c1b0c118d4e6206896710e4cad1a28df688b62cb9825a",
+      "mask_iou": 0.9856392835083385
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-10-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-10-back.palette.json",
+      "paths": 1,
+      "anchors": 32,
+      "seconds": 0.73,
+      "input": "crops/original-10-back.png",
+      "input_sha256": "480ac3575634a0bf74e6495cfd291f9c5bf5f91d404d5a21b3ee510818ce1071",
+      "mask_iou": 0.9940425844886551
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-11-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-11-hair.palette.json",
+      "paths": 41,
+      "anchors": 243,
+      "seconds": 1.5,
+      "input": "crops/original-11-hair.png",
+      "input_sha256": "b7322170412507ac354411498a121a2edaabcb4ab5df9056943d346cdaa97005",
+      "mask_iou": 0.9784521347204643
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-11-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-11-back.palette.json",
+      "paths": 3,
+      "anchors": 37,
+      "seconds": 0.74,
+      "input": "crops/original-11-back.png",
+      "input_sha256": "93b3ac731ca455a66dc74f7f827e567d7abdb4fc8f4dbc083c4520d84293e2c4",
+      "mask_iou": 0.9973230999625609
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-12-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-12-hair.palette.json",
+      "paths": 73,
+      "anchors": 431,
+      "seconds": 1.65,
+      "input": "crops/original-12-hair.png",
+      "input_sha256": "27469cd3764c15c462480549acba11467e046b794fbb12e32287049bb2596431",
+      "mask_iou": 0.9772677174032844
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-12-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-12-back.palette.json",
+      "paths": 3,
+      "anchors": 43,
+      "seconds": 0.95,
+      "input": "crops/original-12-back.png",
+      "input_sha256": "e287f172154a004feba2b55905e6103511af5b100ea40770b37e8380c9f3dc49",
+      "mask_iou": 0.9953342886100723
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-13-hair.svg",
+      "palette": "/tmp/hearthold-refine-i56lv9fl/refined.palette.json",
+      "paths": 11,
+      "anchors": 91,
+      "seconds": 1.43,
+      "input": "crops/original-13-hair.png",
+      "input_sha256": "386834c3d7b44d931d9529c40dee7b8f10575903556b0b53b6dec6e10a7759f3",
+      "mask_iou": 0.9635377711293942,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9628902598616564
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-13-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-13-back.palette.json",
+      "paths": 1,
+      "anchors": 9,
+      "seconds": 0.74,
+      "input": "crops/original-13-back.png",
+      "input_sha256": "09b4a25ca7c4f2e9ed4680c93c46da51c8bd9918975864a08ee439aaed655fea",
+      "mask_iou": 0.996678070305915
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-14-hair.svg",
+      "palette": "/tmp/hearthold-refine-7dj1eosv/refined.palette.json",
+      "paths": 31,
+      "anchors": 183,
+      "seconds": 1.17,
+      "input": "crops/original-14-hair.png",
+      "input_sha256": "69511859d167a0c736e7719038f49b8a62398977961cc1ed0f6cf4894be1039a",
+      "mask_iou": 0.9706240993238,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9692052063140404
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-14-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-14-back.palette.json",
+      "paths": 1,
+      "anchors": 27,
+      "seconds": 0.72,
+      "input": "crops/original-14-back.png",
+      "input_sha256": "7c44644394d420610c5b9178acc6350a97f79aa309a67f872d69987e009ff8c0",
+      "mask_iou": 0.9929075106592326
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-15-hair.svg",
+      "palette": "/tmp/hearthold-refine-pf1rkwy5/refined.palette.json",
+      "paths": 21,
+      "anchors": 143,
+      "seconds": 1.13,
+      "input": "crops/original-15-hair.png",
+      "input_sha256": "ecac99ab71d8144a3fa9e5b5ff53ed11a00d19be5ae20e796bf1857ae7d230dd",
+      "mask_iou": 0.9557379823967501,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9554070062616348
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-15-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-15-back.palette.json",
+      "paths": 1,
+      "anchors": 20,
+      "seconds": 0.73,
+      "input": "crops/original-15-back.png",
+      "input_sha256": "b67766cb731c412c712c32301861e7a39a5ef90c08618ac53e7bfb6844755ffb",
+      "mask_iou": 0.9886720111537121
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-16-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-16-hair.palette.json",
+      "paths": 11,
+      "anchors": 90,
+      "seconds": 1.11,
+      "input": "crops/original-16-hair.png",
+      "input_sha256": "5ba15f8974cdd8cff0465bf1dc0c4ebc87b4caf0d9cb85e97dabcb9afc10ef31",
+      "mask_iou": 0.9740817641583733
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-16-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-16-back.palette.json",
+      "paths": 1,
+      "anchors": 10,
+      "seconds": 0.9,
+      "input": "crops/original-16-back.png",
+      "input_sha256": "b5a6bf8b5416b4285af63354e917a3a0f33ae0160c2dad69cf602419c76ce55d",
+      "mask_iou": 0.9969315319441264
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-17-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-17-hair.palette.json",
+      "paths": 22,
+      "anchors": 161,
+      "seconds": 1.1,
+      "input": "crops/original-17-hair.png",
+      "input_sha256": "b81fb0dc46b634a2774775a9c16017d3ef589bfc22c29694576455710f7d74e5",
+      "mask_iou": 0.9863680176251893
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-17-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-17-back.palette.json",
+      "paths": 1,
+      "anchors": 31,
+      "seconds": 0.7,
+      "input": "crops/original-17-back.png",
+      "input_sha256": "e49f8db660ad3b7d2da33be53b191be3be0048641b77410980b5fc1e800bea83",
+      "mask_iou": 0.9945439243114607
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-18-hair.svg",
+      "palette": "/tmp/hearthold-refine-t8p1k7y_/refined.palette.json",
+      "paths": 28,
+      "anchors": 195,
+      "seconds": 1.1,
+      "input": "crops/original-18-hair.png",
+      "input_sha256": "306e9877437d7f11269900777951d3bce330996d8cd30ebc670891833be264f9",
+      "mask_iou": 0.9643260840077769,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9627435909029254
+    },
+    {
+      "done": true,
+      "svg": "vectors/original-18-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/original-18-back.palette.json",
+      "paths": 1,
+      "anchors": 25,
+      "seconds": 0.74,
+      "input": "crops/original-18-back.png",
+      "input_sha256": "0ca89c421952a6d222f795c90e9d054f0a0eb7b1f2ab6e05a365493815a1f35c",
+      "mask_iou": 0.9936209165284056
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-00-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-00-face.palette.json",
+      "paths": 2,
+      "anchors": 10,
+      "seconds": 0.71,
+      "input": "crops/dot-00-face.png",
+      "input_sha256": "dd56ac91913ec7c3adea4d463c160e3ec5d76c533256d8bc2d358859a3deb5ad",
+      "mask_iou": 0.9924202547636594
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-00-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-00-ear-0.palette.json",
+      "paths": 3,
+      "anchors": 11,
+      "seconds": 0.62,
+      "input": "crops/dot-00-ear-0.png",
+      "input_sha256": "f3faa6b5e62f857f7ebaefb93e04d3a216c1094b43085fcd6d35c7f24ff316ed",
+      "mask_iou": 0.9827727645611156
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-00-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-00-ear-1.palette.json",
+      "paths": 3,
+      "anchors": 14,
+      "seconds": 0.69,
+      "input": "crops/dot-00-ear-1.png",
+      "input_sha256": "0d7cfa6f5f317cce7cfaec94e8ca4b7e8365cd7a4e0ee1c70e391ec9f708015a",
+      "mask_iou": 0.9832599118942731
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-01-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-01-face.palette.json",
+      "paths": 2,
+      "anchors": 9,
+      "seconds": 0.66,
+      "input": "crops/dot-01-face.png",
+      "input_sha256": "811eb67cbb6a19f5cc6fc0ef43459fb2f0027bd0c617f08cf82a3f547b66a6e0",
+      "mask_iou": 0.9922013820335637
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-01-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-01-ear-0.palette.json",
+      "paths": 3,
+      "anchors": 15,
+      "seconds": 0.54,
+      "input": "crops/dot-01-ear-0.png",
+      "input_sha256": "a437793b663e7b77d818d4bd1f44ff80eea784df5bed44f18e7d58ca1789cd69",
+      "mask_iou": 0.9733570159857904
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-01-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-01-ear-1.palette.json",
+      "paths": 3,
+      "anchors": 15,
+      "seconds": 0.75,
+      "input": "crops/dot-01-ear-1.png",
+      "input_sha256": "5d4277b04e2722bc55933ffa366afbcd81f178f5daf0bc3c94b26e7d90d45981",
+      "mask_iou": 0.9815327793167128
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-02-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-02-face.palette.json",
+      "paths": 2,
+      "anchors": 14,
+      "seconds": 0.81,
+      "input": "crops/dot-02-face.png",
+      "input_sha256": "a4225078fbd5b94d1acdc23c3322b67c3d5e77490b2b8be79145f0fbb9941ae7",
+      "mask_iou": 0.9916561560104783
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-02-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-02-ear-0.palette.json",
+      "paths": 3,
+      "anchors": 17,
+      "seconds": 0.77,
+      "input": "crops/dot-02-ear-0.png",
+      "input_sha256": "94f55e6ea8cde3fd8cfd82bf227f67795f1aaed596d963b14b9a861531af9954",
+      "mask_iou": 0.9754701553556827
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-02-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-02-ear-1.palette.json",
+      "paths": 3,
+      "anchors": 17,
+      "seconds": 0.5,
+      "input": "crops/dot-02-ear-1.png",
+      "input_sha256": "955212d28d3efc917629c8796f16b2d3916a4491fa2058d557522f6002ca43f1",
+      "mask_iou": 0.9753303964757709
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-03-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-03-face.palette.json",
+      "paths": 2,
+      "anchors": 19,
+      "seconds": 0.8,
+      "input": "crops/dot-03-face.png",
+      "input_sha256": "10d47fefe1edb5292a19f8f411389652b408f7433d5d061b8c10aeee84e17c74",
+      "mask_iou": 0.9933868265585045
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-03-ear-0.svg",
+      "palette": "/tmp/hearthold-refine-48x6ecgo/refined.palette.json",
+      "paths": 2,
+      "anchors": 9,
+      "seconds": 0.98,
+      "input": "crops/dot-03-ear-0.png",
+      "input_sha256": "0474f8f5a9a2ba885523089824723288815c99f0afe293a07794df3e94c123f5",
+      "mask_iou": 0.9666666666666667,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9508771929824561
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-03-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-03-ear-1.palette.json",
+      "paths": 3,
+      "anchors": 15,
+      "seconds": 0.61,
+      "input": "crops/dot-03-ear-1.png",
+      "input_sha256": "eb116f2e66feeb90f4fbfca3a6cd02fdb4f5efdc52b37d22bac7632d02af9cc9",
+      "mask_iou": 0.980440097799511
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-04-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-04-face.palette.json",
+      "paths": 2,
+      "anchors": 8,
+      "seconds": 0.73,
+      "input": "crops/dot-04-face.png",
+      "input_sha256": "85d92e14faa33dd06021fa192d9b5510e3a2b42ca7b111f92d5166e347d3aedf",
+      "mask_iou": 0.9939527852075822
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-04-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-04-ear-0.palette.json",
+      "paths": 2,
+      "anchors": 8,
+      "seconds": 0.64,
+      "input": "crops/dot-04-ear-0.png",
+      "input_sha256": "d78f7dbce630f25aacd4fac5d032816f0a8616a577cb0d5a55016d265f18e485",
+      "mask_iou": 0.9840255591054313
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-04-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-04-ear-1.palette.json",
+      "paths": 4,
+      "anchors": 13,
+      "seconds": 0.52,
+      "input": "crops/dot-04-ear-1.png",
+      "input_sha256": "e0ea0efa7a6de7d763f4702d669064bd99a34345ac6eff4341726f1557187efb",
+      "mask_iou": 0.9818181818181818
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-05-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-05-face.palette.json",
+      "paths": 2,
+      "anchors": 9,
+      "seconds": 0.82,
+      "input": "crops/dot-05-face.png",
+      "input_sha256": "f709f0f217833a484c7b6da018690c7ffe12ea1645de7389472f9ed049488082",
+      "mask_iou": 0.995475113122172
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-05-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-05-ear-0.palette.json",
+      "paths": 3,
+      "anchors": 11,
+      "seconds": 0.63,
+      "input": "crops/dot-05-ear-0.png",
+      "input_sha256": "91e392a41cf6d1827255b8ac2cc8378c1c469f83ea521ebe2cd2ad6d63d1412b",
+      "mask_iou": 0.9829059829059829
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-05-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-05-ear-1.palette.json",
+      "paths": 4,
+      "anchors": 13,
+      "seconds": 0.5,
+      "input": "crops/dot-05-ear-1.png",
+      "input_sha256": "68c8e5fc8501a67d7877fb895fbf73c0337245769c103d285f85454fb2c31eb7",
+      "mask_iou": 0.9820574162679426
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-06-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-06-face.palette.json",
+      "paths": 2,
+      "anchors": 9,
+      "seconds": 0.73,
+      "input": "crops/dot-06-face.png",
+      "input_sha256": "51070d4c3d7c9677621e62c3c35e8d3b7c219119a6f624ab80d27e89fd6f90d8",
+      "mask_iou": 0.9915500063059655
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-06-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-06-ear-0.palette.json",
+      "paths": 5,
+      "anchors": 28,
+      "seconds": 0.61,
+      "input": "crops/dot-06-ear-0.png",
+      "input_sha256": "4447bf68b8bff2076fb7b90932a82e5a170daf0cc642ff158526742e5fa3aeac",
+      "mask_iou": 0.9711316397228638
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-06-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-06-ear-1.palette.json",
+      "paths": 3,
+      "anchors": 14,
+      "seconds": 0.63,
+      "input": "crops/dot-06-ear-1.png",
+      "input_sha256": "d0c25d8441c380c91cbd715d526b7415212c20097777f1c78d063e3134dde1e9",
+      "mask_iou": 0.9639751552795031
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-07-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-07-face.palette.json",
+      "paths": 2,
+      "anchors": 8,
+      "seconds": 0.72,
+      "input": "crops/dot-07-face.png",
+      "input_sha256": "ec800758e80e90c51bbfb952e40f94851d1602b58b0606d956c1399d0d3db1dc",
+      "mask_iou": 0.9925555782174179
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-07-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-07-ear-0.palette.json",
+      "paths": 4,
+      "anchors": 17,
+      "seconds": 0.71,
+      "input": "crops/dot-07-ear-0.png",
+      "input_sha256": "a875de84f320c836c99af14520d2fa6b538abded73913f6f3987cacb861bab9e",
+      "mask_iou": 0.9814385150812065
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-07-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-07-ear-1.palette.json",
+      "paths": 4,
+      "anchors": 18,
+      "seconds": 0.63,
+      "input": "crops/dot-07-ear-1.png",
+      "input_sha256": "4cf358b83deed8b84b45a37847c3a7b0c9a2863abb6c0299cc52623f6b5b8e27",
+      "mask_iou": 0.9798994974874372
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-08-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-08-face.palette.json",
+      "paths": 2,
+      "anchors": 16,
+      "seconds": 0.68,
+      "input": "crops/dot-08-face.png",
+      "input_sha256": "0b7789d7b945e394938d435b146d918042475a3613d87854c7c9ad2da5c241e0",
+      "mask_iou": 0.9911644051751342
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-08-ear-0.svg",
+      "palette": "/tmp/hearthold-refine-p4ui7nh6/refined.palette.json",
+      "paths": 1,
+      "anchors": 5,
+      "seconds": 1.04,
+      "input": "crops/dot-08-ear-0.png",
+      "input_sha256": "f43461dea7c454ba5006c5e812921ffcd18f478d5bdfeecb77760d6bc72aa426",
+      "mask_iou": 0.8924731182795699,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.8541666666666666
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-08-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-08-ear-1.palette.json",
+      "paths": 2,
+      "anchors": 8,
+      "seconds": 0.6,
+      "input": "crops/dot-08-ear-1.png",
+      "input_sha256": "6658bd60cac42e5d6da0957b97799a270de6161a3936e8d1864279e29c26f003",
+      "mask_iou": 0.9867452135493373
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-09-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-09-face.palette.json",
+      "paths": 2,
+      "anchors": 10,
+      "seconds": 0.79,
+      "input": "crops/dot-09-face.png",
+      "input_sha256": "e24b19a0801fb9fc7a62bc923b66e87ea1b87220416e2b3086866cfefb9342d5",
+      "mask_iou": 0.9946542707728065
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-09-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-09-ear-0.palette.json",
+      "paths": 2,
+      "anchors": 10,
+      "seconds": 0.53,
+      "input": "crops/dot-09-ear-0.png",
+      "input_sha256": "e7b69e5ba2a461d811b21e0bb1725a34403e78e7fdedd9c98e1c6885e914870a",
+      "mask_iou": 0.9817460317460317
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-09-ear-1.svg",
+      "palette": "/tmp/hearthold-refine-0d5henmu/refined.palette.json",
+      "paths": 2,
+      "anchors": 10,
+      "seconds": 0.73,
+      "input": "crops/dot-09-ear-1.png",
+      "input_sha256": "3d0b110d12c4bc3e2688e9c1a4e0c3a73f23a19aa81c5697eacae9f3a25c7e6b",
+      "mask_iou": 0.9853061224489796,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9682410423452769
+    },
+    {
+      "done": true,
+      "svg": "vectors/elf-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/elf-face.palette.json",
+      "paths": 2,
+      "anchors": 10,
+      "seconds": 0.92,
+      "input": "crops/elf-face.png",
+      "input_sha256": "fc7971e546700ab24c9f6f3dd993e06ff1fff738f303bceee7035c913fd1f00a",
+      "mask_iou": 0.9964989917096123
+    },
+    {
+      "done": true,
+      "svg": "vectors/elf-ear-0.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/elf-ear-0.palette.json",
+      "paths": 3,
+      "anchors": 25,
+      "seconds": 0.67,
+      "input": "crops/elf-ear-0.png",
+      "input_sha256": "cf31ba34e605fbb97500756d3cb2fdbe6dd4022f509e0e6482600c027eb6c65d",
+      "mask_iou": 0.9876712328767123
+    },
+    {
+      "done": true,
+      "svg": "vectors/elf-ear-1.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/elf-ear-1.palette.json",
+      "paths": 3,
+      "anchors": 23,
+      "seconds": 0.58,
+      "input": "crops/elf-ear-1.png",
+      "input_sha256": "16c798d1240449a1cfc369130bb2a5080b349c0e4b1c8f96823ab82bb85920db",
+      "mask_iou": 0.9856883692803871
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-00-hair.svg",
+      "palette": "/tmp/hearthold-refine-y5wa1s5a/refined.palette.json",
+      "paths": 18,
+      "anchors": 121,
+      "seconds": 1.05,
+      "input": "crops/dot-00-hair.png",
+      "input_sha256": "097f962bd481851b75c0ba6c5738abcfd014bff90241ab7d9c45f482272e3504",
+      "mask_iou": 0.9622218066205349,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9614520958083832
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-01-hair.palette.json",
+      "paths": 13,
+      "anchors": 108,
+      "seconds": 0.76,
+      "input": "crops/dot-01-hair.png",
+      "input_sha256": "6d31166673864435acbfa60f78ad2fb588a448396576f0d2e1229ecd9573fce5",
+      "mask_iou": 0.9736243747157799
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-02-hair.palette.json",
+      "paths": 13,
+      "anchors": 74,
+      "seconds": 0.8,
+      "input": "crops/dot-02-hair.png",
+      "input_sha256": "2e9bd9d0dae03c06d183c456597a81ffb0029531c1c83636f8305052a82aa706",
+      "mask_iou": 0.9601741373750403
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-03-hair.palette.json",
+      "paths": 21,
+      "anchors": 136,
+      "seconds": 0.89,
+      "input": "crops/dot-03-hair.png",
+      "input_sha256": "e57c457036c00ef287276603eebc7b250e00b4a4b0829fd65b5a9898ea11d456",
+      "mask_iou": 0.9708187741996411
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-04-hair.palette.json",
+      "paths": 12,
+      "anchors": 104,
+      "seconds": 0.72,
+      "input": "crops/dot-04-hair.png",
+      "input_sha256": "70d3123324eb1284f7e68f3b989500b7b893b35699a271f12142af93695be4ff",
+      "mask_iou": 0.9710970682689319
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-05-hair.palette.json",
+      "paths": 13,
+      "anchors": 86,
+      "seconds": 0.77,
+      "input": "crops/dot-05-hair.png",
+      "input_sha256": "cc3824cff63c143b9b4513771a257637144c4dc295e818ff6f3ff4dbbfc9aa39",
+      "mask_iou": 0.947215143793229
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-06-hair.svg",
+      "palette": "/tmp/hearthold-refine-qe71mft7/refined.palette.json",
+      "paths": 32,
+      "anchors": 202,
+      "seconds": 1.74,
+      "input": "crops/dot-06-hair.png",
+      "input_sha256": "4432418fc64115acbb9c67b5fe126ec55864cd5a372f9dfaaeb60dc206855334",
+      "mask_iou": 0.9656758272574313,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9643577673167452
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-07-hair.svg",
+      "palette": "/tmp/hearthold-refine-g3u2efhu/refined.palette.json",
+      "paths": 16,
+      "anchors": 96,
+      "seconds": 0.93,
+      "input": "crops/dot-07-hair.png",
+      "input_sha256": "1010271f8768d0995e5ffc2e235ea418f96d4f0ae5525b36e63dec76fbdd68df",
+      "mask_iou": 0.9745094750964279,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9679153368049723
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-08-hair.svg",
+      "palette": "/tmp/hearthold-refine-k134oo_k/refined.palette.json",
+      "paths": 15,
+      "anchors": 121,
+      "seconds": 1.08,
+      "input": "crops/dot-08-hair.png",
+      "input_sha256": "5f9f2ce14abcb865f09e2bcfb4f49adce1446286d956f21681dc4d026912521e",
+      "mask_iou": 0.9641720846590123,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9632139399806389
+    },
+    {
+      "done": true,
+      "svg": "vectors/dot-09-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/dot-09-hair.palette.json",
+      "paths": 17,
+      "anchors": 78,
+      "seconds": 1.02,
+      "input": "crops/dot-09-hair.png",
+      "input_sha256": "10fa900596f5d96090f9751c1d34bdb68d642853832a17ddf8478177aad9cee3",
+      "mask_iou": 0.9712421781387298
+    },
+    {
+      "done": true,
+      "svg": "vectors/elf-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/elf-hair.palette.json",
+      "paths": 5,
+      "anchors": 149,
+      "seconds": 2.11,
+      "input": "crops/elf-hair.png",
+      "input_sha256": "bfda8b4a1f5380c5401715e7194710533a3f70ff819bd5ef735d238234d0d6f3",
+      "mask_iou": 0.9940157341111995
+    },
+    {
+      "done": true,
+      "svg": "vectors/elf-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/elf-eyes.palette.json",
+      "paths": 14,
+      "anchors": 76,
+      "seconds": 0.86,
+      "input": "crops/elf-eyes.png",
+      "input_sha256": "4e812de09745e0dbf2cf4f0cde81082ba32b46ad4c6e4d14548a993e8167b949",
+      "mask_iou": 1.0
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-00-hair.svg",
+      "palette": "/tmp/hearthold-refine-s9p0zzic/refined.palette.json",
+      "paths": 11,
+      "anchors": 113,
+      "seconds": 0.77,
+      "input": "crops/colour-01-00-hair.png",
+      "input_sha256": "c5877cad43d59ca969e7ccf4cbe43ea914d88a79db668d66d0ce8635fa33760d",
+      "mask_iou": 0.9538017324350336,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9425506555423123
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-00-back.palette.json",
+      "paths": 1,
+      "anchors": 19,
+      "seconds": 0.55,
+      "input": "crops/colour-01-00-back.png",
+      "input_sha256": "ec48058a9995184c432b6a8e9e882a11ab1477a9ea47b0c224663f3a59371922"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-01-hair.svg",
+      "palette": "/tmp/hearthold-refine-u2lb6_my/refined.palette.json",
+      "paths": 12,
+      "anchors": 97,
+      "seconds": 0.92,
+      "input": "crops/colour-01-01-hair.png",
+      "input_sha256": "426eb0e162af2049a10bef79297a619709091df233aa00de5d908f1b9176ecfe",
+      "mask_iou": 0.9477733737467942,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9409164922074901
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-01-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-01-back.palette.json",
+      "paths": 1,
+      "anchors": 14,
+      "seconds": 0.55,
+      "input": "crops/colour-01-01-back.png",
+      "input_sha256": "32a8dfc788846d4605d888dbf926d82db62fe3af0ee8e0047fdc7ab95b25c063"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-02-hair.svg",
+      "palette": "/tmp/hearthold-refine-emlbwyv5/refined.palette.json",
+      "paths": 9,
+      "anchors": 39,
+      "seconds": 0.92,
+      "input": "crops/colour-01-02-hair.png",
+      "input_sha256": "fac6599bca45ae24c6f05ee85fc141873f405a91834c317eff4867cb2ca6413b",
+      "mask_iou": 0.9289855072463769,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9248554913294798
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-03-hair.palette.json",
+      "paths": 11,
+      "anchors": 60,
+      "seconds": 1.55,
+      "input": "crops/colour-01-03-hair.png",
+      "input_sha256": "10f6efcfd7b15b1c5fab6321eb094d20c172fa990f5b5679c56d79c6d0ccc0ec",
+      "mask_iou": 0.9766702014846236
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-03-back.palette.json",
+      "paths": 1,
+      "anchors": 11,
+      "seconds": 0.54,
+      "input": "crops/colour-01-03-back.png",
+      "input_sha256": "16793ef3a3c5deec699145c41243cef4b031e47b3d44a7168dc36391a85204f0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-04-hair.svg",
+      "palette": "/tmp/hearthold-refine-s7xsqghx/refined.palette.json",
+      "paths": 6,
+      "anchors": 35,
+      "seconds": 0.76,
+      "input": "crops/colour-01-04-hair.png",
+      "input_sha256": "ce977166ad63b44040853ec54a1779d8e07de0d4095f98e238919465643bfdae",
+      "mask_iou": 0.9724025974025974,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9654892407632968
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-05-hair.svg",
+      "palette": "/tmp/hearthold-refine-wjex36u4/refined.palette.json",
+      "paths": 5,
+      "anchors": 27,
+      "seconds": 0.88,
+      "input": "crops/colour-01-05-hair.png",
+      "input_sha256": "17cf28c1399c01212b9d1b24299c027b3e3b1bc2390955e169550a16161b77cc",
+      "mask_iou": 0.9691516709511568,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9606837606837607
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-06-hair.svg",
+      "palette": "/tmp/hearthold-refine-ib6o7ccu/refined.palette.json",
+      "paths": 9,
+      "anchors": 63,
+      "seconds": 0.94,
+      "input": "crops/colour-01-06-hair.png",
+      "input_sha256": "a99b7d4719fbcc408ff15de7c307ff3da55e08294e5a16f76e7cdd91010549ac",
+      "mask_iou": 0.9356084996780425,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9273422562141491
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-08-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-08-hair.palette.json",
+      "paths": 6,
+      "anchors": 18,
+      "seconds": 0.75,
+      "input": "crops/colour-01-08-hair.png",
+      "input_sha256": "9ab68733fb626ce40c8eface23d88c24a315b288c375ee6dfb039da1ec456345"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-09-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-09-hair.palette.json",
+      "paths": 16,
+      "anchors": 81,
+      "seconds": 1.17,
+      "input": "crops/colour-01-09-hair.png",
+      "input_sha256": "8c64ff1ea4e192a9bbb8e55065322144b42d38fcaf2d07dce40b843ba726709f",
+      "mask_iou": 0.9802527646129542
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-09-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-09-back.palette.json",
+      "paths": 1,
+      "anchors": 14,
+      "seconds": 0.52,
+      "input": "crops/colour-01-09-back.png",
+      "input_sha256": "6603f5f7416770fa9af913f4116e8e437af9a79683f6540cce4965b013f905aa"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-10-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-10-hair.palette.json",
+      "paths": 7,
+      "anchors": 39,
+      "seconds": 1.02,
+      "input": "crops/colour-01-10-hair.png",
+      "input_sha256": "fc81188462acfbcac6866972b8af239719e42d8b18985e45c01f80d47662d3ad",
+      "mask_iou": 0.9787234042553191
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-10-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-10-back.palette.json",
+      "paths": 2,
+      "anchors": 15,
+      "seconds": 0.51,
+      "input": "crops/colour-01-10-back.png",
+      "input_sha256": "d2f9c7db1f34334f4d732988b30722c5181d953e7590ea1b6fd701c30e2d14dd"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-01-11-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-01-11-hair.palette.json",
+      "paths": 7,
+      "anchors": 31,
+      "seconds": 0.83,
+      "input": "crops/colour-01-11-hair.png",
+      "input_sha256": "1d68e0ba6d3d71935193202b69b29b4ee33eef919f191e029036e91cc7c783cc"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-00-hair.svg",
+      "palette": "/tmp/hearthold-refine-vg47oepp/refined.palette.json",
+      "paths": 13,
+      "anchors": 103,
+      "seconds": 1.2,
+      "input": "crops/colour-02-00-hair.png",
+      "input_sha256": "23c57fed6a2b3766bf1f41aa56ad401a019a5f45c6bcb4ae285df0f8cff9719f",
+      "mask_iou": 0.9388539482879106,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9286463798530955
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-00-back.palette.json",
+      "paths": 2,
+      "anchors": 13,
+      "seconds": 0.53,
+      "input": "crops/colour-02-00-back.png",
+      "input_sha256": "600d760402be9abb0f340e9b4dce38c7d9a835f7e1f22ed5289ce94b7e91e09b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-01-hair.palette.json",
+      "paths": 6,
+      "anchors": 42,
+      "seconds": 0.71,
+      "input": "crops/colour-02-01-hair.png",
+      "input_sha256": "60d99f492a972c2de77521f5687e03608f4617e3a0a9764a47be384802918362"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-02-hair.palette.json",
+      "paths": 22,
+      "anchors": 86,
+      "seconds": 1.46,
+      "input": "crops/colour-02-02-hair.png",
+      "input_sha256": "10f9e74a76d33f0f00e638e15a2f2a6d5470f4cce5da09c959802d4b76083a0f",
+      "mask_iou": 0.9808328977173724
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-02-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-02-back.palette.json",
+      "paths": 3,
+      "anchors": 33,
+      "seconds": 0.53,
+      "input": "crops/colour-02-02-back.png",
+      "input_sha256": "5132d85a0a15a401ce7fbad1e31ca7399d64e91f9ae3e3f5eb6316ffd9dda820"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-03-hair.palette.json",
+      "paths": 10,
+      "anchors": 45,
+      "seconds": 1.36,
+      "input": "crops/colour-02-03-hair.png",
+      "input_sha256": "e4c571d3881e1cc8dacb71cd4aab8bc99deb740061487911935ac6d718d88350",
+      "mask_iou": 0.9808945830523713
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-03-back.palette.json",
+      "paths": 2,
+      "anchors": 21,
+      "seconds": 0.86,
+      "input": "crops/colour-02-03-back.png",
+      "input_sha256": "869e89de67b2761be3e9c369f16eaa1da79f702e650d6f9f70413bf89ee31e2a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-04-hair.svg",
+      "palette": "/tmp/hearthold-refine-19twx5h9/refined.palette.json",
+      "paths": 21,
+      "anchors": 106,
+      "seconds": 0.86,
+      "input": "crops/colour-02-04-hair.png",
+      "input_sha256": "f43a88cbbdce79f5151ca9705212605eaeb422310449874ee783847462297570",
+      "mask_iou": 0.9346429920664904,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9236267870579383
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-05-hair.palette.json",
+      "paths": 1,
+      "anchors": 18,
+      "seconds": 1.27,
+      "input": "crops/colour-02-05-hair.png",
+      "input_sha256": "152c6b7fcde4cd8183a1610c6a55cd89aa45e4299447bd1ae6cb839380735372",
+      "mask_iou": 0.9883051457358762
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-06-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-02-06-hair.palette.json",
+      "paths": 2,
+      "anchors": 12,
+      "seconds": 1.09,
+      "input": "crops/colour-02-06-hair.png",
+      "input_sha256": "cb231fc99eb88215926c58a0951c852f61b1e5dbdc9d5baf84bf78f775996ace",
+      "mask_iou": 0.981913499344692
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-08-hair.svg",
+      "palette": "/tmp/hearthold-refine-73mye759/refined.palette.json",
+      "paths": 24,
+      "anchors": 94,
+      "seconds": 0.84,
+      "input": "crops/colour-02-08-hair.png",
+      "input_sha256": "8580553b120d5f23575c86758c069d1f399c1c5981224942b293dd20fee72596",
+      "mask_iou": 0.93505923650724,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9185185185185185
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-02-09-hair.svg",
+      "palette": "/tmp/hearthold-refine-5pyx8b3h/refined.palette.json",
+      "paths": 18,
+      "anchors": 78,
+      "seconds": 0.91,
+      "input": "crops/colour-02-09-hair.png",
+      "input_sha256": "0307030cc9f8fd32a840b76b2b23b8abe1e1bfe052d0f47020b7b3f38e21ba81",
+      "mask_iou": 0.9734726688102894,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9636581469648562
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-00-hair.palette.json",
+      "paths": 9,
+      "anchors": 62,
+      "seconds": 1.59,
+      "input": "crops/colour-03-00-hair.png",
+      "input_sha256": "29d190b9394da9237c9aed2cacbf60af78bdc17baaabe0b28b5eb201ce674470",
+      "mask_iou": 0.9753020611229567
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-00-back.palette.json",
+      "paths": 2,
+      "anchors": 26,
+      "seconds": 0.53,
+      "input": "crops/colour-03-00-back.png",
+      "input_sha256": "85d44e0e352d61454c6e3579a3c1ef1ba1f60e3925baa3d4b83eedf5d70668fc"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-01-hair.palette.json",
+      "paths": 6,
+      "anchors": 17,
+      "seconds": 0.76,
+      "input": "crops/colour-03-01-hair.png",
+      "input_sha256": "75858461cccafe20f51841534e75ced2cc838a12a032702d19188dfead7dfeb0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-02-hair.palette.json",
+      "paths": 36,
+      "anchors": 119,
+      "seconds": 0.91,
+      "input": "crops/colour-03-02-hair.png",
+      "input_sha256": "71b141e9e303f4f9e6a8b05460c453226039562fdc60b658e2c3a33791963f96"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-03-hair.palette.json",
+      "paths": 7,
+      "anchors": 43,
+      "seconds": 1.24,
+      "input": "crops/colour-03-03-hair.png",
+      "input_sha256": "8b755fda274e0f47e55233008f211d233b8418332af8ac3c8435960c65d17709",
+      "mask_iou": 0.9725175006481721
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-03-back.palette.json",
+      "paths": 2,
+      "anchors": 11,
+      "seconds": 0.6,
+      "input": "crops/colour-03-03-back.png",
+      "input_sha256": "fa7583e9be3143255296dc3ca58fc537aae8883fc5e89da802334abd7e61e470"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-04-hair.palette.json",
+      "paths": 16,
+      "anchors": 82,
+      "seconds": 1.51,
+      "input": "crops/colour-03-04-hair.png",
+      "input_sha256": "1e7eb87bcdd1a162f43304ce84639010675c06b9425b1c8d3be7a1dd524af760",
+      "mask_iou": 0.9862715394811589
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-04-back.palette.json",
+      "paths": 2,
+      "anchors": 27,
+      "seconds": 0.64,
+      "input": "crops/colour-03-04-back.png",
+      "input_sha256": "1ab9421c747c26956be363bf22aa3c11040a2daae0f2a2300a960e9fa6d15e2a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-05-hair.svg",
+      "palette": "/tmp/hearthold-refine-ajr6ghbb/refined.palette.json",
+      "paths": 13,
+      "anchors": 48,
+      "seconds": 0.93,
+      "input": "crops/colour-03-05-hair.png",
+      "input_sha256": "54ba867ac8ccdb5251bbe25095635a00d65d1a381e3d6d649527b7724afb335d",
+      "mask_iou": 0.9759036144578314,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9678456591639871
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-06-hair.svg",
+      "palette": "/tmp/hearthold-refine-u_435stc/refined.palette.json",
+      "paths": 5,
+      "anchors": 61,
+      "seconds": 0.76,
+      "input": "crops/colour-03-06-hair.png",
+      "input_sha256": "1df06bad110f08e2644f11248e65fcc6eeb12686f0b2894fc3912a9e6914b409",
+      "mask_iou": 0.9714398266692928,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9639921722113503
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-06-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-06-back.palette.json",
+      "paths": 1,
+      "anchors": 13,
+      "seconds": 0.64,
+      "input": "crops/colour-03-06-back.png",
+      "input_sha256": "897cc8e00c5f92c53d9c90d865cd0183d0457986c51bf196b855d1e7fe31d9d3"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-08-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-08-hair.palette.json",
+      "paths": 4,
+      "anchors": 27,
+      "seconds": 0.85,
+      "input": "crops/colour-03-08-hair.png",
+      "input_sha256": "7617edd95596493c1c653f92d20f9b4c3c5a6a4172564afdc25047d5c5f691a1"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-09-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-09-hair.palette.json",
+      "paths": 10,
+      "anchors": 66,
+      "seconds": 1.53,
+      "input": "crops/colour-03-09-hair.png",
+      "input_sha256": "ac6692fb96d2e47b7ebe5428bf339d6662e375dcfd17606774cd6633d98fbe88",
+      "mask_iou": 0.9770442814452595
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-09-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-03-09-back.palette.json",
+      "paths": 1,
+      "anchors": 15,
+      "seconds": 0.61,
+      "input": "crops/colour-03-09-back.png",
+      "input_sha256": "587900790eceb3f5bafb4e8bdb53f2ea1e8044e3f898a1c1e883b399bd66cb73"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-03-10-hair.svg",
+      "palette": "/tmp/hearthold-refine-8m3_ot8_/refined.palette.json",
+      "paths": 4,
+      "anchors": 34,
+      "seconds": 0.87,
+      "input": "crops/colour-03-10-hair.png",
+      "input_sha256": "19cdcfc88c82cfb7b1f21e2e907c60ef182ff24780626feff3467c29ffc750de",
+      "mask_iou": 0.9790159189580319,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9675792507204611
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-00-hair.svg",
+      "palette": "/tmp/hearthold-refine-76h_rwnx/refined.palette.json",
+      "paths": 7,
+      "anchors": 96,
+      "seconds": 1.05,
+      "input": "crops/colour-04-00-hair.png",
+      "input_sha256": "bcf733cd14761b2559e75fa9925178ec1fc2673dbd334992bb513507311cc81b",
+      "mask_iou": 0.9584709768758849,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9463840399002493
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-00-back.palette.json",
+      "paths": 2,
+      "anchors": 28,
+      "seconds": 0.64,
+      "input": "crops/colour-04-00-back.png",
+      "input_sha256": "00bcfe5e868b0fc4c291f38f97caed385efe5f7a8998058390562b721e409e13"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-01-hair.palette.json",
+      "paths": 11,
+      "anchors": 42,
+      "seconds": 0.68,
+      "input": "crops/colour-04-01-hair.png",
+      "input_sha256": "afdf995a63c6e477e04a02e2a4439e40c4e2f6888cdd552b4f4e5eaa97c62f9a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-02-hair.svg",
+      "palette": "/tmp/hearthold-refine-mxbkhax3/refined.palette.json",
+      "paths": 15,
+      "anchors": 81,
+      "seconds": 1.02,
+      "input": "crops/colour-04-02-hair.png",
+      "input_sha256": "edc462002a4a471f39e04976fc7dbdd652133e50e72d04cd8c335e0b336b6002",
+      "mask_iou": 0.9752692461108895,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9641086654768987
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-02-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-02-back.palette.json",
+      "paths": 2,
+      "anchors": 17,
+      "seconds": 0.61,
+      "input": "crops/colour-04-02-back.png",
+      "input_sha256": "cfd85b263fb8f9a727a693435535273ef6f3d3181f2b1e70f27ca5102b61e3aa"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-03-hair.svg",
+      "palette": "/tmp/hearthold-refine-7c62zsn2/refined.palette.json",
+      "paths": 17,
+      "anchors": 124,
+      "seconds": 1.14,
+      "input": "crops/colour-04-03-hair.png",
+      "input_sha256": "ef002b0404d1883c2f1b6be284f2a9b0979fa5fa34f0adb3bab100543988ac27",
+      "mask_iou": 0.9716112930900016,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9598200434377909
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-03-back.palette.json",
+      "paths": 2,
+      "anchors": 11,
+      "seconds": 0.55,
+      "input": "crops/colour-04-03-back.png",
+      "input_sha256": "5403d2640524bcabac0b9fd1a20e93eb34f76e1825278d34a2a76a9a3be67269"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-04-hair.palette.json",
+      "paths": 6,
+      "anchors": 38,
+      "seconds": 1.09,
+      "input": "crops/colour-04-04-hair.png",
+      "input_sha256": "1a9015e9619c02ecdc6c67627221efaa939a706f0778277d78e871d4aa84ca20"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-05-hair.palette.json",
+      "paths": 16,
+      "anchors": 51,
+      "seconds": 1.61,
+      "input": "crops/colour-04-05-hair.png",
+      "input_sha256": "a773423e31c95685aec5ec194d282aabc6c71fe20ac9f0a5031f27f058e00a91",
+      "mask_iou": 0.974025974025974
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-07-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-07-hair.palette.json",
+      "paths": 8,
+      "anchors": 52,
+      "seconds": 1.25,
+      "input": "crops/colour-04-07-hair.png",
+      "input_sha256": "4e33556040ff22146c56d7362ee1c4b8a09d9a83d5a42d5adf3934b6906334ee",
+      "mask_iou": 0.9810109654987965
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-07-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-07-back.palette.json",
+      "paths": 2,
+      "anchors": 18,
+      "seconds": 0.56,
+      "input": "crops/colour-04-07-back.png",
+      "input_sha256": "1c2292d213fec6366bd78e6788781cbf1f06ad9d02c061092ba401c545b0f499"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-08-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-08-hair.palette.json",
+      "paths": 4,
+      "anchors": 48,
+      "seconds": 1.61,
+      "input": "crops/colour-04-08-hair.png",
+      "input_sha256": "749b50217a2eb656f2f8dbcdf7214ec5da6c46d73651a962ecf3ddd60f155b6e",
+      "mask_iou": 0.980256084449223
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-08-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-04-08-back.palette.json",
+      "paths": 2,
+      "anchors": 21,
+      "seconds": 0.62,
+      "input": "crops/colour-04-08-back.png",
+      "input_sha256": "6872a0dafc1520077cf508d8112f9eb13519d23f5803b22da6a664057cfeddc6"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-04-09-hair.svg",
+      "palette": "/tmp/hearthold-refine-iaqb5_a1/refined.palette.json",
+      "paths": 17,
+      "anchors": 59,
+      "seconds": 1.0,
+      "input": "crops/colour-04-09-hair.png",
+      "input_sha256": "2507865d4ef0b36e521bc5ae541ebf845a5241e1c469c1d05082f0f7986050da",
+      "mask_iou": 0.9744017807456873,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9655364091161757
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-00-hair.palette.json",
+      "paths": 11,
+      "anchors": 44,
+      "seconds": 0.92,
+      "input": "crops/colour-05-00-hair.png",
+      "input_sha256": "55ea24dc0f36e09040124ff5f79fab62b931c1a76286bc7f21d5e25867ae8767"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-01-hair.svg",
+      "palette": "/tmp/hearthold-refine-cfq9eybf/refined.palette.json",
+      "paths": 19,
+      "anchors": 93,
+      "seconds": 1.03,
+      "input": "crops/colour-05-01-hair.png",
+      "input_sha256": "3db02f4f1eb961c00aea33cb85f388ad61073b7bff0a901379df6bbd28013270",
+      "mask_iou": 0.9499165275459098,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9418604651162791
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-02-hair.palette.json",
+      "paths": 1,
+      "anchors": 8,
+      "seconds": 0.68,
+      "input": "crops/colour-05-02-hair.png",
+      "input_sha256": "04a8381d62ded83bf5f08d538b54383083d91905a7be4332e10f7752a3caa2c2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-03-hair.palette.json",
+      "paths": 1,
+      "anchors": 10,
+      "seconds": 1.29,
+      "input": "crops/colour-05-03-hair.png",
+      "input_sha256": "9c06a8671bbcdea5b8b97aa920f6b8d7e205afb7042385b189af3f91ef8c3f82",
+      "mask_iou": 0.983
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-04-hair.palette.json",
+      "paths": 3,
+      "anchors": 38,
+      "seconds": 1.34,
+      "input": "crops/colour-05-04-hair.png",
+      "input_sha256": "f68a2ddefbd260cfb1879581b05f9a3ca582fa8ceab5e21161467e4d650ae6af",
+      "mask_iou": 0.9783352337514253
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-04-back.palette.json",
+      "paths": 1,
+      "anchors": 20,
+      "seconds": 0.52,
+      "input": "crops/colour-05-04-back.png",
+      "input_sha256": "30996a764364eb87fa3ffcef9217e62d19bea4c418ea4d53f06a07d4fc28cd97"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-05-hair.palette.json",
+      "paths": 2,
+      "anchors": 25,
+      "seconds": 0.82,
+      "input": "crops/colour-05-05-hair.png",
+      "input_sha256": "f48c077e2d2f15ea445527739d58bffbe93afc5244fec304afc8217323b33d7d"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-06-hair.svg",
+      "palette": "/tmp/hearthold-refine-103u5c5v/refined.palette.json",
+      "paths": 78,
+      "anchors": 325,
+      "seconds": 1.19,
+      "input": "crops/colour-05-06-hair.png",
+      "input_sha256": "d70ef6e4d45f4186e6cc56426f3f6e86cd34a5ad5dc981c780010749bd966b5a",
+      "mask_iou": 0.9609455292908531,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.955719557195572
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-07-hair.svg",
+      "palette": "/tmp/hearthold-refine-bqwpm8uk/refined.palette.json",
+      "paths": 16,
+      "anchors": 180,
+      "seconds": 1.2,
+      "input": "crops/colour-05-07-hair.png",
+      "input_sha256": "e4413fe808f7159f0af7063b0be3322bc741a72676fd73fdb0687a17d1ac1403",
+      "mask_iou": 0.9733154841588576,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9675093466263129
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-07-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-07-back.palette.json",
+      "paths": 2,
+      "anchors": 19,
+      "seconds": 0.54,
+      "input": "crops/colour-05-07-back.png",
+      "input_sha256": "09bd30e5fedbffc802c586667fab6b1f588421a85e3f75a35ee774d29ef58dbf"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-08-hair.svg",
+      "palette": "/tmp/hearthold-refine-tmnxcffu/refined.palette.json",
+      "paths": 23,
+      "anchors": 106,
+      "seconds": 1.03,
+      "input": "crops/colour-05-08-hair.png",
+      "input_sha256": "7601b22e47bc7a981626058af445c0bdf7d81b4a37bd35f2147dbe36a2ed0243",
+      "mask_iou": 0.9699217140502678,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9629781982723159
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-09-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-09-hair.palette.json",
+      "paths": 5,
+      "anchors": 85,
+      "seconds": 1.71,
+      "input": "crops/colour-05-09-hair.png",
+      "input_sha256": "b3e0d1a5ff6253f57922b247049d0c0b8cf0cec0768af0439b81a4fa69401acb",
+      "mask_iou": 0.9730551933941765
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-05-09-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-05-09-back.palette.json",
+      "paths": 3,
+      "anchors": 30,
+      "seconds": 0.53,
+      "input": "crops/colour-05-09-back.png",
+      "input_sha256": "41d23048f20208942787ee8c0b1d8621d4777958e6d54009d4126aac615381f4"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-00-hair.palette.json",
+      "paths": 1,
+      "anchors": 16,
+      "seconds": 1.67,
+      "input": "crops/colour-06-00-hair.png",
+      "input_sha256": "fb8422495484655a6204150700d8fed332cdafb90e2eb3647ca9423de9ac7c81",
+      "mask_iou": 0.9788622129436325
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-01-hair.palette.json",
+      "paths": 2,
+      "anchors": 15,
+      "seconds": 1.25,
+      "input": "crops/colour-06-01-hair.png",
+      "input_sha256": "afc920e167321ba6bf6b1538717e69c01f08a8dac095c986db76a6a5268ed460",
+      "mask_iou": 0.9853207982846776
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-02-hair.palette.json",
+      "paths": 6,
+      "anchors": 53,
+      "seconds": 1.47,
+      "input": "crops/colour-06-02-hair.png",
+      "input_sha256": "7b6516ae56c9b0e7ce2fdb0454ee8541defb1def30649f97251f192a6fa75a40",
+      "mask_iou": 0.9705583756345177
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-03-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-03-hair.palette.json",
+      "paths": 8,
+      "anchors": 39,
+      "seconds": 0.92,
+      "input": "crops/colour-06-03-hair.png",
+      "input_sha256": "4610d3a8457c78272526c660fdfc0cf584ab850d5812a475c5ee1c9959968929"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-04-hair.palette.json",
+      "paths": 10,
+      "anchors": 69,
+      "seconds": 1.55,
+      "input": "crops/colour-06-04-hair.png",
+      "input_sha256": "e0eb6c255a6901b27b2b5c0feb0ae265457b832eb6e3d8ed0f2c72491bcc7139",
+      "mask_iou": 0.9855010048808498
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-04-back.palette.json",
+      "paths": 2,
+      "anchors": 19,
+      "seconds": 0.67,
+      "input": "crops/colour-06-04-back.png",
+      "input_sha256": "b9aefa9d8cdbe613c01044109899d19ef25a247ef5d6c26f85667ced114b4252"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-05-hair.svg",
+      "palette": "/tmp/hearthold-refine-amobdrod/refined.palette.json",
+      "paths": 17,
+      "anchors": 107,
+      "seconds": 1.12,
+      "input": "crops/colour-06-05-hair.png",
+      "input_sha256": "57a871484ed529fc87bb981ace332f479cd78f2469af8c64a4d999c1518497fb",
+      "mask_iou": 0.9661648049214829,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9567315425446357
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-05-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-05-back.palette.json",
+      "paths": 2,
+      "anchors": 18,
+      "seconds": 0.59,
+      "input": "crops/colour-06-05-back.png",
+      "input_sha256": "3b7e43400e3021d9d7f02ddba5264eed2a0758a6a8d9a6fd0c96b91682256dc2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-06-hair.svg",
+      "palette": "/tmp/hearthold-refine-xjw18cc6/refined.palette.json",
+      "paths": 9,
+      "anchors": 36,
+      "seconds": 0.79,
+      "input": "crops/colour-06-06-hair.png",
+      "input_sha256": "d4ba3137af9762e0945ccb2e15e918cb5975cb09ecc9103e33540503c8b3cbc7",
+      "mask_iou": 0.9631578947368421,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9615181866104375
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-07-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-07-hair.palette.json",
+      "paths": 16,
+      "anchors": 96,
+      "seconds": 0.81,
+      "input": "crops/colour-06-07-hair.png",
+      "input_sha256": "028e18f92aaf33594ea47c58292c8b8ac62eb58d426d1cbef1be8d3c4ed3d770",
+      "mask_iou": 0.9736938253562295
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-08-hair.svg",
+      "palette": "/tmp/hearthold-refine-0afxxmhi/refined.palette.json",
+      "paths": 30,
+      "anchors": 124,
+      "seconds": 1.01,
+      "input": "crops/colour-06-08-hair.png",
+      "input_sha256": "d06a07bfcecf43c1d9931d302847567bdeec0f811a5e46608d262e8f96368f9a",
+      "mask_iou": 0.9567371202113606,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9512676983865657
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-09-hair.svg",
+      "palette": "/tmp/hearthold-refine-e6d51x58/refined.palette.json",
+      "paths": 6,
+      "anchors": 132,
+      "seconds": 1.04,
+      "input": "crops/colour-06-09-hair.png",
+      "input_sha256": "97863dfab5619cb54ad08e77d466175b32044cb0dff6c80d9b9e8fbec434abbf",
+      "mask_iou": 0.9674624076119276,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9618669146867338
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-06-09-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-06-09-back.palette.json",
+      "paths": 2,
+      "anchors": 29,
+      "seconds": 0.71,
+      "input": "crops/colour-06-09-back.png",
+      "input_sha256": "d555d6809f98695084fc7afafbedca25c96d83b942a27fb8a91f17c4e8e0203f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-00-hair.palette.json",
+      "paths": 18,
+      "anchors": 104,
+      "seconds": 1.4,
+      "input": "crops/colour-07-00-hair.png",
+      "input_sha256": "ac8f2622054981b431858b36b52769733314431bf2969290bd4840e443932029",
+      "mask_iou": 0.9815079118833385
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-00-back.palette.json",
+      "paths": 3,
+      "anchors": 31,
+      "seconds": 0.62,
+      "input": "crops/colour-07-00-back.png",
+      "input_sha256": "11e80d9abad318c4b4a741065b4f90dac7a0c6147bf228e9b546f4dcfa0083e5"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-01-hair.svg",
+      "palette": "/tmp/hearthold-refine-_hj0oqm9/refined.palette.json",
+      "paths": 20,
+      "anchors": 144,
+      "seconds": 0.91,
+      "input": "crops/colour-07-01-hair.png",
+      "input_sha256": "e6082409458846a771832b883c01e35e992483cae89cb1e307d2ee8503581379",
+      "mask_iou": 0.9766295237156098,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.969956658786446
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-01-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-01-back.palette.json",
+      "paths": 3,
+      "anchors": 30,
+      "seconds": 0.52,
+      "input": "crops/colour-07-01-back.png",
+      "input_sha256": "f09eb3679b7fa99dc28d4be4fc6b32f1eaa35151b4a4d5c329a4575d593cdf2e"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-02-hair.svg",
+      "palette": "/tmp/hearthold-refine-6y_a694_/refined.palette.json",
+      "paths": 12,
+      "anchors": 85,
+      "seconds": 0.88,
+      "input": "crops/colour-07-02-hair.png",
+      "input_sha256": "8c8369a8138a5274d16838ba67f3e51bd4714989387f7e8b7a23d4821168135c",
+      "mask_iou": 0.9754397989490519,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9652272727272727
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-03-hair.svg",
+      "palette": "/tmp/hearthold-refine-3zwmqcy2/refined.palette.json",
+      "paths": 41,
+      "anchors": 158,
+      "seconds": 1.21,
+      "input": "crops/colour-07-03-hair.png",
+      "input_sha256": "57bd8722012f01921ef1c97322662cd9a4e9391a68f4c9057cddab6d9d38620a",
+      "mask_iou": 0.958997722095672,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9463340891912321
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-03-back.palette.json",
+      "paths": 1,
+      "anchors": 9,
+      "seconds": 0.62,
+      "input": "crops/colour-07-03-back.png",
+      "input_sha256": "03b0745d4fa1cc2835bbc090d6d89fc9ad01fa9966e58431e8a0defd7d818d70"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-04-hair.palette.json",
+      "paths": 2,
+      "anchors": 25,
+      "seconds": 1.47,
+      "input": "crops/colour-07-04-hair.png",
+      "input_sha256": "50b02e6de80eb03d462668ae37d29e88ce3ca1fc442fd309de1dca52ca32c0d7",
+      "mask_iou": 0.9804932735426009
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-05-hair.palette.json",
+      "paths": 5,
+      "anchors": 58,
+      "seconds": 1.68,
+      "input": "crops/colour-07-05-hair.png",
+      "input_sha256": "23848353a8e3298fa9ac1b54cfc2169445d55b67bc40dbdfcec8b27916e59df0",
+      "mask_iou": 0.980819529206626
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-05-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-05-back.palette.json",
+      "paths": 1,
+      "anchors": 20,
+      "seconds": 0.62,
+      "input": "crops/colour-07-05-back.png",
+      "input_sha256": "81070c4c9860cc9444d638ffa80a3edff203ed519827d95e735129bd1e52a981"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-06-hair.svg",
+      "palette": "/tmp/hearthold-refine-rlyhpkn9/refined.palette.json",
+      "paths": 10,
+      "anchors": 121,
+      "seconds": 0.97,
+      "input": "crops/colour-07-06-hair.png",
+      "input_sha256": "2a63688242b2fef904388b9728f345cff9e45548e004ca862739687692d0fef2",
+      "mask_iou": 0.9432835820895522,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.936663124335813
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-07-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-07-07-hair.palette.json",
+      "paths": 8,
+      "anchors": 43,
+      "seconds": 0.66,
+      "input": "crops/colour-07-07-hair.png",
+      "input_sha256": "e00c53766123de6cf02724ecceca3494c3804d4818def6e38d2fadb1a32f964f",
+      "mask_iou": 0.981484944828876
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-08-hair.svg",
+      "palette": "/tmp/hearthold-refine-98equ_15/refined.palette.json",
+      "paths": 4,
+      "anchors": 73,
+      "seconds": 1.25,
+      "input": "crops/colour-07-08-hair.png",
+      "input_sha256": "cab0cfafd750c1792f563be2d7352bdfd3cc700d71027726b61acc9de2e022a6",
+      "mask_iou": 0.9669952850407201,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9599147121535181
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-07-09-hair.svg",
+      "palette": "/tmp/hearthold-refine-qdyf39a6/refined.palette.json",
+      "paths": 23,
+      "anchors": 169,
+      "seconds": 1.02,
+      "input": "crops/colour-07-09-hair.png",
+      "input_sha256": "4546534cff8d6aec43bb842c4f6c38a15a3195a187dd88993ef6bd426cd05221",
+      "mask_iou": 0.9274382314694408,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9112028910686629
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-08-00-hair.palette.json",
+      "paths": 5,
+      "anchors": 28,
+      "seconds": 0.91,
+      "input": "crops/colour-08-00-hair.png",
+      "input_sha256": "7247f6b55f69cd5ce7a4f2a373e6ac673b3d2c0f2d76c6770e703263b3a10a2b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-02-hair.svg",
+      "palette": "/tmp/hearthold-refine-qxem4kzp/refined.palette.json",
+      "paths": 22,
+      "anchors": 104,
+      "seconds": 1.45,
+      "input": "crops/colour-08-02-hair.png",
+      "input_sha256": "60deac359618bfee34929d60cb93193f8e69f4fccfd406b44148ad4e121cc670",
+      "mask_iou": 0.949449125081011,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9414037347070187
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-04-hair.svg",
+      "palette": "/tmp/hearthold-refine-zec0hj1j/refined.palette.json",
+      "paths": 96,
+      "anchors": 362,
+      "seconds": 1.91,
+      "input": "crops/colour-08-04-hair.png",
+      "input_sha256": "6ecffb61ffd3b75d5d39d63931eb9cc351d7ad65f6d60d52e3278a9225c54254",
+      "mask_iou": 0.9581522613874135,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9527862534125582
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-08-04-back.palette.json",
+      "paths": 1,
+      "anchors": 26,
+      "seconds": 0.59,
+      "input": "crops/colour-08-04-back.png",
+      "input_sha256": "34e0cfd1e96dce7f37734b00e76b7ea48f405ab0ceb28a210a464658e5873f54"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-08-05-hair.palette.json",
+      "paths": 2,
+      "anchors": 25,
+      "seconds": 1.41,
+      "input": "crops/colour-08-05-hair.png",
+      "input_sha256": "1d078fb31dbd60faf6e7401e5fc9e29d60352d59bee8ede20955548df31a448c",
+      "mask_iou": 0.9872833670943056
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-05-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-08-05-back.palette.json",
+      "paths": 1,
+      "anchors": 10,
+      "seconds": 0.6,
+      "input": "crops/colour-08-05-back.png",
+      "input_sha256": "804409514482a99f3114ebb5ae042291c91717d23cc41294ec13ebf5adddd39e"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-07-hair.svg",
+      "palette": "/tmp/hearthold-refine-ln5i1lpu/refined.palette.json",
+      "paths": 30,
+      "anchors": 197,
+      "seconds": 0.88,
+      "input": "crops/colour-08-07-hair.png",
+      "input_sha256": "3bdfe3fda61bdbd5d1dd7376175c40be7c4bf45348d4ffc89819eb7c7e8345e6",
+      "mask_iou": 0.8451225150254277,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.8250688705234159
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-08-09-hair.svg",
+      "palette": "/tmp/hearthold-refine-lyf0izow/refined.palette.json",
+      "paths": 29,
+      "anchors": 110,
+      "seconds": 0.86,
+      "input": "crops/colour-08-09-hair.png",
+      "input_sha256": "1b71570f45e87efb989a3b2ea7eced6a76c02f70db77f5d53913ae1f9c1d33e9",
+      "mask_iou": 0.9591211037301993,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9475292919001528
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-00-hair.svg",
+      "palette": "/tmp/hearthold-refine-tq0afg97/refined.palette.json",
+      "paths": 13,
+      "anchors": 75,
+      "seconds": 1.09,
+      "input": "crops/colour-09-00-hair.png",
+      "input_sha256": "20f5f7c5753843fcca0c919dfb583de655ba6145a588ec73869ea908a706692e",
+      "mask_iou": 0.9755443886097153,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9686143572621035
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-09-01-hair.palette.json",
+      "paths": 59,
+      "anchors": 239,
+      "seconds": 1.29,
+      "input": "crops/colour-09-01-hair.png",
+      "input_sha256": "543022148f13305be91f09aa336848b9de16c88713e0e00d2e89ad4809d4af4c"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-02-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-09-02-hair.palette.json",
+      "paths": 12,
+      "anchors": 54,
+      "seconds": 1.02,
+      "input": "crops/colour-09-02-hair.png",
+      "input_sha256": "b3ad5c32caa0768e00e62a1b4b3bdcb16fca335cc974178904089b0b9d8f4e9f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-03-hair.svg",
+      "palette": "/tmp/hearthold-refine-iezjonu4/refined.palette.json",
+      "paths": 14,
+      "anchors": 80,
+      "seconds": 1.12,
+      "input": "crops/colour-09-03-hair.png",
+      "input_sha256": "81d216df3d7e6274298788c74e1bc7550e1438b340aa3e6ec4b51cc2498e5764",
+      "mask_iou": 0.9518823236100723,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9445549477871705
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-09-03-back.palette.json",
+      "paths": 1,
+      "anchors": 13,
+      "seconds": 0.5,
+      "input": "crops/colour-09-03-back.png",
+      "input_sha256": "41de421ea8f838dc0c1d146b6717a9f264bff92bc8f524844f4dc5a29ac66eec"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-04-hair.svg",
+      "palette": "/tmp/hearthold-refine-l1sq0g9o/refined.palette.json",
+      "paths": 4,
+      "anchors": 73,
+      "seconds": 0.94,
+      "input": "crops/colour-09-04-hair.png",
+      "input_sha256": "6b497b34c0b4885b1f13f4906e79aa59b31f88e9c857a777f57c4f77f3dcba41",
+      "mask_iou": 0.9154732797764583,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9039861351819758
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-09-04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-09-04-back.palette.json",
+      "paths": 1,
+      "anchors": 16,
+      "seconds": 0.64,
+      "input": "crops/colour-09-04-back.png",
+      "input_sha256": "f7414d99d2237c0a4ed66489f91fdf372aff2c9ce11bd65c5298a64c59abe8c3"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-00-hair.palette.json",
+      "paths": 24,
+      "anchors": 144,
+      "seconds": 1.51,
+      "input": "crops/colour-10-00-hair.png",
+      "input_sha256": "e5067f1835c384a2542794cbd5d0ed86720b461aee287a955f4634b3d0ed6b32",
+      "mask_iou": 0.979362652869238
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-00-back.palette.json",
+      "paths": 2,
+      "anchors": 26,
+      "seconds": 0.52,
+      "input": "crops/colour-10-00-back.png",
+      "input_sha256": "7af0bc7dc6c2bde77f446cb9cf7774569b8fedf9a651909e1c9603681c082cc9"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-01-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-01-hair.palette.json",
+      "paths": 6,
+      "anchors": 30,
+      "seconds": 0.8,
+      "input": "crops/colour-10-01-hair.png",
+      "input_sha256": "fcb6e2f007aafa78707249e4ef6c227d871fb58241d7069e0cd5cc2cf707221e",
+      "mask_iou": 0.9858156028368794
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-02-hair.svg",
+      "palette": "/tmp/hearthold-refine-htv99ul7/refined.palette.json",
+      "paths": 32,
+      "anchors": 201,
+      "seconds": 1.34,
+      "input": "crops/colour-10-02-hair.png",
+      "input_sha256": "3a16a4451fcb643dd45dcdeccfaeae448585f696e7bfa7a3a7fc1bcc7ea7388c",
+      "mask_iou": 0.9052408681842244,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.8900811305940853
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-03-hair.svg",
+      "palette": "/tmp/hearthold-refine-kek7a5pe/refined.palette.json",
+      "paths": 26,
+      "anchors": 152,
+      "seconds": 0.74,
+      "input": "crops/colour-10-03-hair.png",
+      "input_sha256": "6d1776715d8af18c0b45896e96b738378de3b728aa5f67fc72252b7500a0b38e",
+      "mask_iou": 0.9468727789623312,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9362944611573173
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-04-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-04-hair.palette.json",
+      "paths": 2,
+      "anchors": 19,
+      "seconds": 1.03,
+      "input": "crops/colour-10-04-hair.png",
+      "input_sha256": "efe54a3f972b0007ce3cb165365f2131afe7f327b4add1b34f593faba4c058e0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-05-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-05-hair.palette.json",
+      "paths": 9,
+      "anchors": 62,
+      "seconds": 1.67,
+      "input": "crops/colour-10-05-hair.png",
+      "input_sha256": "af42b43c514d46ccf6582e62ad359e737759424535939ef74c2fa75add2e73cb",
+      "mask_iou": 0.9739918176504968
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-06-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-06-hair.palette.json",
+      "paths": 1,
+      "anchors": 11,
+      "seconds": 0.52,
+      "input": "crops/colour-10-06-hair.png",
+      "input_sha256": "9dd524e9e19516138ab4bf54ea2d029fe0b4e98624c29d551ab157457392f56d",
+      "mask_iou": 0.9915159633846841
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-07-hair.svg",
+      "palette": "/tmp/hearthold-refine-4inyb2so/refined.palette.json",
+      "paths": 33,
+      "anchors": 235,
+      "seconds": 1.0,
+      "input": "crops/colour-10-07-hair.png",
+      "input_sha256": "962b24e3ba2058dee4a772ffecc64790d0a1d91125a09632d1486567990a7fd2",
+      "mask_iou": 0.9418064255405132,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9277543648404576
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-07-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-07-back.palette.json",
+      "paths": 2,
+      "anchors": 28,
+      "seconds": 0.6,
+      "input": "crops/colour-10-07-back.png",
+      "input_sha256": "b08b4932887c144ef75061b78c19ca1516b60f1bbc14399bea37b101e6c4b181"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-08-hair.svg",
+      "palette": "/tmp/hearthold-refine-tziakwp6/refined.palette.json",
+      "paths": 13,
+      "anchors": 107,
+      "seconds": 1.11,
+      "input": "crops/colour-10-08-hair.png",
+      "input_sha256": "8d695b3d2721f2c6a96ec4b1f09441a00723c54307bd6b404fd50c1365c9c6a0",
+      "mask_iou": 0.9362875956575903,
+      "settings": {
+        "detail": 1,
+        "smooth": 0.1,
+        "lines": "fill"
+      },
+      "previous_iou": 0.9329539391783745
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-10-09-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-10-09-hair.palette.json",
+      "paths": 2,
+      "anchors": 16,
+      "seconds": 0.63,
+      "input": "crops/colour-10-09-hair.png",
+      "input_sha256": "1d4c4fefcbe7aa7a4c88841832af20a9870fee03c936b02b4d8df7b128b04647",
+      "mask_iou": 0.9827442827442827
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-11-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-11-00-hair.palette.json",
+      "paths": 29,
+      "anchors": 259,
+      "seconds": 3.05,
+      "input": "crops/colour-11-00-hair.png",
+      "input_sha256": "19192362137d98c31c7a0649c67207c4082b181da25da97a335eda3e0102bc2e",
+      "mask_iou": 0.9964305751707326
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-11-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-11-00-back.palette.json",
+      "paths": 2,
+      "anchors": 31,
+      "seconds": 0.84,
+      "input": "crops/colour-11-00-back.png",
+      "input_sha256": "6550fa646efe7e74adbb1202802db50dc94d3b01f7ac481e5f8787f007e6ac7c"
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-12-00-hair.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-12-00-hair.palette.json",
+      "paths": 14,
+      "anchors": 111,
+      "seconds": 1.97,
+      "input": "crops/colour-12-00-hair.png",
+      "input_sha256": "77f4893ae4032e6f067fbd50c8f364ff144628ee6da0878f62d78ae4a73163b8",
+      "mask_iou": 0.9733297413793104
+    },
+    {
+      "done": true,
+      "svg": "vectors/colour-12-00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/pool/vectors/colour-12-00-back.palette.json",
+      "paths": 3,
+      "anchors": 55,
+      "seconds": 0.75,
+      "input": "crops/colour-12-00-back.png",
+      "input_sha256": "65873136ec16ce05786cd5953ca3f08df8901efeb2d8fb6d6de0281eb8cec781"
+    }
+  ]
+}

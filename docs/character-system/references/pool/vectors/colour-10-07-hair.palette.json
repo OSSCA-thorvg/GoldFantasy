@@ -1,0 +1,44 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Beige",
+      "color": "#edd798ff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#242017ff"
+    },
+    {
+      "index": 2,
+      "name": "Umber",
+      "color": "#4c442bff"
+    },
+    {
+      "index": 3,
+      "name": "Umber 2",
+      "color": "#352f1dff"
+    },
+    {
+      "index": 4,
+      "name": "Beige 2",
+      "color": "#f0d99aff"
+    },
+    {
+      "index": 5,
+      "name": "Beige 3",
+      "color": "#edd89aff"
+    },
+    {
+      "index": 6,
+      "name": "Beige 4",
+      "color": "#e6cda4ff"
+    },
+    {
+      "index": 7,
+      "name": "Black 2",
+      "color": "#21250eff"
+    }
+  ]
+}

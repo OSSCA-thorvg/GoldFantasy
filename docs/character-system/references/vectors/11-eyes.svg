@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="154" height="74" viewBox="0 0 154 74">
+<g id="fills">
+<path id="fill-1-s0" fill="#0f0f0f" d="M104.05 62.45C116.49 67.61 133.73 66.11 138.65 51.56C143.02 38.65 140.44 33.98 126.06 34.44C130.53 42.34 131.32 56.91 120.69 60.25C114.84 62.09 105.03 55.4 109.71 49.21C104.36 48.51 109.95 43.26 107.03 41C102.33 44.96 101.79 51.62 100.01 57C97.44 45.78 108.02 34.24 118.71 31.97C128.32 29.93 140.66 32.39 147 40.31L143.81 40C141.23 46.39 141.2 53.65 136.26 59.2C128.35 68.1 113.36 69.91 104.05 62.45Z"/>
+<path id="fill-2-s0" fill="#0f0f0f" d="M32.51 61C31.99 58.8 30.7 57 28.88 55.7C22.57 51.18 25.07 41.78 27.92 35.42C19.85 33.65 13.39 41.83 6.38 41.88C13.47 35.06 24.85 30.79 34.71 32.69C44.73 34.61 57.77 45.46 53.75 57C52.47 51.41 51.63 44.62 46.26 41.24C48.47 50.16 44.07 63.62 32.51 61Z"/>
+<path id="fill-3-s0" fill="#0f0f0f" d="M13.15 17.65C20.89 7.7 40.49 3.34 50 12.33C37.57 7.33 24.24 11.41 13.15 17.65Z"/>
+<path id="fill-4-s0" fill="#0f0f0f" d="M103.21 12.71C111.91 3.2 132.02 6.14 139.85 15.65C128.57 10.02 115.2 6.91 103.21 12.71Z"/>
+<path id="fill-5-s0" fill="#0f0f0f" d="M13.2 43C12.12 62.3 34.69 71.89 49.9 62.4C40.92 70.61 22.62 69.05 16.02 57.93C13.58 53.81 11.06 47.35 13.2 43Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s0" fill="none" stroke="#0f0f0f" stroke-width="2.33" stroke-linecap="round" stroke-linejoin="round" d="M103.67 12.12C114.51 5.72 128.97 7.88 138.94 14.97"/>
+<path id="line-2-s0" fill="none" stroke="#0f0f0f" stroke-width="2.48" stroke-linecap="round" stroke-linejoin="round" d="M48.97 11.42C37.53 6.08 23.78 9.34 14.16 16.92"/>
+<path id="line-3-s0" fill="none" stroke="#0f0f0f" stroke-width="2.52" stroke-linecap="round" stroke-linejoin="round" d="M122.2 31.75C128.99 32.98 135.97 33.68 142.22 36.88"/>
+<path id="line-4-s0" fill="none" stroke="#0f0f0f" stroke-width="1.74" stroke-linecap="round" stroke-linejoin="round" d="M142.22 36.88C141.38 45.24 140.57 54.28 134.06 60.37C126.21 67.72 113.69 67.44 104.56 62.77"/>
+<path id="line-5-s0" fill="none" stroke="#0f0f0f" stroke-width="2.44" stroke-linecap="round" stroke-linejoin="round" d="M33.11 33.14C23.98 33.58 14.79 35.9 7.64 41.88"/>
+<path id="line-6-s0" fill="none" stroke="#0f0f0f" stroke-width="1.81" stroke-linecap="round" stroke-linejoin="round" d="M109.28 37.23C103.72 41.78 100.16 48.65 100 55.88"/>
+<path id="line-7-s0" fill="none" stroke="#0f0f0f" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round" d="M44.19 37C49.74 41.72 54.01 48.49 54 55.97"/>
+<path id="line-8-s0" fill="none" stroke="#0f0f0f" stroke-width="1.56" stroke-linecap="round" stroke-linejoin="round" d="M12.8 43.48C11.54 62.93 34.36 73.14 49.47 62.62"/>
+</g>
+</svg>

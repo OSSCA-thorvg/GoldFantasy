@@ -1,0 +1,135 @@
+[
+  {
+    "index": 0,
+    "name": "Side part",
+    "source_svg": "docs/character-system/references/layers/00-hair.svg",
+    "maximum_coordinate_error": 4.974358974951798e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 1,
+    "name": "Long waves",
+    "source_svg": "docs/character-system/references/layers/01-hair.svg",
+    "maximum_coordinate_error": 4.871794873295698e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 2,
+    "name": "Side fringe",
+    "source_svg": "docs/character-system/references/layers/02-hair.svg",
+    "maximum_coordinate_error": 4.878048781797872e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 3,
+    "name": "Wind swept",
+    "source_svg": "docs/character-system/references/layers/03-hair.svg",
+    "maximum_coordinate_error": 4.956521739263309e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 4,
+    "name": "Curly crown",
+    "source_svg": "docs/character-system/references/layers/04-hair.svg",
+    "maximum_coordinate_error": 4.984126983131887e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 5,
+    "name": "Flipped bob",
+    "source_svg": "docs/character-system/references/layers/05-hair.svg",
+    "maximum_coordinate_error": 4.985915493582738e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 6,
+    "name": "Long centre part",
+    "source_svg": "docs/character-system/references/layers/06-hair.svg",
+    "maximum_coordinate_error": 4.048192773886683e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 7,
+    "name": "Spiky crop",
+    "source_svg": "docs/character-system/references/layers/07-hair.svg",
+    "maximum_coordinate_error": 4.950819672888684e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 8,
+    "name": "Soft bob",
+    "source_svg": "docs/character-system/references/layers/08-hair.svg",
+    "maximum_coordinate_error": 4.987012986568118e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 9,
+    "name": "Twin loops",
+    "source_svg": "docs/character-system/references/layers/09-hair.svg",
+    "maximum_coordinate_error": 4.9879518071449525e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 10,
+    "name": "Tousled crop",
+    "source_svg": "docs/character-system/references/layers/10-hair.svg",
+    "maximum_coordinate_error": 4.705882354461011e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 11,
+    "name": "Braids",
+    "source_svg": "docs/character-system/references/layers/11-hair.svg",
+    "maximum_coordinate_error": 4.736842107000427e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 12,
+    "name": "Long locks",
+    "source_svg": "docs/character-system/references/layers/12-hair.svg",
+    "maximum_coordinate_error": 4.938271606302891e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 13,
+    "name": "Short centre part",
+    "source_svg": "docs/character-system/references/layers/13-hair.svg",
+    "maximum_coordinate_error": 4.9382716054147124e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 14,
+    "name": "Wild tuft",
+    "source_svg": "docs/character-system/references/layers/14-hair.svg",
+    "maximum_coordinate_error": 4.933333334289358e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 15,
+    "name": "Short twin tails",
+    "source_svg": "docs/character-system/references/layers/15-hair.svg",
+    "maximum_coordinate_error": 4.888888890164367e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 16,
+    "name": "High bun",
+    "source_svg": "docs/character-system/references/layers/16-hair.svg",
+    "maximum_coordinate_error": 4.857142858138985e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 17,
+    "name": "Light crop",
+    "source_svg": "docs/character-system/references/layers/17-hair.svg",
+    "maximum_coordinate_error": 4.761904763395108e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  },
+  {
+    "index": 18,
+    "name": "Twin buns",
+    "source_svg": "docs/character-system/references/layers/18-hair.svg",
+    "maximum_coordinate_error": 4.761904762951019e-06,
+    "result": "similarity transform only; no baked nonlinear warp"
+  }
+]

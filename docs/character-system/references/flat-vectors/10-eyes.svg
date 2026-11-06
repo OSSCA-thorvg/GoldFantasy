@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="161" height="66" viewBox="0 0 161 66">
+<title>10-eyes reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_10_eyes_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#141414" d="M7 34.98C21.08 30.65 57.75 28.66 59.22 49C56.37 46 55.35 41.05 50.71 40C49.01 45.54 46.34 51.9 39.6 51.96C31.15 52.03 28.01 42.41 28.85 35.35L11.08 36.42C16.96 56.25 40.26 61.7 57 53.78C38.86 67.94 14.36 54.31 7 34.98Z"/>
+<path id="fill-2-s0" fill="#141414" d="M104.09 53.41C121.46 62.7 144.04 54.06 150.99 35.51L130 34.64C132.29 41.79 127.89 52.03 119.4 51.86C112.43 51.72 110.21 44.58 108.36 39.14C104.3 41.08 102.19 44.99 100.29 48.79C100.16 27.68 138.76 31.18 153 33.68C148.87 54.08 120.44 67.8 104.09 53.41Z"/>
+<path id="fill-3-s0" fill="#141414" d="M16 14.21C25.1 5.25 46.19 3.57 54.98 13.52C42.18 8.08 28.37 10.64 16 14.21Z"/>
+<path id="fill-4-s0" fill="#141414" d="M99.5 14C107.39 3.56 128.28 3.17 136.95 11.55C124.52 7.83 111.13 8.23 99.5 14Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s0" fill="none" stroke="#141414" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M135.88 10.36C125.08 6.86 111.68 5.46 102.06 12.52"/>
+<path id="line-2-s0" fill="none" stroke="#141414" stroke-width="3.02" stroke-linecap="round" stroke-linejoin="round" d="M52.39 11.17C40.91 7.39 28.05 7.72 17.3 13.55"/>
+<path id="line-3-s0" fill="none" stroke="#141414" stroke-width="2.02" stroke-linecap="round" stroke-linejoin="round" d="M132.47 33.47C138.89 31.77 145.76 33.45 152.28 34.11M152.28 34.11C146.7 53.38 122.05 65.39 104.69 53.64"/>
+<path id="line-4-s0" fill="none" stroke="#141414" stroke-width="2.93" stroke-linecap="round" stroke-linejoin="round" d="M29.44 33.5L8.64 34.97"/>
+<path id="line-5-s0" fill="none" stroke="#141414" stroke-width="2.01" stroke-linecap="round" stroke-linejoin="round" d="M8.64 34.97C15.01 53.98 38.32 65.67 55.98 53.69"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,20 @@
+[
+  {
+    "file": "docs/character-system/references/pool/source/dot-constructions.png",
+    "sha256": "b55692aa407ad401ac64ca11c15d14c3b94bb1ba952f7e5e872441f5af1b4064",
+    "size": [
+      1024,
+      1536
+    ],
+    "source": "user supplied"
+  },
+  {
+    "file": "docs/character-system/references/pool/source/flat-lid-elf.png",
+    "sha256": "8bea178f56a9c20cc3d1475ee616f1a47df70df1206b38d7766fd69a46c9c954",
+    "size": [
+      1536,
+      1024
+    ],
+    "source": "user supplied"
+  }
+]

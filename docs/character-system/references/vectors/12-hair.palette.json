@@ -1,0 +1,24 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Silver",
+      "color": "#b2b2b2ff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#171714ff"
+    },
+    {
+      "index": 2,
+      "name": "Black 2",
+      "color": "#030202ff"
+    },
+    {
+      "index": 3,
+      "name": "Gray",
+      "color": "#888888ff"
+    }
+  ]
+}

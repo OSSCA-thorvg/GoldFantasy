@@ -1,0 +1,3848 @@
+[
+  {
+    "file": "docs/character-system/references/flat-vectors/00-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 43,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/00-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 45,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/00-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 63,
+    "path_count": 57,
+    "path_command_count": 556,
+    "id_count": 60,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/00-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 63,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/01-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 50,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/01-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 14,
+    "path_count": 8,
+    "path_command_count": 39,
+    "id_count": 11,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/01-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 52,
+    "path_count": 46,
+    "path_command_count": 485,
+    "id_count": 49,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/01-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 102,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/02-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 14,
+    "path_count": 8,
+    "path_command_count": 40,
+    "id_count": 11,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/02-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 37,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/02-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 100,
+    "path_count": 94,
+    "path_command_count": 757,
+    "id_count": 97,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/02-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 96,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/03-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 41,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/03-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 51,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/03-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 72,
+    "path_count": 66,
+    "path_command_count": 667,
+    "id_count": 69,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/03-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 80,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/04-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 40,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/04-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 13,
+    "path_count": 7,
+    "path_command_count": 40,
+    "id_count": 10,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/04-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 58,
+    "path_count": 52,
+    "path_command_count": 499,
+    "id_count": 55,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/04-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 31,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/05-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 43,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/05-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 58,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/05-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 117,
+    "path_count": 111,
+    "path_command_count": 1044,
+    "id_count": 114,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "dense_path",
+        "message": "Path has 181 commands; simplify anchors if the shape is intended to deform.",
+        "element_id": "fill-105-s1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 1,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/05-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 102,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/06-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 53,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/06-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 41,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/06-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 109,
+    "path_count": 103,
+    "path_command_count": 910,
+    "id_count": 106,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/06-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 27,
+    "path_count": 21,
+    "path_command_count": 141,
+    "id_count": 24,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/07-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 42,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/07-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 45,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/07-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 48,
+    "path_count": 42,
+    "path_command_count": 394,
+    "id_count": 45,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/07-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 25,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/08-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 47,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/08-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 32,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/08-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 117,
+    "path_count": 111,
+    "path_command_count": 803,
+    "id_count": 114,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/08-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 26,
+    "path_count": 20,
+    "path_command_count": 109,
+    "id_count": 23,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/09-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 43,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/09-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 31,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/09-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 74,
+    "path_count": 68,
+    "path_command_count": 680,
+    "id_count": 71,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "dense_path",
+        "message": "Path has 144 commands; simplify anchors if the shape is intended to deform.",
+        "element_id": "fill-60-s1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 1,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/09-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 21,
+    "path_count": 15,
+    "path_command_count": 103,
+    "id_count": 18,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/10-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 38,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/10-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 38,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/10-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 134,
+    "path_count": 128,
+    "path_command_count": 937,
+    "id_count": 131,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/10-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 21,
+    "path_count": 15,
+    "path_command_count": 124,
+    "id_count": 18,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/11-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 45,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/11-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 37,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/11-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 83,
+    "path_count": 77,
+    "path_command_count": 662,
+    "id_count": 80,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/11-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 112,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/12-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 43,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/12-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 13,
+    "path_count": 7,
+    "path_command_count": 46,
+    "id_count": 10,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/12-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 125,
+    "path_count": 119,
+    "path_command_count": 1033,
+    "id_count": 122,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/12-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 35,
+    "path_count": 29,
+    "path_command_count": 192,
+    "id_count": 32,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/13-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 18,
+    "path_count": 12,
+    "path_command_count": 48,
+    "id_count": 15,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/13-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 46,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/13-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 93,
+    "path_count": 87,
+    "path_command_count": 645,
+    "id_count": 90,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/13-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 14,
+    "path_count": 8,
+    "path_command_count": 51,
+    "id_count": 11,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/14-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 41,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/14-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 14,
+    "path_count": 8,
+    "path_command_count": 47,
+    "id_count": 11,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/14-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 101,
+    "path_count": 95,
+    "path_command_count": 698,
+    "id_count": 98,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/14-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 24,
+    "path_count": 18,
+    "path_command_count": 101,
+    "id_count": 21,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/15-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 18,
+    "path_count": 12,
+    "path_command_count": 45,
+    "id_count": 15,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/15-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 16,
+    "path_count": 10,
+    "path_command_count": 50,
+    "id_count": 13,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/15-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 95,
+    "path_count": 89,
+    "path_command_count": 737,
+    "id_count": 92,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/15-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 24,
+    "path_count": 18,
+    "path_command_count": 108,
+    "id_count": 21,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/16-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 53,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/16-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 14,
+    "path_count": 8,
+    "path_command_count": 40,
+    "id_count": 11,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/16-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 48,
+    "path_count": 42,
+    "path_command_count": 404,
+    "id_count": 45,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/16-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 69,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/17-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 37,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/17-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 39,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/17-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 108,
+    "path_count": 102,
+    "path_command_count": 776,
+    "id_count": 105,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/17-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 25,
+    "path_count": 19,
+    "path_command_count": 128,
+    "id_count": 22,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/18-eyes.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 14,
+    "path_count": 8,
+    "path_command_count": 37,
+    "id_count": 11,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/18-face.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 39,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/18-figure.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 73,
+    "path_count": 67,
+    "path_command_count": 731,
+    "id_count": 70,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "dense_path",
+        "message": "Path has 139 commands; simplify anchors if the shape is intended to deform.",
+        "element_id": "fill-59-s1"
+      },
+      {
+        "severity": "warning",
+        "code": "dense_path",
+        "message": "Path has 131 commands; simplify anchors if the shape is intended to deform.",
+        "element_id": "fill-60-s1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 2,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/flat-vectors/18-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 77,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/00-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 30,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/00-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 22,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/00-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 20,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/00-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 18,
+    "path_count": 12,
+    "path_command_count": 94,
+    "id_count": 15,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/00-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/00-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/01-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 25,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/01-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 24,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/01-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/01-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 122,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/01-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/01-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/02-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 19,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/02-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/02-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/02-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 118,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/02-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/02-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/03-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 24,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/03-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/03-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 17,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/03-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 114,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/03-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/03-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 10,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/04-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 31,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/04-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 25,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/04-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/04-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 34,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/04-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/04-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 10,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/05-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 22,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/05-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 25,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/05-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 22,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/05-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 136,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/05-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/05-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 11,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/06-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 28,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/06-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/06-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/06-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 29,
+    "path_count": 23,
+    "path_command_count": 184,
+    "id_count": 26,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/06-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/06-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/07-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 23,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/07-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/07-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 24,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/07-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 26,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/07-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/07-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/08-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 18,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/08-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 17,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/08-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 17,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/08-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 26,
+    "path_count": 20,
+    "path_command_count": 145,
+    "id_count": 23,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/08-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/08-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/09-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 34,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/09-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 26,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/09-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 21,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/09-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 31,
+    "path_count": 25,
+    "path_command_count": 178,
+    "id_count": 28,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/09-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/09-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 10,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/10-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 32,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/10-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 17,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/10-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/10-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 31,
+    "path_count": 25,
+    "path_command_count": 205,
+    "id_count": 28,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/10-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/10-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 11,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/11-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 32,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/11-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 17,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/11-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/11-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 17,
+    "path_count": 11,
+    "path_command_count": 147,
+    "id_count": 14,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/11-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/11-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 10,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/12-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 44,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/12-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 21,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/12-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 21,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/12-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 40,
+    "path_count": 34,
+    "path_command_count": 268,
+    "id_count": 37,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/12-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/12-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/13-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/13-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 21,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/13-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 20,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/13-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 15,
+    "path_count": 9,
+    "path_command_count": 76,
+    "id_count": 12,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/13-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/13-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 10,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/14-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 23,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/14-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 20,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/14-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/14-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 25,
+    "path_count": 19,
+    "path_command_count": 132,
+    "id_count": 22,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/14-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 5,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/14-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 10,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/15-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 21,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/15-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/15-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 12,
+    "path_count": 6,
+    "path_command_count": 35,
+    "id_count": 9,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/15-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 25,
+    "path_count": 19,
+    "path_command_count": 145,
+    "id_count": 22,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/15-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/15-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/16-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 10,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/16-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 27,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/16-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 23,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/16-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 19,
+    "path_count": 13,
+    "path_command_count": 97,
+    "id_count": 16,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/16-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/16-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/17-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 27,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/17-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 18,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/17-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/17-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 24,
+    "path_count": 18,
+    "path_command_count": 142,
+    "id_count": 21,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/17-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 7,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/17-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 14,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/18-back.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 27,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/18-ear-L.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 10,
+    "path_count": 4,
+    "path_command_count": 23,
+    "id_count": 7,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/18-ear-R.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 9,
+    "path_count": 3,
+    "path_command_count": 19,
+    "id_count": 6,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/18-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 20,
+    "path_count": 14,
+    "path_command_count": 114,
+    "id_count": 17,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/18-skull-mask.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 7,
+    "path_count": 1,
+    "path_command_count": 6,
+    "id_count": 4,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/layers/18-skull.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 8,
+    "path_count": 2,
+    "path_command_count": 12,
+    "id_count": 5,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/00-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 70,
+    "path_count": 48,
+    "path_command_count": 321,
+    "id_count": 52,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/01-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 61,
+    "path_count": 39,
+    "path_command_count": 372,
+    "id_count": 43,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/02-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 68,
+    "path_count": 46,
+    "path_command_count": 353,
+    "id_count": 50,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/03-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 64,
+    "path_count": 42,
+    "path_command_count": 346,
+    "id_count": 46,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/04-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 46,
+    "path_count": 24,
+    "path_command_count": 201,
+    "id_count": 28,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/05-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 69,
+    "path_count": 47,
+    "path_command_count": 400,
+    "id_count": 51,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/06-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 89,
+    "path_count": 67,
+    "path_command_count": 493,
+    "id_count": 71,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/07-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 45,
+    "path_count": 23,
+    "path_command_count": 178,
+    "id_count": 27,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/08-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 82,
+    "path_count": 60,
+    "path_command_count": 403,
+    "id_count": 64,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/09-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 95,
+    "path_count": 73,
+    "path_command_count": 495,
+    "id_count": 77,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/10-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 92,
+    "path_count": 70,
+    "path_command_count": 536,
+    "id_count": 74,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/11-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 66,
+    "path_count": 44,
+    "path_command_count": 419,
+    "id_count": 48,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/12-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 113,
+    "path_count": 91,
+    "path_command_count": 683,
+    "id_count": 95,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/13-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 61,
+    "path_count": 39,
+    "path_command_count": 257,
+    "id_count": 43,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/14-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 80,
+    "path_count": 58,
+    "path_command_count": 384,
+    "id_count": 62,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/15-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 83,
+    "path_count": 61,
+    "path_command_count": 426,
+    "id_count": 65,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/16-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 70,
+    "path_count": 48,
+    "path_command_count": 315,
+    "id_count": 52,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/17-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 78,
+    "path_count": 56,
+    "path_command_count": 412,
+    "id_count": 60,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/derived/layered-heads/18-head.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 72,
+    "path_count": 50,
+    "path_command_count": 358,
+    "id_count": 54,
+    "duplicate_ids": [],
+    "findings": [
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "front-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "ear-coverage"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip--1"
+      },
+      {
+        "severity": "warning",
+        "code": "clip_path",
+        "message": "clipPath found. Prefer direct geometry for strict portability when feasible.",
+        "element_id": "eye-clip-1"
+      }
+    ],
+    "counts": {
+      "error": 0,
+      "warning": 4,
+      "info": 0
+    }
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Skin",
+      "color": "#e9e5d8ff"
+    },
+    {
+      "index": 1,
+      "name": "Skin 2",
+      "color": "#e9e6d7ff"
+    },
+    {
+      "index": 2,
+      "name": "Skin 3",
+      "color": "#e8e4d5ff"
+    },
+    {
+      "index": 3,
+      "name": "Skin 4",
+      "color": "#eae8d8ff"
+    },
+    {
+      "index": 4,
+      "name": "Skin 5",
+      "color": "#e9e6dcff"
+    },
+    {
+      "index": 5,
+      "name": "Umber",
+      "color": "#474339ff"
+    }
+  ]
+}

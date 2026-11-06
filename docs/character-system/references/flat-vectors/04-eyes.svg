@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="143" height="61" viewBox="0 0 143 61">
+<title>04-eyes reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_04_eyes_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#141414" d="M92.96 39.54C99.66 55.86 124.83 57.63 134 42.71L121.42 36.08C121.08 40.72 119.75 45.74 115.65 48.49C106.92 54.35 95.51 43.68 99.9 34.4L91 36.5C103.26 24.92 124.44 32.59 136 42.24C131.22 51.43 119.34 56.7 109.28 54.31C102.17 52.62 93.54 47.42 92.96 39.54Z"/>
+<path id="fill-2-s1" fill="#ffffff" d="M7 41.79C10.47 38.45 15.26 37.09 19.59 35.27C32.92 29.67 22.54 46.01 34.58 45.86C43.88 45.74 38.05 34.7 42.58 31C48.13 33.93 55.12 33.82 51.02 41.79C42.24 58.88 15.3 59.74 7 41.79Z"/>
+<path id="fill-3-s0" fill="#141414" d="M22.24 33.26C31.7 28.8 54.04 29.27 43.01 45.45C35.12 57.02 19.79 44.57 22.24 33.26Z"/>
+<path id="fill-4-s0" fill="#141414" d="M129.5 19C120.14 11.66 107.84 8.18 96 9.33C105.58 2.45 125.32 7.95 129.5 19Z"/>
+<path id="fill-5-s0" fill="#141414" d="M14.5 18C19.52 7.95 37.79 2.65 47 9.42C35.63 7.97 23.68 11.08 14.5 18Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s0" fill="none" stroke="#141414" stroke-width="2.72" stroke-linecap="round" stroke-linejoin="round" d="M45.73 8.98C35.4 5.83 23.15 9.53 15.38 16.8"/>
+<path id="line-2-s0" fill="none" stroke="#141414" stroke-width="2.99" stroke-linecap="round" stroke-linejoin="round" d="M97.41 8.95C108.12 5.87 121.02 9.61 128.61 17.78"/>
+<path id="line-3-s0" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M44.47 34.09C47.05 34 49.65 34.56 51.83 35.97C48.67 56.8 17.48 60.09 7.71 42.51C11.56 39.45 16.06 37.11 20.83 35.91"/>
+<path id="line-4-s0" fill="none" stroke="#141414" stroke-width="1.68" stroke-linecap="round" stroke-linejoin="round" d="M121.81 35.33C126.64 37 131.51 39 135.34 42.49C126.39 57.99 99.51 57.81 93.19 40.19"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="178" height="152" viewBox="0 0 178 152">
+<title>13-hair reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_13_hair_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#707070" d="M144.5 142L140.03 139.53C147.68 125.58 150.15 105.64 146.16 89.7C144.6 83.47 140.55 81.07 135.69 77.25C121 65.74 107.32 51.84 102.59 33.09C91.31 56.43 74.22 76.95 50.37 88.02C37.25 94.1 31.11 89.18 31 106.53C30.93 117.11 31.37 128.46 36.68 137.82C19.32 139.74 8.69 111.07 7.01 95.9C2.4 54.24 36.34 15.14 76.25 7.21C122.95 -2.06 171.69 36.35 172 84.57C172.08 97.32 165.78 135.1 150.26 137.62C147.39 138.09 145.66 138.99 144.5 142Z"/>
+<path id="fill-2-s1" fill="#1f1f1f" d="M30 136.71L35.62 134.29L38.85 143.65C34.34 144.11 32.55 139.47 30 136.71Z"/>
+<path id="fill-3-s1" fill="#1f1f1f" d="M138.15 144.65C138.84 141.55 140.55 138.57 143.44 137.06L146.45 140.35L138.15 144.65Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s1" fill="none" stroke="#1f1f1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M102.78 29.2C90.78 56.25 69.8 82.9 39.94 90.69C29.2 93.5 20.36 101.28 10.17 105.66M102.78 29.2C108.79 66.62 149.29 78.17 167.73 106.91M145.42 83.33C151 101.37 148.45 120.61 143.75 138.5M152.14 136.73C162.5 129.03 165.52 116.47 168.54 104.71C177.74 68.88 157.8 29.24 124.06 14.17C118.05 11.48 103.43 7.58 96.92 7.17C36.45 3.35 -13.8 67.95 17.32 123.77C19.47 127.63 22.38 130.72 25.25 134.02"/>
+<path id="line-2-s1" fill="none" stroke="#1f1f1f" stroke-width="1.49" stroke-linecap="round" stroke-linejoin="round" d="M120.33 38.95C133.3 62.39 159.82 75.62 169.42 101.02M29.8 95.05C29.9 104.65 29.23 114.24 31.06 123.71C31.78 127.4 32.7 130.91 32.9 134.68C33.08 138.29 33.7 143.08 38.59 142.7"/>
+<path id="line-3-s1" fill="none" stroke="#1f1f1f" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round" d="M71.06 56.33C62.23 70.03 48.83 79.68 37.59 91.19M157.91 113.58C155.3 122.45 152.59 133.96 143.75 138.5"/>
+<path id="line-4-s1" fill="none" stroke="#1f1f1f" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round" d="M51.41 50.59C39.26 63.02 25.99 74.58 16.41 89.22"/>
+<path id="line-5-s1" fill="none" stroke="#1f1f1f" stroke-width="1.12" stroke-linecap="round" stroke-linejoin="round" d="M21.5 106.56L23.03 127.45"/>
+</g>
+</g>
+</svg>

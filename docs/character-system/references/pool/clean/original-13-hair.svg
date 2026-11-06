@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="178" height="152" viewBox="0 0 178 152">
+<g id="fills">
+<path id="fill-1-s0" fill="#707070" d="M138.19 144.69C147.23 128.73 148.65 109.7 146.28 91.79C145.28 84.2 141.5 82.15 135.7 77.53C121.03 65.86 107.33 51.86 102.33 33.17C90.2 59.58 69.55 83.04 41.12 91.79C37.62 92.86 32.11 93.09 31.21 97.48C27.87 113.7 33.27 131.61 40.85 145.65C33.7 146.05 32.22 136.49 26.56 135.05C14.73 132.05 6.12 100.94 6 90.12C5.52 44.74 47.12 5.89 91.48 6C150.86 6.14 191.25 71.61 163.54 124.82C158.16 135.16 147.75 139.49 138.19 144.69Z"/>
+<path id="fill-2-s1" fill="#141414" d="M19.14 100.64L27.86 96.36C25.34 98.37 22.49 100.56 19.14 100.64Z"/>
+<path id="fill-3-s1" fill="#141414" d="M149.1 107.7C149.1 105.8 149.9 104.82 149.9 107.3C149.9 109.2 149.1 110.18 149.1 107.7Z"/>
+<path id="fill-4-s1" fill="#141414" d="M102.89 29.02C103.16 28.13 103.71 28.69 103.51 29.38C103.25 30.26 102.67 29.71 102.89 29.02Z"/>
+<path id="fill-5-s1" fill="#141414" d="M8.23 92.64C8.23 91.71 8.77 91.11 8.77 92.36C8.77 93.29 8.23 93.89 8.23 92.64Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s1" fill="none" stroke="#141414" stroke-width="1.39" stroke-linecap="round" stroke-linejoin="round" d="M120.3 38.88C132.97 61.73 158.29 74.88 168.66 99.03"/>
+<path id="line-2-s1" fill="none" stroke="#141414" stroke-width="1.09" stroke-linecap="round" stroke-linejoin="round" d="M51.41 50.59C39.26 63.01 26.01 74.59 16.41 89.22"/>
+<path id="line-3-s1" fill="none" stroke="#141414" stroke-width="1.24" stroke-linecap="round" stroke-linejoin="round" d="M71.09 56.31C61.48 69.61 49.51 81.57 35.77 90.56"/>
+<path id="line-4-s1" fill="none" stroke="#141414" stroke-width="1.44" stroke-linecap="round" stroke-linejoin="round" d="M148.73 86.78C156.25 91.31 162.21 98.3 166.91 105.66"/>
+<path id="line-5-s1" fill="none" stroke="#141414" stroke-width="1.12" stroke-linecap="round" stroke-linejoin="round" d="M21.5 106.56L23 127.8"/>
+<path id="line-6-s1" fill="none" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M157.91 113.58C156.19 120.03 154.37 126.53 150.36 132.02"/>
+</g>
+</svg>

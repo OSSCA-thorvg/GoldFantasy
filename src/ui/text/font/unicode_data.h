@@ -1,0 +1,37 @@
+// Unicode 17.0.0 Default_Ignorable_Code_Point ranges.
+// Source: https://www.unicode.org/Public/17.0.0/ucd/DerivedCoreProperties.txt
+// Unicode data license: src/ui/text/font/UNICODE-LICENSE.txt
+#pragma once
+
+namespace te::detail {
+struct PropertyRange { uint32_t begin, end; uint8_t value; };
+inline constexpr PropertyRange defaultIgnorable[] = {
+    {0xad, 0xad, 1},
+    {0x34f, 0x34f, 1},
+    {0x61c, 0x61c, 1},
+    {0x115f, 0x1160, 1},
+    {0x17b4, 0x17b5, 1},
+    {0x180b, 0x180d, 1},
+    {0x180e, 0x180e, 1},
+    {0x180f, 0x180f, 1},
+    {0x200b, 0x200f, 1},
+    {0x202a, 0x202e, 1},
+    {0x2060, 0x2064, 1},
+    {0x2065, 0x2065, 1},
+    {0x2066, 0x206f, 1},
+    {0x3164, 0x3164, 1},
+    {0xfe00, 0xfe0f, 1},
+    {0xfeff, 0xfeff, 1},
+    {0xffa0, 0xffa0, 1},
+    {0xfff0, 0xfff8, 1},
+    {0x1bca0, 0x1bca3, 1},
+    {0x1d173, 0x1d17a, 1},
+    {0xe0000, 0xe0000, 1},
+    {0xe0001, 0xe0001, 1},
+    {0xe0002, 0xe001f, 1},
+    {0xe0020, 0xe007f, 1},
+    {0xe0080, 0xe00ff, 1},
+    {0xe0100, 0xe01ef, 1},
+    {0xe01f0, 0xe0fff, 1},
+};
+}  // namespace te::detail

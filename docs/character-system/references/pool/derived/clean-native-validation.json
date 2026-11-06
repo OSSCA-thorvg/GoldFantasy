@@ -1,0 +1,16 @@
+[
+  {
+    "renderer": "gl",
+    "frames": 60,
+    "hidden": true,
+    "dummyAudio": true,
+    "exit": 0
+  },
+  {
+    "renderer": "wgpu",
+    "frames": 60,
+    "hidden": true,
+    "dummyAudio": true,
+    "exit": 0
+  }
+]

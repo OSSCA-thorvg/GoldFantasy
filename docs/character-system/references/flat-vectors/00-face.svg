@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="175" height="158" viewBox="0 0 175 158">
+<title>00-face reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_00_face_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#ffffff" d="M26.87 72.63C23.8 36.9 54.23 5.52 89.63 6C124.13 6.47 150.41 37.71 148.25 71.75C155.46 66.69 165.63 66.09 168.45 75.95C173.28 92.87 157.68 109.53 141.23 108.91C135.25 108.68 134.75 112.84 131.76 117.52C124.03 129.67 97.92 155.98 82.13 149.48C66.6 143.09 52.16 130.98 43.07 117.01C39.78 111.96 39.26 107.99 32.64 108.79C24.11 109.83 14.97 103.81 10.86 96.63C3.11 83.09 7.32 59.06 26.87 72.63Z"/>
+<path id="fill-2-s1" fill="#141414" d="M89.5 103C85.77 102.95 85.53 98.33 87.68 96.18L89.5 103Z"/>
+<path id="fill-3-s1" fill="#141414" d="M145.5 79C144.94 77.07 146.12 75.21 147.71 74.21L145.5 79Z"/>
+<path id="fill-4-s1" fill="#141414" d="M28.62 79C28.26 78.47 28.18 77.82 28.46 77.22C28.61 76.91 29.12 76.6 29.38 77C29.74 77.53 29.82 78.18 29.54 78.78C29.39 79.09 28.88 79.4 28.62 79Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s1" fill="none" stroke="#141414" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" d="M27.98 74.88C22.65 28.15 73.32 -8.19 115.41 13.46C137.31 24.72 148.52 50.14 147 74.17M27.98 74.88C18.64 66.75 8.32 68.87 8.01 82.36C7.65 98.34 23.37 111.17 39.06 106.97"/>
+<path id="line-2-s1" fill="none" stroke="#141414" stroke-width="2.76" stroke-linecap="round" stroke-linejoin="round" d="M147 74.17C153.65 69.16 164.36 66.08 167.22 76.51C171.96 93.81 153.24 112.3 135.97 106.97M34.53 96.95C40.81 113.77 51.28 128.4 66.16 138.44C87.82 153.06 91.1 152.26 112.16 136.75C125.88 126.65 134.95 112.27 140.61 96.28"/>
+<path id="line-3-s1" fill="none" stroke="#141414" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" d="M159.67 80.44C153.98 82.26 149.07 86.72 147.25 92.48"/>
+<path id="line-4-s1" fill="none" stroke="#141414" stroke-width="2.14" stroke-linecap="round" stroke-linejoin="round" d="M15.22 81.34C21.69 82.04 25.94 87.58 28.59 93.02"/>
+<path id="line-5-s1" fill="none" stroke="#141414" stroke-width="2.01" stroke-linecap="round" stroke-linejoin="round" d="M82.52 122L93.5 122"/>
+</g>
+</g>
+</svg>

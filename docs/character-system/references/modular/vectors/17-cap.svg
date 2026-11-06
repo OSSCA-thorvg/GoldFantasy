@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="128" height="62" viewBox="0 0 128 62">
+<title>17-cap reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_17_cap_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#707070" d="M6.5 59C-6.44 26.62 30.02 7.15 56.35 3.85C87.41 -0.05 135.43 18.6 121.29 57.79C107.49 38.2 81.31 33.24 66.84 14.34C62.93 15.78 60.72 19.37 57.79 22.02C42.02 36.3 19.16 41.2 6.5 59Z"/>
+<path id="fill-2-s1" fill="#141414" d="M60 3.79C63.08 2.77 67.22 2.24 70 4.21C66.92 5.23 62.78 5.76 60 3.79Z"/>
+<path id="fill-3-s1" fill="#141414" fill-rule="evenodd" d="M120.5 57C107.1 37.24 79.17 33.05 66.22 12.28C81.05 30.53 106.11 36.61 120.52 54.98C130.38 25.45 95.69 5.06 70.04 4.46C96.56 1.51 135.57 27.51 120.5 57ZM6.5 57C-5.65 26.25 32.61 4.45 58.95 4.45C34 7.56 -1.63 24.4 7.57 54.93C23.51 37.73 48.23 32.14 63.86 14.36C49.72 34.34 22.43 39.08 6.5 57Z"/>
+</g>
+<g id="lines">
+</g>
+</g>
+</svg>

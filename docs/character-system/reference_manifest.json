@@ -1,0 +1,172 @@
+[
+  {
+    "file": "references/source/sheet-01.png",
+    "size": [
+      1024,
+      1536
+    ],
+    "sha256": "802b10f856a01799d15ec58522908da11897d4bc7ccf357ff368c408b1f66da2",
+    "source": "user supplied",
+    "scope": "trace editable hair, eyes, face and whole outfit references",
+    "priority": "locked",
+    "roles": [
+      "style_geometry",
+      "face_eyes",
+      "face_mouth",
+      "face_hair",
+      "clothing",
+      "line_and_rendering"
+    ],
+    "creator": "unspecified",
+    "provenance": "User supplied; explicit request to trace and integrate",
+    "view": "front",
+    "preserve": [
+      "hair silhouette",
+      "face contour",
+      "eye construction",
+      "whole outfit"
+    ],
+    "adapt": [
+      "scan noise removed",
+      "left eye mirrored",
+      "one compatible eye topology",
+      "hair fitted by anchors"
+    ]
+  },
+  {
+    "file": "references/source/sheet-02.png",
+    "size": [
+      1024,
+      1536
+    ],
+    "sha256": "9640ea3702f96075a737da01d6318e85cc156b1db96f955b503c803c2e83ddbd",
+    "source": "user supplied",
+    "scope": "trace editable hair, eyes, face and whole outfit references",
+    "priority": "locked",
+    "roles": [
+      "style_geometry",
+      "face_eyes",
+      "face_mouth",
+      "face_hair",
+      "clothing",
+      "line_and_rendering"
+    ],
+    "creator": "unspecified",
+    "provenance": "User supplied; explicit request to trace and integrate",
+    "view": "front",
+    "preserve": [
+      "hair silhouette",
+      "face contour",
+      "eye construction",
+      "whole outfit"
+    ],
+    "adapt": [
+      "scan noise removed",
+      "left eye mirrored",
+      "one compatible eye topology",
+      "hair fitted by anchors"
+    ]
+  },
+  {
+    "file": "references/source/sheet-03.png",
+    "size": [
+      1086,
+      1448
+    ],
+    "sha256": "2bdea9eebd1bf38e95bed3ed6c80e890185fa4c682e7ad1d81ee73736071dd85",
+    "source": "user supplied",
+    "scope": "trace editable hair, eyes, face and whole outfit references",
+    "priority": "locked",
+    "roles": [
+      "style_geometry",
+      "face_eyes",
+      "face_mouth",
+      "face_hair",
+      "clothing",
+      "line_and_rendering"
+    ],
+    "creator": "unspecified",
+    "provenance": "User supplied; explicit request to trace and integrate",
+    "view": "front",
+    "preserve": [
+      "hair silhouette",
+      "face contour",
+      "eye construction",
+      "whole outfit"
+    ],
+    "adapt": [
+      "scan noise removed",
+      "left eye mirrored",
+      "one compatible eye topology",
+      "hair fitted by anchors"
+    ]
+  },
+  {
+    "file": "references/source/sheet-04.png",
+    "size": [
+      1024,
+      1536
+    ],
+    "sha256": "2557b570eb36265b5080d4b1e2c277ed06dd94a2a0fd914fd23980360c906019",
+    "source": "user supplied",
+    "scope": "trace editable hair, eyes, face and whole outfit references",
+    "priority": "locked",
+    "roles": [
+      "style_geometry",
+      "face_eyes",
+      "face_mouth",
+      "face_hair",
+      "clothing",
+      "line_and_rendering"
+    ],
+    "creator": "unspecified",
+    "provenance": "User supplied; explicit request to trace and integrate",
+    "view": "front",
+    "preserve": [
+      "hair silhouette",
+      "face contour",
+      "eye construction",
+      "whole outfit"
+    ],
+    "adapt": [
+      "scan noise removed",
+      "left eye mirrored",
+      "one compatible eye topology",
+      "hair fitted by anchors"
+    ]
+  },
+  {
+    "file": "references/source/sheet-05.png",
+    "size": [
+      1199,
+      1312
+    ],
+    "sha256": "52830a67d2ed3c0ad14c45745a334cdbd7f63b45e30828617663636a732e83d3",
+    "source": "user supplied",
+    "scope": "trace editable hair, eyes, face and whole outfit references",
+    "priority": "locked",
+    "roles": [
+      "style_geometry",
+      "face_eyes",
+      "face_mouth",
+      "face_hair",
+      "clothing",
+      "line_and_rendering"
+    ],
+    "creator": "unspecified",
+    "provenance": "User supplied; explicit request to trace and integrate",
+    "view": "front",
+    "preserve": [
+      "hair silhouette",
+      "face contour",
+      "eye construction",
+      "whole outfit"
+    ],
+    "adapt": [
+      "scan noise removed",
+      "left eye mirrored",
+      "one compatible eye topology",
+      "hair fitted by anchors"
+    ]
+  }
+]

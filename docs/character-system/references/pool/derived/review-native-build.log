@@ -1,0 +1,44 @@
+ninja: Entering directory `/tmp/tellin-engine-witheditor'
+[1/43] Compiling C++ object src/game/libhearthold-game.a.p/person_look.cpp.o
+[2/43] Compiling C++ object src/game/libhearthold-game.a.p/person_portrait.cpp.o
+[3/43] Compiling C++ object src/game/libhearthold-game.a.p/road_construction.cpp.o
+[4/43] Compiling C++ object src/game/libhearthold-game.a.p/portrait_background.cpp.o
+[5/43] Compiling C++ object src/game/libhearthold-game.a.p/idle_gesture.cpp.o
+[6/43] Compiling C++ object src/game/libhearthold-game.a.p/person_speech.cpp.o
+[7/43] Compiling C++ object src/game/libhearthold-game.a.p/character_preset.cpp.o
+[8/43] Compiling C++ object src/game/libhearthold-game.a.p/game_map_editor.cpp.o
+[9/43] Compiling C++ object src/game/libhearthold-game.a.p/unit_orders.cpp.o
+[10/43] Compiling C++ object src/game/libhearthold-game.a.p/town_economy.cpp.o
+[11/43] Compiling C++ object src/game/libhearthold-game.a.p/unit_needs.cpp.o
+[12/43] Compiling C++ object src/game/libhearthold-game.a.p/unit_housing.cpp.o
+[13/43] Compiling C++ object src/game/libhearthold-game.a.p/unit_status.cpp.o
+[14/43] Compiling C++ object src/game/libhearthold-game.a.p/resource_harvesting.cpp.o
+[15/43] Compiling C++ object src/game/libhearthold-game.a.p/town_people.cpp.o
+[16/43] Compiling C++ object src/game/libhearthold-game.a.p/town.cpp.o
+[17/43] Compiling C++ object src/game/libhearthold-game.a.p/construction_work.cpp.o
+[18/43] Compiling C++ object src/game/libhearthold-game.a.p/traffic.cpp.o
+[19/43] Compiling C++ object src/game/libhearthold-game.a.p/town_monsters.cpp.o
+[20/43] Compiling C++ object src/game/libhearthold-game.a.p/world_sprites.cpp.o
+[21/43] Compiling C++ object src/game/libhearthold-game.a.p/game_commands.cpp.o
+[22/43] Compiling C++ object src/game/libhearthold-game.a.p/terrain_painter.cpp.o
+[23/43] Compiling C++ object src/game/libhearthold-game.a.p/world_renderer.cpp.o
+[24/43] Compiling C++ object src/game/libhearthold-game.a.p/game_app.cpp.o
+[25/43] Compiling C++ object src/game/libhearthold-game.a.p/game_context_dock.cpp.o
+[26/43] Compiling C++ object src/game/libhearthold-game.a.p/game_unit_panel.cpp.o
+[27/43] Compiling C++ object src/game/libhearthold-game.a.p/game_speech.cpp.o
+[28/43] Compiling C++ object src/game/libhearthold-game.a.p/game_soundscape.cpp.o
+[29/43] Compiling C++ object src/game/libhearthold-game.a.p/game_hud.cpp.o
+[30/43] Compiling C++ object src/game/libhearthold-game.a.p/authoring_character_editor.cpp.o
+[31/43] Compiling C++ object src/game/libhearthold-game.a.p/authoring_map_editor.cpp.o
+[32/43] Compiling C++ object src/game/libhearthold-game.a.p/authoring_character_controls.cpp.o
+[33/43] Compiling C++ object src/game/libhearthold-game.a.p/game_building_editor.cpp.o
+[34/43] Compiling C++ object src/game/libhearthold-application.a.p/demo.cpp.o
+[35/43] Linking static target src/game/libhearthold-game.a
+[36/43] Compiling C++ object src/game/libhearthold-application.a.p/sound_board.cpp.o
+[37/43] Compiling C++ object src/game/libhearthold-application.a.p/effect_manager.cpp.o
+[38/43] Compiling C++ object src/game/Hearthold-character-library.p/.._.._tools_render_character_library.cpp.o
+[39/43] Linking target src/game/Hearthold-character-library
+[40/43] Compiling C++ object src/game/libhearthold-application.a.p/application.cpp.o
+[41/43] Linking static target src/game/libhearthold-application.a
+[42/43] Linking target src/game/Hearthold
+[43/43] Compiling C++ object tests/Hearthold-tests.p/game_testCharacterAssets.cpp.o

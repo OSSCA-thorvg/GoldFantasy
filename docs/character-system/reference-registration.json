@@ -1,0 +1,653 @@
+{
+  "version": 2,
+  "source": "Reviewed source-to-figure similarity registration; all hair paths retain their original proportions. The former nonlinear forehead correspondences are intentionally removed.",
+  "coordinates": "original crop pixels; crown is anatomical skull crown, excluding buns, spikes and tufts",
+  "references": [
+    {
+      "index": 0,
+      "figure_crown": [
+        69,
+        7
+      ],
+      "figure_chin": [
+        68,
+        85
+      ],
+      "figure_eyes": [
+        [
+          51,
+          48
+        ],
+        [
+          87,
+          48
+        ]
+      ],
+      "hair_to_figure_scale": 0.522,
+      "figure_ears": [
+        [
+          28,
+          48
+        ],
+        [
+          110,
+          48
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 90
+    },
+    {
+      "index": 1,
+      "figure_crown": [
+        85,
+        7
+      ],
+      "figure_chin": [
+        84,
+        85
+      ],
+      "figure_eyes": [
+        [
+          68,
+          51
+        ],
+        [
+          101,
+          51
+        ]
+      ],
+      "hair_to_figure_scale": 0.5,
+      "figure_ears": [
+        [
+          39,
+          53
+        ],
+        [
+          132,
+          53
+        ]
+      ],
+      "ears_front": true
+    },
+    {
+      "index": 2,
+      "figure_crown": [
+        62,
+        8
+      ],
+      "figure_chin": [
+        62,
+        90
+      ],
+      "figure_eyes": [
+        [
+          45,
+          58
+        ],
+        [
+          78,
+          58
+        ]
+      ],
+      "hair_to_figure_scale": 0.545,
+      "figure_ears": [
+        [
+          21,
+          64
+        ],
+        [
+          103,
+          64
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 94
+    },
+    {
+      "index": 3,
+      "figure_crown": [
+        82,
+        26
+      ],
+      "figure_chin": [
+        82,
+        95
+      ],
+      "figure_eyes": [
+        [
+          66,
+          67
+        ],
+        [
+          96,
+          67
+        ]
+      ],
+      "hair_to_figure_scale": 0.552,
+      "figure_ears": [
+        [
+          45,
+          73
+        ],
+        [
+          119,
+          73
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 91
+    },
+    {
+      "index": 4,
+      "figure_crown": [
+        85,
+        57
+      ],
+      "figure_chin": [
+        85,
+        120
+      ],
+      "figure_eyes": [
+        [
+          70,
+          91
+        ],
+        [
+          104,
+          91
+        ]
+      ],
+      "hair_to_figure_scale": 0.639,
+      "figure_ears": [
+        [
+          48,
+          101
+        ],
+        [
+          123,
+          101
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 111
+    },
+    {
+      "index": 5,
+      "figure_crown": [
+        74,
+        32
+      ],
+      "figure_chin": [
+        74,
+        103
+      ],
+      "figure_eyes": [
+        [
+          58,
+          71
+        ],
+        [
+          90,
+          71
+        ]
+      ],
+      "hair_to_figure_scale": 0.558,
+      "figure_ears": [
+        [
+          30,
+          78
+        ],
+        [
+          119,
+          78
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 107
+    },
+    {
+      "index": 6,
+      "figure_crown": [
+        90,
+        24
+      ],
+      "figure_chin": [
+        90,
+        107
+      ],
+      "figure_eyes": [
+        [
+          71,
+          75
+        ],
+        [
+          109,
+          75
+        ]
+      ],
+      "hair_to_figure_scale": 0.664,
+      "figure_ears": [
+        [
+          39,
+          81
+        ],
+        [
+          141,
+          81
+        ]
+      ],
+      "ears_front": true
+    },
+    {
+      "index": 7,
+      "figure_crown": [
+        63,
+        44
+      ],
+      "figure_chin": [
+        63,
+        105
+      ],
+      "figure_eyes": [
+        [
+          48,
+          80
+        ],
+        [
+          78,
+          80
+        ]
+      ],
+      "hair_to_figure_scale": 0.482,
+      "figure_ears": [
+        [
+          24,
+          84
+        ],
+        [
+          102,
+          84
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 109
+    },
+    {
+      "index": 8,
+      "figure_crown": [
+        64,
+        8
+      ],
+      "figure_chin": [
+        64,
+        85
+      ],
+      "figure_eyes": [
+        [
+          48,
+          57
+        ],
+        [
+          80,
+          57
+        ]
+      ],
+      "hair_to_figure_scale": 0.489,
+      "figure_ears": [
+        [
+          35,
+          64
+        ],
+        [
+          94,
+          64
+        ]
+      ],
+      "ears_front": false,
+      "figure_outfit_top": 90
+    },
+    {
+      "index": 9,
+      "figure_crown": [
+        84,
+        8
+      ],
+      "figure_chin": [
+        84,
+        91
+      ],
+      "figure_eyes": [
+        [
+          65,
+          56
+        ],
+        [
+          102,
+          56
+        ]
+      ],
+      "hair_to_figure_scale": 0.564,
+      "figure_ears": [
+        [
+          40,
+          63
+        ],
+        [
+          126,
+          63
+        ]
+      ],
+      "ears_front": true
+    },
+    {
+      "index": 10,
+      "figure_crown": [
+        57,
+        28
+      ],
+      "figure_chin": [
+        57,
+        96
+      ],
+      "figure_eyes": [
+        [
+          40,
+          65
+        ],
+        [
+          74,
+          65
+        ]
+      ],
+      "hair_to_figure_scale": 0.42,
+      "figure_ears": [
+        [
+          14,
+          66
+        ],
+        [
+          101,
+          66
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 102
+    },
+    {
+      "index": 11,
+      "figure_crown": [
+        74,
+        8
+      ],
+      "figure_chin": [
+        74,
+        84
+      ],
+      "figure_eyes": [
+        [
+          58,
+          55
+        ],
+        [
+          89,
+          55
+        ]
+      ],
+      "hair_to_figure_scale": 0.52,
+      "figure_ears": [
+        [
+          47,
+          61
+        ],
+        [
+          101,
+          61
+        ]
+      ],
+      "ears_front": false
+    },
+    {
+      "index": 12,
+      "figure_crown": [
+        86,
+        8
+      ],
+      "figure_chin": [
+        86,
+        89
+      ],
+      "figure_eyes": [
+        [
+          69,
+          54
+        ],
+        [
+          104,
+          54
+        ]
+      ],
+      "hair_to_figure_scale": 0.85,
+      "hair_to_figure_offset": [
+        -5.375,
+        2.9
+      ],
+      "figure_ears": [
+        [
+          35,
+          56
+        ],
+        [
+          137,
+          56
+        ]
+      ],
+      "ears_front": true
+    },
+    {
+      "index": 13,
+      "figure_crown": [
+        59,
+        8
+      ],
+      "figure_chin": [
+        59,
+        89
+      ],
+      "figure_eyes": [
+        [
+          42,
+          54
+        ],
+        [
+          76,
+          54
+        ]
+      ],
+      "hair_to_figure_scale": 0.46,
+      "figure_ears": [
+        [
+          14,
+          62
+        ],
+        [
+          101,
+          62
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 96
+    },
+    {
+      "index": 14,
+      "figure_crown": [
+        67,
+        55
+      ],
+      "figure_chin": [
+        67,
+        115
+      ],
+      "figure_eyes": [
+        [
+          51,
+          87
+        ],
+        [
+          84,
+          87
+        ]
+      ],
+      "hair_to_figure_scale": 0.582,
+      "figure_ears": [
+        [
+          33,
+          91
+        ],
+        [
+          101,
+          91
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 119
+    },
+    {
+      "index": 15,
+      "figure_crown": [
+        89,
+        8
+      ],
+      "figure_chin": [
+        89,
+        80
+      ],
+      "figure_eyes": [
+        [
+          65,
+          52
+        ],
+        [
+          101,
+          52
+        ]
+      ],
+      "hair_to_figure_scale": 0.602,
+      "figure_ears": [
+        [
+          43,
+          58
+        ],
+        [
+          135,
+          58
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 86
+    },
+    {
+      "index": 16,
+      "figure_crown": [
+        56,
+        47
+      ],
+      "figure_chin": [
+        56,
+        131
+      ],
+      "figure_eyes": [
+        [
+          36,
+          97
+        ],
+        [
+          75,
+          97
+        ]
+      ],
+      "hair_to_figure_scale": 0.413,
+      "figure_ears": [
+        [
+          22,
+          103
+        ],
+        [
+          89,
+          103
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 136
+    },
+    {
+      "index": 17,
+      "figure_crown": [
+        65,
+        21
+      ],
+      "figure_chin": [
+        65,
+        105
+      ],
+      "figure_eyes": [
+        [
+          45,
+          74
+        ],
+        [
+          86,
+          74
+        ]
+      ],
+      "hair_to_figure_scale": 0.46,
+      "figure_ears": [
+        [
+          15,
+          80
+        ],
+        [
+          113,
+          80
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 110
+    },
+    {
+      "index": 18,
+      "figure_crown": [
+        86,
+        8
+      ],
+      "figure_chin": [
+        86,
+        92
+      ],
+      "figure_eyes": [
+        [
+          68,
+          56
+        ],
+        [
+          106,
+          56
+        ]
+      ],
+      "hair_to_figure_scale": 0.47,
+      "figure_ears": [
+        [
+          45,
+          65
+        ],
+        [
+          127,
+          65
+        ]
+      ],
+      "ears_front": true,
+      "figure_outfit_top": 103
+    }
+  ],
+  "landmark_notes": "Crowns obscured by buns, spikes or dense hair are anatomical estimates; visible forehead and face contacts are reviewed source landmarks."
+}

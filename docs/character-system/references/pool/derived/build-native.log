@@ -1,0 +1,5 @@
+ninja: Entering directory `/tmp/tellin-engine-witheditor'
+[1/4] Compiling C++ object src/game/libhearthold-game.a.p/authoring_character_controls.cpp.o
+[2/4] Linking static target src/game/libhearthold-game.a
+[3/4] Linking target src/game/Hearthold-character-library
+[4/4] Linking target src/game/Hearthold

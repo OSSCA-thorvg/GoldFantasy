@@ -1,0 +1,108 @@
++ meson setup /tmp/hearthold-web-final /home/soon/orca/workspaces/GoldFantasy/tellin --cross-file /tmp/hearthold-web-deps/emscripten.ini -Dprofile=witheditor -Drenderer=gl -Dtargets=game,engine -Dengine_mode=standalone -Dbuildtype=debugoptimized -Dtests=disabled -Dpkg_config_path=[] -Dcpp_args=['--use-port=sdl3', '--use-port=emdawnwebgpu', '-fexceptions'] -Dcpp_link_args=['--use-port=sdl3', '--use-port=emdawnwebgpu', '-fexceptions', '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=0', '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=2147483648', '-sMIN_WEBGL_VERSION=2', '-sMAX_WEBGL_VERSION=2', '-sFULL_ES3=1', '-sFORCE_FILESYSTEM=1', '-sEXIT_RUNTIME=0', '-sASSERTIONS=1', '-lidbfs.js', '-sEXPORTED_RUNTIME_METHODS=FS,IDBFS,addRunDependency,removeRunDependency,ccall', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/ui/assets/fonts@/fonts', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/GameEngine/assets/demo.lua@/scripts/engine.lua', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/game/scripts/hud.lua@/scripts/hud.lua', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/GameEngine/assets/building.json@/assets/engine-building.json', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/game/assets/buildings@/assets/buildings'] --reconfigure --clearcache
+The Meson build system
+Version: 1.12.1
+Source dir: /home/soon/orca/workspaces/GoldFantasy/tellin
+Build dir: /tmp/hearthold-web-final
+Build type: cross build
+Project name: Hearthold
+Project version: 0.1.0
+C compiler for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/emcc (emscripten 6.0.2 "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.2 (7a2d97d627ff4945eae28847ce0387ac52b92c09)")
+C linker for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/emcc ld.wasm 23.0.0
+C++ compiler for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/em++ (emscripten 6.0.2 "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.2 (7a2d97d627ff4945eae28847ce0387ac52b92c09)")
+C++ linker for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/em++ ld.wasm 23.0.0
+C compiler for the build machine: cc (gcc 16.2.1 "cc (GCC) 16.2.1 20260810")
+C linker for the build machine: cc ld.bfd 2.47
+C++ compiler for the build machine: c++ (gcc 16.2.1 "c++ (GCC) 16.2.1 20260810")
+C++ linker for the build machine: c++ ld.bfd 2.47
+Build machine cpu family: x86_64
+Build machine cpu: x86_64
+Host machine cpu family: wasm32
+Host machine cpu: wasm32
+Target machine cpu family: wasm32
+Target machine cpu: wasm32
+Configuring engine_config.h using configuration
+Found pkg-config: YES (/usr/bin/pkg-config) 3.0.10
+Run-time dependency thorvg-1 found: YES 1.2.0
+
+Executing subproject lua for machine: host
+
+lua| Project name: lua
+lua| Project version: 5.4.8
+lua| C compiler for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/emcc (emscripten 6.0.2 "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.2 (7a2d97d627ff4945eae28847ce0387ac52b92c09)")
+lua| C linker for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/emcc ld.wasm 23.0.0
+lua| C compiler for the build machine: cc (gcc 16.2.1 "cc (GCC) 16.2.1 20260810")
+lua| C linker for the build machine: cc ld.bfd 2.47
+lua| Library m found: YES
+lua| Build targets in project: 1
+lua| Subproject lua finished.
+
+
+Executing subproject stb for machine: host
+
+stb| Project name: stb
+stb| Project version: 1.26
+stb| C compiler for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/emcc (emscripten 6.0.2 "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.2 (7a2d97d627ff4945eae28847ce0387ac52b92c09)")
+stb| C linker for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/emcc ld.wasm 23.0.0
+stb| C++ compiler for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/em++ (emscripten 6.0.2 "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.2 (7a2d97d627ff4945eae28847ce0387ac52b92c09)")
+stb| C++ linker for the host machine: /home/soon/Desktop/repo/toyproject/emsdk/upstream/emscripten/em++ ld.wasm 23.0.0
+stb| C compiler for the build machine: cc (gcc 16.2.1 "cc (GCC) 16.2.1 20260810")
+stb| C linker for the build machine: cc ld.bfd 2.47
+stb| C++ compiler for the build machine: c++ (gcc 16.2.1 "c++ (GCC) 16.2.1 20260810")
+stb| C++ linker for the build machine: c++ ld.bfd 2.47
+stb| Build targets in project: 3
+stb| Subproject stb finished.
+
+Configuring builtin_data.h using configuration
+Checking if "C++ #embed" compiles: YES
+Program python3 found: YES (/usr/bin/python)
+Library dl found: YES
+Build targets in project: 17
+
+Hearthold 0.1.0
+
+    C++ standard   : c++23
+    Profile        : witheditor
+    Targets        : game
+                     engine
+    GameEngine     : true
+    Renderer       : gl
+    Web            : true
+    Tests          : false
+
+  Subprojects (for host machine)
+    lua            : YES
+    stb            : YES
+
+  User defined options
+    Cross files    : /tmp/hearthold-web-deps/emscripten.ini
+    buildtype      : debugoptimized
+    cpp_args       : ['--use-port=sdl3', '--use-port=emdawnwebgpu', '-fexceptions']
+    cpp_link_args  : ['--use-port=sdl3', '--use-port=emdawnwebgpu', '-fexceptions', '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=0', '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=2147483648', '-sMIN_WEBGL_VERSION=2', '-sMAX_WEBGL_VERSION=2', '-sFULL_ES3=1', '-sFORCE_FILESYSTEM=1', '-sEXIT_RUNTIME=0', '-sASSERTIONS=1', '-lidbfs.js', '-sEXPORTED_RUNTIME_METHODS=FS,IDBFS,addRunDependency,removeRunDependency,ccall', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/ui/assets/fonts@/fonts', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/GameEngine/assets/demo.lua@/scripts/engine.lua', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/game/scripts/hud.lua@/scripts/hud.lua', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/GameEngine/assets/building.json@/assets/engine-building.json', '--preload-file', '/home/soon/orca/workspaces/GoldFantasy/tellin/src/game/assets/buildings@/assets/buildings']
+    engine_mode    : standalone
+    pkg_config_path: []
+    profile        : witheditor
+    renderer       : gl
+    targets        : game,engine
+    tests          : disabled
+
+Found ninja-1.13.2 at /usr/bin/ninja
+
+Generating targets:   0%|          | 0/17 eta ?
+
+
+Writing build.ninja:   0%|          | 0/176 eta ?
+
+Cleaning... 0 files.
++ meson compile -C /tmp/hearthold-web-final -j 3
+ninja: Entering directory `/tmp/hearthold-web-final'
+[1/4] Compiling C++ object src/game/libhearthold-game.a.p/authoring_character_controls.cpp.o
+em++: warning: sdl3 port is still experimental [-Wexperimental]
+[2/4] Linking static target src/game/libhearthold-game.a
+[3/4] Linking target src/game/Hearthold.js
+em++: warning: sdl3 port is still experimental [-Wexperimental]
+[4/4] Linking target src/GameEngine/GameEngine.js
+em++: warning: sdl3 port is still experimental [-Wexperimental]
+INFO: autodetecting backend as ninja
+INFO: calculating backend command to run: /usr/bin/ninja -C /tmp/hearthold-web-final -j 3
+Web applications: /tmp/hearthold-web-final/web
+Serve with: python3 -m http.server --directory /tmp/hearthold-web-final/web 8080

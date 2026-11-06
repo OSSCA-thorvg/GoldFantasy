@@ -1,0 +1,24 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "White",
+      "color": "#fdfdfdff"
+    },
+    {
+      "index": 1,
+      "name": "Charcoal",
+      "color": "#2c2c2cff"
+    },
+    {
+      "index": 2,
+      "name": "Gray",
+      "color": "#8d8d8eff"
+    },
+    {
+      "index": 3,
+      "name": "White 2",
+      "color": "#e3e4e4ff"
+    }
+  ]
+}

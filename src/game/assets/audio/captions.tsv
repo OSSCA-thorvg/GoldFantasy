@@ -1,0 +1,239 @@
+voice/berserker/ack_01	Aye!
+voice/berserker/ack_02	On it.
+voice/berserker/ack_03	Right away.
+voice/berserker/ack_04	It will be done.
+voice/berserker/alarm_01	To arms!
+voice/berserker/alarm_02	Raiders!
+voice/berserker/alarm_03	Wake up!
+voice/berserker/attack_01	Hah! ... Hup! ... Yah! ... Hmph!
+voice/berserker/attack_02	Hah! ... Hup! ... Yah! ... Hmph!
+voice/berserker/attack_03	Hah! ... Hup! ... Yah! ... Hmph!
+voice/berserker/attack_04	Hah! ... Hup! ... Yah! ... Hmph!
+voice/berserker/complain_01	I'm hungry.
+voice/berserker/complain_02	Brr, so cold.
+voice/berserker/complain_03	Not again.
+voice/berserker/death_01	Ugh. ... Hngh. ... Ahh.
+voice/berserker/death_02	Ugh. ... Hngh. ... Ahh.
+voice/berserker/death_03	Ugh. ... Hngh. ... Ahh.
+voice/berserker/happy_01	Ha, good!
+voice/berserker/happy_02	Wonderful!
+voice/berserker/happy_03	Yes!
+voice/berserker/hum_01	Hmm.
+voice/berserker/hum_02	Hmm.
+voice/berserker/hum_03	Hmm.
+voice/berserker/hurt_01	Uhk! ... Ak! ... Ut! ... Nk!
+voice/berserker/hurt_02	Uhk! ... Ak! ... Ut! ... Nk!
+voice/berserker/hurt_03	Uhk! ... Ak! ... Ut! ... Nk!
+voice/berserker/hurt_04	Uhk! ... Ak! ... Ut! ... Nk!
+voice/berserker/mumble_01	Now where did I leave that hammer... ah, there it is.
+voice/berserker/mumble_02	Now where did I leave that hammer... ah, there it is.
+voice/berserker/mumble_03	Now where did I leave that hammer... ah, there it is.
+voice/berserker/select_01	Yes?
+voice/berserker/select_02	What is it?
+voice/berserker/select_03	I'm listening.
+voice/berserker/sigh_01	Haaah.
+voice/berserker/sigh_02	Haaah.
+voice/berserker/sigh_03	Haaah.
+voice/berserker/sleep_01	Mmm... five more winters...
+voice/berserker/sleep_02	Mmm... five more winters...
+voice/berserker/sleep_03	Mmm... five more winters...
+voice/berserker/thanks_01	Thank you!
+voice/berserker/thanks_02	Thanks!
+voice/berserker/thanks_03	My thanks.
+voice/berserker/work_01	Hup! ... Hah! ... Hnh! ... Hup!
+voice/berserker/work_02	Hup! ... Hah! ... Hnh! ... Hup!
+voice/berserker/work_03	Hup! ... Hah! ... Hnh! ... Hup!
+voice/berserker/work_04	Hup! ... Hah! ... Hnh! ... Hup!
+voice/berserker/yawn_01	Haaaaah... mmh.
+voice/berserker/yawn_02	Haaaaah... mmh.
+voice/berserker/yawn_03	Haaaaah... mmh.
+voice/huntress/ack_01	Aye!
+voice/huntress/ack_02	On it.
+voice/huntress/ack_03	Right away.
+voice/huntress/ack_04	It will be done.
+voice/huntress/alarm_01	To arms!
+voice/huntress/alarm_02	Raiders!
+voice/huntress/alarm_03	Wake up!
+voice/huntress/attack_01	Hah! ... Hup! ... Yah! ... Hmph!
+voice/huntress/attack_02	Hah! ... Hup! ... Yah! ... Hmph!
+voice/huntress/attack_03	Hah! ... Hup! ... Yah! ... Hmph!
+voice/huntress/attack_04	Hah! ... Hup! ... Yah! ... Hmph!
+voice/huntress/complain_01	I'm hungry. ... Brr, so cold. ... Not again.
+voice/huntress/complain_02	I'm hungry. ... Brr, so cold. ... Not again.
+voice/huntress/complain_03	I'm hungry. ... Brr, so cold. ... Not again.
+voice/huntress/death_01	Ugh. ... Hngh. ... Ahh.
+voice/huntress/death_02	Ugh. ... Hngh. ... Ahh.
+voice/huntress/death_03	Ugh. ... Hngh. ... Ahh.
+voice/huntress/happy_01	Ha, good!
+voice/huntress/happy_02	Wonderful!
+voice/huntress/happy_03	Yes!
+voice/huntress/hum_01	Hmm.
+voice/huntress/hum_02	Hmm.
+voice/huntress/hum_03	Hmm.
+voice/huntress/hurt_01	Uhk! ... Ak! ... Ut! ... Nk!
+voice/huntress/hurt_02	Uhk! ... Ak! ... Ut! ... Nk!
+voice/huntress/hurt_03	Uhk! ... Ak! ... Ut! ... Nk!
+voice/huntress/hurt_04	Uhk! ... Ak! ... Ut! ... Nk!
+voice/huntress/mumble_01	Now where did I leave that hammer... ah, there it is.
+voice/huntress/mumble_02	Now where did I leave that hammer... ah, there it is.
+voice/huntress/mumble_03	Now where did I leave that hammer... ah, there it is.
+voice/huntress/select_01	Yes?
+voice/huntress/select_02	What is it?
+voice/huntress/select_03	I'm listening.
+voice/huntress/sigh_01	Haaah.
+voice/huntress/sigh_02	Haaah.
+voice/huntress/sigh_03	Haaah.
+voice/huntress/sleep_01	Mmm... five more winters...
+voice/huntress/sleep_02	Mmm... five more winters...
+voice/huntress/sleep_03	Mmm... five more winters...
+voice/huntress/work_01	Hup! ... Hah! ... Hnh! ... Hup!
+voice/huntress/work_02	Hup! ... Hah! ... Hnh! ... Hup!
+voice/huntress/work_03	Hup! ... Hah! ... Hnh! ... Hup!
+voice/huntress/work_04	Hup! ... Hah! ... Hnh! ... Hup!
+voice/huntress/yawn_01	Haaaaah... mmh.
+voice/huntress/yawn_02	Haaaaah... mmh.
+voice/huntress/yawn_03	Haaaaah... mmh.
+voice/maiden/ack_01	Aye!
+voice/maiden/ack_02	On it.
+voice/maiden/ack_03	Right away.
+voice/maiden/ack_04	It will be done.
+voice/maiden/alarm_01	To arms!
+voice/maiden/alarm_02	Raiders!
+voice/maiden/alarm_03	Wake up!
+voice/maiden/attack_01	Hah! ... Hup! ... Yah! ... Hmph!
+voice/maiden/attack_02	Hah! ... Hup! ... Yah! ... Hmph!
+voice/maiden/attack_03	Hah! ... Hup! ... Yah! ... Hmph!
+voice/maiden/attack_04	Hah! ... Hup! ... Yah! ... Hmph!
+voice/maiden/complain_01	I'm hungry.
+voice/maiden/complain_02	Brr, so cold.
+voice/maiden/complain_03	Not again.
+voice/maiden/death_01	Ugh. ... Hngh. ... Ahh.
+voice/maiden/death_02	Ugh. ... Hngh. ... Ahh.
+voice/maiden/death_03	Ugh. ... Hngh. ... Ahh.
+voice/maiden/happy_01	Ha, good!
+voice/maiden/happy_02	Wonderful!
+voice/maiden/happy_03	Yes!
+voice/maiden/hum_01	Hmm.
+voice/maiden/hum_02	Hmm.
+voice/maiden/hum_03	Hmm.
+voice/maiden/hurt_01	Uhk! ... Ak! ... Ut! ... Nk!
+voice/maiden/hurt_02	Uhk! ... Ak! ... Ut! ... Nk!
+voice/maiden/hurt_03	Uhk! ... Ak! ... Ut! ... Nk!
+voice/maiden/hurt_04	Uhk! ... Ak! ... Ut! ... Nk!
+voice/maiden/mumble_01	Now where did I leave that hammer... ah, there it is.
+voice/maiden/mumble_02	Now where did I leave that hammer... ah, there it is.
+voice/maiden/mumble_03	Now where did I leave that hammer... ah, there it is.
+voice/maiden/select_01	Yes?
+voice/maiden/select_02	What is it?
+voice/maiden/select_03	I'm listening.
+voice/maiden/sigh_01	Haaah.
+voice/maiden/sigh_02	Haaah.
+voice/maiden/sigh_03	Haaah.
+voice/maiden/sleep_01	Mmm... five more winters...
+voice/maiden/sleep_02	Mmm... five more winters...
+voice/maiden/sleep_03	Mmm... five more winters...
+voice/maiden/thanks_01	Thank you!
+voice/maiden/thanks_02	Thanks!
+voice/maiden/thanks_03	My thanks.
+voice/maiden/work_01	Hup! ... Hah! ... Hnh! ... Hup!
+voice/maiden/work_02	Hup! ... Hah! ... Hnh! ... Hup!
+voice/maiden/work_03	Hup! ... Hah! ... Hnh! ... Hup!
+voice/maiden/work_04	Hup! ... Hah! ... Hnh! ... Hup!
+voice/maiden/yawn_01	Haaaaah... mmh.
+voice/maiden/yawn_02	Haaaaah... mmh.
+voice/maiden/yawn_03	Haaaaah... mmh.
+voice/veteran/ack_01	Aye!
+voice/veteran/ack_02	On it.
+voice/veteran/ack_03	Right away.
+voice/veteran/ack_04	It will be done.
+voice/veteran/alarm_01	To arms!
+voice/veteran/alarm_02	Raiders!
+voice/veteran/alarm_03	Wake up!
+voice/veteran/attack_01	Hah! ... Hup! ... Yah! ... Hmph!
+voice/veteran/attack_02	Hah! ... Hup! ... Yah! ... Hmph!
+voice/veteran/attack_03	Hah! ... Hup! ... Yah! ... Hmph!
+voice/veteran/attack_04	Hah! ... Hup! ... Yah! ... Hmph!
+voice/veteran/complain_01	I'm hungry. ... Brr, so cold. ... Not again.
+voice/veteran/complain_02	I'm hungry. ... Brr, so cold. ... Not again.
+voice/veteran/complain_03	I'm hungry. ... Brr, so cold. ... Not again.
+voice/veteran/death_01	Ugh. ... Hngh. ... Ahh.
+voice/veteran/death_02	Ugh. ... Hngh. ... Ahh.
+voice/veteran/death_03	Ugh. ... Hngh. ... Ahh.
+voice/veteran/happy_01	Ha, good! ... Wonderful! ... Yes!
+voice/veteran/happy_02	Ha, good! ... Wonderful! ... Yes!
+voice/veteran/happy_03	Ha, good! ... Wonderful! ... Yes!
+voice/veteran/hum_01	Hmm.
+voice/veteran/hum_02	Hmm.
+voice/veteran/hum_03	Hmm.
+voice/veteran/hurt_01	Uhk! ... Ak! ... Ut! ... Nk!
+voice/veteran/hurt_02	Uhk! ... Ak! ... Ut! ... Nk!
+voice/veteran/hurt_03	Uhk! ... Ak! ... Ut! ... Nk!
+voice/veteran/hurt_04	Uhk! ... Ak! ... Ut! ... Nk!
+voice/veteran/mumble_01	Now where did I leave that hammer... ah, there it is.
+voice/veteran/mumble_02	Now where did I leave that hammer... ah, there it is.
+voice/veteran/mumble_03	Now where did I leave that hammer... ah, there it is.
+voice/veteran/select_01	Yes?
+voice/veteran/select_02	What is it?
+voice/veteran/select_03	I'm listening.
+voice/veteran/sigh_01	Haaah.
+voice/veteran/sigh_02	Haaah.
+voice/veteran/sigh_03	Haaah.
+voice/veteran/sleep_01	Mmm... five more winters...
+voice/veteran/sleep_02	Mmm... five more winters...
+voice/veteran/sleep_03	Mmm... five more winters...
+voice/veteran/thanks_01	Thank you!
+voice/veteran/thanks_02	Thanks!
+voice/veteran/thanks_03	My thanks.
+voice/veteran/work_01	Hup! ... Hah! ... Hnh! ... Hup!
+voice/veteran/work_02	Hup! ... Hah! ... Hnh! ... Hup!
+voice/veteran/work_03	Hup! ... Hah! ... Hnh! ... Hup!
+voice/veteran/work_04	Hup! ... Hah! ... Hnh! ... Hup!
+voice/veteran/yawn_01	Haaaaah... mmh.
+voice/veteran/yawn_02	Haaaaah... mmh.
+voice/veteran/yawn_03	Haaaaah... mmh.
+voice/young/ack_01	Aye!
+voice/young/ack_02	On it.
+voice/young/ack_03	Right away.
+voice/young/ack_04	It will be done.
+voice/young/alarm_01	To arms!
+voice/young/alarm_02	Raiders!
+voice/young/alarm_03	Wake up!
+voice/young/attack_01	Hah! ... Hup! ... Yah! ... Hmph!
+voice/young/attack_02	Hah! ... Hup! ... Yah! ... Hmph!
+voice/young/attack_03	Hah! ... Hup! ... Yah! ... Hmph!
+voice/young/attack_04	Hah! ... Hup! ... Yah! ... Hmph!
+voice/young/complain_01	I'm hungry. ... Brr, so cold. ... Not again.
+voice/young/complain_02	I'm hungry. ... Brr, so cold. ... Not again.
+voice/young/complain_03	I'm hungry. ... Brr, so cold. ... Not again.
+voice/young/death_01	Ugh. ... Hngh. ... Ahh.
+voice/young/death_02	Ugh. ... Hngh. ... Ahh.
+voice/young/death_03	Ugh. ... Hngh. ... Ahh.
+voice/young/happy_01	Ha, good!
+voice/young/happy_02	Wonderful!
+voice/young/happy_03	Yes!
+voice/young/hum_01	Hmm.
+voice/young/hum_02	Hmm.
+voice/young/hum_03	Hmm.
+voice/young/hurt_01	Uhk! ... Ak! ... Ut! ... Nk!
+voice/young/hurt_02	Uhk! ... Ak! ... Ut! ... Nk!
+voice/young/hurt_03	Uhk! ... Ak! ... Ut! ... Nk!
+voice/young/hurt_04	Uhk! ... Ak! ... Ut! ... Nk!
+voice/young/mumble_01	Now where did I leave that hammer... ah, there it is.
+voice/young/mumble_02	Now where did I leave that hammer... ah, there it is.
+voice/young/mumble_03	Now where did I leave that hammer... ah, there it is.
+voice/young/sigh_01	Haaah.
+voice/young/sigh_02	Haaah.
+voice/young/sigh_03	Haaah.
+voice/young/sleep_01	Mmm... five more winters...
+voice/young/sleep_02	Mmm... five more winters...
+voice/young/sleep_03	Mmm... five more winters...
+voice/young/thanks_01	Thank you!
+voice/young/thanks_02	Thanks!
+voice/young/thanks_03	My thanks.
+voice/young/work_01	Hup! ... Hah! ... Hnh! ... Hup!
+voice/young/work_02	Hup! ... Hah! ... Hnh! ... Hup!
+voice/young/work_03	Hup! ... Hah! ... Hnh! ... Hup!
+voice/young/work_04	Hup! ... Hah! ... Hnh! ... Hup!
+voice/young/yawn_01	Haaaaah... mmh.
+voice/young/yawn_02	Haaaaah... mmh.
+voice/young/yawn_03	Haaaaah... mmh.

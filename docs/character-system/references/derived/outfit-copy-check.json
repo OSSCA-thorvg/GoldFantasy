@@ -1,0 +1,142 @@
+[
+  {
+    "id": "sheet-01-row-1",
+    "name": "Traveller tunic",
+    "source_svg": "docs/character-system/references/flat-vectors/00-figure.svg",
+    "paths": 57,
+    "commands": 556,
+    "compound_paths": 4,
+    "maximum_coordinate_error": 4.871794875072055e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-01-row-3",
+    "name": "Hood & breeches",
+    "source_svg": "docs/character-system/references/flat-vectors/02-figure.svg",
+    "paths": 94,
+    "commands": 757,
+    "compound_paths": 6,
+    "maximum_coordinate_error": 4.878048784462408e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-01-row-4",
+    "name": "Fur mantle & cape",
+    "source_svg": "docs/character-system/references/flat-vectors/03-figure.svg",
+    "paths": 66,
+    "commands": 667,
+    "compound_paths": 4,
+    "maximum_coordinate_error": 4.927536233267915e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-02-row-1",
+    "name": "Fur collar & coat",
+    "source_svg": "docs/character-system/references/flat-vectors/04-figure.svg",
+    "paths": 52,
+    "commands": 499,
+    "compound_paths": 4,
+    "maximum_coordinate_error": 4.920634921745659e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-02-row-2",
+    "name": "Wrapped cape & trousers",
+    "source_svg": "docs/character-system/references/flat-vectors/05-figure.svg",
+    "paths": 111,
+    "commands": 1044,
+    "compound_paths": 4,
+    "maximum_coordinate_error": 4.929577468004709e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-02-row-4",
+    "name": "Cape & leggings",
+    "source_svg": "docs/character-system/references/flat-vectors/07-figure.svg",
+    "paths": 42,
+    "commands": 394,
+    "compound_paths": 5,
+    "maximum_coordinate_error": 4.918032789902327e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-03-row-1",
+    "name": "Short cape & boots",
+    "source_svg": "docs/character-system/references/flat-vectors/08-figure.svg",
+    "paths": 111,
+    "commands": 803,
+    "compound_paths": 8,
+    "maximum_coordinate_error": 4.935064936262279e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-03-row-3",
+    "name": "Sleeveless tunic",
+    "source_svg": "docs/character-system/references/flat-vectors/10-figure.svg",
+    "paths": 128,
+    "commands": 937,
+    "compound_paths": 8,
+    "maximum_coordinate_error": 4.705882357569635e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-04-row-2",
+    "name": "Round travel cloak",
+    "source_svg": "docs/character-system/references/flat-vectors/13-figure.svg",
+    "paths": 87,
+    "commands": 645,
+    "compound_paths": 5,
+    "maximum_coordinate_error": 4.938271605858802e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-04-row-3",
+    "name": "Split hem tunic",
+    "source_svg": "docs/character-system/references/flat-vectors/14-figure.svg",
+    "paths": 95,
+    "commands": 698,
+    "compound_paths": 8,
+    "maximum_coordinate_error": 3.3333333391283304e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-04-row-4",
+    "name": "Small shoulder cape",
+    "source_svg": "docs/character-system/references/flat-vectors/15-figure.svg",
+    "paths": 89,
+    "commands": 737,
+    "compound_paths": 6,
+    "maximum_coordinate_error": 4.444444446249918e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-05-row-1",
+    "name": "Dark mantle & breeches",
+    "source_svg": "docs/character-system/references/flat-vectors/16-figure.svg",
+    "paths": 42,
+    "commands": 404,
+    "compound_paths": 4,
+    "maximum_coordinate_error": 4.7619047656155544e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-05-row-2",
+    "name": "High collar robe",
+    "source_svg": "docs/character-system/references/flat-vectors/17-figure.svg",
+    "paths": 102,
+    "commands": 776,
+    "compound_paths": 5,
+    "maximum_coordinate_error": 4.761904769168268e-06,
+    "result": "verbatim geometry; uniform placement only"
+  },
+  {
+    "id": "sheet-05-row-3",
+    "name": "Wrapped robe",
+    "source_svg": "docs/character-system/references/flat-vectors/18-figure.svg",
+    "paths": 67,
+    "commands": 731,
+    "compound_paths": 7,
+    "maximum_coordinate_error": 4.7619047656155544e-06,
+    "result": "verbatim geometry; uniform placement only"
+  }
+]

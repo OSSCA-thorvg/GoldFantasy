@@ -1,0 +1,51 @@
+version: 2
+mode: ui_avatar
+technical_profile: game_runtime
+state: static_authored
+reference_priority: latest_five_monochrome_construction_sheets
+geometry:
+  head_height: 6.4
+  view: front
+  silhouette: traced_source_hair_and_face
+  corners: soft_curves_with_source_hair_tips
+line_system:
+  type: hybrid
+  caps: round
+  joins: round
+  eye_outline: 0.06
+  upper_lid: 0.09
+  brow_mouth: 0.065
+palette:
+  face_ink: [25, 28, 27]
+  sclera: [253, 252, 248]
+  skin: authored_token
+  hair: authored_token
+  costume: source_flat_greys
+face:
+  eye_topology: four_cubics_thirteen_points
+  brow_topology: one_cubic_four_points
+  mouth_topology: one_cubic_line
+  hair_fit: positive_scalp_and_lateral_lock_skin_weights
+  hair_y: fixed
+  hair_source_warp: uniform_placement_only
+  ears: independent_source_uniform_size_skull_attachment
+  layers: [hair_back, head_base, face_features, hair_front, ears]
+  jaw_animation: forbidden
+body:
+  update: whole_asset_swap
+  geometry: original_compound_svg_fills
+  preview_scale: independent_of_hair
+  source_head_removal: measured_costume_top_and_face_mask
+  detailed_proportion_work: deferred
+background:
+  source: selected_character_map_tile
+  separate_from_character_palette: true
+motion:
+  profile_animation: removed
+  authored_static_parameters: true
+  map_walking: separate_existing_system
+assumptions:
+  - only_front_views_are_supported
+  - eyes_are_mirrored_from_the_left_source_eye
+  - scan_noise_is_collapsed_to_flat_fills_before_tracing
+  - body_outfits_are_reused_as_whole_sets

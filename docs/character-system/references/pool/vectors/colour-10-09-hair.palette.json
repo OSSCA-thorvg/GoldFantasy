@@ -1,0 +1,14 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Black",
+      "color": "#010702ff"
+    },
+    {
+      "index": 1,
+      "name": "Black 2",
+      "color": "#1c1915ff"
+    }
+  ]
+}

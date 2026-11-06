@@ -1,0 +1,306 @@
+[
+  {
+    "file": "docs/character-system/references/modular/derived/parts/00-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 34,
+    "path_count": 26,
+    "path_command_count": 133,
+    "id_count": 31,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/01-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 50,
+    "path_count": 42,
+    "path_command_count": 211,
+    "id_count": 47,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/02-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 28,
+    "path_count": 20,
+    "path_command_count": 155,
+    "id_count": 25,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/03-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 43,
+    "path_count": 35,
+    "path_command_count": 204,
+    "id_count": 40,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/04-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 50,
+    "path_count": 42,
+    "path_command_count": 303,
+    "id_count": 47,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/05-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 39,
+    "path_count": 31,
+    "path_command_count": 212,
+    "id_count": 36,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/06-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 21,
+    "path_count": 13,
+    "path_command_count": 119,
+    "id_count": 18,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/07-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 29,
+    "path_count": 21,
+    "path_command_count": 142,
+    "id_count": 26,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/08-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 36,
+    "path_count": 28,
+    "path_command_count": 149,
+    "id_count": 33,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/09-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 31,
+    "path_count": 23,
+    "path_command_count": 146,
+    "id_count": 28,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/10-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 60,
+    "path_count": 52,
+    "path_command_count": 309,
+    "id_count": 57,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/11-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 38,
+    "path_count": 30,
+    "path_command_count": 194,
+    "id_count": 35,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/12-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 40,
+    "path_count": 32,
+    "path_command_count": 184,
+    "id_count": 37,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/13-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 18,
+    "path_count": 10,
+    "path_command_count": 73,
+    "id_count": 15,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/14-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 36,
+    "path_count": 28,
+    "path_command_count": 165,
+    "id_count": 33,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/15-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 30,
+    "path_count": 22,
+    "path_command_count": 133,
+    "id_count": 27,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/16-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 28,
+    "path_count": 20,
+    "path_command_count": 121,
+    "id_count": 25,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/17-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 31,
+    "path_count": 23,
+    "path_command_count": 134,
+    "id_count": 28,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  },
+  {
+    "file": "docs/character-system/references/modular/derived/parts/18-hair.svg",
+    "profile": "game_runtime",
+    "parse_ok": true,
+    "element_count": 37,
+    "path_count": 29,
+    "path_command_count": 160,
+    "id_count": 34,
+    "duplicate_ids": [],
+    "findings": [],
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    }
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gold",
+      "color": "#c5933cff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#221909ff"
+    },
+    {
+      "index": 2,
+      "name": "Brown",
+      "color": "#bd8f49ff"
+    },
+    {
+      "index": 3,
+      "name": "Umber",
+      "color": "#3b2a0eff"
+    },
+    {
+      "index": 4,
+      "name": "Black 2",
+      "color": "#252408ff"
+    }
+  ]
+}

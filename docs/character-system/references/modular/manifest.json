@@ -1,0 +1,1974 @@
+{
+  "looks": [
+    {
+      "index": 0,
+      "sheet": 6,
+      "row": 0,
+      "parts": {
+        "face": {
+          "crop": "crops/00-face.png",
+          "svg": "vectors/00-face.svg",
+          "box": [
+            105,
+            11,
+            212,
+            120
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/00-ears.png",
+          "svg": "vectors/00-ears.svg",
+          "box": [
+            300,
+            39,
+            413,
+            88
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/00-cap.png",
+          "svg": "vectors/00-cap.svg",
+          "box": [
+            474,
+            9,
+            611,
+            101
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/00-fringe.png",
+          "svg": "vectors/00-fringe.svg",
+          "box": [
+            676,
+            15,
+            807,
+            95
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/00-back.png",
+          "svg": "vectors/00-back.svg",
+          "box": [
+            866,
+            32,
+            1019,
+            84
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/00-eyes.png",
+          "svg": "vectors/00-eyes.svg",
+          "box": [
+            1087,
+            36,
+            1212,
+            90
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/00-assembled.png",
+          "svg": "vectors/00-assembled.svg",
+          "box": [
+            1269,
+            6,
+            1446,
+            130
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 1,
+      "sheet": 6,
+      "row": 1,
+      "parts": {
+        "face": {
+          "crop": "crops/01-face.png",
+          "svg": "vectors/01-face.svg",
+          "box": [
+            102,
+            132,
+            215,
+            244
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/01-ears.png",
+          "svg": "vectors/01-ears.svg",
+          "box": [
+            294,
+            157,
+            418,
+            209
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/01-cap.png",
+          "svg": "vectors/01-cap.svg",
+          "box": [
+            473,
+            134,
+            612,
+            212
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/01-fringe.png",
+          "svg": "vectors/01-fringe.svg",
+          "box": [
+            670,
+            137,
+            806,
+            218
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/01-back.png",
+          "svg": "vectors/01-back.svg",
+          "box": [
+            857,
+            116,
+            1022,
+            275
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/01-eyes.png",
+          "svg": "vectors/01-eyes.svg",
+          "box": [
+            1087,
+            155,
+            1211,
+            206
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/01-assembled.png",
+          "svg": "vectors/01-assembled.svg",
+          "box": [
+            1280,
+            117,
+            1440,
+            256
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 2,
+      "sheet": 6,
+      "row": 2,
+      "parts": {
+        "face": {
+          "crop": "crops/02-face.png",
+          "svg": "vectors/02-face.svg",
+          "box": [
+            99,
+            258,
+            218,
+            359
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/02-ears.png",
+          "svg": "vectors/02-ears.svg",
+          "box": [
+            300,
+            281,
+            411,
+            328
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/02-cap.png",
+          "svg": "vectors/02-cap.svg",
+          "box": [
+            457,
+            255,
+            629,
+            343
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/02-fringe.png",
+          "svg": "vectors/02-fringe.svg",
+          "box": [
+            673,
+            265,
+            808,
+            345
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/02-back.png",
+          "svg": "vectors/02-back.svg",
+          "box": [
+            829,
+            261,
+            830,
+            262
+          ],
+          "empty": true
+        },
+        "eyes": {
+          "crop": "crops/02-eyes.png",
+          "svg": "vectors/02-eyes.svg",
+          "box": [
+            1086,
+            279,
+            1210,
+            331
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/02-assembled.png",
+          "svg": "vectors/02-assembled.svg",
+          "box": [
+            1276,
+            243,
+            1446,
+            367
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 3,
+      "sheet": 6,
+      "row": 3,
+      "parts": {
+        "face": {
+          "crop": "crops/03-face.png",
+          "svg": "vectors/03-face.svg",
+          "box": [
+            104,
+            369,
+            213,
+            477
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/03-ears.png",
+          "svg": "vectors/03-ears.svg",
+          "box": [
+            298,
+            397,
+            413,
+            444
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/03-cap.png",
+          "svg": "vectors/03-cap.svg",
+          "box": [
+            447,
+            368,
+            641,
+            475
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/03-fringe.png",
+          "svg": "vectors/03-fringe.svg",
+          "box": [
+            641,
+            372,
+            642,
+            373
+          ],
+          "empty": true
+        },
+        "back": {
+          "crop": "crops/03-back.png",
+          "svg": "vectors/03-back.svg",
+          "box": [
+            852,
+            365,
+            1035,
+            464
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/03-eyes.png",
+          "svg": "vectors/03-eyes.svg",
+          "box": [
+            1092,
+            394,
+            1205,
+            442
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/03-assembled.png",
+          "svg": "vectors/03-assembled.svg",
+          "box": [
+            1261,
+            354,
+            1466,
+            486
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 4,
+      "sheet": 4,
+      "row": 2,
+      "parts": {
+        "face": {
+          "crop": "crops/04-face.png",
+          "svg": "vectors/04-face.svg",
+          "box": [
+            96,
+            284,
+            216,
+            394
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/04-ears.png",
+          "svg": "vectors/04-ears.svg",
+          "box": [
+            284,
+            311,
+            408,
+            357
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/04-cap.png",
+          "svg": "vectors/04-cap.svg",
+          "box": [
+            446,
+            270,
+            616,
+            380
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/04-fringe.png",
+          "svg": "vectors/04-fringe.svg",
+          "box": [
+            653,
+            297,
+            810,
+            375
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/04-back.png",
+          "svg": "vectors/04-back.svg",
+          "box": [
+            843,
+            277,
+            1033,
+            404
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/04-eyes.png",
+          "svg": "vectors/04-eyes.svg",
+          "box": [
+            1097,
+            313,
+            1221,
+            360
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/04-assembled.png",
+          "svg": "vectors/04-assembled.svg",
+          "box": [
+            1275,
+            269,
+            1479,
+            410
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 5,
+      "sheet": 4,
+      "row": 3,
+      "parts": {
+        "face": {
+          "crop": "crops/05-face.png",
+          "svg": "vectors/05-face.svg",
+          "box": [
+            98,
+            412,
+            214,
+            516
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/05-ears.png",
+          "svg": "vectors/05-ears.svg",
+          "box": [
+            286,
+            445,
+            405,
+            485
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/05-cap.png",
+          "svg": "vectors/05-cap.svg",
+          "box": [
+            469,
+            414,
+            596,
+            489
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/05-fringe.png",
+          "svg": "vectors/05-fringe.svg",
+          "box": [
+            645,
+            424,
+            809,
+            498
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/05-back.png",
+          "svg": "vectors/05-back.svg",
+          "box": [
+            836,
+            429,
+            1050,
+            515
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/05-eyes.png",
+          "svg": "vectors/05-eyes.svg",
+          "box": [
+            1103,
+            432,
+            1212,
+            482
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/05-assembled.png",
+          "svg": "vectors/05-assembled.svg",
+          "box": [
+            1289,
+            397,
+            1469,
+            527
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 6,
+      "sheet": 4,
+      "row": 4,
+      "parts": {
+        "face": {
+          "crop": "crops/06-face.png",
+          "svg": "vectors/06-face.svg",
+          "box": [
+            98,
+            529,
+            214,
+            639
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/06-ears.png",
+          "svg": "vectors/06-ears.svg",
+          "box": [
+            287,
+            553,
+            404,
+            595
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/06-cap.png",
+          "svg": "vectors/06-cap.svg",
+          "box": [
+            464,
+            519,
+            599,
+            607
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/06-fringe.png",
+          "svg": "vectors/06-fringe.svg",
+          "box": [
+            658,
+            538,
+            794,
+            621
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/06-back.png",
+          "svg": "vectors/06-back.svg",
+          "box": [
+            872,
+            522,
+            985,
+            661
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/06-eyes.png",
+          "svg": "vectors/06-eyes.svg",
+          "box": [
+            1098,
+            550,
+            1221,
+            599
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/06-assembled.png",
+          "svg": "vectors/06-assembled.svg",
+          "box": [
+            1312,
+            514,
+            1443,
+            652
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 7,
+      "sheet": 4,
+      "row": 5,
+      "parts": {
+        "face": {
+          "crop": "crops/07-face.png",
+          "svg": "vectors/07-face.svg",
+          "box": [
+            99,
+            654,
+            211,
+            753
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/07-ears.png",
+          "svg": "vectors/07-ears.svg",
+          "box": [
+            281,
+            679,
+            411,
+            723
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/07-cap.png",
+          "svg": "vectors/07-cap.svg",
+          "box": [
+            452,
+            640,
+            607,
+            731
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/07-fringe.png",
+          "svg": "vectors/07-fringe.svg",
+          "box": [
+            641,
+            657,
+            642,
+            658
+          ],
+          "empty": true
+        },
+        "back": {
+          "crop": "crops/07-back.png",
+          "svg": "vectors/07-back.svg",
+          "box": [
+            851,
+            657,
+            997,
+            754
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/07-eyes.png",
+          "svg": "vectors/07-eyes.svg",
+          "box": [
+            1097,
+            678,
+            1214,
+            725
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/07-assembled.png",
+          "svg": "vectors/07-assembled.svg",
+          "box": [
+            1304,
+            639,
+            1451,
+            759
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 8,
+      "sheet": 6,
+      "row": 8,
+      "parts": {
+        "face": {
+          "crop": "crops/08-face.png",
+          "svg": "vectors/08-face.svg",
+          "box": [
+            112,
+            862,
+            205,
+            938
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/08-ears.png",
+          "svg": "vectors/08-ears.svg",
+          "box": [
+            300,
+            875,
+            415,
+            918
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/08-cap.png",
+          "svg": "vectors/08-cap.svg",
+          "box": [
+            480,
+            862,
+            600,
+            926
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/08-fringe.png",
+          "svg": "vectors/08-fringe.svg",
+          "box": [
+            666,
+            864,
+            798,
+            926
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/08-back.png",
+          "svg": "vectors/08-back.svg",
+          "box": [
+            874,
+            862,
+            1001,
+            938
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/08-eyes.png",
+          "svg": "vectors/08-eyes.svg",
+          "box": [
+            1090,
+            874,
+            1215,
+            919
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/08-assembled.png",
+          "svg": "vectors/08-assembled.svg",
+          "box": [
+            1288,
+            847,
+            1440,
+            938
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 9,
+      "sheet": 6,
+      "row": 9,
+      "parts": {
+        "face": {
+          "crop": "crops/09-face.png",
+          "svg": "vectors/09-face.svg",
+          "box": [
+            105,
+            940,
+            212,
+            1020
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/09-ears.png",
+          "svg": "vectors/09-ears.svg",
+          "box": [
+            304,
+            960,
+            410,
+            1000
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/09-cap.png",
+          "svg": "vectors/09-cap.svg",
+          "box": [
+            463,
+            946,
+            619,
+            1010
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/09-fringe.png",
+          "svg": "vectors/09-fringe.svg",
+          "box": [
+            673,
+            947,
+            797,
+            1011
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/09-back.png",
+          "svg": "vectors/09-back.svg",
+          "box": [
+            857,
+            947,
+            1021,
+            1022
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/09-eyes.png",
+          "svg": "vectors/09-eyes.svg",
+          "box": [
+            1095,
+            952,
+            1206,
+            999
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/09-assembled.png",
+          "svg": "vectors/09-assembled.svg",
+          "box": [
+            1278,
+            925,
+            1443,
+            1024
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 10,
+      "sheet": 4,
+      "row": 0,
+      "parts": {
+        "face": {
+          "crop": "crops/10-face.png",
+          "svg": "vectors/10-face.svg",
+          "box": [
+            103,
+            7,
+            213,
+            139
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/10-ears.png",
+          "svg": "vectors/10-ears.svg",
+          "box": [
+            283,
+            57,
+            411,
+            106
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/10-cap.png",
+          "svg": "vectors/10-cap.svg",
+          "box": [
+            469,
+            3,
+            604,
+            114
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/10-fringe.png",
+          "svg": "vectors/10-fringe.svg",
+          "box": [
+            656,
+            39,
+            810,
+            126
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/10-back-complete.png",
+          "svg": "vectors/10-back-complete.svg",
+          "box": [
+            866,
+            5,
+            1024,
+            141
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/10-eyes.png",
+          "svg": "vectors/10-eyes.svg",
+          "box": [
+            1098,
+            54,
+            1221,
+            101
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/10-assembled.png",
+          "svg": "vectors/10-assembled.svg",
+          "box": [
+            1301,
+            2,
+            1455,
+            153
+          ],
+          "empty": false
+        },
+        "back-source": {
+          "crop": "crops/10-back.png",
+          "svg": "vectors/10-back.svg",
+          "box": [
+            866,
+            5,
+            1024,
+            141
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 11,
+      "sheet": 4,
+      "row": 1,
+      "parts": {
+        "face": {
+          "crop": "crops/11-face.png",
+          "svg": "vectors/11-face.svg",
+          "box": [
+            99,
+            155,
+            214,
+            262
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/11-ears.png",
+          "svg": "vectors/11-ears.svg",
+          "box": [
+            282,
+            183,
+            410,
+            230
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/11-cap.png",
+          "svg": "vectors/11-cap.svg",
+          "box": [
+            468,
+            155,
+            600,
+            240
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/11-fringe.png",
+          "svg": "vectors/11-fringe.svg",
+          "box": [
+            663,
+            162,
+            795,
+            249
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/11-back-root.png",
+          "svg": "vectors/11-back-root.svg",
+          "box": [
+            868,
+            145,
+            1014,
+            281
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/11-eyes.png",
+          "svg": "vectors/11-eyes.svg",
+          "box": [
+            1104,
+            176,
+            1213,
+            225
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/11-assembled.png",
+          "svg": "vectors/11-assembled.svg",
+          "box": [
+            1299,
+            146,
+            1452,
+            282
+          ],
+          "empty": false
+        },
+        "back-source": {
+          "crop": "crops/11-back.png",
+          "svg": "vectors/11-back.svg",
+          "box": [
+            868,
+            145,
+            1014,
+            281
+          ],
+          "empty": false
+        },
+        "tied-L": {
+          "crop": "crops/11-tied-L.png",
+          "svg": "vectors/11-tied-L.svg",
+          "box": [
+            868,
+            145,
+            1014,
+            281
+          ],
+          "empty": false
+        },
+        "tied-R": {
+          "crop": "crops/11-tied-R.png",
+          "svg": "vectors/11-tied-R.svg",
+          "box": [
+            868,
+            145,
+            1014,
+            281
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 12,
+      "sheet": 6,
+      "row": 4,
+      "parts": {
+        "face": {
+          "crop": "crops/12-face.png",
+          "svg": "vectors/12-face.svg",
+          "box": [
+            107,
+            488,
+            210,
+            588
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/12-ears.png",
+          "svg": "vectors/12-ears.svg",
+          "box": [
+            289,
+            516,
+            422,
+            561
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/12-cap.png",
+          "svg": "vectors/12-cap.svg",
+          "box": [
+            479,
+            491,
+            606,
+            567
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/12-fringe.png",
+          "svg": "vectors/12-fringe.svg",
+          "box": [
+            683,
+            490,
+            801,
+            592
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/12-back.png",
+          "svg": "vectors/12-back.svg",
+          "box": [
+            867,
+            476,
+            1027,
+            625
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/12-eyes.png",
+          "svg": "vectors/12-eyes.svg",
+          "box": [
+            1087,
+            513,
+            1211,
+            559
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/12-assembled.png",
+          "svg": "vectors/12-assembled.svg",
+          "box": [
+            1283,
+            473,
+            1439,
+            596
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 13,
+      "sheet": 6,
+      "row": 5,
+      "parts": {
+        "face": {
+          "crop": "crops/13-face.png",
+          "svg": "vectors/13-face.svg",
+          "box": [
+            104,
+            598,
+            213,
+            689
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/13-ears.png",
+          "svg": "vectors/13-ears.svg",
+          "box": [
+            303,
+            622,
+            412,
+            661
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/13-cap.png",
+          "svg": "vectors/13-cap.svg",
+          "box": [
+            481,
+            604,
+            604,
+            666
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/13-fringe.png",
+          "svg": "vectors/13-fringe.svg",
+          "box": [
+            679,
+            604,
+            796,
+            668
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/13-back.png",
+          "svg": "vectors/13-back.svg",
+          "box": [
+            829,
+            601,
+            830,
+            602
+          ],
+          "empty": true
+        },
+        "eyes": {
+          "crop": "crops/13-eyes.png",
+          "svg": "vectors/13-eyes.svg",
+          "box": [
+            1092,
+            616,
+            1206,
+            663
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/13-assembled.png",
+          "svg": "vectors/13-assembled.svg",
+          "box": [
+            1284,
+            583,
+            1437,
+            691
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 14,
+      "sheet": 6,
+      "row": 6,
+      "parts": {
+        "face": {
+          "crop": "crops/14-face.png",
+          "svg": "vectors/14-face.svg",
+          "box": [
+            103,
+            693,
+            214,
+            785
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/14-ears.png",
+          "svg": "vectors/14-ears.svg",
+          "box": [
+            303,
+            714,
+            412,
+            757
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/14-cap.png",
+          "svg": "vectors/14-cap.svg",
+          "box": [
+            468,
+            686,
+            616,
+            777
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/14-fringe.png",
+          "svg": "vectors/14-fringe.svg",
+          "box": [
+            659,
+            697,
+            813,
+            769
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/14-back.png",
+          "svg": "vectors/14-back.svg",
+          "box": [
+            874,
+            701,
+            1009,
+            775
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/14-eyes.png",
+          "svg": "vectors/14-eyes.svg",
+          "box": [
+            1088,
+            710,
+            1212,
+            757
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/14-assembled.png",
+          "svg": "vectors/14-assembled.svg",
+          "box": [
+            1275,
+            678,
+            1445,
+            785
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 15,
+      "sheet": 6,
+      "row": 7,
+      "parts": {
+        "face": {
+          "crop": "crops/15-face.png",
+          "svg": "vectors/15-face.svg",
+          "box": [
+            108,
+            787,
+            209,
+            859
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/15-ears.png",
+          "svg": "vectors/15-ears.svg",
+          "box": [
+            303,
+            803,
+            412,
+            842
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/15-cap.png",
+          "svg": "vectors/15-cap.svg",
+          "box": [
+            481,
+            789,
+            600,
+            847
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/15-fringe.png",
+          "svg": "vectors/15-fringe.svg",
+          "box": [
+            666,
+            794,
+            798,
+            851
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/15-back.png",
+          "svg": "vectors/15-back.svg",
+          "box": [
+            863,
+            800,
+            1010,
+            843
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/15-eyes.png",
+          "svg": "vectors/15-eyes.svg",
+          "box": [
+            1092,
+            798,
+            1207,
+            845
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/15-assembled.png",
+          "svg": "vectors/15-assembled.svg",
+          "box": [
+            1273,
+            772,
+            1453,
+            860
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 16,
+      "sheet": 4,
+      "row": 6,
+      "parts": {
+        "face": {
+          "crop": "crops/16-face.png",
+          "svg": "vectors/16-face.svg",
+          "box": [
+            101,
+            761,
+            209,
+            852
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/16-ears.png",
+          "svg": "vectors/16-ears.svg",
+          "box": [
+            286,
+            786,
+            404,
+            824
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/16-cap.png",
+          "svg": "vectors/16-cap.svg",
+          "box": [
+            472,
+            765,
+            589,
+            831
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/16-fringe.png",
+          "svg": "vectors/16-fringe.svg",
+          "box": [
+            663,
+            779,
+            772,
+            835
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/16-back.png",
+          "svg": "vectors/16-back.svg",
+          "box": [
+            867,
+            752,
+            968,
+            853
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/16-eyes.png",
+          "svg": "vectors/16-eyes.svg",
+          "box": [
+            1099,
+            782,
+            1210,
+            827
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/16-assembled.png",
+          "svg": "vectors/16-assembled.svg",
+          "box": [
+            1315,
+            746,
+            1431,
+            852
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 17,
+      "sheet": 4,
+      "row": 7,
+      "parts": {
+        "face": {
+          "crop": "crops/17-face.png",
+          "svg": "vectors/17-face.svg",
+          "box": [
+            103,
+            854,
+            205,
+            939
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/17-ears.png",
+          "svg": "vectors/17-ears.svg",
+          "box": [
+            274,
+            874,
+            413,
+            914
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/17-cap.png",
+          "svg": "vectors/17-cap.svg",
+          "box": [
+            464,
+            859,
+            592,
+            921
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/17-fringe.png",
+          "svg": "vectors/17-fringe.svg",
+          "box": [
+            650,
+            865,
+            782,
+            928
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/17-back.png",
+          "svg": "vectors/17-back.svg",
+          "box": [
+            860,
+            873,
+            980,
+            935
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/17-eyes.png",
+          "svg": "vectors/17-eyes.svg",
+          "box": [
+            1094,
+            876,
+            1221,
+            912
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/17-assembled.png",
+          "svg": "vectors/17-assembled.svg",
+          "box": [
+            1299,
+            839,
+            1444,
+            939
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 18,
+      "sheet": 4,
+      "row": 8,
+      "parts": {
+        "face": {
+          "crop": "crops/18-face.png",
+          "svg": "vectors/18-face.svg",
+          "box": [
+            95,
+            941,
+            208,
+            1024
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/18-ears.png",
+          "svg": "vectors/18-ears.svg",
+          "box": [
+            282,
+            960,
+            406,
+            1000
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/18-cap.png",
+          "svg": "vectors/18-cap.svg",
+          "box": [
+            471,
+            941,
+            593,
+            1011
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/18-fringe.png",
+          "svg": "vectors/18-fringe.svg",
+          "box": [
+            655,
+            950,
+            779,
+            1012
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/18-back.png",
+          "svg": "vectors/18-back.svg",
+          "box": [
+            841,
+            948,
+            1002,
+            1023
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/18-eyes.png",
+          "svg": "vectors/18-eyes.svg",
+          "box": [
+            1098,
+            953,
+            1212,
+            997
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/18-assembled.png",
+          "svg": "vectors/18-assembled.svg",
+          "box": [
+            1296,
+            926,
+            1449,
+            1024
+          ],
+          "empty": false
+        }
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "index": 0,
+      "parts": {
+        "face": {
+          "crop": "crops/base-0-face.png",
+          "svg": "vectors/base-0-face.svg",
+          "box": [
+            44,
+            69,
+            216,
+            237
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/base-0-ears.png",
+          "svg": "vectors/base-0-ears.svg",
+          "box": [
+            255,
+            113,
+            401,
+            174
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/base-0-cap.png",
+          "svg": "vectors/base-0-cap.svg",
+          "box": [
+            434,
+            63,
+            618,
+            202
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/base-0-fringe.png",
+          "svg": "vectors/base-0-fringe.svg",
+          "box": [
+            660,
+            78,
+            843,
+            190
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/base-0-back.png",
+          "svg": "vectors/base-0-back.svg",
+          "box": [
+            829,
+            80,
+            1081,
+            223
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/base-0-eyes.png",
+          "svg": "vectors/base-0-eyes.svg",
+          "box": [
+            1132,
+            132,
+            1216,
+            156
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/base-0-assembled.png",
+          "svg": "vectors/base-0-assembled.svg",
+          "box": [
+            1273,
+            56,
+            1509,
+            237
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 1,
+      "parts": {
+        "face": {
+          "crop": "crops/base-1-face.png",
+          "svg": "vectors/base-1-face.svg",
+          "box": [
+            44,
+            309,
+            216,
+            541
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/base-1-ears.png",
+          "svg": "vectors/base-1-ears.svg",
+          "box": [
+            255,
+            364,
+            402,
+            425
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/base-1-cap.png",
+          "svg": "vectors/base-1-cap.svg",
+          "box": [
+            434,
+            312,
+            619,
+            454
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/base-1-fringe.png",
+          "svg": "vectors/base-1-fringe.svg",
+          "box": [
+            660,
+            328,
+            843,
+            442
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/base-1-back.png",
+          "svg": "vectors/base-1-back.svg",
+          "box": [
+            829,
+            332,
+            1081,
+            475
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/base-1-eyes.png",
+          "svg": "vectors/base-1-eyes.svg",
+          "box": [
+            1132,
+            383,
+            1216,
+            407
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/base-1-assembled.png",
+          "svg": "vectors/base-1-assembled.svg",
+          "box": [
+            1275,
+            304,
+            1509,
+            590
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 2,
+      "parts": {
+        "face": {
+          "crop": "crops/base-2-face.png",
+          "svg": "vectors/base-2-face.svg",
+          "box": [
+            27,
+            592,
+            231,
+            738
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/base-2-ears.png",
+          "svg": "vectors/base-2-ears.svg",
+          "box": [
+            255,
+            623,
+            401,
+            683
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/base-2-cap.png",
+          "svg": "vectors/base-2-cap.svg",
+          "box": [
+            422,
+            590,
+            631,
+            707
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/base-2-fringe.png",
+          "svg": "vectors/base-2-fringe.svg",
+          "box": [
+            650,
+            603,
+            848,
+            699
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/base-2-back.png",
+          "svg": "vectors/base-2-back.svg",
+          "box": [
+            829,
+            600,
+            1081,
+            720
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/base-2-eyes.png",
+          "svg": "vectors/base-2-eyes.svg",
+          "box": [
+            1081,
+            642,
+            1216,
+            711
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/base-2-assembled.png",
+          "svg": "vectors/base-2-assembled.svg",
+          "box": [
+            1254,
+            582,
+            1527,
+            739
+          ],
+          "empty": false
+        }
+      }
+    },
+    {
+      "index": 3,
+      "parts": {
+        "face": {
+          "crop": "crops/base-3-face.png",
+          "svg": "vectors/base-3-face.svg",
+          "box": [
+            44,
+            800,
+            216,
+            990
+          ],
+          "empty": false
+        },
+        "ears": {
+          "crop": "crops/base-3-ears.png",
+          "svg": "vectors/base-3-ears.svg",
+          "box": [
+            255,
+            867,
+            402,
+            930
+          ],
+          "empty": false
+        },
+        "cap": {
+          "crop": "crops/base-3-cap.png",
+          "svg": "vectors/base-3-cap.svg",
+          "box": [
+            433,
+            800,
+            618,
+            956
+          ],
+          "empty": false
+        },
+        "fringe": {
+          "crop": "crops/base-3-fringe.png",
+          "svg": "vectors/base-3-fringe.svg",
+          "box": [
+            660,
+            817,
+            843,
+            944
+          ],
+          "empty": false
+        },
+        "back": {
+          "crop": "crops/base-3-back.png",
+          "svg": "vectors/base-3-back.svg",
+          "box": [
+            829,
+            832,
+            1081,
+            974
+          ],
+          "empty": false
+        },
+        "eyes": {
+          "crop": "crops/base-3-eyes.png",
+          "svg": "vectors/base-3-eyes.svg",
+          "box": [
+            1132,
+            884,
+            1216,
+            908
+          ],
+          "empty": false
+        },
+        "assembled": {
+          "crop": "crops/base-3-assembled.png",
+          "svg": "vectors/base-3-assembled.svg",
+          "box": [
+            1275,
+            795,
+            1509,
+            990
+          ],
+          "empty": false
+        }
+      }
+    }
+  ]
+}

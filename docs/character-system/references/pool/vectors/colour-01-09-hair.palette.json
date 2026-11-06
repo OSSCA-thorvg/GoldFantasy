@@ -1,0 +1,34 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Black",
+      "color": "#010101ff"
+    },
+    {
+      "index": 1,
+      "name": "Black 2",
+      "color": "#242423ff"
+    },
+    {
+      "index": 2,
+      "name": "Charcoal",
+      "color": "#434442ff"
+    },
+    {
+      "index": 3,
+      "name": "Black 3",
+      "color": "#191712ff"
+    },
+    {
+      "index": 4,
+      "name": "Petrol",
+      "color": "#0c393fff"
+    },
+    {
+      "index": 5,
+      "name": "Charcoal 2",
+      "color": "#3e3d3cff"
+    }
+  ]
+}

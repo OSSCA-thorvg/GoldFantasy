@@ -1,0 +1,123 @@
+{
+  "profile": "witheditor",
+  "webPackage": "artifacts/web-witheditor",
+  "files": {
+    "index.html": "af2b539a156da21daa1e5794dffc8f1600de2d723a91df42b0bde41eade7816b",
+    "GameEngine.html": "6ee17092b8ca5d97c43ee3e8b6dff1e528bac0182a86b5943dfa7c67cb775bfa",
+    "GameEngine.data": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15",
+    "GameEngine.wasm": "f33e8f6bc18cbfbe81678198231825d082ae8b4937f1c32a6f30610fc08cab22",
+    "GameEngine.js": "f27bf89bc0c03087a2ea0874563e07f7406d2487be041197296dd1be53527b3d",
+    "Hearthold.html": "bce02cb3466c9fbe88b59be8a00de2d9c1f7967ab16453523e6377dfc8170581",
+    "Hearthold.data": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15",
+    "Hearthold.wasm": "2e2e88ccc36588b01095e9af5370293605fbd5a856074b9984dd5f8930b6b467",
+    "Hearthold.js": "3a74264b8a6d709072ffc86432dc084c8f108afb9c71d25acd86624912dcd67f",
+    "licenses/Lua.txt": "05980eef8a3ee9b12778219e987a47120501b02481ff344643e2d8bd40ae878e",
+    "licenses/SDL3.txt": "1c040b8271b37e5076359f8fd54240e371114112924d2df81ef87c7d6a1dfdfd",
+    "licenses/EmdawnWebGPU.txt": "2f79bf3699b0870251255b381670237f73f21a04a38c094f791eba39c5fd1df7",
+    "licenses/Emscripten.txt": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86",
+    "licenses/RapidJSON.txt": "01b0d15338bb72e2ced401051b4037a5bd4d464d2d8a25728f25ce6b99eb86af",
+    "licenses/ThorVG.txt": "74242cdc4ccaebc73fa04fbd52a538429eae2be7a231f9eaf1dbf59d2bedc16b",
+    "licenses/Voice.txt": "29ab5e95466e206ccf95c66725c9c585651fa639725e9c775b75f371648608ff",
+    "licenses/stb.txt": "bebfe904b14301657e4e5d655c811d51fd31b97c455b9cc2d8600d6bac6cff63",
+    "licenses/Unicode.txt": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96",
+    "licenses/DejaVu.txt": "63d3ba759d12804c5b31a9d5940d855c1820d1f5999e6b0872eb1c7ff045fbc9",
+    "licenses/Hearthold.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "nativeEditor": "/tmp/tellin-engine-witheditor/src/game/Hearthold",
+  "nativeSha256": "d3aae00a524f67ec6e4687abe1c028fb76a8696bf2e712adcbeca02b08589a95",
+  "nativeValidation": [
+    {
+      "renderer": "gl",
+      "frames": 60,
+      "hidden": true,
+      "dummyAudio": true,
+      "exitCode": 0
+    },
+    {
+      "renderer": "wgpu",
+      "frames": 60,
+      "hidden": true,
+      "dummyAudio": true,
+      "exitCode": 0
+    }
+  ],
+  "focusedTests": {
+    "passed": 71,
+    "failed": 0
+  },
+  "browserChecksPerRenderer": 24,
+  "browserRenderers": [
+    "gl",
+    "wgpu"
+  ],
+  "symmetricFaces": 30,
+  "readyReferences": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    49
+  ],
+  "archivedReferences": 130,
+  "retiredHairIds": [
+    10
+  ],
+  "wholeHairstylesOnly": true,
+  "cleanTraces": 76,
+  "solidRearCurtainIds": [
+    1,
+    6,
+    11,
+    12,
+    49
+  ],
+  "extremeEyeCases": 720,
+  "longHairNeckCases": 15,
+  "sideLockCases": 20,
+  "worldHeads": "compact silhouettes independent of portrait geometry",
+  "coreSourceSha256": {
+    "src/game/character_assets.cpp": "fb9f8ef8232bc4fca3abf5fbc59a09832d797383105b5e31084d744bae56371e",
+    "src/game/world_sprites.cpp": "09fa114e2dfd987384a14b0e083e880cdaab57e89ced538afde1d68838971750",
+    "src/game/authoring/character_controls.cpp": "4e5d028b2ffdddfc8d848a95b7f066fe75aa89ddfac2332f77bd8587dd4c8b46",
+    "src/game/authoring/character_editor.cpp": "c287b1c77aea5356e0eb25ccc41ab77113e0d7e8f9b8337d6c5314eb6327d50e",
+    "src/game/assets/characters/character-pool.inc": "7f2baae0ca464451799d5ad7063c57dcaf363f2e50a3008086dc3e6ba2664381",
+    "src/game/character_assets.h": "c94ab500c09f62dd0e8feba1f0cbfb161ac5b44ac4a615083a4c37fe859993e1",
+    "src/game/character_preset.cpp": "8e2595455b901657de73a8eb1cc79ba3a04abef40cbec8415ad849517c0d5269"
+  },
+  "selectableOutfits": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    11,
+    12,
+    13
+  ],
+  "retiredOutfitIds": [
+    10
+  ],
+  "outfitFallbacks": {
+    "10": 0
+  }
+}

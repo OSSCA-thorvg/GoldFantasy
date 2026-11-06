@@ -1,0 +1,807 @@
+{
+  "tool": "/home/soon/orca/workspaces/GoldFantasy/logperch/aurum/tools/vectorize/vectorize.py",
+  "colors": 3,
+  "detail": 0.65,
+  "smooth": 0.65,
+  "lines": "fill",
+  "results": [
+    {
+      "svg": "layers/00-back.svg",
+      "input": "layers/00-back.png",
+      "input_sha256": "0ac6e0796d628f1ba4ae574979cc911ffd6ea373668bb25c89538b3f76209c91",
+      "svg_sha256": "2c40312b94c5f66633f26dc2d4d00e4b67d64c87089385502f6bdc994446e3c5",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/00-ear-L.svg",
+      "input": "layers/00-ear-L.png",
+      "input_sha256": "1a0ece27c80849a1e50b4d076fc26bd0b95a74dbf527f7b7ccbf4a8cacc20df3",
+      "svg_sha256": "81dedce2e98e5531cbdd3a8ea3da456782fbf2b4f529dcdd624a5e5971547d86",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/00-ear-R.svg",
+      "input": "layers/00-ear-R.png",
+      "input_sha256": "dc134eee02fbcb3c8171ba9bb1d166be6beb2649f7d60da506712282b6b199e3",
+      "svg_sha256": "053ee81c6db5a9ff04703f956a2779c6415f5b4ea8d659ede320dbfd5ea07767",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/00-hair.svg",
+      "input": "layers/00-hair.png",
+      "input_sha256": "da1d4cd5ca86b8a693efa979ff04e08bea06d503ac0f9bbe7758968de95bd8aa",
+      "svg_sha256": "10a270b3965dc9a13c1746909ec4803f30d179695deb29c0884565a495dfcfe6",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/00-skull-mask.svg",
+      "input": "layers/00-skull-mask.png",
+      "input_sha256": "db019da863034ecdd5d3ee028571789a792191e8f86ac99ed5eb3725e7f72b08",
+      "svg_sha256": "3f42e025bf139364a4db1ecb082f22cc951b1d5948f624968f0eb25d0ad182ab",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/00-skull.svg",
+      "input": "layers/00-skull.png",
+      "input_sha256": "caf1f1bacef26b3f34a863d32e96e9f9fe1be65b36ef832d4d9d73267ccdb111",
+      "svg_sha256": "34b99c8be3e00de89e4b6b7e089872defbf859f1ca08494f74cf6a3aa608a8a2",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/01-back.svg",
+      "input": "layers/01-back.png",
+      "input_sha256": "598ea712398148deb947ec3ffb3f0e3cb572e57147a2492234515980723092e3",
+      "svg_sha256": "e0ccd5bee7d0fd6d39261c0721a7ee5f2acb22e9437a891dc971b6170c53861a",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/01-ear-L.svg",
+      "input": "layers/01-ear-L.png",
+      "input_sha256": "fe7c7cd71af19bc5f04a8dfb53dcf7c7331f19ba75018b6037e1278915c6d5be",
+      "svg_sha256": "2cb6cc2c0be4990305ca1bd4d83e83d5dd96df89b39ceab65e4c0893d49e1db2",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/01-ear-R.svg",
+      "input": "layers/01-ear-R.png",
+      "input_sha256": "203801c935eafe6dea691dfe2466369ac543218f762dcd0916070cb2c27062bf",
+      "svg_sha256": "541141b7113e2b2f018fe4f80ca0a248fc4b7d5caf0ee0882f4fcec2ebde852e",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/01-hair.svg",
+      "input": "layers/01-hair.png",
+      "input_sha256": "3bdba05a29cd611eceae016bc7fc01531b2794fe3532af314fba2b3ce266e5b4",
+      "svg_sha256": "32a3bde23163a0b44ca86ee91f8e15f57c6ffaa57fa96d8b6df1c56056d4424c",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/01-skull-mask.svg",
+      "input": "layers/01-skull-mask.png",
+      "input_sha256": "661a9e0293cec75b8d5dcb0b6ce5ba20e4fe4fea20059b6d362517893e2ad3fa",
+      "svg_sha256": "c817c385be873fef842f327158163453ea02df6e392b16fab4840b525dee5af5",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/01-skull.svg",
+      "input": "layers/01-skull.png",
+      "input_sha256": "d21cd84063e7a7c88ea58ea94fee29de63ae430180a42cd0e82fce4cbd7ecc3b",
+      "svg_sha256": "2285ead013f70c2ffb928b5b622347ed59cde0398e4791bc3b6a5bf46f3a1b42",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/02-back.svg",
+      "input": "layers/02-back.png",
+      "input_sha256": "5f54957e4426ea744a61517ae7e5f7c32de437795a443e7e1c72b1d18ee61a1e",
+      "svg_sha256": "212d79f9e34793d211acec5b2d638e2aed42b37fd9119fc276deab048c890ccc",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/02-ear-L.svg",
+      "input": "layers/02-ear-L.png",
+      "input_sha256": "58e2cb48faafe4b00296e1b8046e6d0c8dd99c5d86cd218a3f55d99c817f2967",
+      "svg_sha256": "2c99118ddd23e37f0c04b5dfdf51dbcc00b94d8695bc8f6b52935ca2e4ab55aa",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/02-ear-R.svg",
+      "input": "layers/02-ear-R.png",
+      "input_sha256": "2f8ded35425938d33f174868bab35a2a2831ea244bc7211e2e809bdaed08deb3",
+      "svg_sha256": "c8cf2328e1ab1995c4cc0907619e6f06824e0bbde0ff008c7923e25d47b70fc0",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/02-hair.svg",
+      "input": "layers/02-hair.png",
+      "input_sha256": "5f94fd53aab466ee94398cb5ef6405640f29680bd2aa5964cc6de6e6c9c70947",
+      "svg_sha256": "90188c6b57fa5bee553d9e4cfa926ed0c9805932500745694e1b889ccfefa015",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/02-skull-mask.svg",
+      "input": "layers/02-skull-mask.png",
+      "input_sha256": "1e5e6851d544fc314fdb801000af851384cfb7342e468991cf08d99c293fabd5",
+      "svg_sha256": "e7e3d7f9063402363f33fc0164908168293fd1285600a19023a32a422a0fa06d",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/02-skull.svg",
+      "input": "layers/02-skull.png",
+      "input_sha256": "61b37e43385a4105411da4f756baaf956a3e02d13c79e569f8ce353e7e95abc3",
+      "svg_sha256": "4ef8a33676588a6308447b69ac557753311c9b228b639217ac766986c3434051",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/03-back.svg",
+      "input": "layers/03-back.png",
+      "input_sha256": "22815158d31fb3761e531f1748b040454f66c931fadd5a9393d0bf15960c23fe",
+      "svg_sha256": "ae516b91addf6385295028b263875f04d25edc55d1d836fec18d8e2f3e4ba142",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/03-ear-L.svg",
+      "input": "layers/03-ear-L.png",
+      "input_sha256": "44ebead70be7017bacfabf26dda0c1baddef7966175de8a5668bf0a62d6460c3",
+      "svg_sha256": "28e8e7ba241c15b1b8332cd03813c2693e39d9734662d9c1fedffae5fcd14496",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/03-ear-R.svg",
+      "input": "layers/03-ear-R.png",
+      "input_sha256": "cd186e0e6e60782973b186fd32c0dc2a3a8c32dbfdf568d9b51dd4bf1112a6eb",
+      "svg_sha256": "a3fade2f179b5a7a7128e8f2d8172a6ec044015dc5e248b51840fe0748bc4b02",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/03-hair.svg",
+      "input": "layers/03-hair.png",
+      "input_sha256": "c1e59a9d5fc87dff4e5c6ded426847b757ffdc327d453be1195a0fba627638e9",
+      "svg_sha256": "9842e52393e4c2561814e703d072a1c6a61ad4056d6cf850449000a5b52d8dd6",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/03-skull-mask.svg",
+      "input": "layers/03-skull-mask.png",
+      "input_sha256": "4d7af5e76b47a985ee67c04cca1e329416800723b974f089c557984c4980f73d",
+      "svg_sha256": "68e0fcf78d8de31180676dadff5c427e15785e475f5cbf741e1d621b7a5d4b1c",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/03-skull.svg",
+      "input": "layers/03-skull.png",
+      "input_sha256": "d8427a525d3ef9e4843efdf1d33df020a74882ca7fb159553e9a245a0f6e6d7f",
+      "svg_sha256": "4e8135b0700c3553c93aa91f845adedc241a508ba08c8483520da1f95b82f361",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/04-back.svg",
+      "input": "layers/04-back.png",
+      "input_sha256": "71fc45ed19b00a2fa32f696e43a6f79e25f2eb7a391b06ec51fd08ec2aee3daf",
+      "svg_sha256": "bbdd53734b665896b6896311cffec1f8d9b0d9b6ae034d34bd1541a9b8f49816",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/04-ear-L.svg",
+      "input": "layers/04-ear-L.png",
+      "input_sha256": "05edc4c733f2c49fd8baf46f1c96319bc0d00769b64fd39d8f98c4fde6794528",
+      "svg_sha256": "b3b9b6341f2cbcf503454ec22d482741b42eb11b52311032f9c7a545eebed78b",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/04-ear-R.svg",
+      "input": "layers/04-ear-R.png",
+      "input_sha256": "a2fa2e0cfad1fb07832c95aafd632525b5b63ce942925e0421f61f8e4c20e16b",
+      "svg_sha256": "b7712f6d42c907ccaf7089fcc0cef3665e052342a93f593ccb0a5b5228eaed36",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/04-hair.svg",
+      "input": "layers/04-hair.png",
+      "input_sha256": "c0710cda8eb42ef3c3c45e96cfdc668ca3ad71f8fafcd572c94bb5344c0bc533",
+      "svg_sha256": "8c053e12ec9fa8cb5110d6f0241609c3cea3738e337f9daa9a6f91a73951cb08",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/04-skull-mask.svg",
+      "input": "layers/04-skull-mask.png",
+      "input_sha256": "9603cefbc30299d9005b382ce5adbaee25c1da43c7bc3125a6b53f2a779d87d4",
+      "svg_sha256": "c011403bd06d59a0d2394cf060d99c12836a986c03fe1d01f208a3a92542fdc1",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/04-skull.svg",
+      "input": "layers/04-skull.png",
+      "input_sha256": "302a4b6e5fa5c0ab831eb4904c236a0a55329584f3378ae54bedf05969e659cb",
+      "svg_sha256": "af15babb1e86426f01523e88f40ae220cc202fc5d2def8063ad8aec3e5a85466",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/05-back.svg",
+      "input": "layers/05-back.png",
+      "input_sha256": "21b45d16f0ec55992f263e92a6e94bb671e39f1e84df421e4bc4482a4e077d14",
+      "svg_sha256": "c6a1ae8883a165020de17920fc6ade4229b0639e7df011175d87d37614c62535",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/05-ear-L.svg",
+      "input": "layers/05-ear-L.png",
+      "input_sha256": "bcf169c1d2fc72c906ac86a26b02fc5d5afa7c5a35f942fe1c8f813103770809",
+      "svg_sha256": "10d77ebd2128a2490ef1e47b665fc02b25b6e764e13c053ad3238653c60d50ca",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/05-ear-R.svg",
+      "input": "layers/05-ear-R.png",
+      "input_sha256": "0e6a0a120e054adf77cccd98321309ed0196056f9532598b682975ebe1fda8b6",
+      "svg_sha256": "81b8dc4bb4ef6997f91a0773f6638749f1937a785773f567364f5acbca846873",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/05-hair.svg",
+      "input": "layers/05-hair.png",
+      "input_sha256": "edc6926b52e3e8c0c444f558c8d8ee9a38258e642afda0cdaee357cc3d74a813",
+      "svg_sha256": "0ef56d36a145b74c5e77384d68d9291b52d29e1e3fc51773f82f35db5adcf044",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/05-skull-mask.svg",
+      "input": "layers/05-skull-mask.png",
+      "input_sha256": "6fe1367c53525279e0f1128c48ac2025d5561efa12cd2bd0a3d1c79fd0c95ecb",
+      "svg_sha256": "81be963dabc6258c8658a4250031e800ca4428517276df736d00099225c9ad22",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/05-skull.svg",
+      "input": "layers/05-skull.png",
+      "input_sha256": "eab9cc7036caf38f7fb27cb2fbdd978efc7712737f154398549671ae6bc1d94a",
+      "svg_sha256": "3768dfda91d75db9947038ce5fddf63dfb575512e2c24696dad22abcfb99c3c7",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/06-back.svg",
+      "input": "layers/06-back.png",
+      "input_sha256": "b75a29a8be01be30c12e2e275da994fe65ab3a5ffa91ed1a001d9535548b70e3",
+      "svg_sha256": "a9a39aa035ccde723694e5de832a585e8a14514ebfc1ec6e44e5278ea7cb49ba",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/06-ear-L.svg",
+      "input": "layers/06-ear-L.png",
+      "input_sha256": "e3ab49f19954d11aadea67b2611b2e07a35c57be22a0fe6960dba9f763ed3363",
+      "svg_sha256": "23e4210e4112e6111ac2c587a5a355a4f10f088d0f8b2b1b0adf4a28b406be28",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/06-ear-R.svg",
+      "input": "layers/06-ear-R.png",
+      "input_sha256": "3c496ca88975c587d85fe8e1a727b7aaa17b1e0631fb4487b1db80652f335dcc",
+      "svg_sha256": "c41d5e5cc8eeecf08d57e16248eec748d91d4c912f472d70e1425342e5b8dbfa",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/06-hair.svg",
+      "input": "layers/06-hair.png",
+      "input_sha256": "bd09c145ba62b26b77f4aa8373f05effa783ac4194bb18eac83a9ea680ccff2b",
+      "svg_sha256": "148ee07562f1e986c9a72972a4bb460a5f4423168198ba50562689afe4de8757",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/06-skull-mask.svg",
+      "input": "layers/06-skull-mask.png",
+      "input_sha256": "968d6fc0f4373399c5599f231bba5d7f1e47f7a21c6766803b37afb411748947",
+      "svg_sha256": "7fbc05a182f7cb69e0a7cb6a021c2fabbd923db39a9867099aa3e11edb834961",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/06-skull.svg",
+      "input": "layers/06-skull.png",
+      "input_sha256": "e4a0351724a493b6b4eabd1f24bc5fc980dfe0d17bc43eff2ff9f879672c329b",
+      "svg_sha256": "3d67f436602b96849734a6a9da78e89c4034507d09e8f2599e38bf161bdf0215",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/07-back.svg",
+      "input": "layers/07-back.png",
+      "input_sha256": "a28f8cbdd760c8257bf6a306821712d86cacc08fd04bff9e270f1a66110cfb52",
+      "svg_sha256": "33ff3af477640467ad998a31656461b63f70e06ebcba09e634dc91518cbc6c7b",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/07-ear-L.svg",
+      "input": "layers/07-ear-L.png",
+      "input_sha256": "1b3095c8be597f1e4b2c542d7d02d0551ced9a6cab3298355ef24d43531d1237",
+      "svg_sha256": "5f798bab51efc9258a6c94beaa864fd8e889a48d9a303122d29708e8217985af",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/07-ear-R.svg",
+      "input": "layers/07-ear-R.png",
+      "input_sha256": "c475f3131894e08513e1f985ccb0f1e0150201a8f0ba127d9884d20d03854ecf",
+      "svg_sha256": "6c22e3d8c81bfc8d1259005361f9a9a09d2bba66d74e5108cf2b6cfcbf19b626",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/07-hair.svg",
+      "input": "layers/07-hair.png",
+      "input_sha256": "73fd20f2fcf71d1d05c9bfd72833ac0eebedf143b43267c9c3878e3f20e6a252",
+      "svg_sha256": "ebdbed78bba9a8aaff96886047c2041b10653f153d4d4bbeab8dadb0efdd1cab",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/07-skull-mask.svg",
+      "input": "layers/07-skull-mask.png",
+      "input_sha256": "0ba09f3e4be9bc2fc3aee4fda9231a47d4e3b99117836f5c9d1200ec931cf93f",
+      "svg_sha256": "60a77786a07e356b2edbd781cff7f3badb2b6588a4ae9e13bb154363599454fd",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/07-skull.svg",
+      "input": "layers/07-skull.png",
+      "input_sha256": "b4f49954eeee94a74f3d743b6e7bc27e9ccfe14f9198ca1c2145a908c13042c5",
+      "svg_sha256": "757e4e5c7b361bbd91f54eadbd877242b8d331bf0a0f7e48d83ff40c1583668c",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/08-back.svg",
+      "input": "layers/08-back.png",
+      "input_sha256": "4e16b529096141764048e619ee2a866f94a1d9bc884739f273f4185c72eacd43",
+      "svg_sha256": "077420ccadaec35c0096495dc09b9598a2060ac1bce7a8f1121437a11c330cee",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/08-ear-L.svg",
+      "input": "layers/08-ear-L.png",
+      "input_sha256": "7f35aa5af460270d37c69e26fcf097a7601e1af5e9fd35e1af9f5c2245f40c06",
+      "svg_sha256": "189f42df1774d93efb9a08a6ea42bf266d865929dc794943dcf2f22a2586427c",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/08-ear-R.svg",
+      "input": "layers/08-ear-R.png",
+      "input_sha256": "f83734907ded093e071d28eeb8ade6442b6d9ce78fb1b5b286140ad6a22fd58e",
+      "svg_sha256": "7a375bffbcd83a14767a0e5c116e64316c5c0d2245f841cb07e58198809fccfb",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/08-hair.svg",
+      "input": "layers/08-hair.png",
+      "input_sha256": "47124b30e1626467066f099137a19e866d5434b608adfd4ac23c90348facb651",
+      "svg_sha256": "7a3a2e1f8abe0870cf376402a29e66af428321c91c96302b8f21eff86ca7aab7",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/08-skull-mask.svg",
+      "input": "layers/08-skull-mask.png",
+      "input_sha256": "8c5163f4e2bfb3e6d8df618b833c78cd7cc11024b93075a14a27199b5bde0f06",
+      "svg_sha256": "f1165de0d2846cdcd5b24db323b0fc0bd08df925967a0386f56b38bb993d7463",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/08-skull.svg",
+      "input": "layers/08-skull.png",
+      "input_sha256": "fa248090789c4f99730e0301c853c9e8c12c93fa6588ce24e064e2291cbdde4f",
+      "svg_sha256": "28a7041d1dfa2b724b387cd84d98d3cd44b09a9f927d81597a8a4304d4abe1ff",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/09-back.svg",
+      "input": "layers/09-back.png",
+      "input_sha256": "7f21be72d9d69644c4efaa25a5a25085d5400ee2244d56a89672301d7776c41e",
+      "svg_sha256": "bbba1901b80fdd2e244d3e9136438ef57ff3bf600baecf3262b65ec21ad2c624",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/09-ear-L.svg",
+      "input": "layers/09-ear-L.png",
+      "input_sha256": "32741505bc1092f7217c35f496b3a78012092ddd26931b063602d014857f322e",
+      "svg_sha256": "e21ef42de790b2882acc00e06ec062aebb20064d6e80a3e113071148455ebfbf",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/09-ear-R.svg",
+      "input": "layers/09-ear-R.png",
+      "input_sha256": "c15ce3f7af5a5b59f9795c9f3f7ee8a27e370e820d5b20e2db0424944d3ba815",
+      "svg_sha256": "fd837336f3c9de9dd9e1c077f69d0fa2b6e38f4987eed6ca2388f0d2a61a11cb",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/09-hair.svg",
+      "input": "layers/09-hair.png",
+      "input_sha256": "51408339c31cf1cef5a5ace193fc57ab30ee2fda5ce25f57caa7eeb4693140fb",
+      "svg_sha256": "b16f5fc76db92bcd95b0595e3e9db794074e11f58410a0ee6a45da30ff523482",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/09-skull-mask.svg",
+      "input": "layers/09-skull-mask.png",
+      "input_sha256": "62daa599a45fcb31d6f15191f2892d361ecce0cf1b55b2ba264ba14fc6cc3b4a",
+      "svg_sha256": "492284a112eace823a5489240de305c78f3807ddd85ed669cbf69224cf1dd14a",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/09-skull.svg",
+      "input": "layers/09-skull.png",
+      "input_sha256": "f7c2c88919a991bce35f4a24c601a49a772b9ca649973a0d656e5cec675d6d33",
+      "svg_sha256": "cdf0cbbea735f36dc37736c80ef56a9a8b0a77cf5ed7a500efe1e693d69be8b7",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/10-back.svg",
+      "input": "layers/10-back.png",
+      "input_sha256": "f62024fcf03ad6862e34865da4a69a557ce7354ee2fc10bb4f32c1d7e512f9b3",
+      "svg_sha256": "774647d5fc7b4392842338d05f73ca2e2d31e2aca7cd0ba5b733d0bdbd537297",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/10-ear-L.svg",
+      "input": "layers/10-ear-L.png",
+      "input_sha256": "7a0f8ffd9675d766d654bbfb8ca6a00b26a8abc90908367c940db711610937bf",
+      "svg_sha256": "6bb4bda681dfa7303f475b705478edcb0bd6e5ad9bcd8c533cc53696e88a57b0",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/10-ear-R.svg",
+      "input": "layers/10-ear-R.png",
+      "input_sha256": "7906c5b20d8ccf28d806ec95f03ea9f8432e477469d96f66fe129b4a55fc87d9",
+      "svg_sha256": "52cbba1254506a61f93b2f55e766f518b0b11e85a700f91dc1610cb1071851c2",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/10-hair.svg",
+      "input": "layers/10-hair.png",
+      "input_sha256": "4d5c0416c165362858b79619cab922b96d4871a860b2b539842eca965850ae8c",
+      "svg_sha256": "2187c0077630159be26224f911e546fa3fc05d2a53e39ea5eda17a9f861f2013",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/10-skull-mask.svg",
+      "input": "layers/10-skull-mask.png",
+      "input_sha256": "493cded9f031363a58ee5f278679b263675314d362a7a1953937d2e34ed87563",
+      "svg_sha256": "9d13a79423af2c109e44a783a3f92a82eae37fd273d5b488c51584f10dde8b33",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/10-skull.svg",
+      "input": "layers/10-skull.png",
+      "input_sha256": "5ba064d4d26bc7797b3880e9ae18542316fed8f5f8d6671151e0b853dc63e099",
+      "svg_sha256": "4e9af0394f1c45851f505264c6ab3f2731149d976cbd24a16804526603cd2d4f",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/11-back.svg",
+      "input": "layers/11-back.png",
+      "input_sha256": "afac3804ee099607779e3b4828fccfe90509b4bc7437c500c34d7fbc43544b31",
+      "svg_sha256": "bb61f25a039609685f2aa6c395d2f35e5866d7cb8ccfa0400823208983fee5f7",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/11-ear-L.svg",
+      "input": "layers/11-ear-L.png",
+      "input_sha256": "55be281c4073e7780cda62a2cffeb4ac1fd6f7bf077b6daa15015fb0e5617da6",
+      "svg_sha256": "5b301111c6bd61fc8d12855734ac33db965f1fac4aa116c358fd212527b3e3e6",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/11-ear-R.svg",
+      "input": "layers/11-ear-R.png",
+      "input_sha256": "ad691f685c64212e266b79b79b7303a84c8563c16fcf7aa8da06d4a7a03cce14",
+      "svg_sha256": "2fea96fa7711ead6f75c441eaf84b6e47ff9e00ee0eae96492b98d5c157d41ee",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/11-hair.svg",
+      "input": "layers/11-hair.png",
+      "input_sha256": "481a4135ca47de0b87ac0fd3613fde69d895a9b541ccedfd10a055410a240867",
+      "svg_sha256": "c37ab4dfaf42201cfc6284259c0dfc3dfb3923d74e56f5c41a47fe74b7cb2afc",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/11-skull-mask.svg",
+      "input": "layers/11-skull-mask.png",
+      "input_sha256": "1244450f927fd253cfe118a1a3038aecea63675963439315eba0366fc8cfb626",
+      "svg_sha256": "3c812417dc0e4e953626a5042f53330f9ab6f587b28ded9dee3bcd0dc3e3125a",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/11-skull.svg",
+      "input": "layers/11-skull.png",
+      "input_sha256": "52bcfbf2d19b7dd3c1f919a21477a069578c9e2b9cf8ba94cf5c007d6a664e4d",
+      "svg_sha256": "99f6c98c88707cc5f116b685948a1e3f8de242bdf9ed115f809ab08f20025020",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/12-back.svg",
+      "input": "layers/12-back.png",
+      "input_sha256": "b214da25263894c3cccbc5f601d6786391e75f3c5d71ae98ddc4f6e5b99092f7",
+      "svg_sha256": "9268c0b03dbc7507e6d42d46ab0094b5ca496d407c761fec6e25ec04adee1d5e",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/12-ear-L.svg",
+      "input": "layers/12-ear-L.png",
+      "input_sha256": "64d69269683b4bf69e7f0e019d923a74b67474ea5707c1fc1ac330ad44025446",
+      "svg_sha256": "fde85f44164b047d85be053d38544252851428ea090ec36e8899c8d07a5d1249",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/12-ear-R.svg",
+      "input": "layers/12-ear-R.png",
+      "input_sha256": "768008d7724adc1bba615f761de41c60c39c6547a814cbd883cb1b092a621797",
+      "svg_sha256": "512442c68346b20ee8649bf52d00367be99051ea392418f37911abca7d10fbb2",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/12-hair.svg",
+      "input": "layers/12-hair.png",
+      "input_sha256": "329bdf96a227ad49acd56863561994ce92b7c981e4ae869ce54bb4313518c509",
+      "svg_sha256": "a28f80351986a0168220dea1ecccdb73eb7091d8a42be7aaa1b4a56277544af9",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/12-skull-mask.svg",
+      "input": "layers/12-skull-mask.png",
+      "input_sha256": "b160bd7494c7bf592127fa8bb12cdc38869017548bc302ca747d7542a5cce19e",
+      "svg_sha256": "2c5329e5b0e14e9d6975fb0e68c16c95675abdb85abb362fe681981e3bdab44b",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/12-skull.svg",
+      "input": "layers/12-skull.png",
+      "input_sha256": "cd2c067c7203405e0284582275ee5e2828ce5cf9b177d8f32f72bfb5e4053759",
+      "svg_sha256": "aa4d571a71631b06283464ebd0cfc54edc6b32819fc83dc3bc2a76843fe2702a",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/13-back.svg",
+      "input": "layers/13-back.png",
+      "input_sha256": "6d90c49e3c0eaec679b6f5ad4a06b138ac395464b77074362c4b4559abd89b89",
+      "svg_sha256": "3d887bf40dc3b40953d122384a5f24eb0a8eb50ee873af2b86caece486d0c29f",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/13-ear-L.svg",
+      "input": "layers/13-ear-L.png",
+      "input_sha256": "2a60b90477cc9519f9c861ee72a6f4b21e7579a642ba58835ff8a559f9c7301f",
+      "svg_sha256": "251ef1d085775c90508e1b3ed91c72088de9600a5fd3770cfe29327b1134a54a",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/13-ear-R.svg",
+      "input": "layers/13-ear-R.png",
+      "input_sha256": "146e848c8c80081fcd7315185aae04d195116c78fdfb583defb4cb04a1dd0e70",
+      "svg_sha256": "f33a2eec2ecd609db16e4d7fd8a4548600f9dcfd21297626ca8287ae90b82747",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/13-hair.svg",
+      "input": "layers/13-hair.png",
+      "input_sha256": "6c3505a95832dcab68d92419c5b8dc862d4dda017f86a3514f4722708f77ecd2",
+      "svg_sha256": "1ca6daffc790e1df4500362e69b791dee8baa2ab1e31e8d36931c4277e0351eb",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/13-skull-mask.svg",
+      "input": "layers/13-skull-mask.png",
+      "input_sha256": "00c2ca641ffeb4cd845b91b2a54fb77b8c6b00f3aca4b0cabd77f67785f76772",
+      "svg_sha256": "17f56f173ce6a98754f39efc9e2f1db74958cab6c0e63bac6a35bb7650cebe4c",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/13-skull.svg",
+      "input": "layers/13-skull.png",
+      "input_sha256": "9ef02bcca2e17162825218976b982126654dc535d18a528f1cf1630d9f4122f0",
+      "svg_sha256": "a36c50162d93549b110572ff838cb714c3f1470ac7c44be73aa4f0af14ba7808",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/14-back.svg",
+      "input": "layers/14-back.png",
+      "input_sha256": "a785009e1e66a2d6e1f96413f525d5ac93a8f74a922ae6e13104af94e5a38ef2",
+      "svg_sha256": "3cb2b27b4c5dbac07230c51bd893bd894159527343e474c6e1c75e23931c72cb",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/14-ear-L.svg",
+      "input": "layers/14-ear-L.png",
+      "input_sha256": "6dc258a296d30e2a3008857946404f3bfaa6a602e766c5b77541c56e4db17afa",
+      "svg_sha256": "60c3970d81d0ac2e1ed98dc0bef6967e17ffcc79028fb4e9f8136b6351f9719f",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/14-ear-R.svg",
+      "input": "layers/14-ear-R.png",
+      "input_sha256": "043dd14764a9572178e0389b9facbac73f5578069e54e35402250eab00366e7a",
+      "svg_sha256": "9b55de595370d7c7e286f9b8df9793af6ce7aa761dea75f83f2a4efdeb8a71f6",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/14-hair.svg",
+      "input": "layers/14-hair.png",
+      "input_sha256": "6f6b4facc32e5150d82dc5251e8d3a6620fb6ecee59d9db58d4884cf9dbdd2d3",
+      "svg_sha256": "f6e9a9a4c0b357eed6a27bfdcfc8902f5f1c693c26b7523b6f6b394d93646794",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/14-skull-mask.svg",
+      "input": "layers/14-skull-mask.png",
+      "input_sha256": "068a9c5101ccd817c42f541051d2ee80796b065253d57714cf751041e49b26ba",
+      "svg_sha256": "48a6ca93b0e3128a436f229bf1fe7bcbf367ce47734c914ea44f617b157774d4",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/14-skull.svg",
+      "input": "layers/14-skull.png",
+      "input_sha256": "2a0c2d497b2449191dabf53df2ecbcd90c441fa8e79f6028872f440bd6a5b545",
+      "svg_sha256": "4ba9e6dd92f38b208d8ed71c77b853f6189870023a57b0c3591a3f39bf0d699b",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/15-back.svg",
+      "input": "layers/15-back.png",
+      "input_sha256": "6fe1754553310eca43a5fd6b19edd2d7a8d024f48506b7847f59ad1682242804",
+      "svg_sha256": "2be825a8e483fbb7f4650cabcaf4d0744e558538514a1f117773814dc0db5e35",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/15-ear-L.svg",
+      "input": "layers/15-ear-L.png",
+      "input_sha256": "b39b6fbc8c351d220eca166a2a4e92b96e433b514f4c59815693e85159eb2c29",
+      "svg_sha256": "a2ace4797cf8a21158c84b88377073776bd8b4761dc9ff3f3c63dea43cf0199a",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/15-ear-R.svg",
+      "input": "layers/15-ear-R.png",
+      "input_sha256": "1cebb3e9a198737d5652e1e8452514937e117a4299b979432ee15c023fadd847",
+      "svg_sha256": "afe96cffa7cbe5a83d82960fd76d1c55dcf355ee755c3c6983e822980d091c76",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/15-hair.svg",
+      "input": "layers/15-hair.png",
+      "input_sha256": "f93f098b414813cc9e665cdb04fc1f7deacfa0a49f4781cae2404164719a26fa",
+      "svg_sha256": "868e4b0977805d28daedc9223990623d159e96e8987d0c811588bcf9204f999c",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/15-skull-mask.svg",
+      "input": "layers/15-skull-mask.png",
+      "input_sha256": "bc27836f1812c62e9e7bc371e55d96ae31029cdd819aa4d3c06d7dfc6d430ce1",
+      "svg_sha256": "4e5cac16c78bb43fc035b9c66a437942795b99970eb6c4aa3aa1d4d4dfa1fd68",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/15-skull.svg",
+      "input": "layers/15-skull.png",
+      "input_sha256": "efe8a5e48f8735dbef47edf90ee97dc74a63e34456966c00a4c954297c4397da",
+      "svg_sha256": "46731267bc547e0c2a6dd5e7f892c8e67913f786db843c1944d2bcfaddb4f85a",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/16-back.svg",
+      "input": "layers/16-back.png",
+      "input_sha256": "b615b9588e6a44c5d13f6722b2e753f0211932038499410853d30f8e55209b8b",
+      "svg_sha256": "d469c893510d40b3a13df2c01314b59e160ea98ea51125d799ef8573d94f2b46",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/16-ear-L.svg",
+      "input": "layers/16-ear-L.png",
+      "input_sha256": "97a554e69bc4dbfde0e47909f1c62833554b72323782823c0c43bb30e4b5fb79",
+      "svg_sha256": "8d1e5385bb7b722bdde09a2e64450c22b173db111da9ece569e37d24cf37cb15",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/16-ear-R.svg",
+      "input": "layers/16-ear-R.png",
+      "input_sha256": "4cbd5264a6854570a3c03135cc33ed9b3d3e8fe593984bf967e23eb5b6a8113a",
+      "svg_sha256": "eb6ab63e75ffb0e266dccc46b0d5d81f866f19feda0c7391f4ff52b1fbb3522f",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/16-hair.svg",
+      "input": "layers/16-hair.png",
+      "input_sha256": "973d7d9f6d210ea4ff156630577c2675d796a036972b2378d8632a292e184487",
+      "svg_sha256": "e261551bd518bb107c242c095265f8421b51d157dc268d8d338145dc08f2a046",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/16-skull-mask.svg",
+      "input": "layers/16-skull-mask.png",
+      "input_sha256": "ff5037631b03b1a7420a35f6149de994ee9321e98d3fd2680019ea87b55670f0",
+      "svg_sha256": "f7ea9e4484f87329a951df7177f6e8e0f259e42f522fcd598d75506f1b723831",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/16-skull.svg",
+      "input": "layers/16-skull.png",
+      "input_sha256": "c5a5ba2c5490cb064f96019cb6f59cf9255a732fde3c4664a4c749473811b35e",
+      "svg_sha256": "7fb174de2f7be01419a609dab497589aed8986d32ec01c196c095513cb3cb91f",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/17-back.svg",
+      "input": "layers/17-back.png",
+      "input_sha256": "5dde58ab8ebaa11166913b951f37eca033c30e37ab02e247ecf814d669a4e650",
+      "svg_sha256": "d4369571072f0a8cb695d9dce04a1bf87d5f24cf24e7db22d2cc039a7a98ca5b",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/17-ear-L.svg",
+      "input": "layers/17-ear-L.png",
+      "input_sha256": "9a862d9b6caf47ce46efadcb7b22d2a7ee3b1c9790c547c5d4617b7c38f82412",
+      "svg_sha256": "5ef1c0f2e75574a46f3694cf495271d3cfddb6f4de2661deac54834f9a2ecc7f",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/17-ear-R.svg",
+      "input": "layers/17-ear-R.png",
+      "input_sha256": "c17766b3899de910962412d0444a515e853d2c6e214d65162ca9b9ded4e44c02",
+      "svg_sha256": "89a134e6270ddbebb81c961c0c22d2988483adf37177962dd89552d393ed97b2",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/17-hair.svg",
+      "input": "layers/17-hair.png",
+      "input_sha256": "003f721ad11af473f14386dbe4e55dfd6f1e7cde73863507b079cd1b325363f5",
+      "svg_sha256": "d645ab6818f6ce5871f0eb819c4b425800ac1b4126b568f4b7e3c3d864f47537",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/17-skull-mask.svg",
+      "input": "layers/17-skull-mask.png",
+      "input_sha256": "0236a69d21fec6e291c67fdfbbcefbc81a3f7c6b1c6d8ff24311f861ef396972",
+      "svg_sha256": "21eeb593629aa3476a6eeaae4c7ef7d5bd5716704b21cf0deb7f853904ef451a",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/17-skull.svg",
+      "input": "layers/17-skull.png",
+      "input_sha256": "06140126cb13a0191bec3692c87be72c64d74a027e05869e8fefce999805930d",
+      "svg_sha256": "f6048ae49c5d793016c12edf3ec99ff0b73de38b281f74caff23a45a3f1355bc",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/18-back.svg",
+      "input": "layers/18-back.png",
+      "input_sha256": "de8b50bd2c5c07f723bff3e6b6ef52ab75409ae05a62d12b6c3fa30a23448fba",
+      "svg_sha256": "d05f9e05334fc36f9b55f505275e26a64d19bf3d7b11ee172e708f2ba11641e7",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/18-ear-L.svg",
+      "input": "layers/18-ear-L.png",
+      "input_sha256": "81dc43bfc0a2705c9cd2978012b917f3e6a5368a8929e4148e6f848674982c8a",
+      "svg_sha256": "43bc321eaf6348286130cce17f014db18727d828100f1b462a67e1bd0aea5d1e",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/18-ear-R.svg",
+      "input": "layers/18-ear-R.png",
+      "input_sha256": "e15b3d48946e6686296661309972d08d19940ec9fdca7487552c7e8cc1e6f001",
+      "svg_sha256": "a95b231b705473fab7537a312f47765972425e7e2b42d611cff81be15ea8a1e5",
+      "background": "keep"
+    },
+    {
+      "svg": "layers/18-hair.svg",
+      "input": "layers/18-hair.png",
+      "input_sha256": "f912381ef72918bef3a8623debc4746c36c82d4b4621205961538355c6fdddbd",
+      "svg_sha256": "16a5e1c81830ed0df90019d0dc36a33bdeead9a695a7f5cc30bd158aedafaa34",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/18-skull-mask.svg",
+      "input": "layers/18-skull-mask.png",
+      "input_sha256": "4757cdb8130fac80ba4266135dbdd2909bee922aa32b6dea26b0d99ab49614ce",
+      "svg_sha256": "d0de19ab494ae9d34c434d8b88d3b73e867df4dc863bfc3c4ddff28e308b14ec",
+      "background": "auto"
+    },
+    {
+      "svg": "layers/18-skull.svg",
+      "input": "layers/18-skull.png",
+      "input_sha256": "148419ebc9aeebde0807ccd84499ca70fc23861b299a01ed0fbcdeeecdd66beb",
+      "svg_sha256": "824deb6bb4160e242ac365262e7282fb573fe1d20d3aa258acec136bfd1e3cae",
+      "background": "keep"
+    }
+  ]
+}

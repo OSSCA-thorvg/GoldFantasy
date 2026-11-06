@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="144" height="75" viewBox="0 0 144 75">
+<title>02-eyes reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_02_eyes_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#141414" d="M50.53 55.97C48.07 50.49 46.94 43.71 41.35 40.15C44.97 48.08 43.52 62.42 32.13 61.95C19.47 61.43 19.99 42.42 27.87 36.37C17.05 35.59 7.39 42.15 11.38 53.37C16.37 67.41 34.41 69.05 45.85 62.35C38.79 71.44 22.1 70.03 14.45 61.93C2.78 49.58 5.93 39.28 21.72 34.26C36.16 29.67 51.89 39.8 50.53 55.97Z"/>
+<path id="fill-2-s0" fill="#141414" d="M99.03 63.47C113.5 69.83 132.69 64.68 134.1 46.78C134.74 38.63 121.41 34.75 115.04 36.54C125 41.05 124.59 61.55 112.13 61.94C100.75 62.31 97.74 46.27 104.66 39.16C97.88 41.76 96.03 49.48 94.12 55.62C92.02 43.6 102.52 33.37 114 33.47C125.52 33.58 139.96 37.3 135.6 51.53C130.93 66.77 111.7 73.92 99.03 63.47Z"/>
+<path id="fill-3-s0" fill="#141414" d="M14.08 18.58C25.18 15.38 36.6 7.18 48 7.68C37.38 12.13 25.48 18.94 14.08 18.58Z"/>
+<path id="fill-4-s0" fill="#141414" d="M95 7.83C105.61 7.54 117.64 13.38 126.56 18.94L95 7.83Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s0" fill="none" stroke="#141414" stroke-width="2.39" stroke-linecap="round" stroke-linejoin="round" d="M46.83 7.64L15.41 18.55"/>
+<path id="line-2-s0" fill="none" stroke="#141414" stroke-width="2.37" stroke-linecap="round" stroke-linejoin="round" d="M96.31 7.86L125.64 18.39"/>
+<path id="line-3-s0" fill="none" stroke="#141414" stroke-width="2.11" stroke-linecap="round" stroke-linejoin="round" d="M29.81 35C25.58 33.85 21.31 35.32 17.53 37.18C6.89 42.43 5.99 47.54 12.26 57.46C19.06 68.24 35.01 70.5 45.09 62.98"/>
+<path id="line-4-s0" fill="none" stroke="#141414" stroke-width="2.19" stroke-linecap="round" stroke-linejoin="round" d="M114.09 35.5C122.39 32.66 131.21 38.18 136.49 44.31C134.79 47.89 134.7 51.87 132.99 55.47C127.28 67.49 111.03 70.41 100.2 63.67"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gold",
+      "color": "#ddaa48ff"
+    },
+    {
+      "index": 1,
+      "name": "Gold 2",
+      "color": "#e1ad46ff"
+    },
+    {
+      "index": 2,
+      "name": "Gold 3",
+      "color": "#dcaa4dff"
+    },
+    {
+      "index": 3,
+      "name": "Gold 4",
+      "color": "#dba953ff"
+    },
+    {
+      "index": 4,
+      "name": "Gold 5",
+      "color": "#ddb045ff"
+    },
+    {
+      "index": 5,
+      "name": "Gold 6",
+      "color": "#d9ac4fff"
+    },
+    {
+      "index": 6,
+      "name": "Gold 7",
+      "color": "#dba737ff"
+    }
+  ]
+}

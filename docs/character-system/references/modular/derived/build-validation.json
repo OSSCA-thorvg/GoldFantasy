@@ -1,0 +1,35 @@
+{
+  "profile": "witheditor",
+  "presetVersion": 8,
+  "focusedTests": 35,
+  "cpuRenderReviews": [
+    "heads",
+    "crania",
+    "layers",
+    "crossfits",
+    "outfits",
+    "readability"
+  ],
+  "native": {
+    "gl": {
+      "hidden": true,
+      "frames": 60,
+      "exit": 0
+    },
+    "wgpu": {
+      "hidden": true,
+      "frames": 60,
+      "exit": 0
+    }
+  },
+  "web": [
+    "gl",
+    "wgpu"
+  ],
+  "audio": "Existing embedded audio build cache retained; clean configure is blocked by missing music source files. No source audio was changed.",
+  "webFiles": {
+    "js": "74a694db5b2a48566fd9bbf522cef639295197ab9b8207b3572b0fd7b8a1d030",
+    "wasm": "f6c10d53552f898e53e71cbeaf47957cffe49b1c9ae8505ebdfa20b2a2400e49",
+    "data": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15"
+  }
+}

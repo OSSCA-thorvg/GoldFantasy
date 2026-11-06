@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="183" height="156" viewBox="0 0 183 156">
+<title>02-ear-L reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_02_ear_L_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#ffffff" d="M40 109.46C24.68 115.14 6.54 102.14 6.01 85.95C5.76 78.47 9.48 70.21 17.92 70.01C28.6 69.76 29.81 73.61 30.95 82.65C32.16 92.3 35.24 100.77 40 109.46Z"/>
+<path id="fill-2-s1" fill="#141414" d="M28.31 73L29.78 70.28L29.51 77.99C24.58 71.1 13.27 69.79 9.78 78.58C3.4 94.64 22.67 114.45 38.54 106.04L40 109.44C22.58 116.54 0.11 96.57 7.08 78.32C10.52 69.31 20.75 67.78 28.31 73Z"/>
+<path id="fill-3-s1" fill="#141414" d="M31.5 94C27.52 88.81 22.98 83.52 16 82.5C23.07 80.54 31.02 86.91 31.5 94Z"/>
+</g>
+<g id="lines">
+</g>
+</g>
+</svg>

@@ -1,0 +1,552 @@
+[
+  {
+    "renderer": "gl",
+    "state": {
+      "dataset": {
+        "ready": "true",
+        "frames": "937",
+        "renderer": "gl",
+        "logicalSize": "1280x767",
+        "pixelSize": "1280x767"
+      },
+      "status": ""
+    },
+    "screenshots": [
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-initial.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-static.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-species.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-fit.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-jaw.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-hair.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-ears.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-00.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-01.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-02.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-03.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-04.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-05.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-06.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-07.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-08.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-09.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-10.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-11.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-12.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-13.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-14.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-15.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-16.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-17.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-cycle-18.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-dots.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-open.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-eye-size.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-outline.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-brows.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-outfit-before.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-outfit-after.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-reference-flat.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/gl-reference-restored.png"
+    ],
+    "errors": [],
+    "checks": {
+      "allOriginalHairstyles": true,
+      "allHairstylesKeepFeet": true,
+      "static": true,
+      "species": true,
+      "hairKeepsBody": true,
+      "earsKeepHair": true,
+      "earsKeepBody": true,
+      "craniumChangesHead": true,
+      "jawChangesHead": true,
+      "hairstyleChangesHead": true,
+      "earControlsChangeHead": true,
+      "dotOpenSwitch": true,
+      "eyeSize": true,
+      "eyeOutline": true,
+      "eyebrowControls": true,
+      "outfitHead": true,
+      "outfitBody": true,
+      "tousledRemoved": true,
+      "wholeStylesOnly": true,
+      "referenceRestoresHead": true,
+      "referenceRestoresDots": true,
+      "referenceKeepsOutfit": true,
+      "thirteenOutfits": true,
+      "smallShoulderCapeRemoved": true
+    },
+    "selectedOriginalIds": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      0,
+      1
+    ],
+    "selectedOutfitIds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12,
+      13,
+      0
+    ],
+    "restoredReference": {
+      "hearthold-character": [
+        9
+      ],
+      "name": [
+        null,
+        null,
+        null
+      ],
+      "identity": [
+        1,
+        0,
+        42,
+        42
+      ],
+      "colors": [
+        251,
+        250,
+        246,
+        186,
+        178,
+        176,
+        104,
+        104,
+        103,
+        68,
+        68,
+        67,
+        20,
+        23,
+        22,
+        96,
+        106,
+        99,
+        65,
+        72,
+        67,
+        146,
+        130,
+        99
+      ],
+      "styles": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "face": [
+        0.5,
+        0.400000006,
+        1,
+        8.39999962,
+        1,
+        6
+      ],
+      "body": [
+        1,
+        1
+      ],
+      "body-type": [
+        1
+      ],
+      "jaw": [
+        1,
+        1
+      ],
+      "features": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0.5,
+        1
+      ],
+      "hair-end": [
+        207,
+        183,
+        126
+      ],
+      "portrait": [
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "assets": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "ears": [
+        0,
+        0
+      ],
+      "cranium": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "hair-parts": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "attachments": [
+        1,
+        0,
+        0
+      ],
+      "face-morph": [
+        255,
+        0,
+        255,
+        0
+      ],
+      "eye-system": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1.35000002,
+        -0.219999999
+      ],
+      "brows": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "shape": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "details": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "renderer": "wgpu",
+    "state": {
+      "dataset": {
+        "ready": "true",
+        "frames": "1040",
+        "renderer": "wgpu",
+        "logicalSize": "1280x767",
+        "pixelSize": "1280x767"
+      },
+      "status": ""
+    },
+    "screenshots": [
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-initial.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-static.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-species.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-fit.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-jaw.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-hair.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-ears.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-00.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-01.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-02.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-03.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-04.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-05.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-06.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-07.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-08.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-09.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-10.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-11.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-12.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-13.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-14.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-15.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-16.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-17.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-cycle-18.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-dots.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-open.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-eye-size.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-outline.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-brows.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-outfit-before.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-outfit-after.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-reference-flat.png",
+      "/home/soon/orca/workspaces/GoldFantasy/tellin/artifacts/character-outfit-removal-validation/wgpu-reference-restored.png"
+    ],
+    "errors": [],
+    "checks": {
+      "allOriginalHairstyles": true,
+      "allHairstylesKeepFeet": true,
+      "static": true,
+      "species": true,
+      "hairKeepsBody": true,
+      "earsKeepHair": true,
+      "earsKeepBody": true,
+      "craniumChangesHead": true,
+      "jawChangesHead": true,
+      "hairstyleChangesHead": true,
+      "earControlsChangeHead": true,
+      "dotOpenSwitch": true,
+      "eyeSize": true,
+      "eyeOutline": true,
+      "eyebrowControls": true,
+      "outfitHead": true,
+      "outfitBody": true,
+      "tousledRemoved": true,
+      "wholeStylesOnly": true,
+      "referenceRestoresHead": true,
+      "referenceRestoresDots": true,
+      "referenceKeepsOutfit": true,
+      "thirteenOutfits": true,
+      "smallShoulderCapeRemoved": true
+    },
+    "selectedOriginalIds": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      0,
+      1
+    ],
+    "selectedOutfitIds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12,
+      13,
+      0
+    ],
+    "restoredReference": {
+      "hearthold-character": [
+        9
+      ],
+      "name": [
+        null,
+        null,
+        null
+      ],
+      "identity": [
+        1,
+        0,
+        42,
+        42
+      ],
+      "colors": [
+        251,
+        250,
+        246,
+        186,
+        178,
+        176,
+        104,
+        104,
+        103,
+        68,
+        68,
+        67,
+        20,
+        23,
+        22,
+        96,
+        106,
+        99,
+        65,
+        72,
+        67,
+        146,
+        130,
+        99
+      ],
+      "styles": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "face": [
+        0.5,
+        0.400000006,
+        1,
+        8.39999962,
+        1,
+        6
+      ],
+      "body": [
+        1,
+        1
+      ],
+      "body-type": [
+        1
+      ],
+      "jaw": [
+        1,
+        1
+      ],
+      "features": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0.5,
+        1
+      ],
+      "hair-end": [
+        207,
+        183,
+        126
+      ],
+      "portrait": [
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "assets": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "ears": [
+        0,
+        0
+      ],
+      "cranium": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "hair-parts": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "attachments": [
+        1,
+        0,
+        0
+      ],
+      "face-morph": [
+        255,
+        0,
+        255,
+        0
+      ],
+      "eye-system": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1.35000002,
+        -0.219999999
+      ],
+      "brows": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "shape": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "details": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]

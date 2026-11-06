@@ -1,0 +1,7 @@
+ninja: Entering directory `/tmp/tellin-engine-witheditor'
+[1/6] Compiling C++ object tests/Hearthold-tests.p/game_testPortraitBackground.cpp.o
+[2/6] Compiling C++ object src/game/libhearthold-game.a.p/character_assets.cpp.o
+[3/6] Linking static target src/game/libhearthold-game.a
+[4/6] Linking target src/game/Hearthold-character-library
+[5/6] Compiling C++ object tests/Hearthold-tests.p/game_testCharacterAssets.cpp.o
+[6/6] Linking target src/game/Hearthold

@@ -1,0 +1,7 @@
+/build*/
+/subprojects/.wraplock
+/.temp/
+artifacts/
+/dist/
+__pycache__/
+*.pyc

@@ -1,0 +1,5 @@
+option('profile', type: 'combo', choices: ['witheditor', 'dev', 'ship'], value: 'witheditor', description: 'Game profile only: authoring, debug, or release distribution')
+option('targets', type: 'array', choices: ['core', 'ui', 'game', 'engine'], value: ['game'], description: 'Independent modules to build; witheditor also builds GameEngine for a game')
+option('renderer', type: 'combo', choices: ['gl', 'wgpu'], value: 'gl', description: 'Game/GameEngine GPU renderer (CPU is only available to UI library clients)')
+option('tests', type: 'feature', value: 'auto', description: 'Module tests; auto enables them outside ship builds')
+option('engine_mode', type: 'combo', choices: ['standalone', 'library'], value: 'standalone', description: 'GameEngine as an independent application or reusable library')

@@ -1,0 +1,56 @@
+{
+  "profile": "witheditor",
+  "webPackage": "artifacts/web-witheditor",
+  "files": {
+    "index.html": "af2b539a156da21daa1e5794dffc8f1600de2d723a91df42b0bde41eade7816b",
+    "GameEngine.html": "6ee17092b8ca5d97c43ee3e8b6dff1e528bac0182a86b5943dfa7c67cb775bfa",
+    "GameEngine.data": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15",
+    "GameEngine.wasm": "c823d774353ec632eb14704c5729478199db21a1ce7bdef2d4b3e3ba75303521",
+    "GameEngine.js": "878990cc384770add0373fd41c6fbd3742a0a07967f5019b1bbdf457c4b67822",
+    "Hearthold.html": "bce02cb3466c9fbe88b59be8a00de2d9c1f7967ab16453523e6377dfc8170581",
+    "Hearthold.data": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15",
+    "Hearthold.wasm": "d4d2c2a0470f3b0067a3c250e1cf418ef2d382b7e485e1c9e4b91650b12b17a3",
+    "Hearthold.js": "49146b88dbdb46cfbb44a8eeb52aeb5c384b7b9b04ef7f41a262552e5f3c6369",
+    "licenses/Lua.txt": "05980eef8a3ee9b12778219e987a47120501b02481ff344643e2d8bd40ae878e",
+    "licenses/SDL3.txt": "1c040b8271b37e5076359f8fd54240e371114112924d2df81ef87c7d6a1dfdfd",
+    "licenses/EmdawnWebGPU.txt": "2f79bf3699b0870251255b381670237f73f21a04a38c094f791eba39c5fd1df7",
+    "licenses/Emscripten.txt": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86",
+    "licenses/RapidJSON.txt": "01b0d15338bb72e2ced401051b4037a5bd4d464d2d8a25728f25ce6b99eb86af",
+    "licenses/ThorVG.txt": "74242cdc4ccaebc73fa04fbd52a538429eae2be7a231f9eaf1dbf59d2bedc16b",
+    "licenses/Voice.txt": "29ab5e95466e206ccf95c66725c9c585651fa639725e9c775b75f371648608ff",
+    "licenses/stb.txt": "bebfe904b14301657e4e5d655c811d51fd31b97c455b9cc2d8600d6bac6cff63",
+    "licenses/Unicode.txt": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96",
+    "licenses/DejaVu.txt": "63d3ba759d12804c5b31a9d5940d855c1820d1f5999e6b0872eb1c7ff045fbc9",
+    "licenses/Hearthold.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "nativeEditor": "/tmp/tellin-engine-witheditor/src/game/Hearthold",
+  "nativeSha256": "e58f6b1adc4225995a76b1d854d6967339a3032ee9b4c543f2084593c3904fab",
+  "nativeValidation": [
+    {
+      "renderer": "gl",
+      "frames": 60,
+      "hidden": true,
+      "dummyAudio": true,
+      "exit": 0
+    },
+    {
+      "renderer": "wgpu",
+      "frames": 60,
+      "hidden": true,
+      "dummyAudio": true,
+      "exit": 0
+    }
+  ],
+  "focusedTests": {
+    "passed": 44,
+    "failed": 0
+  },
+  "browserChecksPerRenderer": 17,
+  "browserRenderers": [
+    "gl",
+    "wgpu"
+  ],
+  "symmetricFaces": 30,
+  "readyReferences": 21,
+  "archivedReferences": 129
+}

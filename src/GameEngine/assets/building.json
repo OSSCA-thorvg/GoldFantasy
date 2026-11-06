@@ -1,0 +1,155 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "example-building",
+  "name": "Example Cottage",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.140000001,
+            0.159999996,
+            0.75999999,
+            0.839999974
+          ],
+          "wall": 20,
+          "roof": 15,
+          "shape": "gable-x",
+          "wallLit": [
+            112,
+            100,
+            86
+          ],
+          "wallShade": [
+            72,
+            64,
+            58
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 1,
+          "door": true,
+          "trim": "timber",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.519999981,
+            0.25999999,
+            0.639999986,
+            0.379999995
+          ],
+          "wall": 11,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            56,
+            54,
+            64
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 20,
+          "delay": 16,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.779999971,
+            0.360000014,
+            0.939999998,
+            0.800000012
+          ],
+          "wall": 8,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            110,
+            78,
+            52
+          ],
+          "wallShade": [
+            74,
+            52,
+            36
+          ],
+          "roofLit": [
+            110,
+            78,
+            52
+          ],
+          "roofShade": [
+            74,
+            52,
+            36
+          ],
+          "base": 0,
+          "delay": 12,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

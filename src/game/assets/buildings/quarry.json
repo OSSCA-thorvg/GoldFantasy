@@ -1,0 +1,223 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "quarry",
+  "name": "Quarry",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [
+        {
+          "bounds": [
+            0.0500000007,
+            0.0500000007,
+            0.949999988,
+            0.949999988
+          ],
+          "color": [
+            72,
+            70,
+            74
+          ],
+          "furrows": 0,
+          "furrow": [
+            0,
+            0,
+            0
+          ],
+          "delay": 0
+        }
+      ],
+      "blocks": [
+        {
+          "bounds": [
+            0.180000007,
+            0.180000007,
+            0.419999987,
+            0.419999987
+          ],
+          "wall": 12,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.140000001,
+            0.519999981,
+            0.460000008,
+            0.819999993
+          ],
+          "wall": 9,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 0,
+          "delay": 8,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.550000012,
+            0.119999997,
+            0.879999995,
+            0.449999988
+          ],
+          "wall": 12,
+          "roof": 8,
+          "shape": "pyramid",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            60,
+            68,
+            82
+          ],
+          "roofShade": [
+            38,
+            44,
+            56
+          ],
+          "base": 0,
+          "delay": 4,
+          "windows": 0,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.519999981,
+            0.579999983,
+            0.75999999,
+            0.819999993
+          ],
+          "wall": 6,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            68,
+            66,
+            76
+          ],
+          "wallShade": [
+            44,
+            42,
+            50
+          ],
+          "roofLit": [
+            68,
+            66,
+            76
+          ],
+          "roofShade": [
+            44,
+            42,
+            50
+          ],
+          "base": 0,
+          "delay": 12,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

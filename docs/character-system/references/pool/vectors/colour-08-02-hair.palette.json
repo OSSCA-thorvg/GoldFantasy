@@ -1,0 +1,39 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Skin",
+      "color": "#e8e4d7ff"
+    },
+    {
+      "index": 1,
+      "name": "Skin 2",
+      "color": "#e6e2d3ff"
+    },
+    {
+      "index": 2,
+      "name": "Skin 3",
+      "color": "#ded9c8ff"
+    },
+    {
+      "index": 3,
+      "name": "Skin 4",
+      "color": "#ebeadcff"
+    },
+    {
+      "index": 4,
+      "name": "Skin 5",
+      "color": "#e1ddc9ff"
+    },
+    {
+      "index": 5,
+      "name": "Skin 6",
+      "color": "#dcd6c2ff"
+    },
+    {
+      "index": 6,
+      "name": "Skin 7",
+      "color": "#d6d0c0ff"
+    }
+  ]
+}

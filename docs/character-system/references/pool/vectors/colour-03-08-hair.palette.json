@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Cream",
+      "color": "#f5edd6ff"
+    },
+    {
+      "index": 1,
+      "name": "Cream 2",
+      "color": "#f2ebc9ff"
+    },
+    {
+      "index": 2,
+      "name": "Charcoal",
+      "color": "#4c4843ff"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="181" height="132" viewBox="0 0 181 132">
+<title>04-face reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_04_face_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#ffffff" d="M27.66 62.84C29.05 27.31 63.75 2.41 97.74 6.23C125.92 9.39 152.39 33.08 151.34 62.84C162.1 58.64 176.22 64.22 174.94 77.4C173.42 93.01 155.36 100.94 141.49 98.01C122.3 132.08 62.5 134.27 38.73 103.01C30.29 91.91 1.22 102 3.02 74.44C3.81 62.33 17.87 58.3 27.66 62.84Z"/>
+<path id="fill-2-s1" fill="#141414" d="M85 97.18C87.82 94.88 91.75 95.39 94.92 96.58L85 97.18Z"/>
+<path id="fill-3-s1" fill="#141414" d="M90 84C88.2 82.94 88.39 80.56 89.71 79.21L90 84Z"/>
+<path id="fill-4-s1" fill="#141414" d="M147.14 78.64L148 73.79L147.14 78.64Z"/>
+<path id="fill-5-s1" fill="#141414" d="M148.8 67.37C149.35 66.87 149.7 67.47 149.52 68.01C149.47 68.15 148.66 69.46 148.5 68.63C148.42 68.21 148.46 67.68 148.8 67.37Z"/>
+</g>
+<g id="lines">
+<path id="line-1-s1" fill="none" stroke="#141414" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" d="M29 64.64C28.44 42.19 44.45 20.63 64.8 11.89C102.39 -4.26 152.98 20.77 150 65"/>
+<path id="line-2-s1" fill="none" stroke="#141414" stroke-width="2.21" stroke-linecap="round" stroke-linejoin="round" d="M29 64.64C15.04 56.55 -1.85 67.83 5.74 83.85C11.16 95.28 25.12 97.99 36.61 96.98M150 65C158.49 60.8 172.14 62.31 173.36 73.68C175.15 90.3 155.87 100.79 141.28 96.25M17.38 71.44C33.91 73.83 32.37 92.44 40.16 103.06C48.24 114.08 78.95 126.47 92.23 124.83C105.17 123.23 125.04 116.47 134.31 107.19C144.98 96.51 143.24 73.81 161.84 72.5"/>
+</g>
+</g>
+</svg>

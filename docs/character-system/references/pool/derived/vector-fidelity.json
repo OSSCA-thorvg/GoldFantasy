@@ -1,0 +1,1069 @@
+{
+  "tool": "/home/soon/orca/workspaces/GoldFantasy/logperch/aurum/tools/vectorize/vectorize.py",
+  "settings": {
+    "detail": 0.92,
+    "smooth": 0.35,
+    "lines": "fill"
+  },
+  "sourceImageHashes": 14,
+  "traces": 211,
+  "meanIoU": 0.9757655093699296,
+  "minimumIoU": 0.8451225150254277,
+  "results": [
+    {
+      "svg": "vectors/original-00-hair.svg",
+      "sourcePixels": 8161,
+      "intersectionOverUnion": 0.9604189501887712
+    },
+    {
+      "svg": "vectors/original-00-back.svg",
+      "sourcePixels": 17317,
+      "intersectionOverUnion": 0.9938940092165899
+    },
+    {
+      "svg": "vectors/original-01-hair.svg",
+      "sourcePixels": 22615,
+      "intersectionOverUnion": 0.961762114537445
+    },
+    {
+      "svg": "vectors/original-01-back.svg",
+      "sourcePixels": 48489,
+      "intersectionOverUnion": 0.9954933635147649
+    },
+    {
+      "svg": "vectors/original-02-hair.svg",
+      "sourcePixels": 14747,
+      "intersectionOverUnion": 0.9767879970396286
+    },
+    {
+      "svg": "vectors/original-02-back.svg",
+      "sourcePixels": 21610,
+      "intersectionOverUnion": 0.9949632641744837
+    },
+    {
+      "svg": "vectors/original-03-hair.svg",
+      "sourcePixels": 18622,
+      "intersectionOverUnion": 0.9808482261936516
+    },
+    {
+      "svg": "vectors/original-03-back.svg",
+      "sourcePixels": 25079,
+      "intersectionOverUnion": 0.9917352088051814
+    },
+    {
+      "svg": "vectors/original-04-hair.svg",
+      "sourcePixels": 28921,
+      "intersectionOverUnion": 0.9933514761100968
+    },
+    {
+      "svg": "vectors/original-04-back.svg",
+      "sourcePixels": 34125,
+      "intersectionOverUnion": 0.995701503011872
+    },
+    {
+      "svg": "vectors/original-05-hair.svg",
+      "sourcePixels": 16715,
+      "intersectionOverUnion": 0.9711182718701515
+    },
+    {
+      "svg": "vectors/original-05-back.svg",
+      "sourcePixels": 23859,
+      "intersectionOverUnion": 0.9940598201213136
+    },
+    {
+      "svg": "vectors/original-06-hair.svg",
+      "sourcePixels": 30292,
+      "intersectionOverUnion": 0.9829143754909663
+    },
+    {
+      "svg": "vectors/original-06-back.svg",
+      "sourcePixels": 54084,
+      "intersectionOverUnion": 0.9959221330381032
+    },
+    {
+      "svg": "vectors/original-07-hair.svg",
+      "sourcePixels": 17226,
+      "intersectionOverUnion": 0.9895490501761072
+    },
+    {
+      "svg": "vectors/original-07-back.svg",
+      "sourcePixels": 24450,
+      "intersectionOverUnion": 0.9940051384527547
+    },
+    {
+      "svg": "vectors/original-08-hair.svg",
+      "sourcePixels": 22887,
+      "intersectionOverUnion": 0.9756841554819592
+    },
+    {
+      "svg": "vectors/original-08-back.svg",
+      "sourcePixels": 31611,
+      "intersectionOverUnion": 0.9946082295443797
+    },
+    {
+      "svg": "vectors/original-09-hair.svg",
+      "sourcePixels": 21930,
+      "intersectionOverUnion": 0.9666545189504373
+    },
+    {
+      "svg": "vectors/original-09-back.svg",
+      "sourcePixels": 31157,
+      "intersectionOverUnion": 0.9914663768857069
+    },
+    {
+      "svg": "vectors/original-10-hair.svg",
+      "sourcePixels": 19226,
+      "intersectionOverUnion": 0.9856392835083385
+    },
+    {
+      "svg": "vectors/original-10-back.svg",
+      "sourcePixels": 27121,
+      "intersectionOverUnion": 0.9940425844886551
+    },
+    {
+      "svg": "vectors/original-11-hair.svg",
+      "sourcePixels": 32326,
+      "intersectionOverUnion": 0.9784521347204643
+    },
+    {
+      "svg": "vectors/original-11-back.svg",
+      "sourcePixels": 53341,
+      "intersectionOverUnion": 0.9973230999625609
+    },
+    {
+      "svg": "vectors/original-12-hair.svg",
+      "sourcePixels": 36096,
+      "intersectionOverUnion": 0.9772677174032844
+    },
+    {
+      "svg": "vectors/original-12-back.svg",
+      "sourcePixels": 57053,
+      "intersectionOverUnion": 0.9953342886100723
+    },
+    {
+      "svg": "vectors/original-13-hair.svg",
+      "sourcePixels": 10682,
+      "intersectionOverUnion": 0.9635377711293942
+    },
+    {
+      "svg": "vectors/original-13-back.svg",
+      "sourcePixels": 20127,
+      "intersectionOverUnion": 0.996678070305915
+    },
+    {
+      "svg": "vectors/original-14-hair.svg",
+      "sourcePixels": 17977,
+      "intersectionOverUnion": 0.9706240993238
+    },
+    {
+      "svg": "vectors/original-14-back.svg",
+      "sourcePixels": 24299,
+      "intersectionOverUnion": 0.9929075106592326
+    },
+    {
+      "svg": "vectors/original-15-hair.svg",
+      "sourcePixels": 11789,
+      "intersectionOverUnion": 0.9557379823967501
+    },
+    {
+      "svg": "vectors/original-15-back.svg",
+      "sourcePixels": 17124,
+      "intersectionOverUnion": 0.9886720111537121
+    },
+    {
+      "svg": "vectors/original-16-hair.svg",
+      "sourcePixels": 27928,
+      "intersectionOverUnion": 0.9740817641583733
+    },
+    {
+      "svg": "vectors/original-16-back.svg",
+      "sourcePixels": 43598,
+      "intersectionOverUnion": 0.9969315319441264
+    },
+    {
+      "svg": "vectors/original-17-hair.svg",
+      "sourcePixels": 21580,
+      "intersectionOverUnion": 0.9863680176251893
+    },
+    {
+      "svg": "vectors/original-17-back.svg",
+      "sourcePixels": 34367,
+      "intersectionOverUnion": 0.9945439243114607
+    },
+    {
+      "svg": "vectors/original-18-hair.svg",
+      "sourcePixels": 22101,
+      "intersectionOverUnion": 0.9643260840077769
+    },
+    {
+      "svg": "vectors/original-18-back.svg",
+      "sourcePixels": 34854,
+      "intersectionOverUnion": 0.9936209165284056
+    },
+    {
+      "svg": "vectors/dot-00-face.svg",
+      "sourcePixels": 9451,
+      "intersectionOverUnion": 0.9924202547636594
+    },
+    {
+      "svg": "vectors/dot-00-ear-0.svg",
+      "sourcePixels": 1210,
+      "intersectionOverUnion": 0.9827727645611156
+    },
+    {
+      "svg": "vectors/dot-00-ear-1.svg",
+      "sourcePixels": 1128,
+      "intersectionOverUnion": 0.9832599118942731
+    },
+    {
+      "svg": "vectors/dot-01-face.svg",
+      "sourcePixels": 10107,
+      "intersectionOverUnion": 0.9922013820335637
+    },
+    {
+      "svg": "vectors/dot-01-ear-0.svg",
+      "sourcePixels": 1104,
+      "intersectionOverUnion": 0.9733570159857904
+    },
+    {
+      "svg": "vectors/dot-01-ear-1.svg",
+      "sourcePixels": 1069,
+      "intersectionOverUnion": 0.9815327793167128
+    },
+    {
+      "svg": "vectors/dot-02-face.svg",
+      "sourcePixels": 10249,
+      "intersectionOverUnion": 0.9916561560104783
+    },
+    {
+      "svg": "vectors/dot-02-ear-0.svg",
+      "sourcePixels": 1202,
+      "intersectionOverUnion": 0.9754701553556827
+    },
+    {
+      "svg": "vectors/dot-02-ear-1.svg",
+      "sourcePixels": 1128,
+      "intersectionOverUnion": 0.9753303964757709
+    },
+    {
+      "svg": "vectors/dot-03-face.svg",
+      "sourcePixels": 11298,
+      "intersectionOverUnion": 0.9933868265585045
+    },
+    {
+      "svg": "vectors/dot-03-ear-0.svg",
+      "sourcePixels": 554,
+      "intersectionOverUnion": 0.9666666666666667
+    },
+    {
+      "svg": "vectors/dot-03-ear-1.svg",
+      "sourcePixels": 1207,
+      "intersectionOverUnion": 0.980440097799511
+    },
+    {
+      "svg": "vectors/dot-04-face.svg",
+      "sourcePixels": 8581,
+      "intersectionOverUnion": 0.9939527852075822
+    },
+    {
+      "svg": "vectors/dot-04-ear-0.svg",
+      "sourcePixels": 932,
+      "intersectionOverUnion": 0.9840255591054313
+    },
+    {
+      "svg": "vectors/dot-04-ear-1.svg",
+      "sourcePixels": 871,
+      "intersectionOverUnion": 0.9818181818181818
+    },
+    {
+      "svg": "vectors/dot-05-face.svg",
+      "sourcePixels": 13023,
+      "intersectionOverUnion": 0.995475113122172
+    },
+    {
+      "svg": "vectors/dot-05-ear-0.svg",
+      "sourcePixels": 928,
+      "intersectionOverUnion": 0.9829059829059829
+    },
+    {
+      "svg": "vectors/dot-05-ear-1.svg",
+      "sourcePixels": 824,
+      "intersectionOverUnion": 0.9820574162679426
+    },
+    {
+      "svg": "vectors/dot-06-face.svg",
+      "sourcePixels": 7905,
+      "intersectionOverUnion": 0.9915500063059655
+    },
+    {
+      "svg": "vectors/dot-06-ear-0.svg",
+      "sourcePixels": 860,
+      "intersectionOverUnion": 0.9711316397228638
+    },
+    {
+      "svg": "vectors/dot-06-ear-1.svg",
+      "sourcePixels": 798,
+      "intersectionOverUnion": 0.9639751552795031
+    },
+    {
+      "svg": "vectors/dot-07-face.svg",
+      "sourcePixels": 9780,
+      "intersectionOverUnion": 0.9925555782174179
+    },
+    {
+      "svg": "vectors/dot-07-ear-0.svg",
+      "sourcePixels": 1273,
+      "intersectionOverUnion": 0.9814385150812065
+    },
+    {
+      "svg": "vectors/dot-07-ear-1.svg",
+      "sourcePixels": 1178,
+      "intersectionOverUnion": 0.9798994974874372
+    },
+    {
+      "svg": "vectors/dot-08-face.svg",
+      "sourcePixels": 9470,
+      "intersectionOverUnion": 0.9911644051751342
+    },
+    {
+      "svg": "vectors/dot-08-ear-0.svg",
+      "sourcePixels": 88,
+      "intersectionOverUnion": 0.8924731182795699
+    },
+    {
+      "svg": "vectors/dot-08-ear-1.svg",
+      "sourcePixels": 673,
+      "intersectionOverUnion": 0.9867452135493373
+    },
+    {
+      "svg": "vectors/dot-09-face.svg",
+      "sourcePixels": 8583,
+      "intersectionOverUnion": 0.9946542707728065
+    },
+    {
+      "svg": "vectors/dot-09-ear-0.svg",
+      "sourcePixels": 1253,
+      "intersectionOverUnion": 0.9817460317460317
+    },
+    {
+      "svg": "vectors/dot-09-ear-1.svg",
+      "sourcePixels": 1218,
+      "intersectionOverUnion": 0.9853061224489796
+    },
+    {
+      "svg": "vectors/elf-face.svg",
+      "sourcePixels": 35635,
+      "intersectionOverUnion": 0.9964989917096123
+    },
+    {
+      "svg": "vectors/elf-ear-0.svg",
+      "sourcePixels": 5057,
+      "intersectionOverUnion": 0.9876712328767123
+    },
+    {
+      "svg": "vectors/elf-ear-1.svg",
+      "sourcePixels": 4899,
+      "intersectionOverUnion": 0.9856883692803871
+    },
+    {
+      "svg": "vectors/dot-00-hair.svg",
+      "sourcePixels": 5298,
+      "intersectionOverUnion": 0.9622218066205349
+    },
+    {
+      "svg": "vectors/dot-01-hair.svg",
+      "sourcePixels": 10950,
+      "intersectionOverUnion": 0.9736243747157799
+    },
+    {
+      "svg": "vectors/dot-02-hair.svg",
+      "sourcePixels": 6183,
+      "intersectionOverUnion": 0.9601741373750403
+    },
+    {
+      "svg": "vectors/dot-03-hair.svg",
+      "sourcePixels": 10527,
+      "intersectionOverUnion": 0.9708187741996411
+    },
+    {
+      "svg": "vectors/dot-04-hair.svg",
+      "sourcePixels": 9614,
+      "intersectionOverUnion": 0.9710970682689319
+    },
+    {
+      "svg": "vectors/dot-05-hair.svg",
+      "sourcePixels": 5450,
+      "intersectionOverUnion": 0.947215143793229
+    },
+    {
+      "svg": "vectors/dot-06-hair.svg",
+      "sourcePixels": 8878,
+      "intersectionOverUnion": 0.9656758272574313
+    },
+    {
+      "svg": "vectors/dot-07-hair.svg",
+      "sourcePixels": 5917,
+      "intersectionOverUnion": 0.9745094750964279
+    },
+    {
+      "svg": "vectors/dot-08-hair.svg",
+      "sourcePixels": 7190,
+      "intersectionOverUnion": 0.9641720846590123
+    },
+    {
+      "svg": "vectors/dot-09-hair.svg",
+      "sourcePixels": 7485,
+      "intersectionOverUnion": 0.9712421781387298
+    },
+    {
+      "svg": "vectors/elf-hair.svg",
+      "sourcePixels": 226180,
+      "intersectionOverUnion": 0.9940157341111995
+    },
+    {
+      "svg": "vectors/elf-eyes.svg",
+      "sourcePixels": 26442,
+      "intersectionOverUnion": 1.0
+    },
+    {
+      "svg": "vectors/colour-01-00-hair.svg",
+      "sourcePixels": 4056,
+      "intersectionOverUnion": 0.9538017324350336
+    },
+    {
+      "svg": "vectors/colour-01-00-back.svg",
+      "sourcePixels": 10019,
+      "intersectionOverUnion": 0.9897695669447756
+    },
+    {
+      "svg": "vectors/colour-01-01-hair.svg",
+      "sourcePixels": 4135,
+      "intersectionOverUnion": 0.9477733737467942
+    },
+    {
+      "svg": "vectors/colour-01-01-back.svg",
+      "sourcePixels": 10414,
+      "intersectionOverUnion": 0.9932956613351211
+    },
+    {
+      "svg": "vectors/colour-01-02-hair.svg",
+      "sourcePixels": 667,
+      "intersectionOverUnion": 0.9289855072463769
+    },
+    {
+      "svg": "vectors/colour-01-03-hair.svg",
+      "sourcePixels": 6497,
+      "intersectionOverUnion": 0.9766702014846236
+    },
+    {
+      "svg": "vectors/colour-01-03-back.svg",
+      "sourcePixels": 15721,
+      "intersectionOverUnion": 0.9958097898546124
+    },
+    {
+      "svg": "vectors/colour-01-04-hair.svg",
+      "sourcePixels": 2417,
+      "intersectionOverUnion": 0.9724025974025974
+    },
+    {
+      "svg": "vectors/colour-01-05-hair.svg",
+      "sourcePixels": 1149,
+      "intersectionOverUnion": 0.9691516709511568
+    },
+    {
+      "svg": "vectors/colour-01-06-hair.svg",
+      "sourcePixels": 1502,
+      "intersectionOverUnion": 0.9356084996780425
+    },
+    {
+      "svg": "vectors/colour-01-08-hair.svg",
+      "sourcePixels": 234,
+      "intersectionOverUnion": 0.8669354838709677
+    },
+    {
+      "svg": "vectors/colour-01-09-hair.svg",
+      "sourcePixels": 5002,
+      "intersectionOverUnion": 0.9802527646129542
+    },
+    {
+      "svg": "vectors/colour-01-09-back.svg",
+      "sourcePixels": 11070,
+      "intersectionOverUnion": 0.9950490593212711
+    },
+    {
+      "svg": "vectors/colour-01-10-hair.svg",
+      "sourcePixels": 4753,
+      "intersectionOverUnion": 0.9787234042553191
+    },
+    {
+      "svg": "vectors/colour-01-10-back.svg",
+      "sourcePixels": 11487,
+      "intersectionOverUnion": 0.9917748917748918
+    },
+    {
+      "svg": "vectors/colour-01-11-hair.svg",
+      "sourcePixels": 738,
+      "intersectionOverUnion": 0.9074550128534704
+    },
+    {
+      "svg": "vectors/colour-02-00-hair.svg",
+      "sourcePixels": 2774,
+      "intersectionOverUnion": 0.9388539482879106
+    },
+    {
+      "svg": "vectors/colour-02-00-back.svg",
+      "sourcePixels": 9729,
+      "intersectionOverUnion": 0.9879345603271984
+    },
+    {
+      "svg": "vectors/colour-02-01-hair.svg",
+      "sourcePixels": 1718,
+      "intersectionOverUnion": 0.9081803005008348
+    },
+    {
+      "svg": "vectors/colour-02-02-hair.svg",
+      "sourcePixels": 5687,
+      "intersectionOverUnion": 0.9808328977173724
+    },
+    {
+      "svg": "vectors/colour-02-02-back.svg",
+      "sourcePixels": 9370,
+      "intersectionOverUnion": 0.9881343362644348
+    },
+    {
+      "svg": "vectors/colour-02-03-hair.svg",
+      "sourcePixels": 4415,
+      "intersectionOverUnion": 0.9808945830523713
+    },
+    {
+      "svg": "vectors/colour-02-03-back.svg",
+      "sourcePixels": 8339,
+      "intersectionOverUnion": 0.9888835763805881
+    },
+    {
+      "svg": "vectors/colour-02-04-hair.svg",
+      "sourcePixels": 2525,
+      "intersectionOverUnion": 0.9346429920664904
+    },
+    {
+      "svg": "vectors/colour-02-05-hair.svg",
+      "sourcePixels": 5531,
+      "intersectionOverUnion": 0.9883051457358762
+    },
+    {
+      "svg": "vectors/colour-02-06-hair.svg",
+      "sourcePixels": 3791,
+      "intersectionOverUnion": 0.981913499344692
+    },
+    {
+      "svg": "vectors/colour-02-08-hair.svg",
+      "sourcePixels": 2166,
+      "intersectionOverUnion": 0.93505923650724
+    },
+    {
+      "svg": "vectors/colour-02-09-hair.svg",
+      "sourcePixels": 2450,
+      "intersectionOverUnion": 0.9734726688102894
+    },
+    {
+      "svg": "vectors/colour-03-00-hair.svg",
+      "sourcePixels": 5570,
+      "intersectionOverUnion": 0.9753020611229567
+    },
+    {
+      "svg": "vectors/colour-03-00-back.svg",
+      "sourcePixels": 14382,
+      "intersectionOverUnion": 0.9928615981703514
+    },
+    {
+      "svg": "vectors/colour-03-01-hair.svg",
+      "sourcePixels": 2056,
+      "intersectionOverUnion": 0.9787951807228915
+    },
+    {
+      "svg": "vectors/colour-03-02-hair.svg",
+      "sourcePixels": 3621,
+      "intersectionOverUnion": 0.9804188196899647
+    },
+    {
+      "svg": "vectors/colour-03-03-hair.svg",
+      "sourcePixels": 3817,
+      "intersectionOverUnion": 0.9725175006481721
+    },
+    {
+      "svg": "vectors/colour-03-03-back.svg",
+      "sourcePixels": 6258,
+      "intersectionOverUnion": 0.9933035714285714
+    },
+    {
+      "svg": "vectors/colour-03-04-hair.svg",
+      "sourcePixels": 10467,
+      "intersectionOverUnion": 0.9862715394811589
+    },
+    {
+      "svg": "vectors/colour-03-04-back.svg",
+      "sourcePixels": 20207,
+      "intersectionOverUnion": 0.9962001579155152
+    },
+    {
+      "svg": "vectors/colour-03-05-hair.svg",
+      "sourcePixels": 1228,
+      "intersectionOverUnion": 0.9759036144578314
+    },
+    {
+      "svg": "vectors/colour-03-06-hair.svg",
+      "sourcePixels": 4999,
+      "intersectionOverUnion": 0.9714398266692928
+    },
+    {
+      "svg": "vectors/colour-03-06-back.svg",
+      "sourcePixels": 10560,
+      "intersectionOverUnion": 0.9919864240595833
+    },
+    {
+      "svg": "vectors/colour-03-08-hair.svg",
+      "sourcePixels": 2209,
+      "intersectionOverUnion": 0.971020954079358
+    },
+    {
+      "svg": "vectors/colour-03-09-hair.svg",
+      "sourcePixels": 7250,
+      "intersectionOverUnion": 0.9770442814452595
+    },
+    {
+      "svg": "vectors/colour-03-09-back.svg",
+      "sourcePixels": 12893,
+      "intersectionOverUnion": 0.9942017781213761
+    },
+    {
+      "svg": "vectors/colour-03-10-hair.svg",
+      "sourcePixels": 1364,
+      "intersectionOverUnion": 0.9790159189580319
+    },
+    {
+      "svg": "vectors/colour-04-00-hair.svg",
+      "sourcePixels": 6208,
+      "intersectionOverUnion": 0.9584709768758849
+    },
+    {
+      "svg": "vectors/colour-04-00-back.svg",
+      "sourcePixels": 12497,
+      "intersectionOverUnion": 0.9849230280907793
+    },
+    {
+      "svg": "vectors/colour-04-01-hair.svg",
+      "sourcePixels": 3465,
+      "intersectionOverUnion": 0.9803194523673702
+    },
+    {
+      "svg": "vectors/colour-04-02-hair.svg",
+      "sourcePixels": 4958,
+      "intersectionOverUnion": 0.9752692461108895
+    },
+    {
+      "svg": "vectors/colour-04-02-back.svg",
+      "sourcePixels": 9893,
+      "intersectionOverUnion": 0.9946604876083014
+    },
+    {
+      "svg": "vectors/colour-04-03-hair.svg",
+      "sourcePixels": 6311,
+      "intersectionOverUnion": 0.9716112930900016
+    },
+    {
+      "svg": "vectors/colour-04-03-back.svg",
+      "sourcePixels": 22635,
+      "intersectionOverUnion": 0.9938879606015302
+    },
+    {
+      "svg": "vectors/colour-04-04-hair.svg",
+      "sourcePixels": 2788,
+      "intersectionOverUnion": 0.9602811950790862
+    },
+    {
+      "svg": "vectors/colour-04-05-hair.svg",
+      "sourcePixels": 682,
+      "intersectionOverUnion": 0.974025974025974
+    },
+    {
+      "svg": "vectors/colour-04-07-hair.svg",
+      "sourcePixels": 7417,
+      "intersectionOverUnion": 0.9810109654987965
+    },
+    {
+      "svg": "vectors/colour-04-07-back.svg",
+      "sourcePixels": 14517,
+      "intersectionOverUnion": 0.9964926758819889
+    },
+    {
+      "svg": "vectors/colour-04-08-hair.svg",
+      "sourcePixels": 10114,
+      "intersectionOverUnion": 0.980256084449223
+    },
+    {
+      "svg": "vectors/colour-04-08-back.svg",
+      "sourcePixels": 21780,
+      "intersectionOverUnion": 0.9948703856370797
+    },
+    {
+      "svg": "vectors/colour-04-09-hair.svg",
+      "sourcePixels": 1770,
+      "intersectionOverUnion": 0.9744017807456873
+    },
+    {
+      "svg": "vectors/colour-05-00-hair.svg",
+      "sourcePixels": 4141,
+      "intersectionOverUnion": 0.9896709104011531
+    },
+    {
+      "svg": "vectors/colour-05-01-hair.svg",
+      "sourcePixels": 2304,
+      "intersectionOverUnion": 0.9499165275459098
+    },
+    {
+      "svg": "vectors/colour-05-02-hair.svg",
+      "sourcePixels": 2930,
+      "intersectionOverUnion": 0.9867617107942973
+    },
+    {
+      "svg": "vectors/colour-05-03-hair.svg",
+      "sourcePixels": 2984,
+      "intersectionOverUnion": 0.983
+    },
+    {
+      "svg": "vectors/colour-05-04-hair.svg",
+      "sourcePixels": 6085,
+      "intersectionOverUnion": 0.9783352337514253
+    },
+    {
+      "svg": "vectors/colour-05-04-back.svg",
+      "sourcePixels": 16232,
+      "intersectionOverUnion": 0.9939821922014124
+    },
+    {
+      "svg": "vectors/colour-05-05-hair.svg",
+      "sourcePixels": 5705,
+      "intersectionOverUnion": 0.9871192341166232
+    },
+    {
+      "svg": "vectors/colour-05-06-hair.svg",
+      "sourcePixels": 4713,
+      "intersectionOverUnion": 0.9609455292908531
+    },
+    {
+      "svg": "vectors/colour-05-07-hair.svg",
+      "sourcePixels": 10985,
+      "intersectionOverUnion": 0.9733154841588576
+    },
+    {
+      "svg": "vectors/colour-05-07-back.svg",
+      "sourcePixels": 32481,
+      "intersectionOverUnion": 0.9960356484326982
+    },
+    {
+      "svg": "vectors/colour-05-08-hair.svg",
+      "sourcePixels": 2378,
+      "intersectionOverUnion": 0.9699217140502678
+    },
+    {
+      "svg": "vectors/colour-05-09-hair.svg",
+      "sourcePixels": 9058,
+      "intersectionOverUnion": 0.9730551933941765
+    },
+    {
+      "svg": "vectors/colour-05-09-back.svg",
+      "sourcePixels": 24795,
+      "intersectionOverUnion": 0.9957345780853889
+    },
+    {
+      "svg": "vectors/colour-06-00-hair.svg",
+      "sourcePixels": 3802,
+      "intersectionOverUnion": 0.9788622129436325
+    },
+    {
+      "svg": "vectors/colour-06-01-hair.svg",
+      "sourcePixels": 6010,
+      "intersectionOverUnion": 0.9853207982846776
+    },
+    {
+      "svg": "vectors/colour-06-02-hair.svg",
+      "sourcePixels": 5829,
+      "intersectionOverUnion": 0.9705583756345177
+    },
+    {
+      "svg": "vectors/colour-06-03-hair.svg",
+      "sourcePixels": 3656,
+      "intersectionOverUnion": 0.964916979110873
+    },
+    {
+      "svg": "vectors/colour-06-04-hair.svg",
+      "sourcePixels": 13823,
+      "intersectionOverUnion": 0.9855010048808498
+    },
+    {
+      "svg": "vectors/colour-06-04-back.svg",
+      "sourcePixels": 27419,
+      "intersectionOverUnion": 0.9962537280861279
+    },
+    {
+      "svg": "vectors/colour-06-05-hair.svg",
+      "sourcePixels": 6027,
+      "intersectionOverUnion": 0.9661648049214829
+    },
+    {
+      "svg": "vectors/colour-06-05-back.svg",
+      "sourcePixels": 12345,
+      "intersectionOverUnion": 0.9921761574447492
+    },
+    {
+      "svg": "vectors/colour-06-06-hair.svg",
+      "sourcePixels": 1869,
+      "intersectionOverUnion": 0.9631578947368421
+    },
+    {
+      "svg": "vectors/colour-06-07-hair.svg",
+      "sourcePixels": 8088,
+      "intersectionOverUnion": 0.9736938253562295
+    },
+    {
+      "svg": "vectors/colour-06-08-hair.svg",
+      "sourcePixels": 2943,
+      "intersectionOverUnion": 0.9567371202113606
+    },
+    {
+      "svg": "vectors/colour-06-09-hair.svg",
+      "sourcePixels": 11529,
+      "intersectionOverUnion": 0.9674624076119276
+    },
+    {
+      "svg": "vectors/colour-06-09-back.svg",
+      "sourcePixels": 31723,
+      "intersectionOverUnion": 0.9945664122616916
+    },
+    {
+      "svg": "vectors/colour-07-00-hair.svg",
+      "sourcePixels": 15939,
+      "intersectionOverUnion": 0.9815079118833385
+    },
+    {
+      "svg": "vectors/colour-07-00-back.svg",
+      "sourcePixels": 41993,
+      "intersectionOverUnion": 0.996721545150025
+    },
+    {
+      "svg": "vectors/colour-07-01-hair.svg",
+      "sourcePixels": 9997,
+      "intersectionOverUnion": 0.9766295237156098
+    },
+    {
+      "svg": "vectors/colour-07-01-back.svg",
+      "sourcePixels": 37769,
+      "intersectionOverUnion": 0.9967766651694893
+    },
+    {
+      "svg": "vectors/colour-07-02-hair.svg",
+      "sourcePixels": 8624,
+      "intersectionOverUnion": 0.9754397989490519
+    },
+    {
+      "svg": "vectors/colour-07-03-hair.svg",
+      "sourcePixels": 1283,
+      "intersectionOverUnion": 0.958997722095672
+    },
+    {
+      "svg": "vectors/colour-07-03-back.svg",
+      "sourcePixels": 4678,
+      "intersectionOverUnion": 0.990405117270789
+    },
+    {
+      "svg": "vectors/colour-07-04-hair.svg",
+      "sourcePixels": 4419,
+      "intersectionOverUnion": 0.9804932735426009
+    },
+    {
+      "svg": "vectors/colour-07-05-hair.svg",
+      "sourcePixels": 13614,
+      "intersectionOverUnion": 0.980819529206626
+    },
+    {
+      "svg": "vectors/colour-07-05-back.svg",
+      "sourcePixels": 31677,
+      "intersectionOverUnion": 0.9966275844679778
+    },
+    {
+      "svg": "vectors/colour-07-06-hair.svg",
+      "sourcePixels": 4546,
+      "intersectionOverUnion": 0.9432835820895522
+    },
+    {
+      "svg": "vectors/colour-07-07-hair.svg",
+      "sourcePixels": 5298,
+      "intersectionOverUnion": 0.981484944828876
+    },
+    {
+      "svg": "vectors/colour-07-08-hair.svg",
+      "sourcePixels": 4576,
+      "intersectionOverUnion": 0.9669952850407201
+    },
+    {
+      "svg": "vectors/colour-07-09-hair.svg",
+      "sourcePixels": 3657,
+      "intersectionOverUnion": 0.9274382314694408
+    },
+    {
+      "svg": "vectors/colour-08-00-hair.svg",
+      "sourcePixels": 1899,
+      "intersectionOverUnion": 0.9622933884297521
+    },
+    {
+      "svg": "vectors/colour-08-02-hair.svg",
+      "sourcePixels": 1505,
+      "intersectionOverUnion": 0.949449125081011
+    },
+    {
+      "svg": "vectors/colour-08-04-hair.svg",
+      "sourcePixels": 6035,
+      "intersectionOverUnion": 0.9581522613874135
+    },
+    {
+      "svg": "vectors/colour-08-04-back.svg",
+      "sourcePixels": 17611,
+      "intersectionOverUnion": 0.9918528995756718
+    },
+    {
+      "svg": "vectors/colour-08-05-hair.svg",
+      "sourcePixels": 8821,
+      "intersectionOverUnion": 0.9872833670943056
+    },
+    {
+      "svg": "vectors/colour-08-05-back.svg",
+      "sourcePixels": 16555,
+      "intersectionOverUnion": 0.9962016158205715
+    },
+    {
+      "svg": "vectors/colour-08-07-hair.svg",
+      "sourcePixels": 2010,
+      "intersectionOverUnion": 0.8451225150254277
+    },
+    {
+      "svg": "vectors/colour-08-09-hair.svg",
+      "sourcePixels": 1927,
+      "intersectionOverUnion": 0.9591211037301993
+    },
+    {
+      "svg": "vectors/colour-09-00-hair.svg",
+      "sourcePixels": 5858,
+      "intersectionOverUnion": 0.9755443886097153
+    },
+    {
+      "svg": "vectors/colour-09-01-hair.svg",
+      "sourcePixels": 3430,
+      "intersectionOverUnion": 0.9491001124859393
+    },
+    {
+      "svg": "vectors/colour-09-02-hair.svg",
+      "sourcePixels": 1361,
+      "intersectionOverUnion": 0.9206128133704735
+    },
+    {
+      "svg": "vectors/colour-09-03-hair.svg",
+      "sourcePixels": 3852,
+      "intersectionOverUnion": 0.9518823236100723
+    },
+    {
+      "svg": "vectors/colour-09-03-back.svg",
+      "sourcePixels": 5647,
+      "intersectionOverUnion": 0.9894291754756871
+    },
+    {
+      "svg": "vectors/colour-09-04-hair.svg",
+      "sourcePixels": 2709,
+      "intersectionOverUnion": 0.9154732797764583
+    },
+    {
+      "svg": "vectors/colour-09-04-back.svg",
+      "sourcePixels": 5566,
+      "intersectionOverUnion": 0.9894473260597388
+    },
+    {
+      "svg": "vectors/colour-10-00-hair.svg",
+      "sourcePixels": 16807,
+      "intersectionOverUnion": 0.979362652869238
+    },
+    {
+      "svg": "vectors/colour-10-00-back.svg",
+      "sourcePixels": 45644,
+      "intersectionOverUnion": 0.9970029095841264
+    },
+    {
+      "svg": "vectors/colour-10-01-hair.svg",
+      "sourcePixels": 2923,
+      "intersectionOverUnion": 0.9858156028368794
+    },
+    {
+      "svg": "vectors/colour-10-02-hair.svg",
+      "sourcePixels": 3542,
+      "intersectionOverUnion": 0.9052408681842244
+    },
+    {
+      "svg": "vectors/colour-10-03-hair.svg",
+      "sourcePixels": 5437,
+      "intersectionOverUnion": 0.9468727789623312
+    },
+    {
+      "svg": "vectors/colour-10-04-hair.svg",
+      "sourcePixels": 4895,
+      "intersectionOverUnion": 0.9781420765027322
+    },
+    {
+      "svg": "vectors/colour-10-05-hair.svg",
+      "sourcePixels": 6758,
+      "intersectionOverUnion": 0.9739918176504968
+    },
+    {
+      "svg": "vectors/colour-10-06-hair.svg",
+      "sourcePixels": 4462,
+      "intersectionOverUnion": 0.9915159633846841
+    },
+    {
+      "svg": "vectors/colour-10-07-hair.svg",
+      "sourcePixels": 4778,
+      "intersectionOverUnion": 0.9418064255405132
+    },
+    {
+      "svg": "vectors/colour-10-07-back.svg",
+      "sourcePixels": 21040,
+      "intersectionOverUnion": 0.995026525198939
+    },
+    {
+      "svg": "vectors/colour-10-08-hair.svg",
+      "sourcePixels": 5375,
+      "intersectionOverUnion": 0.9362875956575903
+    },
+    {
+      "svg": "vectors/colour-10-09-hair.svg",
+      "sourcePixels": 4773,
+      "intersectionOverUnion": 0.9827442827442827
+    },
+    {
+      "svg": "vectors/colour-11-00-hair.svg",
+      "sourcePixels": 103142,
+      "intersectionOverUnion": 0.9964305751707326
+    },
+    {
+      "svg": "vectors/colour-11-00-back.svg",
+      "sourcePixels": 261551,
+      "intersectionOverUnion": 0.99885377185475
+    },
+    {
+      "svg": "vectors/colour-12-00-hair.svg",
+      "sourcePixels": 25684,
+      "intersectionOverUnion": 0.9733297413793104
+    },
+    {
+      "svg": "vectors/colour-12-00-back.svg",
+      "sourcePixels": 76935,
+      "intersectionOverUnion": 0.9959939325580491
+    }
+  ]
+}

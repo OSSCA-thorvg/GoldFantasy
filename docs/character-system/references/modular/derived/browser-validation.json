@@ -1,0 +1,58 @@
+[
+  {
+    "renderer": "gl",
+    "state": {
+      "dataset": {
+        "ready": "true",
+        "frames": "451",
+        "renderer": "gl",
+        "logicalSize": "1280x767",
+        "pixelSize": "1280x767"
+      },
+      "status": ""
+    },
+    "checks": {
+      "allTwentyHairstyles": true,
+      "allHairstylesKeepFeet": true,
+      "static": true,
+      "species": true,
+      "hairKeepsBody": true,
+      "earsKeepHair": true,
+      "earsKeepBody": true,
+      "craniumChangesHead": true,
+      "hairstyleChangesHead": true,
+      "earControlsChangeHead": true,
+      "outfitHead": true,
+      "outfitBody": true
+    },
+    "errors": []
+  },
+  {
+    "renderer": "wgpu",
+    "state": {
+      "dataset": {
+        "ready": "true",
+        "frames": "317",
+        "renderer": "wgpu",
+        "logicalSize": "1280x767",
+        "pixelSize": "1280x767"
+      },
+      "status": ""
+    },
+    "checks": {
+      "allTwentyHairstyles": true,
+      "allHairstylesKeepFeet": true,
+      "static": true,
+      "species": true,
+      "hairKeepsBody": true,
+      "earsKeepHair": true,
+      "earsKeepBody": true,
+      "craniumChangesHead": true,
+      "hairstyleChangesHead": true,
+      "earControlsChangeHead": true,
+      "outfitHead": true,
+      "outfitBody": true
+    },
+    "errors": []
+  }
+]

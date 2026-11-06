@@ -1,0 +1,39 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Brown",
+      "color": "#c08d4cff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#231a0eff"
+    },
+    {
+      "index": 2,
+      "name": "Umber",
+      "color": "#311d0eff"
+    },
+    {
+      "index": 3,
+      "name": "Umber 2",
+      "color": "#483319ff"
+    },
+    {
+      "index": 4,
+      "name": "Umber 3",
+      "color": "#352716ff"
+    },
+    {
+      "index": 5,
+      "name": "Tan",
+      "color": "#b98e5dff"
+    },
+    {
+      "index": 6,
+      "name": "Brown 2",
+      "color": "#7c572cff"
+    }
+  ]
+}

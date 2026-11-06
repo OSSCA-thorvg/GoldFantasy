@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@APPLICATION@</title>
+<style>
+:root{color-scheme:dark;--background:#17191d;--surface:#1e2126;--raised:#272b31;--border:#393e46;--text:#ebedef;--muted:#979ea8;--accent:#a8be97;--accent-text:#182419;--danger:#e0948c;--radius:2px}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;background:var(--background);color:var(--text);font:12px/1.4 system-ui,sans-serif}
+#stage{flex:1 1 0;min-width:0;min-height:0;overflow:hidden}
+canvas{display:block;width:100%;height:100%;outline:0}
+#status{flex:none;margin:0;padding:7px 12px;border-top:1px solid var(--border);color:var(--muted);background:var(--surface);overflow-wrap:anywhere}
+#status:empty{display:none}
+body[data-error] #status{color:var(--danger)}
+#project{flex:none;min-width:0;border-top:1px solid var(--border);background:var(--surface)}
+#project[hidden]{display:none}
+summary{display:flex;align-items:center;gap:9px;min-height:32px;padding:0 12px;cursor:pointer;list-style:none;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'›';width:8px;color:var(--muted);font-size:16px;line-height:1}
+details[open] summary::before{transform:rotate(90deg)}
+.dock-title{flex:none;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+#project-state{min-width:0;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px}
+.source-tools{display:flex;align-items:center;gap:6px;min-height:38px;padding:5px 12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+button{flex:none;min-height:27px;padding:3px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--raised);color:var(--text);font:inherit;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:active{background:var(--surface)}
+button.primary{margin-left:auto;border-color:var(--accent);background:var(--accent);color:var(--accent-text);font-weight:600}
+button:disabled{opacity:.5;cursor:wait}
+select{min-width:0;min-height:27px;padding:3px 8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--raised);color:var(--text);font:inherit}
+.mode-tools{display:flex;align-items:center;gap:9px;padding:5px 12px;border-top:1px solid var(--border);color:var(--muted)}
+.asset-note{margin:0;padding:8px 12px;color:var(--muted)}
+#asset-message{display:block;min-height:28px;padding:4px 12px;overflow-wrap:anywhere;color:var(--muted)}
+#asset-message[data-error="true"]{color:var(--danger)}
+:focus-visible:not(canvas){outline:2px solid var(--accent);outline-offset:-2px}
+#project-message{min-width:0;margin-left:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+#project-message[data-error="true"]{color:var(--danger);white-space:normal;overflow-wrap:anywhere}
+#source{display:block;width:100%;height:clamp(100px,27vh,260px);min-width:0;margin:0;padding:10px 12px;resize:none;border:0;border-radius:0;background:var(--background);color:var(--text);font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2;scrollbar-width:thin;scrollbar-color:var(--border) var(--background)}
+.source-hint{display:flex;justify-content:space-between;gap:12px;padding:4px 12px;border-top:1px solid var(--border);color:var(--muted);font-size:10px}
+@media(max-width:640px){.source-tools{flex-wrap:wrap}#project-message{order:2;flex-basis:100%;margin-left:0;white-space:normal}.source-hint span:first-child{display:none}#source{height:clamp(90px,24vh,160px)}}
+@media(max-height:480px){#source{height:90px}.source-hint{display:none}}
+</style>
+<main id="stage" aria-label="@APPLICATION@ viewport">
+  <canvas id="canvas" tabindex="0" aria-label="@APPLICATION@ application" oncontextmenu="event.preventDefault()"></canvas>
+</main>
+<details id="project" hidden>
+  <summary><span class="dock-title" id="dock-title">Lua source</span><span id="project-state">project.lua</span></summary>
+  <div class="mode-tools" id="mode-tools" hidden>
+    <label for="document-kind">Edit</label>
+    <select id="document-kind"><option value="lua">Lua source</option><option value="building">Building asset</option></select>
+  </div>
+  <div class="source-tools" id="lua-tools" role="toolbar" aria-label="Lua project files">
+    <button id="upload-button" type="button">Open Lua…</button>
+    <input id="upload" type="file" accept=".lua,text/plain" aria-label="Open Lua project" hidden>
+    <button id="download" type="button">Download</button>
+    <output id="project-message" aria-live="polite"></output>
+    <button id="apply" type="button" class="primary">Apply changes</button>
+  </div>
+  <textarea id="source" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Lua project source"></textarea>
+  <div class="source-hint" id="lua-hint"><span>Stored locally in this browser</span><span id="apply-shortcut"></span></div>
+  <div id="asset-tools" hidden>
+    <div class="source-tools" role="toolbar" aria-label="Building asset files">
+      <button id="asset-edit" type="button">Edit building</button>
+      <button id="asset-upload-button" type="button">Open JSON…</button>
+      <input id="asset-upload" type="file" accept=".json,application/json" aria-label="Open building JSON" hidden>
+      <button id="asset-download" type="button">Download JSON</button>
+      <button id="asset-save" type="button" class="primary">Save in browser</button>
+    </div>
+    <p class="asset-note">Edit geometry and colors in the canvas. Apply updates the game. Use Save in browser here to keep changes after reload.</p>
+    <output id="asset-message" aria-live="polite"></output>
+  </div>
+</details>
+<output id="status" role="status" aria-live="polite">Loading @APPLICATION@…</output>
+<script>
+const query = new URLSearchParams(location.search);
+const canvas = document.getElementById('canvas');
+const stage = document.getElementById('stage');
+const status = document.getElementById('status');
+let storageWarning = '';
+let assetWarning = '';
+function setStatus(text = '') {
+  if (!document.body.dataset.error) status.textContent = text || storageWarning || assetWarning;
+}
+function reportError(error) {
+  const message = error?.message || String(error);
+  document.body.dataset.error = message;
+  status.textContent = 'Unable to run: ' + message;
+}
+window.addEventListener('error', event => reportError(event.error || event.message));
+window.addEventListener('unhandledrejection', event => reportError(event.reason));
+var Module = {
+  canvas,
+  arguments: ['--renderer', query.get('renderer') || '@RENDERER@', ...(query.has('frames') ? ['--frames', query.get('frames')] : []), ...(query.has('standalone') ? ['--standalone'] : [])],
+  print: text => console.log(text),
+  printErr: text => {
+    if (text.startsWith('Building assets warning:')) { console.warn(text); assetWarning = text; setStatus(); return; }
+    console.error(text);
+    if (/UI host:|Hearthold:|GameEngine:|error:|Aborted/.test(text)) reportError(text);
+  },
+  setStatus,
+  preRun: [() => {
+    const FS = Module.FS;
+    FS.mkdir('/data');
+    FS.mount(Module.IDBFS, {autoPersist: true}, '/data');
+    Module.addRunDependency('browser-storage');
+    FS.syncfs(true, error => {
+      if (error) {
+        console.error(error);
+        storageWarning = 'Browser storage is unavailable. Download your files to keep changes.';
+        setStatus();
+      }
+      FS.chdir('/data');
+      Module.removeRunDependency('browser-storage');
+    });
+  }],
+  onRuntimeInitialized: () => { document.body.dataset.ready = 'true'; setStatus(); canvas.focus({preventScroll:true}); },
+  onAbort: reportError
+};
+function measureViewport() {
+  const bounds = stage.getBoundingClientRect();
+  Module.uiViewport = {width:bounds.width, height:bounds.height};
+  // Container layout can change without a browser-window resize.
+  if (document.body.dataset.ready) window.dispatchEvent(new Event('resize'));
+}
+new ResizeObserver(measureViewport).observe(stage);
+measureViewport();
+canvas.width = Math.max(1, Math.round(Module.uiViewport.width * devicePixelRatio));
+canvas.height = Math.max(1, Math.round(Module.uiViewport.height * devicePixelRatio));
+canvas.addEventListener('pointerdown', () => canvas.focus({preventScroll:true}));
+{
+  const hasLua = '@APPLICATION@' === 'GameEngine';
+  const panel = document.getElementById('project');
+  const source = document.getElementById('source');
+  const feedback = document.getElementById('project-message');
+  const state = document.getElementById('project-state');
+  const mac = navigator.userAgentData?.platform === 'macOS' || /^(Mac|iPhone|iPad)/.test(navigator.platform);
+  const shortcut = mac ? '⌘ Enter' : 'Ctrl+Enter';
+  document.getElementById('apply-shortcut').textContent = shortcut + ' to apply';
+  document.getElementById('apply').title = 'Apply changes (' + shortcut + ')';
+  let filename = 'project.lua';
+  let assetFilename = 'building.json';
+  let uploadSequence = 0;
+  function savedBuildingPath() {
+    if (!hasLua) return '';
+    try {
+      const path = JSON.parse(Module.FS.readFile('/data/building-editor.json', {encoding:'utf8'})).path;
+      return typeof path === 'string' && /^\/data\/assets\/buildings\/[a-z][a-z0-9-]{0,63}\.json$/.test(path)
+        && Module.FS.analyzePath(path).exists ? path : '';
+    } catch { return ''; }
+  }
+  const mode = document.getElementById('document-kind');
+  const assetFeedback = document.getElementById('asset-message');
+  const hostCommand = (name, argument = '') => Module.ccall('ui_host_command', 'number', ['string','string'], [name, argument]);
+  const assetMessage = (message, error = false) => { assetFeedback.textContent = message; assetFeedback.dataset.error = String(error); };
+  function showMode() {
+    const building = mode.value === 'building';
+    document.getElementById('dock-title').textContent = building ? 'Building asset' : 'Lua source';
+    state.textContent = building ? assetFilename : filename;
+    for (const id of ['lua-tools','source','lua-hint']) document.getElementById(id).hidden = building;
+    document.getElementById('asset-tools').hidden = !building;
+  }
+  mode.onchange = showMode;
+  function download(bytes, name, type) {
+    const url = URL.createObjectURL(new Blob([bytes], {type}));
+    const link = document.createElement('a'); link.href = url; link.download = name; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function exportedAsset() {
+    const path = '/tmp/browser-building-export-' + (++uploadSequence) + '.json';
+    try {
+      if (!hostCommand('asset.export', path)) throw new Error('Open a building in the canvas and resolve any editor message first.');
+      const bytes = Module.FS.readFile(path);
+      const asset = JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(bytes));
+      if (!/^[a-z][a-z0-9-]{0,63}$/.test(asset.id)) throw new Error('The building has an invalid asset ID.');
+      return {bytes, id:asset.id};
+    } finally { if (Module.FS.analyzePath(path).exists) Module.FS.unlink(path); }
+  }
+  document.getElementById('asset-edit').onclick = () => {
+    const saved = savedBuildingPath();
+    const accepted = hostCommand(saved ? 'asset.open' : 'asset.editor', saved);
+    assetMessage(accepted ? 'Building editor opened.' : 'Resolve the editor message before opening another asset.', !accepted);
+    if (accepted) {
+      if (saved) { assetFilename = saved.split('/').pop(); state.textContent = assetFilename; }
+      canvas.focus({preventScroll:true});
+    }
+  };
+  document.getElementById('asset-upload-button').onclick = () => document.getElementById('asset-upload').click();
+  document.getElementById('asset-upload').onchange = async event => {
+    if (!event.target.files.length) return;
+    const file = event.target.files[0];
+    const path = '/tmp/browser-building-upload-' + (++uploadSequence) + '.json';
+    try {
+      if (file.size > 4 * 1024 * 1024) throw new Error('Building assets must be at most 4 MiB.');
+      // Drafts, pending discard choices and applied catalog entries retain their
+      // original file stamp. Keep upload sources alive until this page closes.
+      Module.FS.writeFile(path, new Uint8Array(await file.arrayBuffer()));
+      const accepted = hostCommand('asset.open', path);
+      assetMessage(accepted ? 'Opened draft. Apply it in the canvas or save a browser copy.' : 'Open needs attention. Check the message in the canvas; the previous draft is kept.', !accepted);
+      if (accepted) {
+        assetFilename = file.name; state.textContent = assetFilename; canvas.focus({preventScroll:true});
+      }
+    } catch (error) { assetMessage(error.message || String(error), true); }
+    finally { event.target.value = ''; }
+  };
+  document.getElementById('asset-save').onclick = async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const asset = exportedAsset();
+      Module.FS.mkdirTree('/data/assets/buildings');
+      const path = '/data/assets/buildings/' + asset.id + '.json';
+      if (!hostCommand('asset.save', path)) throw new Error('Save needs attention. Check the editor message; Download remains available.');
+      if (hasLua) Module.FS.writeFile('/data/building-editor.json', JSON.stringify({path}));
+      assetMessage('Saving browser copy…');
+      await new Promise((resolve, reject) => Module.FS.syncfs(false, error => error
+        ? reject(new Error('Browser storage could not be synchronized: ' + (error.message || String(error)))) : resolve()));
+      assetFilename = asset.id + '.json'; state.textContent = assetFilename;
+      assetMessage('Saved in this browser. Apply in the canvas to update the running game.');
+    } catch (error) { assetMessage((error.message || String(error)) + ' Download JSON to keep a separate copy.', true); }
+    finally { button.disabled = false; }
+  };
+  document.getElementById('asset-download').onclick = () => {
+    try {
+      const asset = exportedAsset();
+      download(asset.bytes, asset.id + '.json', 'application/json');
+      assetMessage('Downloaded the current building draft.');
+    } catch (error) { assetMessage(error.message || String(error), true); }
+  };
+  function apply() {
+    if (!Number(document.body.dataset.frames)) { feedback.textContent = 'Wait for GameEngine to start.'; return; }
+    Module.FS.writeFile('/data/project.lua', source.value);
+    const accepted = Module.ccall('ui_host_command', 'number', ['string','string'], ['open','/data/project.lua']);
+    feedback.textContent = accepted ? (storageWarning ? 'Applied. Download to keep changes.' : 'Applied and saved locally.') : 'Lua error. Review the message in GameEngine.';
+    feedback.dataset.error = String(!accepted);
+    state.textContent = accepted ? filename : filename + ' · needs attention';
+  }
+  source.addEventListener('input', () => { state.textContent = filename + ' · modified'; });
+  for (const type of ['keydown','keyup','keypress']) source.addEventListener(type, event => {
+    event.stopPropagation();
+    if (type === 'keydown' && (mac ? event.metaKey : event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); apply(); }
+  });
+  document.getElementById('apply').onclick = apply;
+  document.getElementById('upload-button').onclick = () => document.getElementById('upload').click();
+  document.getElementById('upload').onchange = async event => {
+    if (!event.target.files.length) return;
+    const file = event.target.files[0];
+    source.value = await file.text();
+    filename = file.name;
+    panel.open = true;
+    apply();
+    event.target.value = '';
+  };
+  document.getElementById('download').onclick = () => {
+    download(source.value, filename, 'text/x-lua');
+  };
+  const wait = setInterval(() => {
+    if (!Number(document.body.dataset.frames)) return;
+    clearInterval(wait);
+    const hasAssets = !!hostCommand('asset.available');
+    if (!hasLua && !hasAssets) return;
+    document.getElementById('mode-tools').hidden = !(hasLua && hasAssets);
+    mode.value = hasLua ? 'lua' : 'building';
+    const savedBuilding = savedBuildingPath();
+    if (savedBuilding) assetFilename = savedBuilding.split('/').pop();
+    showMode();
+    panel.hidden = false;
+    if (!hasLua) return;
+    let saved = false;
+    try { source.value = Module.FS.readFile('/data/project.lua', {encoding:'utf8'}); saved = true; }
+    catch { source.value = Module.FS.readFile('/scripts/engine.lua', {encoding:'utf8'}); }
+    if (saved) apply();
+  }, 100);
+}
+</script>
+<script async src="@APPLICATION@.js"></script>
+</html>

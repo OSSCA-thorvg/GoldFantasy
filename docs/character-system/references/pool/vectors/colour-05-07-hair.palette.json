@@ -1,0 +1,39 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gold",
+      "color": "#e3b961ff"
+    },
+    {
+      "index": 1,
+      "name": "Gold 2",
+      "color": "#e4ba64ff"
+    },
+    {
+      "index": 2,
+      "name": "Umber",
+      "color": "#584420ff"
+    },
+    {
+      "index": 3,
+      "name": "Umber 2",
+      "color": "#574524ff"
+    },
+    {
+      "index": 4,
+      "name": "Tan",
+      "color": "#bb984fff"
+    },
+    {
+      "index": 5,
+      "name": "Tan 2",
+      "color": "#b7964fff"
+    },
+    {
+      "index": 6,
+      "name": "Brown",
+      "color": "#b18b4eff"
+    }
+  ]
+}

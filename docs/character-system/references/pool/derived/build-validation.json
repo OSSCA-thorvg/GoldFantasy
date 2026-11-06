@@ -1,0 +1,94 @@
+{
+  "profile": "witheditor",
+  "presetVersion": 9,
+  "native": {
+    "executable": "/tmp/tellin-engine-witheditor/src/game/Hearthold",
+    "sha256": "8d5742faed2324c52fea60bac1bac53f3b4ace667cd9de27b4a7edf09373f2bf",
+    "hiddenFramesPerRenderer": 60,
+    "renderers": [
+      "gl",
+      "wgpu"
+    ]
+  },
+  "web": {
+    "source": "/tmp/hearthold-web-final/web",
+    "localPackage": "artifacts/web-witheditor",
+    "files": [
+      {
+        "name": "GameEngine.data",
+        "bytes": 1824753,
+        "sha256": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15"
+      },
+      {
+        "name": "GameEngine.html",
+        "bytes": 16636,
+        "sha256": "6ee17092b8ca5d97c43ee3e8b6dff1e528bac0182a86b5943dfa7c67cb775bfa"
+      },
+      {
+        "name": "GameEngine.js",
+        "bytes": 367402,
+        "sha256": "5ce4cd2061e78bf250523f32a71e370c16f261db3bf0be5dcaf81f0ef8ebd819"
+      },
+      {
+        "name": "GameEngine.wasm",
+        "bytes": 16319875,
+        "sha256": "f43c23448650fa9df57f599d321d87bd2f4b050a9d5a71d387a0f98952819a43"
+      },
+      {
+        "name": "Hearthold.data",
+        "bytes": 1824753,
+        "sha256": "31b35ff667ae3bd200be94eed679b3bc7f1de21d9991fb9291f210a427099f15"
+      },
+      {
+        "name": "Hearthold.html",
+        "bytes": 16630,
+        "sha256": "bce02cb3466c9fbe88b59be8a00de2d9c1f7967ab16453523e6377dfc8170581"
+      },
+      {
+        "name": "Hearthold.js",
+        "bytes": 367379,
+        "sha256": "598ac9327a37b5801430d68a86c43dae1a5dc997b4e103461adee8cdbed07130"
+      },
+      {
+        "name": "Hearthold.wasm",
+        "bytes": 16206265,
+        "sha256": "19eebdc1583c0c11f71a6480ccb48d405b1facfa7b14836f7b3dd558d5818739"
+      },
+      {
+        "name": "index.html",
+        "bytes": 165,
+        "sha256": "af2b539a156da21daa1e5794dffc8f1600de2d723a91df42b0bde41eade7816b"
+      }
+    ]
+  },
+  "data": {
+    "hairReferences": 150,
+    "faceEarTemplates": 30,
+    "eyeBrowRecipes": 20,
+    "copiedOutfits": 14,
+    "closedColourBacks": 36,
+    "poolSha256": "02c411b2e12f56923cdbaae8b4a179890559fa526cf450fc0f5534665283989f"
+  },
+  "focusedTests": {
+    "passed": 42,
+    "failed": 0
+  },
+  "normalConfigureBuild": true,
+  "browser": {
+    "renderers": [
+      {
+        "renderer": "gl",
+        "checksPassed": 17,
+        "runtimeErrors": 0,
+        "frames": 493
+      },
+      {
+        "renderer": "wgpu",
+        "checksPassed": 17,
+        "runtimeErrors": 0,
+        "frames": 461
+      }
+    ],
+    "ownedProcessesClosed": true
+  }
+}

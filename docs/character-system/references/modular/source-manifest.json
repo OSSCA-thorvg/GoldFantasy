@@ -1,0 +1,182 @@
+[
+  {
+    "sheet": 1,
+    "file": "docs/character-system/references/modular/source/sheet-01.png",
+    "sha256": "ed8036f27e4af97e193d308fd01da56707c3f0a2cd6e92845e385b4701d39ed6",
+    "size": [
+      1254,
+      1254
+    ],
+    "role": "calibration"
+  },
+  {
+    "sheet": 2,
+    "file": "docs/character-system/references/modular/source/sheet-02.png",
+    "sha256": "dfda19ad3494b344191ed9a3188683f4ce7594ae301e8dd3fa7314b828ba5e1c",
+    "size": [
+      1536,
+      1024
+    ],
+    "role": "calibration"
+  },
+  {
+    "sheet": 3,
+    "file": "docs/character-system/references/modular/source/sheet-03.png",
+    "sha256": "1db4461bc6e95c0a55d53dd9d964b5e124d9961cc68d2139cda7a9f794755145",
+    "size": [
+      1536,
+      1024
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 4,
+    "file": "docs/character-system/references/modular/source/sheet-04.png",
+    "sha256": "868cda88b5b3e5e7c6022a55b313333d13275c1b7f69086e680d127b3a7750e2",
+    "size": [
+      1536,
+      1024
+    ],
+    "role": "current_19_hair_parts"
+  },
+  {
+    "sheet": 5,
+    "file": "docs/character-system/references/modular/source/sheet-05.png",
+    "sha256": "89043d1c0a9fbe276d71b36fb7c9a86535dcdff385f7e8610a9018d7d06a5cad",
+    "size": [
+      1536,
+      1024
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 6,
+    "file": "docs/character-system/references/modular/source/sheet-06.png",
+    "sha256": "35174b4f6550bedd7c5703d0e2adeb2bafb92dcfb5463280be6adce3837926fb",
+    "size": [
+      1536,
+      1024
+    ],
+    "role": "current_19_hair_parts"
+  },
+  {
+    "sheet": 7,
+    "file": "docs/character-system/references/modular/source/sheet-07.png",
+    "sha256": "1c2276bd47922b2307a334a883832f150f97b93071f72c314328eeadb9324b36",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 8,
+    "file": "docs/character-system/references/modular/source/sheet-08.png",
+    "sha256": "75288c8fd52100597d587778ec636927436462f6b088991dc589ee3fb273b770",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 9,
+    "file": "docs/character-system/references/modular/source/sheet-09.png",
+    "sha256": "726b990161d86fcf43535a72252b32ec0cbcb660b521041bd1527d9e6ee73977",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 10,
+    "file": "docs/character-system/references/modular/source/sheet-10.png",
+    "sha256": "6ec30163917007dc45aa6863fb976d35ee037916add10ccf31cc801ae82b0fb5",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 11,
+    "file": "docs/character-system/references/modular/source/sheet-11.png",
+    "sha256": "2d38cb2a3e3a0c9eb1d6e0442504e75dd33e20566d4eddb59e0e03cabfd882ab",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 12,
+    "file": "docs/character-system/references/modular/source/sheet-12.png",
+    "sha256": "bab2cde44662ee5ba392ece43ecdec498b65fb26f12e5ed0e51d88ea4f05676e",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 13,
+    "file": "docs/character-system/references/modular/source/sheet-13.png",
+    "sha256": "f710d0cd6eafe1c2aae07a54df5e740e9766d1f454ccd7f5523bb1eecb99bc94",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 14,
+    "file": "docs/character-system/references/modular/source/sheet-14.png",
+    "sha256": "15bdfc091bff4bc5402b52f84b1e684ae0ea42dadb6bed7b27fdf60d4f180b8c",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 15,
+    "file": "docs/character-system/references/modular/source/sheet-15.png",
+    "sha256": "e6a5a4bf26411c1b719041e2d4249f2067ca6c6597fc586cdca0637a7f0933f4",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 16,
+    "file": "docs/character-system/references/modular/source/sheet-16.png",
+    "sha256": "ef90cfc9e6a0deb1886464ba645be6b83c0b3798162710a97c7500f9a928cef4",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 17,
+    "file": "docs/character-system/references/modular/source/sheet-17.png",
+    "sha256": "866312e41c41f07b0e5e283611ecaee443d0364fbeb436825ae913332a181679",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  },
+  {
+    "sheet": 18,
+    "file": "docs/character-system/references/modular/source/sheet-18.png",
+    "sha256": "900c3b6872bfd4f1ae65714651fcd90a401bb4f70d410c3aa01acffde591d9ab",
+    "size": [
+      1024,
+      1536
+    ],
+    "role": "supplemental_catalogue"
+  }
+]

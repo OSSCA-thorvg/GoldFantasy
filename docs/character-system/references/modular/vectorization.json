@@ -1,0 +1,1388 @@
+{
+  "tool": "/home/soon/orca/workspaces/GoldFantasy/logperch/aurum/tools/vectorize/vectorize.py",
+  "lines": "fill",
+  "detail": 0.75,
+  "smooth": 0.6,
+  "results": [
+    {
+      "done": true,
+      "svg": "vectors/00-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/00-face.palette.json",
+      "paths": 6,
+      "anchors": 14,
+      "seconds": 0.77,
+      "input": "crops/00-face.png",
+      "input_sha256": "d8e13aa8d6acbdf2eb48812c45bac4e402f94406c20e39b70c7935727a0d0f1f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/00-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/00-ears.palette.json",
+      "paths": 7,
+      "anchors": 25,
+      "seconds": 0.82,
+      "input": "crops/00-ears.png",
+      "input_sha256": "aafaea4f0d46ddf43cf611090f2ba2baee1a06d22c300add44f08e6df2c91612"
+    },
+    {
+      "done": true,
+      "svg": "vectors/00-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/00-cap.palette.json",
+      "paths": 13,
+      "anchors": 35,
+      "seconds": 0.82,
+      "input": "crops/00-cap.png",
+      "input_sha256": "d33f765de0a0a13b9944a062060f7205013df3889779a4e3047abad09a534b19"
+    },
+    {
+      "done": true,
+      "svg": "vectors/00-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/00-fringe.palette.json",
+      "paths": 5,
+      "anchors": 25,
+      "seconds": 0.73,
+      "input": "crops/00-fringe.png",
+      "input_sha256": "af38f7974b9046c90af31917117d5f31ab350810d097071f2fe93cf1869810e8"
+    },
+    {
+      "done": true,
+      "svg": "vectors/00-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/00-back.palette.json",
+      "paths": 8,
+      "anchors": 17,
+      "seconds": 0.73,
+      "input": "crops/00-back.png",
+      "input_sha256": "b2fecfb37d13bfd4f2a2ae2efaa8526575d197145c90e35a07e681dc6b0463c0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/00-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/00-eyes.palette.json",
+      "paths": 8,
+      "anchors": 22,
+      "seconds": 0.58,
+      "input": "crops/00-eyes.png",
+      "input_sha256": "04cd5a0916ac6a726da5442e01bdef70798abdf950288282b28a5b5bd1dd03ed"
+    },
+    {
+      "done": true,
+      "svg": "vectors/01-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/01-face.palette.json",
+      "paths": 4,
+      "anchors": 10,
+      "seconds": 0.62,
+      "input": "crops/01-face.png",
+      "input_sha256": "f7b8123f941d419e5be44e135e234ff020697d9feb40cef42e0d66ffd2f142ed"
+    },
+    {
+      "done": true,
+      "svg": "vectors/01-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/01-ears.palette.json",
+      "paths": 6,
+      "anchors": 23,
+      "seconds": 0.74,
+      "input": "crops/01-ears.png",
+      "input_sha256": "511d107bc9c4af8e594c0f01e56233b640462c2551caba5f87ab367956a59413"
+    },
+    {
+      "done": true,
+      "svg": "vectors/01-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/01-cap.palette.json",
+      "paths": 3,
+      "anchors": 12,
+      "seconds": 0.87,
+      "input": "crops/01-cap.png",
+      "input_sha256": "2d59f2466d05ba59bf26d00699c7b9861db9c03a8a86d51f411f3cc328ba5937"
+    },
+    {
+      "done": true,
+      "svg": "vectors/01-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/01-fringe.palette.json",
+      "paths": 8,
+      "anchors": 26,
+      "seconds": 0.81,
+      "input": "crops/01-fringe.png",
+      "input_sha256": "3dd7159fb85ebcec2b093401cbe34b08f83802090ade20a08ec3945132178dea"
+    },
+    {
+      "done": true,
+      "svg": "vectors/01-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/01-back.palette.json",
+      "paths": 31,
+      "anchors": 85,
+      "seconds": 0.85,
+      "input": "crops/01-back.png",
+      "input_sha256": "ee4437e5f9883e957ee069c69c1a8ce2d39df1204a45095b9ba93015e71f7218"
+    },
+    {
+      "done": true,
+      "svg": "vectors/01-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/01-eyes.palette.json",
+      "paths": 4,
+      "anchors": 21,
+      "seconds": 0.68,
+      "input": "crops/01-eyes.png",
+      "input_sha256": "8141938275f51d7b0b2b8e9173fd6e0f82ad4812041af8ff5bf85e50298307de"
+    },
+    {
+      "done": true,
+      "svg": "vectors/02-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/02-face.palette.json",
+      "paths": 4,
+      "anchors": 10,
+      "seconds": 0.8,
+      "input": "crops/02-face.png",
+      "input_sha256": "cb751aba890911de54cfa994c74081fd419f289f61e4ac89614163b045677482"
+    },
+    {
+      "done": true,
+      "svg": "vectors/02-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/02-ears.palette.json",
+      "paths": 8,
+      "anchors": 27,
+      "seconds": 0.77,
+      "input": "crops/02-ears.png",
+      "input_sha256": "e65e107eefd7ca89ae57da7f10f1a6e77777a1f13593539c0e6f43d4caa96433"
+    },
+    {
+      "done": true,
+      "svg": "vectors/02-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/02-cap.palette.json",
+      "paths": 14,
+      "anchors": 77,
+      "seconds": 0.68,
+      "input": "crops/02-cap.png",
+      "input_sha256": "01cc2aa054a907fce2dfcb35e412bf1557a01e82d8cdb9678e084b1284a646b8"
+    },
+    {
+      "done": true,
+      "svg": "vectors/02-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/02-fringe.palette.json",
+      "paths": 6,
+      "anchors": 34,
+      "seconds": 0.73,
+      "input": "crops/02-fringe.png",
+      "input_sha256": "58c991b814d9439395614dd211e146a946ef84164463b94790cd2fba4c81e25a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/02-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/02-eyes.palette.json",
+      "paths": 7,
+      "anchors": 21,
+      "seconds": 0.68,
+      "input": "crops/02-eyes.png",
+      "input_sha256": "19cd23ddde2b142b02937547b7ff93f4e00f27d7b26f175a7d1b790e0fe59c20"
+    },
+    {
+      "done": true,
+      "svg": "vectors/03-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/03-face.palette.json",
+      "paths": 5,
+      "anchors": 14,
+      "seconds": 0.7,
+      "input": "crops/03-face.png",
+      "input_sha256": "e12c91ee63f8160e31d990621dca1d59e1b969046b3cbd2ab2436ea04488248f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/03-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/03-ears.palette.json",
+      "paths": 4,
+      "anchors": 19,
+      "seconds": 0.69,
+      "input": "crops/03-ears.png",
+      "input_sha256": "61e74ab270db6eff241e54024b714fc0a2db2e61c7149912012efb10604fa066"
+    },
+    {
+      "done": true,
+      "svg": "vectors/03-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/03-cap.palette.json",
+      "paths": 21,
+      "anchors": 87,
+      "seconds": 0.97,
+      "input": "crops/03-cap.png",
+      "input_sha256": "50c98fbe559031a4dda6b3318fba6f74558970beab28cd50346722078e98c952"
+    },
+    {
+      "done": true,
+      "svg": "vectors/03-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/03-back.palette.json",
+      "paths": 14,
+      "anchors": 47,
+      "seconds": 0.82,
+      "input": "crops/03-back.png",
+      "input_sha256": "44214976c6b88434613f953f7ccbd639354f550bb6f5509a178ec503830c5bd0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/03-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/03-eyes.palette.json",
+      "paths": 10,
+      "anchors": 28,
+      "seconds": 0.78,
+      "input": "crops/03-eyes.png",
+      "input_sha256": "8a93b27bcb6c7481868af4c06fb0ea3a8fa3402faa24f002c52118e35844f95e"
+    },
+    {
+      "done": true,
+      "svg": "vectors/04-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/04-face.palette.json",
+      "paths": 5,
+      "anchors": 14,
+      "seconds": 0.79,
+      "input": "crops/04-face.png",
+      "input_sha256": "5be96a125d218bc004a9c95d016e9363f138ff5cbcb126b5141992c26a5cc97a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/04-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/04-ears.palette.json",
+      "paths": 7,
+      "anchors": 22,
+      "seconds": 0.72,
+      "input": "crops/04-ears.png",
+      "input_sha256": "c3931da094b1bd5fe271f6094e3949e74e7254cdcff751a64a473067c458489f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/04-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/04-cap.palette.json",
+      "paths": 3,
+      "anchors": 50,
+      "seconds": 0.82,
+      "input": "crops/04-cap.png",
+      "input_sha256": "5bc741f95914b7e12a9ae0b04fb7dcc8d1ce0687316375200dc3160c2a28a07b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/04-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/04-fringe.palette.json",
+      "paths": 14,
+      "anchors": 82,
+      "seconds": 0.8,
+      "input": "crops/04-fringe.png",
+      "input_sha256": "a0a8b7e04d6e7e4bdc5a69860d01d006ed0a765b7e87a53bcf1ec4ea48542576"
+    },
+    {
+      "done": true,
+      "svg": "vectors/04-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/04-back.palette.json",
+      "paths": 25,
+      "anchors": 83,
+      "seconds": 0.75,
+      "input": "crops/04-back.png",
+      "input_sha256": "62b90fde0c9b9efc315f6fd467c7b3b42072a9c77b6103f4cc08ea64b57e8394"
+    },
+    {
+      "done": true,
+      "svg": "vectors/04-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/04-eyes.palette.json",
+      "paths": 8,
+      "anchors": 25,
+      "seconds": 0.77,
+      "input": "crops/04-eyes.png",
+      "input_sha256": "654078277498016c63f4e92c470edb0ca6553ec25d6e2fdfcc368984cd45f9fd"
+    },
+    {
+      "done": true,
+      "svg": "vectors/05-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/05-face.palette.json",
+      "paths": 4,
+      "anchors": 10,
+      "seconds": 0.73,
+      "input": "crops/05-face.png",
+      "input_sha256": "6ed9480d7562fea64e6d00cce783315efdd3da0e8c5af6af400abc73f7ae8931"
+    },
+    {
+      "done": true,
+      "svg": "vectors/05-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/05-ears.palette.json",
+      "paths": 7,
+      "anchors": 18,
+      "seconds": 0.59,
+      "input": "crops/05-ears.png",
+      "input_sha256": "75a00ed44ae01bab06ea514ca5ef8c8c845af7aeba3e02bf825f981fd9e63681"
+    },
+    {
+      "done": true,
+      "svg": "vectors/05-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/05-cap.palette.json",
+      "paths": 2,
+      "anchors": 13,
+      "seconds": 0.73,
+      "input": "crops/05-cap.png",
+      "input_sha256": "562aa0ae02f9bbf8bd6e713dedc08e1cdb1fff460a9c606164bc7277a04cc5a5"
+    },
+    {
+      "done": true,
+      "svg": "vectors/05-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/05-fringe.palette.json",
+      "paths": 27,
+      "anchors": 99,
+      "seconds": 0.84,
+      "input": "crops/05-fringe.png",
+      "input_sha256": "69e4a8533514e9235f41cb746a88229df0137ca41383bb60dac7c18cd9e9694e"
+    },
+    {
+      "done": true,
+      "svg": "vectors/05-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/05-back.palette.json",
+      "paths": 10,
+      "anchors": 81,
+      "seconds": 0.84,
+      "input": "crops/05-back.png",
+      "input_sha256": "286646d3a8f7e1ce74a1babba6b681fe1c099642765e59663ef129cfc7fc2cc4"
+    },
+    {
+      "done": true,
+      "svg": "vectors/05-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/05-eyes.palette.json",
+      "paths": 8,
+      "anchors": 24,
+      "seconds": 0.56,
+      "input": "crops/05-eyes.png",
+      "input_sha256": "2f835e6ef3f3eabb29fede5224679269236ba5b03cddd49065897e0b095ade85"
+    },
+    {
+      "done": true,
+      "svg": "vectors/06-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/06-face.palette.json",
+      "paths": 5,
+      "anchors": 12,
+      "seconds": 0.7,
+      "input": "crops/06-face.png",
+      "input_sha256": "7b48da4b997fcd7ca91ba7fb395da2afe46d59a21f92361420a101fdebd73b5a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/06-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/06-ears.palette.json",
+      "paths": 5,
+      "anchors": 16,
+      "seconds": 0.61,
+      "input": "crops/06-ears.png",
+      "input_sha256": "74bc08582846b6a859bac417b162d78baa8b08a93178a4531e7b85c2c9c0665a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/06-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/06-cap.palette.json",
+      "paths": 2,
+      "anchors": 27,
+      "seconds": 0.7,
+      "input": "crops/06-cap.png",
+      "input_sha256": "9eca42dbb79b180e849848f4ebb14a41bee8cc88d964835fba7d2a7e8ccefec2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/06-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/06-fringe.palette.json",
+      "paths": 10,
+      "anchors": 38,
+      "seconds": 0.73,
+      "input": "crops/06-fringe.png",
+      "input_sha256": "c7c6415eeb1bdc5a2ffb325673d9d0608415fd41eb77c83f3c4c314d6692f99b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/06-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/06-back.palette.json",
+      "paths": 1,
+      "anchors": 20,
+      "seconds": 0.69,
+      "input": "crops/06-back.png",
+      "input_sha256": "b4fcc85512aa6847cb7eacfd19cd886102676cfdcb7f213210283518fd074f79"
+    },
+    {
+      "done": true,
+      "svg": "vectors/06-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/06-eyes.palette.json",
+      "paths": 6,
+      "anchors": 26,
+      "seconds": 0.67,
+      "input": "crops/06-eyes.png",
+      "input_sha256": "1e81c34623b75b3a163fbfd84c261aa90d4fc682d4b746d571a5c717f1d78fb0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/07-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/07-face.palette.json",
+      "paths": 5,
+      "anchors": 12,
+      "seconds": 0.68,
+      "input": "crops/07-face.png",
+      "input_sha256": "5ad28c4e287eb402221f3e8b22d5cb0b282b5cc22f4fded18a591f57899fbb33"
+    },
+    {
+      "done": true,
+      "svg": "vectors/07-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/07-ears.palette.json",
+      "paths": 5,
+      "anchors": 21,
+      "seconds": 0.76,
+      "input": "crops/07-ears.png",
+      "input_sha256": "568e81953222539b0b771534513b8a76e050f091d5afa0717f467055e8ea37a8"
+    },
+    {
+      "done": true,
+      "svg": "vectors/07-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/07-cap.palette.json",
+      "paths": 20,
+      "anchors": 83,
+      "seconds": 0.63,
+      "input": "crops/07-cap.png",
+      "input_sha256": "a4e56c069187520c7d1c7edbc403b908e01f86486f8a9926599a1e38e993a048"
+    },
+    {
+      "done": true,
+      "svg": "vectors/07-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/07-back.palette.json",
+      "paths": 1,
+      "anchors": 17,
+      "seconds": 0.8,
+      "input": "crops/07-back.png",
+      "input_sha256": "da9cc2e8a96e14fb226b65dc2edb06756ee4a2d3e07f0dffb436f7c0f5b31035"
+    },
+    {
+      "done": true,
+      "svg": "vectors/07-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/07-eyes.palette.json",
+      "paths": 4,
+      "anchors": 19,
+      "seconds": 0.67,
+      "input": "crops/07-eyes.png",
+      "input_sha256": "1f734d2755fe6dec47d4c9f61a2694e587fcfb45b176e053f9456798ce471fd4"
+    },
+    {
+      "done": true,
+      "svg": "vectors/08-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/08-face.palette.json",
+      "paths": 4,
+      "anchors": 10,
+      "seconds": 0.66,
+      "input": "crops/08-face.png",
+      "input_sha256": "e425282ee76d917b210adc36a4d3dd5211687d5eaaef7bd9c33dcafdc84f8eb0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/08-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/08-ears.palette.json",
+      "paths": 6,
+      "anchors": 24,
+      "seconds": 0.62,
+      "input": "crops/08-ears.png",
+      "input_sha256": "90a3e41b7127e5d3ae133f45aaabb5d9dfe5e760b36f1ac2bb9db84db7741f2a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/08-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/08-cap.palette.json",
+      "paths": 7,
+      "anchors": 23,
+      "seconds": 0.85,
+      "input": "crops/08-cap.png",
+      "input_sha256": "d90b90281b06a5c34b9e888f6eda0bfb0f03bd3113cbd844f9adcf293dc2d2f0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/08-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/08-fringe.palette.json",
+      "paths": 20,
+      "anchors": 59,
+      "seconds": 0.67,
+      "input": "crops/08-fringe.png",
+      "input_sha256": "6de8e0d7cc29f9ec41fe0efd1bfe9d9e045abfaae8f04ea34fe411c98745c533"
+    },
+    {
+      "done": true,
+      "svg": "vectors/08-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/08-back.palette.json",
+      "paths": 1,
+      "anchors": 11,
+      "seconds": 0.67,
+      "input": "crops/08-back.png",
+      "input_sha256": "45b0c0365a3cd54934eaa4f6923ee517a527e04947bf6b24f291fb6a011c4c0e"
+    },
+    {
+      "done": true,
+      "svg": "vectors/08-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/08-eyes.palette.json",
+      "paths": 5,
+      "anchors": 18,
+      "seconds": 0.67,
+      "input": "crops/08-eyes.png",
+      "input_sha256": "7256e869833af55ffb6dc90d65244bab15c0bd21ed326d27c5bbafaab4346048"
+    },
+    {
+      "done": true,
+      "svg": "vectors/09-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/09-face.palette.json",
+      "paths": 6,
+      "anchors": 16,
+      "seconds": 0.67,
+      "input": "crops/09-face.png",
+      "input_sha256": "671c5967420a4715f78061a1c7c31084b5f00dd1cb146feeb870241c9579b250"
+    },
+    {
+      "done": true,
+      "svg": "vectors/09-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/09-ears.palette.json",
+      "paths": 6,
+      "anchors": 22,
+      "seconds": 0.62,
+      "input": "crops/09-ears.png",
+      "input_sha256": "10d64de4fceb21bda78056060286c6cdf44b5393ea7bdf1f7dc547b58c91e1a2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/09-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/09-cap.palette.json",
+      "paths": 5,
+      "anchors": 39,
+      "seconds": 0.75,
+      "input": "crops/09-cap.png",
+      "input_sha256": "e31170da083c82a2b0e15659896d2de26e73760b37fe8b4d833b8977970e7d1a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/09-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/09-fringe.palette.json",
+      "paths": 8,
+      "anchors": 23,
+      "seconds": 0.6,
+      "input": "crops/09-fringe.png",
+      "input_sha256": "07ecea0c0bc69c4ebf8ca0e28fadd61c9ae62b82bd427ae6919df48d13a091ed"
+    },
+    {
+      "done": true,
+      "svg": "vectors/09-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/09-back.palette.json",
+      "paths": 10,
+      "anchors": 30,
+      "seconds": 0.66,
+      "input": "crops/09-back.png",
+      "input_sha256": "7c4c40bdf657bfc299c310172f7146c5dfba447170570d184ac3308b53dc4677"
+    },
+    {
+      "done": true,
+      "svg": "vectors/09-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/09-eyes.palette.json",
+      "paths": 5,
+      "anchors": 20,
+      "seconds": 0.56,
+      "input": "crops/09-eyes.png",
+      "input_sha256": "d3e0baaca80915efd905f869f2a61248f56cf8488e53ca5dec0c574366a14997"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-face.palette.json",
+      "paths": 7,
+      "anchors": 26,
+      "seconds": 0.68,
+      "input": "crops/10-face.png",
+      "input_sha256": "839730603fbab18fbcd281a5e7ad888c1fa79834452c83bde0579843619db6c7"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-ears.palette.json",
+      "paths": 8,
+      "anchors": 23,
+      "seconds": 0.77,
+      "input": "crops/10-ears.png",
+      "input_sha256": "0296754bbc5432e0c5beeb04f307a77e50597b99a08f32d16e5d257dd01c274d"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-cap.palette.json",
+      "paths": 12,
+      "anchors": 54,
+      "seconds": 0.87,
+      "input": "crops/10-cap.png",
+      "input_sha256": "62e8d0c60752a431f246035d7ede18775aeae99b45ac52a1180ef3a2ed9fcdb8"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-fringe.palette.json",
+      "paths": 38,
+      "anchors": 126,
+      "seconds": 0.72,
+      "input": "crops/10-fringe.png",
+      "input_sha256": "6b354751ca07a62bf0eb30dee4619cdc60971192009d98c3353c5c83965c6cf6"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-back.palette.json",
+      "paths": 5,
+      "anchors": 48,
+      "seconds": 0.7,
+      "input": "crops/10-back.png",
+      "input_sha256": "4a84193f2b26cfa8a2b0b3050d0ca61ebf6ce0640bebaa5344734ac3000fdbda"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-eyes.palette.json",
+      "paths": 7,
+      "anchors": 23,
+      "seconds": 0.68,
+      "input": "crops/10-eyes.png",
+      "input_sha256": "fa1e4719d1400ae7040b5364e744980388fcd2972a71cc1b4efb27d70df097cc"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-face.palette.json",
+      "paths": 6,
+      "anchors": 18,
+      "seconds": 0.91,
+      "input": "crops/11-face.png",
+      "input_sha256": "1c45dd83f37348dd3c05ada29f38f1a532dd4301765f52755e11761b3d856c9b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-ears.palette.json",
+      "paths": 7,
+      "anchors": 18,
+      "seconds": 0.75,
+      "input": "crops/11-ears.png",
+      "input_sha256": "3b8f9d7fdddd7536fe73f92cf5896efc7ced867572c326277bff4c0f14ff97d3"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-cap.palette.json",
+      "paths": 4,
+      "anchors": 21,
+      "seconds": 0.87,
+      "input": "crops/11-cap.png",
+      "input_sha256": "309111a2aa223b044ed07d0d5c42d07321f9fc2437e4766402921bc60bc117cb"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-fringe.palette.json",
+      "paths": 11,
+      "anchors": 47,
+      "seconds": 0.73,
+      "input": "crops/11-fringe.png",
+      "input_sha256": "fb09956a9d7439657bec87c6a5f8b18ed7965b71843094b817d8ce3f9cdb013d"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-back.palette.json",
+      "paths": 13,
+      "anchors": 56,
+      "seconds": 0.82,
+      "input": "crops/11-back.png",
+      "input_sha256": "c8a6bb1a07fdf76201f38a2ca759e1d180e2fb60d84b9c17fcf634e2e952d6db"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-eyes.palette.json",
+      "paths": 6,
+      "anchors": 25,
+      "seconds": 0.63,
+      "input": "crops/11-eyes.png",
+      "input_sha256": "39dff3df76de9644e312c9a83f48b921f513619dba05b47744ccd34bc025549d"
+    },
+    {
+      "done": true,
+      "svg": "vectors/12-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/12-face.palette.json",
+      "paths": 5,
+      "anchors": 12,
+      "seconds": 0.77,
+      "input": "crops/12-face.png",
+      "input_sha256": "da6c6b70b7df3cd75bb4d2d9839f353bd7d43ac50f7ea1556dccce21e669c2de"
+    },
+    {
+      "done": true,
+      "svg": "vectors/12-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/12-ears.palette.json",
+      "paths": 9,
+      "anchors": 29,
+      "seconds": 0.7,
+      "input": "crops/12-ears.png",
+      "input_sha256": "f3b4a4fd2b6a5c0ea77d5079daf1e1fa1f6cd3a22e00200c3d4a52575d0b57a8"
+    },
+    {
+      "done": true,
+      "svg": "vectors/12-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/12-cap.palette.json",
+      "paths": 6,
+      "anchors": 22,
+      "seconds": 0.65,
+      "input": "crops/12-cap.png",
+      "input_sha256": "fcf04c86e141321fed8952d1bb2c6e0ae76a1a8381452d2139fa372b0e720c86"
+    },
+    {
+      "done": true,
+      "svg": "vectors/12-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/12-fringe.palette.json",
+      "paths": 7,
+      "anchors": 34,
+      "seconds": 0.74,
+      "input": "crops/12-fringe.png",
+      "input_sha256": "27242785dfc7b4960e3dcd7ea1cb66671e7eb4b9f6386cacb9020ca335a17a21"
+    },
+    {
+      "done": true,
+      "svg": "vectors/12-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/12-back.palette.json",
+      "paths": 19,
+      "anchors": 58,
+      "seconds": 0.73,
+      "input": "crops/12-back.png",
+      "input_sha256": "c010e65e63c7ec3a384fb25eef89f35fc909f665ed0f439da5ff56d48dce8e9b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/12-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/12-eyes.palette.json",
+      "paths": 6,
+      "anchors": 24,
+      "seconds": 0.63,
+      "input": "crops/12-eyes.png",
+      "input_sha256": "3a5bcfbc54dcf56d188ce8c1bc8ee62421ec753e118a8d9935141d930d580afd"
+    },
+    {
+      "done": true,
+      "svg": "vectors/13-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/13-face.palette.json",
+      "paths": 5,
+      "anchors": 17,
+      "seconds": 0.75,
+      "input": "crops/13-face.png",
+      "input_sha256": "1b2a75af77700d95b8d7e0be6d05ff560bf0ae9f6ba3d07d6ebcb4e1ff4dede5"
+    },
+    {
+      "done": true,
+      "svg": "vectors/13-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/13-ears.palette.json",
+      "paths": 4,
+      "anchors": 16,
+      "seconds": 0.55,
+      "input": "crops/13-ears.png",
+      "input_sha256": "1651ccce673df29d78b0400142d72199876acd36e2ba8fa1945796c9753bf954"
+    },
+    {
+      "done": true,
+      "svg": "vectors/13-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/13-cap.palette.json",
+      "paths": 5,
+      "anchors": 19,
+      "seconds": 0.78,
+      "input": "crops/13-cap.png",
+      "input_sha256": "00b895038f1ad7689c20a801f20ab6f7cbcd3386f9544182001bfaa65c9ed056"
+    },
+    {
+      "done": true,
+      "svg": "vectors/13-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/13-fringe.palette.json",
+      "paths": 5,
+      "anchors": 28,
+      "seconds": 0.82,
+      "input": "crops/13-fringe.png",
+      "input_sha256": "e31a143decd0077e54bd7be9b99a0f3b271c613056a3cfff165e736f1413c6f3"
+    },
+    {
+      "done": true,
+      "svg": "vectors/13-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/13-eyes.palette.json",
+      "paths": 8,
+      "anchors": 24,
+      "seconds": 0.59,
+      "input": "crops/13-eyes.png",
+      "input_sha256": "6233fb8f2ba865d35cef70187ef28b0e97e2cf33688dd743bea40aedd42fdec2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/14-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/14-face.palette.json",
+      "paths": 5,
+      "anchors": 12,
+      "seconds": 0.74,
+      "input": "crops/14-face.png",
+      "input_sha256": "a05f8fc06a24658acd98a77256da8c0b258190775967917a7fb7ed7b6a855246"
+    },
+    {
+      "done": true,
+      "svg": "vectors/14-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/14-ears.palette.json",
+      "paths": 4,
+      "anchors": 20,
+      "seconds": 0.67,
+      "input": "crops/14-ears.png",
+      "input_sha256": "41b20fd44f5df3fc61379669c25c77a04d0fc4cccd53f820ffac31e87c10f46b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/14-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/14-cap.palette.json",
+      "paths": 10,
+      "anchors": 45,
+      "seconds": 0.66,
+      "input": "crops/14-cap.png",
+      "input_sha256": "86569b9a3b2af1b1575bedf3536abf2e37968edabd9e75fe4bfebfa70a96446f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/14-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/14-fringe.palette.json",
+      "paths": 9,
+      "anchors": 31,
+      "seconds": 0.65,
+      "input": "crops/14-fringe.png",
+      "input_sha256": "3bfa96fb7fdce5196672fafedc9be351af792a995670fe3004de0e4a9f303abd"
+    },
+    {
+      "done": true,
+      "svg": "vectors/14-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/14-back.palette.json",
+      "paths": 9,
+      "anchors": 33,
+      "seconds": 0.61,
+      "input": "crops/14-back.png",
+      "input_sha256": "48a547d6f23370da8d7d50e8a2eadc3e4979647767bc2febba2d363297d7ff09"
+    },
+    {
+      "done": true,
+      "svg": "vectors/14-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/14-eyes.palette.json",
+      "paths": 6,
+      "anchors": 24,
+      "seconds": 0.64,
+      "input": "crops/14-eyes.png",
+      "input_sha256": "54ea965dc0b0eb7f83cb70f1a19b7a96b9d4e595f2813a59a3dd43e829a2ec29"
+    },
+    {
+      "done": true,
+      "svg": "vectors/15-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/15-face.palette.json",
+      "paths": 4,
+      "anchors": 10,
+      "seconds": 0.6,
+      "input": "crops/15-face.png",
+      "input_sha256": "493a047a671cad3385f362fa317754daadba42ad841066a60791199cfebb87a7"
+    },
+    {
+      "done": true,
+      "svg": "vectors/15-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/15-ears.palette.json",
+      "paths": 4,
+      "anchors": 17,
+      "seconds": 0.54,
+      "input": "crops/15-ears.png",
+      "input_sha256": "bda779f31aff20b56ab54c6246841611be7b79b87437682ec2aac9e298ebd69c"
+    },
+    {
+      "done": true,
+      "svg": "vectors/15-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/15-cap.palette.json",
+      "paths": 4,
+      "anchors": 18,
+      "seconds": 0.6,
+      "input": "crops/15-cap.png",
+      "input_sha256": "3963ff23b5c18f0ef9326317784e1f4d6a92eb88dc95d5efcb526ca29105c2bd"
+    },
+    {
+      "done": true,
+      "svg": "vectors/15-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/15-fringe.palette.json",
+      "paths": 6,
+      "anchors": 35,
+      "seconds": 0.65,
+      "input": "crops/15-fringe.png",
+      "input_sha256": "a9da0cf9f32d6a999db61b600624595fa3134d3c7f28fbf51e31e26b14d23f73"
+    },
+    {
+      "done": true,
+      "svg": "vectors/15-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/15-back.palette.json",
+      "paths": 12,
+      "anchors": 34,
+      "seconds": 0.55,
+      "input": "crops/15-back.png",
+      "input_sha256": "f8e1f1cd7ec689173dde9ff1b03eee78d30db5d04218f11462f6cec38b52bad2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/15-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/15-eyes.palette.json",
+      "paths": 6,
+      "anchors": 20,
+      "seconds": 0.72,
+      "input": "crops/15-eyes.png",
+      "input_sha256": "acd2d40cf3b1153008e51c64a54c8c5e509d7154d17b9ef1bf4428a444967444"
+    },
+    {
+      "done": true,
+      "svg": "vectors/16-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/16-face.palette.json",
+      "paths": 5,
+      "anchors": 12,
+      "seconds": 0.76,
+      "input": "crops/16-face.png",
+      "input_sha256": "bc1cdfb390c8292a3a60bf6afc164a17dfa1e96027206fdc1a880282d357d8b0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/16-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/16-ears.palette.json",
+      "paths": 7,
+      "anchors": 29,
+      "seconds": 0.7,
+      "input": "crops/16-ears.png",
+      "input_sha256": "03848a9596294610da21bf9b1b68796c5c37068b7ac54e7ffb42681deceee50c"
+    },
+    {
+      "done": true,
+      "svg": "vectors/16-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/16-cap.palette.json",
+      "paths": 10,
+      "anchors": 27,
+      "seconds": 0.72,
+      "input": "crops/16-cap.png",
+      "input_sha256": "f25e6ec3819ad98ab23d2b5aea10e9cd623ecd4e84c3c95111031cf0ffe83841"
+    },
+    {
+      "done": true,
+      "svg": "vectors/16-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/16-fringe.palette.json",
+      "paths": 8,
+      "anchors": 39,
+      "seconds": 0.63,
+      "input": "crops/16-fringe.png",
+      "input_sha256": "8ab8859347f7ae9392a59e0979c3d43195f21e8155c19c1796cb2f37fc5aeecb"
+    },
+    {
+      "done": true,
+      "svg": "vectors/16-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/16-back.palette.json",
+      "paths": 2,
+      "anchors": 13,
+      "seconds": 0.61,
+      "input": "crops/16-back.png",
+      "input_sha256": "53d96e56b0d4965eb32a518f555ace88c73c409f41a7fc71f5ab3c60864a37cb"
+    },
+    {
+      "done": true,
+      "svg": "vectors/16-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/16-eyes.palette.json",
+      "paths": 6,
+      "anchors": 25,
+      "seconds": 0.63,
+      "input": "crops/16-eyes.png",
+      "input_sha256": "a7b29b9d3ee14f8b45074981a1509a93f7a2bc99c7e39e1d9891bbbdcd1a1c98"
+    },
+    {
+      "done": true,
+      "svg": "vectors/17-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/17-face.palette.json",
+      "paths": 6,
+      "anchors": 15,
+      "seconds": 0.63,
+      "input": "crops/17-face.png",
+      "input_sha256": "34c701c9f7aef2243896771abd105fce53a60c58d12807aad9b477ee8a279a5f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/17-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/17-ears.palette.json",
+      "paths": 7,
+      "anchors": 17,
+      "seconds": 0.66,
+      "input": "crops/17-ears.png",
+      "input_sha256": "3434c82538fe661e070a574b2493aec7072b6e421496236f96da13dab32b5a11"
+    },
+    {
+      "done": true,
+      "svg": "vectors/17-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/17-cap.palette.json",
+      "paths": 3,
+      "anchors": 15,
+      "seconds": 0.7,
+      "input": "crops/17-cap.png",
+      "input_sha256": "b1a93c1f70c4048b9ad45bd6a9f3b54e0a2152f8a43b2e1f629c460bfce9ca37"
+    },
+    {
+      "done": true,
+      "svg": "vectors/17-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/17-fringe.palette.json",
+      "paths": 8,
+      "anchors": 34,
+      "seconds": 0.76,
+      "input": "crops/17-fringe.png",
+      "input_sha256": "2b91bf084a1eef72d50deb785632e5d7960ccc619c4d61411b100452a141fb16"
+    },
+    {
+      "done": true,
+      "svg": "vectors/17-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/17-back.palette.json",
+      "paths": 12,
+      "anchors": 35,
+      "seconds": 0.6,
+      "input": "crops/17-back.png",
+      "input_sha256": "03aca209549e4db30239e14275cfd59b71e24ef7b6824d242314360c97d3f4e5"
+    },
+    {
+      "done": true,
+      "svg": "vectors/17-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/17-eyes.palette.json",
+      "paths": 7,
+      "anchors": 20,
+      "seconds": 0.73,
+      "input": "crops/17-eyes.png",
+      "input_sha256": "65fdf3716b0496bd0152bd7a6e913fce57a117884a6abc92769f4e4218889f7f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/18-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/18-face.palette.json",
+      "paths": 4,
+      "anchors": 10,
+      "seconds": 0.7,
+      "input": "crops/18-face.png",
+      "input_sha256": "2dd5959e270ee81df3d320a75ef66de40c38a3c85fbbf491589c63bb442da2fe"
+    },
+    {
+      "done": true,
+      "svg": "vectors/18-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/18-ears.palette.json",
+      "paths": 6,
+      "anchors": 18,
+      "seconds": 0.61,
+      "input": "crops/18-ears.png",
+      "input_sha256": "e51f5b787309fdf2a6edc329ec47dee83bcd8ec33614c93a81227354630d9857"
+    },
+    {
+      "done": true,
+      "svg": "vectors/18-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/18-cap.palette.json",
+      "paths": 2,
+      "anchors": 17,
+      "seconds": 0.59,
+      "input": "crops/18-cap.png",
+      "input_sha256": "75e562970728279b15a4b7f18e713016a7ab2a5aa32a3bb07aa555905b7798c9"
+    },
+    {
+      "done": true,
+      "svg": "vectors/18-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/18-fringe.palette.json",
+      "paths": 5,
+      "anchors": 21,
+      "seconds": 0.78,
+      "input": "crops/18-fringe.png",
+      "input_sha256": "5d08096009b566a38085daddc2cff2ae17ba1837449e1e3823c29d55a03e7d76"
+    },
+    {
+      "done": true,
+      "svg": "vectors/18-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/18-back.palette.json",
+      "paths": 22,
+      "anchors": 62,
+      "seconds": 0.68,
+      "input": "crops/18-back.png",
+      "input_sha256": "c313e5c7c6baa4ea7c437a96639438fcccb167dcd3991a443555956faf2b685f"
+    },
+    {
+      "done": true,
+      "svg": "vectors/18-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/18-eyes.palette.json",
+      "paths": 5,
+      "anchors": 24,
+      "seconds": 0.62,
+      "input": "crops/18-eyes.png",
+      "input_sha256": "e3efbf936a3e963e20a5e8bbcbd6afb433b5eec3c2563b43befc837309bc9bf8"
+    },
+    {
+      "done": true,
+      "svg": "vectors/10-back-complete.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/10-back-complete.palette.json",
+      "paths": 6,
+      "anchors": 36,
+      "seconds": 0.67,
+      "input": "crops/10-back-complete.png",
+      "input_sha256": "3a5046b10d498ec3c529f62bfa2aecc49404fcd8296a81d0f7275a5ff2227cfa"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-back-root.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-back-root.palette.json",
+      "paths": 1,
+      "anchors": 8,
+      "seconds": 1.85,
+      "input": "crops/11-back-root.png",
+      "input_sha256": "30981b8809f5c91e1f5edd842faeb5bdba4015085ec9f69062a9f18080ccfd47"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-tied-L.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-tied-L.palette.json",
+      "paths": 7,
+      "anchors": 26,
+      "seconds": 1.84,
+      "input": "crops/11-tied-L.png",
+      "input_sha256": "e98ad10509e31a1ff5274feff6273ece400eb14fbb2f069bac8e46ca21e3c458"
+    },
+    {
+      "done": true,
+      "svg": "vectors/11-tied-R.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/11-tied-R.palette.json",
+      "paths": 7,
+      "anchors": 26,
+      "seconds": 1.93,
+      "input": "crops/11-tied-R.png",
+      "input_sha256": "213f99cf10f6f7410a45cfc812bc910ed991e4cfd698478cfc6e24fa4fadd36b"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-0-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-0-face.palette.json",
+      "paths": 8,
+      "anchors": 19,
+      "seconds": 0.77,
+      "input": "crops/base-0-face.png",
+      "input_sha256": "b52e0861a4e7cc3fa247fb26df28ac02bc90665d378e8f90006ee6fb8735fa2a"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-0-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-0-ears.palette.json",
+      "paths": 8,
+      "anchors": 22,
+      "seconds": 0.59,
+      "input": "crops/base-0-ears.png",
+      "input_sha256": "485ac52c0b67da9f9cb6404baaa455019a90b06c90576079f996581a2d639ea5"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-0-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-0-cap.palette.json",
+      "paths": 12,
+      "anchors": 40,
+      "seconds": 0.75,
+      "input": "crops/base-0-cap.png",
+      "input_sha256": "07fe1c00146de6f446cca0c30ed2c7c559ecc2000299e21171f470a1cf819062"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-0-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-0-fringe.palette.json",
+      "paths": 4,
+      "anchors": 22,
+      "seconds": 0.78,
+      "input": "crops/base-0-fringe.png",
+      "input_sha256": "1b7600717e5f97a9d97d05da9583279bd564fb42903e08a0995f82115aba1239"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-0-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-0-back.palette.json",
+      "paths": 29,
+      "anchors": 89,
+      "seconds": 0.79,
+      "input": "crops/base-0-back.png",
+      "input_sha256": "8d72e2fa7126026822f457676f54f8faa81ad5aedf11987a03bba5f9d4c3d4b1"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-0-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-0-eyes.palette.json",
+      "paths": 2,
+      "anchors": 6,
+      "seconds": 0.53,
+      "input": "crops/base-0-eyes.png",
+      "input_sha256": "6ed7beb55630acc76734adafff4e901bd3029cd1ce5ca001fd60346767f60950"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-1-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-1-face.palette.json",
+      "paths": 6,
+      "anchors": 20,
+      "seconds": 0.63,
+      "input": "crops/base-1-face.png",
+      "input_sha256": "1f33aa1dc94373ec25dc62a42c6f6380f2ac7b52adab5ca0c68c759ad4bbf4de"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-1-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-1-ears.palette.json",
+      "paths": 7,
+      "anchors": 20,
+      "seconds": 0.62,
+      "input": "crops/base-1-ears.png",
+      "input_sha256": "65569f99431f69915221d07457c9af5d6493a6a72468f43fff4cf7d4d2a27ba4"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-1-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-1-cap.palette.json",
+      "paths": 12,
+      "anchors": 42,
+      "seconds": 0.75,
+      "input": "crops/base-1-cap.png",
+      "input_sha256": "3d436b259ef94cde90b410d8d7c61f16e7b445d108301a0576223d9a1396dccc"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-1-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-1-fringe.palette.json",
+      "paths": 4,
+      "anchors": 21,
+      "seconds": 0.67,
+      "input": "crops/base-1-fringe.png",
+      "input_sha256": "499d9f820c95d4d8799bf09c650beb1564b4da76641cc64488b1052d5900d7b9"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-1-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-1-back.palette.json",
+      "paths": 28,
+      "anchors": 80,
+      "seconds": 0.67,
+      "input": "crops/base-1-back.png",
+      "input_sha256": "f12d4388e92047e1adf19de982f79d8d35c9f22a9afeb4dcd831ca4c1c3a6075"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-1-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-1-eyes.palette.json",
+      "paths": 2,
+      "anchors": 6,
+      "seconds": 0.52,
+      "input": "crops/base-1-eyes.png",
+      "input_sha256": "8170a6f5704ed7dd5482f7bf2351f455b548a56887cfe5ba2379b9995fa6c257"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-2-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-2-face.palette.json",
+      "paths": 6,
+      "anchors": 15,
+      "seconds": 0.66,
+      "input": "crops/base-2-face.png",
+      "input_sha256": "53b5a22ebe6b289b3e0cb8e0570e4c6f142077498ae6a79aed151a314c4acae1"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-2-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-2-ears.palette.json",
+      "paths": 7,
+      "anchors": 19,
+      "seconds": 0.57,
+      "input": "crops/base-2-ears.png",
+      "input_sha256": "53a40cf070fd585a14211741cc9b82ea0fa0adfe08e16a117903da537d74fea4"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-2-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-2-cap.palette.json",
+      "paths": 13,
+      "anchors": 60,
+      "seconds": 0.64,
+      "input": "crops/base-2-cap.png",
+      "input_sha256": "4760e41817b266b271b41c1a07da60c1b78be061ccbd9bce8e3f863b88830077"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-2-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-2-fringe.palette.json",
+      "paths": 7,
+      "anchors": 25,
+      "seconds": 0.68,
+      "input": "crops/base-2-fringe.png",
+      "input_sha256": "24476a89b7cca62e0e598cb79c1870f28ff018e2b24a538bc9948eb1f4779ae2"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-2-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-2-back.palette.json",
+      "paths": 33,
+      "anchors": 93,
+      "seconds": 0.68,
+      "input": "crops/base-2-back.png",
+      "input_sha256": "908e9586a9bbb2614533ab62591ca000395c0467f5f30637262a5e5f6035cf2d"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-2-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-2-eyes.palette.json",
+      "paths": 3,
+      "anchors": 8,
+      "seconds": 0.58,
+      "input": "crops/base-2-eyes.png",
+      "input_sha256": "a76e52a7adf4a97c1a3b6f78c871e3047b198606ae7c757853a24fbc638bdf40"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-3-face.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-3-face.palette.json",
+      "paths": 5,
+      "anchors": 14,
+      "seconds": 0.76,
+      "input": "crops/base-3-face.png",
+      "input_sha256": "30e9a4f2722add55d591859827736421bb0649c80436e1427e8cbcb577855db0"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-3-ears.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-3-ears.palette.json",
+      "paths": 7,
+      "anchors": 20,
+      "seconds": 0.58,
+      "input": "crops/base-3-ears.png",
+      "input_sha256": "7e5e7f0498928b248c2d3f76c5e72d1b0831a9af1f7d57d672c293e5e36294ef"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-3-cap.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-3-cap.palette.json",
+      "paths": 13,
+      "anchors": 50,
+      "seconds": 0.71,
+      "input": "crops/base-3-cap.png",
+      "input_sha256": "f94856381578d815f87859fc4d28e5b552196a713865dd608135380791997a3d"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-3-fringe.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-3-fringe.palette.json",
+      "paths": 4,
+      "anchors": 27,
+      "seconds": 0.7,
+      "input": "crops/base-3-fringe.png",
+      "input_sha256": "f69da656268bc205f3ade94dee21bab08d5eea9eb6a40f1d331a3f09b838a83e"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-3-back.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-3-back.palette.json",
+      "paths": 28,
+      "anchors": 86,
+      "seconds": 0.66,
+      "input": "crops/base-3-back.png",
+      "input_sha256": "67e5f847718ebcad2cdc40ef85f005a0bf379b5e66106c93f6f52880d6f2061c"
+    },
+    {
+      "done": true,
+      "svg": "vectors/base-3-eyes.svg",
+      "palette": "/home/soon/orca/workspaces/GoldFantasy/tellin/docs/character-system/references/modular/vectors/base-3-eyes.palette.json",
+      "paths": 2,
+      "anchors": 6,
+      "seconds": 0.44,
+      "input": "crops/base-3-eyes.png",
+      "input_sha256": "62413284d838c02d7d37abfcfe2774b63ad8741541996377c3a11cbe5bfa3977"
+    }
+  ]
+}

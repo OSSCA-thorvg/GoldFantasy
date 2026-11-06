@@ -1,0 +1,29 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Beige",
+      "color": "#f4daa9ff"
+    },
+    {
+      "index": 1,
+      "name": "Tan",
+      "color": "#f3d08dff"
+    },
+    {
+      "index": 2,
+      "name": "Umber",
+      "color": "#32291cff"
+    },
+    {
+      "index": 3,
+      "name": "Black",
+      "color": "#1c1911ff"
+    },
+    {
+      "index": 4,
+      "name": "Black 2",
+      "color": "#1d1d12ff"
+    }
+  ]
+}

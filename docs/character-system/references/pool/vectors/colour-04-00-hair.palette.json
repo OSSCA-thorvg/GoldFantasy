@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Tan",
+      "color": "#e0c177ff"
+    },
+    {
+      "index": 1,
+      "name": "Tan 2",
+      "color": "#d3b37cff"
+    },
+    {
+      "index": 2,
+      "name": "Brown",
+      "color": "#72613bff"
+    }
+  ]
+}

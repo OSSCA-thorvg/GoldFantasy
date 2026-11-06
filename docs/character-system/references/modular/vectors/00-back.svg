@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg role="img" xmlns="http://www.w3.org/2000/svg" width="153" height="52" viewBox="0 0 153 52">
+<title>00-back reference trace</title>
+<desc>User-supplied construction crop, traced with logperch; editable flat fills and strokes.</desc>
+<g id="CHAR_00_back_root">
+<g id="fills">
+<path id="fill-1-s0" fill="#141414" d="M140.5 49C149.8 33.53 139.18 15.71 127.06 5.44C139.68 7.96 152.38 21.11 149.3 34.74C148.07 40.18 145.37 46.01 140.5 49Z"/>
+<path id="fill-2-s0" fill="#141414" d="M7 41C-5.53 24.76 16.5 7.21 31.83 5.33C19.38 13.1 5.33 24.62 7 41Z"/>
+<path id="fill-3-s1" fill="#707070" d="M28 7.2C29.61 4.53 32.93 3.64 35.83 3.33L28 7.2Z"/>
+<path id="fill-4-s1" fill="#707070" d="M3.03 30.73C3.03 28.42 3.97 27.27 3.97 30.27C3.97 32.58 3.03 33.73 3.03 30.73Z"/>
+<path id="fill-5-s1" fill="#707070" d="M144.03 35.73C144.03 33.42 144.97 32.27 144.97 35.27C144.97 37.58 144.03 38.73 144.03 35.73Z"/>
+<path id="fill-6-s1" fill="#707070" d="M127.32 5.18L130.56 6.94C129.15 7.57 127.87 6.37 127.32 5.18Z"/>
+<path id="fill-7-s1" fill="#707070" d="M149.06 31.22C149.06 29.42 149.94 28.39 149.94 30.78C149.94 32.58 149.06 33.61 149.06 31.22Z"/>
+<path id="fill-8-s1" fill="#707070" d="M141.26 47.82C141.8 47.48 142.28 47.86 141.65 48.26C141.16 48.57 140.81 48.1 141.26 47.82Z"/>
+</g>
+<g id="lines">
+</g>
+</g>
+</svg>

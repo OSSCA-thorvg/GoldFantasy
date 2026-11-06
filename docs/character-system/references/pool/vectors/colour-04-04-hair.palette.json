@@ -1,0 +1,29 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Brown",
+      "color": "#a18240ff"
+    },
+    {
+      "index": 1,
+      "name": "Tan",
+      "color": "#af9254ff"
+    },
+    {
+      "index": 2,
+      "name": "Brown 2",
+      "color": "#b08d44ff"
+    },
+    {
+      "index": 3,
+      "name": "Umber",
+      "color": "#3e2f13ff"
+    },
+    {
+      "index": 4,
+      "name": "Brown 3",
+      "color": "#9b7843ff"
+    }
+  ]
+}

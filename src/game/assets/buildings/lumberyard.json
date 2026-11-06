@@ -1,0 +1,155 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "lumberyard",
+  "name": "Lumberyard",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.119999997,
+            0.119999997,
+            0.600000024,
+            0.620000005
+          ],
+          "wall": 14,
+          "roof": 9,
+          "shape": "gable-y",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.239999995,
+            0.699999988,
+            0.379999995,
+            0.839999974
+          ],
+          "wall": 4,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            110,
+            78,
+            52
+          ],
+          "wallShade": [
+            74,
+            52,
+            36
+          ],
+          "roofLit": [
+            110,
+            78,
+            52
+          ],
+          "roofShade": [
+            74,
+            52,
+            36
+          ],
+          "base": 0,
+          "delay": 12,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.639999986,
+            0.280000001,
+            0.899999976,
+            0.879999995
+          ],
+          "wall": 8,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            110,
+            78,
+            52
+          ],
+          "wallShade": [
+            74,
+            52,
+            36
+          ],
+          "roofLit": [
+            110,
+            78,
+            52
+          ],
+          "roofShade": [
+            74,
+            52,
+            36
+          ],
+          "base": 0,
+          "delay": 8,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

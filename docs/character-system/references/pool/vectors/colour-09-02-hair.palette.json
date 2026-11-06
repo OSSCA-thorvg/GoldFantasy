@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Brown",
+      "color": "#97573aff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#25170eff"
+    },
+    {
+      "index": 2,
+      "name": "Brown 2",
+      "color": "#9b5d3fff"
+    }
+  ]
+}

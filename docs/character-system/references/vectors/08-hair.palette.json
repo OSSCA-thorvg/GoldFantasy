@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gray",
+      "color": "#7e7e7dff"
+    },
+    {
+      "index": 1,
+      "name": "Black",
+      "color": "#141414ff"
+    },
+    {
+      "index": 2,
+      "name": "Black 2",
+      "color": "#202020ff"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Coral",
+      "color": "#d55a2bff"
+    },
+    {
+      "index": 1,
+      "name": "Coral 2",
+      "color": "#d95829ff"
+    },
+    {
+      "index": 2,
+      "name": "Coral 3",
+      "color": "#d95b29ff"
+    },
+    {
+      "index": 3,
+      "name": "Coral 4",
+      "color": "#d45b30ff"
+    },
+    {
+      "index": 4,
+      "name": "Coral 5",
+      "color": "#ce532aff"
+    },
+    {
+      "index": 5,
+      "name": "Coral 6",
+      "color": "#d15b2fff"
+    },
+    {
+      "index": 6,
+      "name": "Coral 7",
+      "color": "#e1542fff"
+    },
+    {
+      "index": 7,
+      "name": "Coral 8",
+      "color": "#cf6235ff"
+    }
+  ]
+}

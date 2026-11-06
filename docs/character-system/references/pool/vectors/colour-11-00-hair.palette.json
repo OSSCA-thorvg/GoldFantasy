@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gold",
+      "color": "#dbb55dff"
+    },
+    {
+      "index": 1,
+      "name": "Gold 2",
+      "color": "#dbb55aff"
+    },
+    {
+      "index": 2,
+      "name": "Gold 3",
+      "color": "#dbb45fff"
+    }
+  ]
+}

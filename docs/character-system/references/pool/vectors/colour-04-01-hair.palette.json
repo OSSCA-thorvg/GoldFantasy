@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Maroon",
+      "color": "#ad462bff"
+    },
+    {
+      "index": 1,
+      "name": "Maroon 2",
+      "color": "#ae4229ff"
+    },
+    {
+      "index": 2,
+      "name": "Maroon 3",
+      "color": "#b3432bff"
+    }
+  ]
+}

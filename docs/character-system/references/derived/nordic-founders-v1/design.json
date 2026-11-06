@@ -1,0 +1,67 @@
+{
+  "stage": "design concept",
+  "generator": "built-in image_gen",
+  "sheet": "concept.png",
+  "size": [
+    1536,
+    1024
+  ],
+  "characters": [
+    {
+      "name": "Askr",
+      "gender": "male",
+      "skin": "fair warm ivory",
+      "hair": "short ash blond sweep",
+      "face": "bilateral softly squared jaw, dot eyes, separate restrained brows, small round human ears",
+      "clothingReference": "sheet-01 third row hood and breeches; preserve existing silhouette",
+      "palette": [
+        "ash blond",
+        "gray-green wool",
+        "unbleached linen",
+        "brown leather"
+      ]
+    },
+    {
+      "name": "Embla",
+      "gender": "female",
+      "skin": "fair warm ivory with sparse freckles",
+      "hair": "wheat blond centre part with two braids ending at upper chest",
+      "face": "bilateral soft oval jaw, dot eyes, separate restrained brows, small round human ears",
+      "clothingReference": "sheet-01 first row traveller tunic and cross-body round clasp; preserve existing silhouette",
+      "palette": [
+        "honey blond",
+        "gray-green wool",
+        "warm ivory",
+        "brown leather",
+        "muted bronze"
+      ]
+    }
+  ],
+  "visualRules": [
+    "Flat vector-oriented masses and a small palette",
+    "Quiet expression and slender approximately five-head adult proportions",
+    "Keep skull, face and ears bilateral",
+    "Hair back behind face and neck, braid attachments separate",
+    "Retain existing copied garment construction",
+    "No small shoulder cape, horns, weapons or elf ears"
+  ],
+  "implementationNotes": [
+    "This PNG is an art-direction reference, not a runtime vector asset",
+    "Future face, eye, brow and hair implementation must retain the existing independent parameter controls",
+    "World sprites keep separate compact hair silhouettes; portrait braids must not be pasted into the walking rig"
+  ],
+  "sourceReferences": [
+    {
+      "file": "docs/character-system/references/source/sheet-01.png",
+      "sha256": "802b10f856a01799d15ec58522908da11897d4bc7ccf357ff368c408b1f66da2",
+      "providedBy": "user",
+      "roles": [
+        "style_geometry",
+        "clothing",
+        "line_and_rendering"
+      ],
+      "priority": "strong"
+    }
+  ],
+  "generatedSha256": "483b65a293c05dadb353d22f7657fb064e7593179cc09afabf4b7fd7280f183e"
+}

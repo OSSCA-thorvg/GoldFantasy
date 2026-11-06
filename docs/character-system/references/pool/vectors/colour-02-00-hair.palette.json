@@ -1,0 +1,24 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Gold",
+      "color": "#edcf7dff"
+    },
+    {
+      "index": 1,
+      "name": "Tan",
+      "color": "#9c8b50ff"
+    },
+    {
+      "index": 2,
+      "name": "Umber",
+      "color": "#42422aff"
+    },
+    {
+      "index": 3,
+      "name": "Umber 2",
+      "color": "#4d482dff"
+    }
+  ]
+}

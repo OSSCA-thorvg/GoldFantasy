@@ -1,0 +1,22 @@
+hearthold-character 9
+name "Reference control study"
+identity 0 0 42 42
+colors 251 250 246 186 178 176 104 104 103 68 68 67 20 23 22 96 106 99 65 72 67 146 130 99
+styles 0 0 0 0 0
+face 0.5 0.400000006 1 8.39999962 1 6
+body 1 1
+body-type 1
+jaw 1 1
+features 0 1 0 0 1 0 0.5 1
+hair-end 207 183 126
+portrait 1 1 0 0 1 1 1
+assets 0 0 0 0
+ears 0 0
+cranium 0 1 1 0 1
+hair-parts 255 255 255 255
+attachments 1 0 0
+face-morph 255 0 255 0
+eye-system 0 0 0 1 0 0 1.35000002 -0.219999999
+brows 1 1 0 0 0
+shape 0 1 0 1 0
+details 0 0 0 0 0 0 0 0 0 0

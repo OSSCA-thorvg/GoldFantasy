@@ -1,0 +1,9 @@
+{
+  "sourceSheets": 18,
+  "traceInputs": 138,
+  "hairstyles": 19,
+  "cranialBases": 4,
+  "nativeCorrectives": 3,
+  "independentlyCheckedCapAndFringePaths": 341,
+  "result": "source hashes, editable vectors, cap contact transforms and similarity-only fringe registration verified"
+}

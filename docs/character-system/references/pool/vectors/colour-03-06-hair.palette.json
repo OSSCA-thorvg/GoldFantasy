@@ -1,0 +1,19 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Beige",
+      "color": "#eee2acff"
+    },
+    {
+      "index": 1,
+      "name": "Gray",
+      "color": "#7f805cff"
+    },
+    {
+      "index": 2,
+      "name": "Umber",
+      "color": "#55462cff"
+    }
+  ]
+}

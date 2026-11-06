@@ -1,0 +1,29 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Umber",
+      "color": "#5b2e12ff"
+    },
+    {
+      "index": 1,
+      "name": "Umber 2",
+      "color": "#5a2e13ff"
+    },
+    {
+      "index": 2,
+      "name": "Black",
+      "color": "#1c0d04ff"
+    },
+    {
+      "index": 3,
+      "name": "Umber 3",
+      "color": "#482f20ff"
+    },
+    {
+      "index": 4,
+      "name": "Umber 4",
+      "color": "#40352cff"
+    }
+  ]
+}

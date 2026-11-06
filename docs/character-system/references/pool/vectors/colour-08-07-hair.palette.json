@@ -1,0 +1,39 @@
+{
+  "swatches": [
+    {
+      "index": 0,
+      "name": "Skin",
+      "color": "#eeeadfff"
+    },
+    {
+      "index": 1,
+      "name": "Peach",
+      "color": "#ebcab5ff"
+    },
+    {
+      "index": 2,
+      "name": "Skin 2",
+      "color": "#ebd2c1ff"
+    },
+    {
+      "index": 3,
+      "name": "Gray",
+      "color": "#8b7b6dff"
+    },
+    {
+      "index": 4,
+      "name": "Beige",
+      "color": "#e0dac1ff"
+    },
+    {
+      "index": 5,
+      "name": "Gray 2",
+      "color": "#7d685bff"
+    },
+    {
+      "index": 6,
+      "name": "Umber",
+      "color": "#63584aff"
+    }
+  ]
+}
