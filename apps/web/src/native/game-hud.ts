@@ -393,7 +393,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     if (isLodging(building.kind) || building.kind === Structure.Tavern || isOutfitter(building.kind))
       textRow(`Earned ${building.earned} gold from guests`, t.muted, 12);
     if (building.kind === Structure.Guild || building.kind === Structure.GuildHall)
-      textRow(`${building.registered} adventurers on the rolls`, t.muted, 12);
+      textRow(`${building.trainingCount} residents trained`, t.muted, 12);
     if (building.kind === Structure.Chapel && building.built()) {
       const peoples = ['humans', 'elves', 'dwarves', 'beastfolk'];
       textRow(`${faithName(building.faith)}: draws ${peoples[building.faith]}`, t.accent, 12, true);
@@ -520,8 +520,8 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
       site.kind === DungeonKind.GiantHall
         ? 'Neutral stone giants live on the eastern coast. They leave their hall by day and return at dusk. They retaliate only when attacked.'
         : this.town.opened(this.selectedDungeon)
-          ? 'Guild access is available. Select residents and right-click this dungeon to send an expedition. Entry is never automatic.'
-          : "Monsters lurk inside and come out to raid by night. Build an adventurers' guild within 10 paces to open it, or send an expedition: select residents and right-click it.";
+          ? 'The dungeon is open. Select residents and right-click it to send an expedition. Entry is never automatic.'
+          : 'Monsters lurk inside and come out to raid by night. Select residents and right-click this dungeon to send an expedition.';
     for (const line of wrap(c, about, inner, 12))
       textRow(line, this.town.opened(this.selectedDungeon) ? t.success : t.muted, 12);
   }
