@@ -19,6 +19,7 @@
 !/scripts/prepare-audio-worklet.mjs
 !/scripts/prepare-character-references.mjs
 !/scripts/verify-audio-assets.mjs
+!/scripts/patch-webcanvas.mjs
 
 # Local workspace and authoring configuration
 /.vscode/

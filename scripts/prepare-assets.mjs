@@ -1,5 +1,6 @@
 import { mkdir, copyFile } from 'node:fs/promises';
 import { verifyAudioAssets } from './verify-audio-assets.mjs';
+await import('./patch-webcanvas.mjs');
 await import('./prepare-character-references.mjs');
 verifyAudioAssets();
 const root = new URL('../', import.meta.url);

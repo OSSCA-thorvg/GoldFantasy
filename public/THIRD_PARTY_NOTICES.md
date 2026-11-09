@@ -6,6 +6,10 @@ Midgard's project license is [GNU GPL version 3](LICENSE.txt). The complete proj
 
 [ThorVG WebCanvas](https://github.com/thorvg/thorvg.web), package `@thorvg/webcanvas` version 1.1.3, supplies the vector rendering engine. Copyright © 2023–2026 ThorVG Project. It is distributed under the [MIT license](licenses/ThorVG-WebCanvas-1.1.3.txt), copied verbatim from the installed package. The build also includes that notice alongside the WebAssembly rendering module.
 
+Midgard applies a version- and checksum-verified compatibility patch from `scripts/patch-webcanvas.mjs` during asset preparation. It gives owned JavaScript paint wrappers one native reference for their lifetime, instead of adding another reference on every scene attachment, clip or mask change. The WebAssembly engine is unchanged. Ownership regression tests cover repeated reordering beyond the native reference counter's range.
+
+The opening Powered by ThorVG animation is supplied separately. See its [source and provenance notice](assets/branding/NOTICE.md).
+
 ## Fonts
 
 The game loads **DejaVu Sans** and **DejaVu Sans Bold** from `assets/native-fonts/`. The fonts retain the Bitstream Vera font license; DejaVu changes are in the public domain. See the [complete font notice](assets/native-fonts/DejaVuSans.LICENSE) and the [DejaVu project](https://dejavu-fonts.github.io/).

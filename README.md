@@ -169,6 +169,8 @@ npm run test:audio
 
 The tracked suite in `tests/regression/` checks work priorities and draws roads through the actual game UI in all four directions around a naturally built first camp. Browser checks also cover the supplied splash, early touch sound activation and playback before background audio finishes. They run headlessly with muted output, use temporary servers and close their own resources. Both build workflows run these checks before publishing.
 
+Real WebAssembly ownership checks also repeat UI reordering, clipping, masking and animation moves 70,000 times. Asset preparation applies a checksum-verified reference ownership fix to the pinned WebCanvas 1.1.3 package; changing that dependency requires reviewing the compatibility patch.
+
 ## Technology and credits
 
 | Technology / asset                                       | Used for                                                                  |
