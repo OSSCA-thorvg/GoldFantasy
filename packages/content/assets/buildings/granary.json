@@ -1,0 +1,223 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "granary",
+  "name": "Granary",
+  "footprint": 1.2,
+  "variants": [
+    {
+      "blocks": [
+        {
+          "bounds": [
+            0.13,
+            0.12,
+            0.86,
+            0.73
+          ],
+          "wall": 20,
+          "roof": 15,
+          "shape": "gable-y",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.16,
+            0.78,
+            0.33,
+            0.91
+          ],
+          "wall": 6,
+          "roof": 3,
+          "shape": "pyramid",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.41,
+            0.78,
+            0.58,
+            0.91
+          ],
+          "wall": 6,
+          "roof": 3,
+          "shape": "pyramid",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.66,
+            0.78,
+            0.83,
+            0.91
+          ],
+          "wall": 6,
+          "roof": 3,
+          "shape": "pyramid",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ],
+      "patches": [
+        {
+          "bounds": [
+            0.06,
+            0.06,
+            0.94,
+            0.94
+          ],
+          "color": [
+            147,
+            129,
+            76
+          ],
+          "furrows": 0,
+          "furrow": [
+            77,
+            65,
+            43
+          ],
+          "delay": 0
+        }
+      ]
+    }
+  ]
+}

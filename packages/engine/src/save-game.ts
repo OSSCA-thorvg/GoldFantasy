@@ -33,13 +33,14 @@ import {
 import { Building, Field } from './town-models';
 import { Road, RoadNetwork, type RoadAnchor } from './road-network';
 import { Climate, Sky } from './climate';
-import { Resources, Structure, isSeat, structureSpec, type Stage } from './building-catalog';
+import { Resources, Product, Structure, isSeat, structureSpec, type Stage } from './building-catalog';
 import { ConstructionMaterials } from './construction-materials';
 import {
   Person,
   Monster,
   Role,
   Calling,
+  Activity,
   Race,
   AnimalKind,
   TreeWorkKind,
@@ -59,8 +60,19 @@ export interface SaveTown extends TownState {
 export const maxSaveBytes = 96 * 1024 * 1024;
 const pointCodec = raw('Point', () => point()),
   coordCodec = raw('TileCoord', () => ({ x: 0, y: 0 }));
-const resourcesCodec = raw('Resources', () => new Resources()),
-  ledgerCodec = raw('CampEconomy::Ledger', () => new Ledger());
+const legacyResourcesCodec = raw('Resources', () => new Resources());
+const resourcesCodec: Codec<Resources> = {
+  read(a) {
+    const value = legacyResourcesCodec.read(a);
+    if (a.formatVersion >= 9) a.fields(value, { planks: i32, cutStone: i32 });
+    return value;
+  },
+  write(a, value) {
+    legacyResourcesCodec.write(a, value);
+    if (a.formatVersion >= 9) a.fields(value as Resources, { planks: i32, cutStone: i32 });
+  },
+};
+const ledgerCodec = raw('CampEconomy::Ledger', () => new Ledger());
 const appearanceCodec = raw('Appearance', defaultAppearance),
   climateCodec = raw('Climate', () => new Climate());
 const stageCodec = raw<Stage>('Stage', () => ({ kind: Structure.Camp, variant: 0, dx: 0, dy: 0 }));
@@ -212,6 +224,10 @@ function monsterFields(a: SaveArchive, v: Monster): void {
   });
   if (a.formatVersion >= 4) a.fields(v, { race: optional(u8), insideLair: boolean, provokedBy: i32 });
   if (a.legacyV6MonsterTags) a.fields(v, { animal: optional(u8) });
+  if (a.formatVersion >= 9) {
+    a.fields(v, { strength: f32 });
+    if (!Number.isFinite(v.strength) || v.strength <= 0) throw new Error('Invalid monster strength');
+  }
   if (v.race !== null && v.race >= 3) throw new Error('Invalid creature race');
 }
 const monsterCodec: Codec<Monster> = {
@@ -314,6 +330,11 @@ function personFields(a: SaveArchive, v: Person): void {
         throw new Error('Invalid recovery flags');
       u8.write(a, (v.recoveringRest ? 1 : 0) | (v.recoveringHealth ? 2 : 0));
     }
+  }
+  if (a.formatVersion >= 9) {
+    a.fields(v, { hydration: f32, hunting: boolean, attackPerson: i32, workField: i32 });
+    if (a.reading && (!Number.isFinite(v.hydration) || v.hydration < 0 || v.hydration > 1))
+      throw new Error('Invalid hydration');
   }
   if (
     a.reading &&
@@ -443,6 +464,23 @@ function townFields(a: SaveArchive, v: SaveTown): void {
         }
       }
     }
+    if (a.formatVersion >= 9) {
+      for (const building of v.placed) {
+        a.fields(building, { productionProgress: f64, repairCredit: f64, repairPending: boolean });
+        if (
+          !Number.isFinite(building.productionProgress) ||
+          building.productionProgress < 0 ||
+          building.productionProgress > 30
+        )
+          throw new Error('Invalid production progress');
+        if (
+          !Number.isFinite(building.repairCredit) ||
+          building.repairCredit < 0 ||
+          building.repairCredit > 0.25
+        )
+          throw new Error('Invalid repair credit');
+      }
+    }
     const extent = a.cursor - start,
       stored = a.value(u32, extent);
     if (a.reading) {
@@ -492,6 +530,20 @@ function townFields(a: SaveArchive, v: SaveTown): void {
       !Number.isFinite(v.time)
     )
       throw new Error('Invalid settlement');
+    // Older completion branches cleared the order marker before handing back
+    // to Auto. Recover only finished construction transactions; explicit Stop
+    // has an Idle task and must remain a deliberate hold.
+    if (a.formatVersion < 9)
+      for (const person of v.folk) {
+        if (person.role !== Role.Resident || person.autoMode || person.ordered) continue;
+        if (person.task === Activity.Building) {
+          const site = v.building(person.taskSite);
+          if (!site || (site.built() && site.health >= 1)) person.autoMode = true;
+        } else if (person.task === Activity.Roadwork) {
+          const road = v.network.road(person.taskSite);
+          if (!road || (road.built >= 1 && road.paving < 0 && road.wear <= 0)) person.autoMode = true;
+        }
+      }
     for (const beast of v.beasts)
       if (
         beast.animal !== null ||
@@ -524,8 +576,31 @@ function townFields(a: SaveArchive, v: SaveTown): void {
 }
 export function encodeTown(town: SaveTown): string {
   const a = new SaveArchive();
-  // Keep historical v7 bytes unchanged when no new recovery state is needed.
-  a.formatVersion = town.folk.some((p) => p.recoveringRest || p.recoveringHealth) ? 8 : 7;
+  // Preserve historical v7/v8 encodings unless the settlement uses v9 state.
+  const refined = (resources: Resources) => resources.planks !== 0 || resources.cutStone !== 0;
+  const newMaterials = (materials: ConstructionMaterials) =>
+    refined(materials.required) || refined(materials.delivered);
+  const extended =
+    town.folk.some(
+      (p) =>
+        p.hydration !== 1 ||
+        p.hunting ||
+        p.attackPerson >= 0 ||
+        p.workField >= 0 ||
+        (p.carrying > 0 && (p.carriedProduct === Product.Planks || p.carriedProduct === Product.CutStone)),
+    ) ||
+    town.beasts.some((m) => m.strength !== 1) ||
+    town.placed.some(
+      (b) =>
+        b.kind >= Structure.Sawmill ||
+        b.productionProgress > 0 ||
+        b.repairCredit > 0 ||
+        b.repairPending ||
+        newMaterials(b.materials),
+    ) ||
+    town.network.list.some((r) => newMaterials(r.materials)) ||
+    [town.provisions, ...town.villages].some((v) => refined(v.stock));
+  a.formatVersion = extended ? 9 : town.folk.some((p) => p.recoveringRest || p.recoveringHealth) ? 8 : 7;
   a.fields(
     {
       version: a.formatVersion,
@@ -564,10 +639,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 8) climateSize = u32.read(a);
+  if (version >= 2 && version <= 9) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 8 ||
+    version > 9 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

@@ -5,13 +5,13 @@ import type { Appearance } from './person-appearance';
 export enum Role { Resident, Guest }
 export enum Calling { Settler, Traveller, Warrior, Ranger, Mage, Cleric, Bard }
 export enum Race { Human, God, Giant }
-export enum Activity { Idle, Moving, Holding, Building, Roadwork, Working, Eating, Sleeping, Relaxing, Exploring, Brooding, Arriving, Leaving, Guarding, Fighting, Expedition, Praying, Shopping, Hauling, Felling, Collecting, Mining, Treating, FetchingMaterials, DeliveringMaterials, WaitingMaterials }
+export enum Activity { Idle, Moving, Holding, Building, Roadwork, Working, Eating, Sleeping, Relaxing, Exploring, Brooding, Arriving, Leaving, Guarding, Fighting, Expedition, Praying, Shopping, Hauling, Felling, Collecting, Mining, Treating, FetchingMaterials, DeliveringMaterials, WaitingMaterials, Drinking }
 export enum AnimalKind { Cow, Pig, Chicken, Wolf, Dog, Cat, Count }
 export const callingName = (calling: Calling): string => ['Settler', 'Traveller', 'Warrior', 'Ranger', 'Mage', 'Cleric', 'Bard'][calling] || '';
 export const raceName = (race: Race): string => ['Human', 'God', 'Giant'][race] || '';
-export const activityName = (activity: Activity): string => ['Idle', 'Moving on orders', 'Holding position', 'Building', 'Working on a road', 'Working', 'Eating', 'Sleeping', 'Relaxing at the tavern', 'Delving the dungeon', 'Brooding', 'Arriving', 'Leaving', 'On watch', 'Fighting', 'On an expedition', 'Praying at the chapel', 'Buying gear', 'Carrying goods', 'Felling a tree', 'Collecting resources', 'Mining stone', 'Receiving treatment', 'Fetching supplies', 'Delivering materials', 'Waiting for materials'][activity] || '';
+export const activityName = (activity: Activity): string => ['Idle', 'Moving on orders', 'Holding position', 'Building', 'Working on a road', 'Working', 'Eating', 'Sleeping', 'Relaxing at the tavern', 'Delving the dungeon', 'Brooding', 'Arriving', 'Leaving', 'On watch', 'Fighting', 'On an expedition', 'Praying at the chapel', 'Buying gear', 'Carrying goods', 'Felling a tree', 'Collecting resources', 'Mining stone', 'Receiving treatment', 'Fetching supplies', 'Delivering materials', 'Waiting for materials', 'Drinking water'][activity] || '';
 export class Monster {
-  health = 3; raider = false; angry = false; ready = 0; home = point(); prey = -1; race: Race | null = null; insideLair = false; provokedBy = -1; animal: AnimalKind | null = null;
+  health = 3; strength = 1; raider = false; angry = false; ready = 0; home = point(); prey = -1; race: Race | null = null; insideLair = false; provokedBy = -1; animal: AnimalKind | null = null;
   constructor(public id: number, public lair: number, public position: Point, public path: Point[] = []) {}
   giant(): boolean { return this.race === Race.Giant; }
 }
@@ -22,6 +22,10 @@ export class Person {
   // Temporary rest can span a meal or combat without replacing the assigned work.
   recoveringRest = false;
   recoveringHealth = false;
+  hydration = 1;
+  hunting = false;
+  attackPerson = -1;
+  workField = -1;
   activity = Activity.Idle; target = -1; until = 0; inside = false; ordered = false; task = Activity.Idle; taskSite = -1;
   food = f32(.8); rest = f32(.9); stress = f32(.15); health = 1; home = -1; job = -1; bed = -1; autoMode = true;
   ready = 0; foe = -1; tree = -1; carrying = 0; carriedProduct = Product.Wood; aggressive = false; approachingOrder = false; goal = point(); days = 0; loot = 0;
@@ -43,5 +47,5 @@ export class Person {
 }
 export const adventurer = (p: Person): boolean => p.calling === Calling.Warrior || p.calling === Calling.Ranger || p.calling === Calling.Mage || p.calling === Calling.Cleric;
 export interface AnimalCall { serial: bigint; kind: AnimalKind; position: Point; at: number; }
-export enum TreeWorkKind { Chop, Fall, Mine, Shatter }
+export enum TreeWorkKind { Chop, Fall, Mine, Shatter, Regrow, Produced }
 export interface TreeWorkEvent { serial: bigint; kind: TreeWorkKind; person: number; cell: number; index: number; worker: Point; at: number; }

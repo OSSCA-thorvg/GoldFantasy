@@ -30,6 +30,7 @@ import { point, project, sub, distance } from '../../../../packages/engine/src/g
 import { f32, clamp, lround } from '../../../../packages/engine/src/numeric';
 import type { Town } from '../../../../packages/engine/src/town';
 import { structureIcon } from '../../../../packages/native-renderer/src/building-icon';
+import { constructionIcon } from '../../../../packages/native-renderer/src/construction-icon';
 import { buildingAppearanceRevision } from '../../../../packages/native-renderer/src/building-assets';
 import type { GameHudApp } from './game-hud-contract';
 import { hudPaint } from './hud-paint';
@@ -76,6 +77,11 @@ const tools: ToolInfo[] = [
   { label: 'Portal', key: 'V', hint: '' },
   { label: 'Clear', key: 'X', hint: 'Demolish a building, a field or a road.' },
   { label: 'Torch', key: '', hint: 'Place a torch on a completed road.' },
+  { label: 'Sawmill', key: '', hint: '' },
+  { label: 'Stoneworks', key: '', hint: '' },
+  { label: 'Timber store', key: '', hint: '' },
+  { label: 'Granary', key: '', hint: '' },
+  { label: 'Stone store', key: '', hint: '' },
 ];
 interface Group {
   name: string;
@@ -84,8 +90,14 @@ interface Group {
 const groups: Group[] = [
   { name: 'Roads', tools: [Tool.Road, Tool.Pave, Tool.Torch] },
   { name: 'Housing', tools: [Tool.Camp, Tool.Tent] },
-  { name: 'Food & materials', tools: [Tool.Farm, Tool.Field, Tool.Lumberyard, Tool.Quarry] },
-  { name: 'Water & storage', tools: [Tool.Well, Tool.Storehouse] },
+  {
+    name: 'Food & materials',
+    tools: [Tool.Farm, Tool.Field, Tool.Lumberyard, Tool.Quarry, Tool.Sawmill, Tool.Stoneworks],
+  },
+  {
+    name: 'Water & storage',
+    tools: [Tool.Well, Tool.Storehouse, Tool.WoodStore, Tool.Granary, Tool.StoneStore],
+  },
   { name: 'Trade & outfitters', tools: [Tool.Market, Tool.Weaponsmith, Tool.Armorer, Tool.Apothecary] },
   { name: 'Lodging & leisure', tools: [Tool.Inn, Tool.Tavern, Tool.Guild] },
   { name: 'Faith & arcane', tools: [Tool.Chapel, Tool.Shrine, Tool.MageTower, Tool.Portal] },
@@ -368,6 +380,9 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
         y = f32(y + 30);
       }
     }
+    if (building.kind === Structure.WoodStore) textRow('Keeps 240 more logs and planks', t.text);
+    if (building.kind === Structure.Granary) textRow('Keeps 240 more food; meals served here', t.text);
+    if (building.kind === Structure.StoneStore) textRow('Keeps 240 more rough and cut stone', t.text);
     if (spec.storage) textRow(`Keeps ${spec.storage} more of wood, stone, food and water`, t.text);
     if (isLodging(building.kind) || building.kind === Structure.Tavern || isOutfitter(building.kind))
       textRow(`Earned ${building.earned} gold from guests`, t.muted, 12);
@@ -455,7 +470,15 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
           standing ? t.success : t.danger,
           12,
         );
-      } else if (spec.product !== Product.None)
+      } else if (spec.product === Product.Planks || spec.product === Product.CutStone)
+        textRow(
+          spec.product === Product.Planks
+            ? '2 logs → 1 plank / 24 worker seconds'
+            : '2 stone → 1 cut stone / 30 worker seconds',
+          t.success,
+          12,
+        );
+      else if (spec.product !== Product.None)
         textRow(
           output.empty() ? 'No output' : `Makes ${describe(output)} a day`,
           output.empty() ? t.danger : t.success,
@@ -665,7 +688,8 @@ export function commandCard(
   for (let i = 0; i < count; i++) {
     const id = group.tools[i],
       bounds = cell(i),
-      kind = toolStructure(id);
+      kind = toolStructure(id),
+      hasIcon = kind !== undefined || id === Tool.Road || id === Tool.Pave || id === Tool.Field;
     let why = '';
     if (id !== Tool.Camp && !this.town.camp()) why = 'Found the camp first';
     else if (kind !== undefined && this.town.population() < structureSpec(kind).requiredPopulation)
@@ -673,23 +697,26 @@ export function commandCard(
     drawButton(
       'card-pick-' + tools[id].label,
       bounds,
-      kind !== undefined ? '' : tools[id].label,
+      hasIcon ? '' : tools[id].label,
       () => this.selectTool(id, !global),
       this.tool === id ? ButtonStyle.Primary : ButtonStyle.Default,
       !why,
     );
-    if (kind !== undefined) {
+    if (hasIcon) {
       const dim = !!why,
         art = new Rect(f32(bounds.x + 6), f32(bounds.y + 3), f32(bounds.w - 12), f32(bounds.h - 23));
-      c.paint(`card-icon-${buildingAppearanceRevision(kind)}${JSON.stringify([kind, art, dim])}`, () => {
-        const holder = new c.tvg.Scene(),
-          icon = hudPaint(c, structureIcon(kind, art.w, art.h));
-        holder.add(icon);
-        icon.dispose();
-        holder.translate(art.x, art.y);
-        if (dim) holder.opacity(90);
-        return holder;
-      });
+      c.paint(
+        `card-icon-${kind === undefined ? 0n : buildingAppearanceRevision(kind)}${JSON.stringify([id, art, dim])}`,
+        () => {
+          const holder = new c.tvg.Scene(),
+            icon = hudPaint(c, constructionIcon(id, art.w, art.h));
+          holder.add(icon);
+          icon.dispose();
+          holder.translate(art.x, art.y);
+          if (dim) holder.opacity(90);
+          return holder;
+        },
+      );
       c.text(
         new Rect(f32(bounds.x + 3), f32(f32(bounds.y + bounds.h) - 20), f32(bounds.w - 6), 18),
         tools[id].label,

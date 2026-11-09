@@ -176,7 +176,9 @@ export function planTitleWork(this: TitleTown): void {
   const completed = (kind: Structure): boolean => this.placed.some((b) => b.kind === kind && b.built());
   const basicsReady = completed(Structure.Farm) && completed(Structure.Well);
   if (basicsReady && this.population() < workforceNeeded && this.population() < this.housing()) {
-    const offer = this.recruitmentOffers().find(item => item.person.calling === Calling.Settler || item.person.calling === Calling.Traveller);
+    const offer = this.recruitmentOffers().find(
+      (item) => item.person.calling === Calling.Settler || item.person.calling === Calling.Traveller,
+    );
     if (offer && this.hireGuest(offer.key)) this.staff();
   }
   const treasury = this.stock();
@@ -191,18 +193,22 @@ export function planTitleWork(this: TitleTown): void {
     return (
       (product === Product.Food && treasury.food < this.population() * 8) ||
       (product === Product.Water && treasury.water < this.population() * 5) ||
-      (product === Product.Goods && treasury.gold < 80)
+      (product === Product.Goods && treasury.gold < 80) ||
+      (product === Product.Planks && treasury.planks < 16) ||
+      (product === Product.CutStone && treasury.cutStone < 16)
     );
   };
   let pendingWork =
     this.placed.some((b) => !b.built()) || this.network.roads().some((r) => r.built < 1 || r.paving >= 0);
   for (const kind of [Structure.Farm, Structure.Well])
     pendingWork ||= !this.placed.some((b) => b.kind === kind && b.built());
-  for (const product of [Product.Food, Product.Water, Product.Goods]) {
+  for (const product of [Product.Food, Product.Water, Product.Goods, Product.Planks, Product.CutStone]) {
     if (
       (product === Product.Food && treasury.food >= this.population() * 8) ||
       (product === Product.Water && treasury.water >= this.population() * 5) ||
-      (product === Product.Goods && treasury.gold >= 80)
+      (product === Product.Goods && treasury.gold >= 80) ||
+      (product === Product.Planks && treasury.planks >= 16) ||
+      (product === Product.CutStone && treasury.cutStone >= 16)
     )
       continue;
     for (const b of this.placed) {
@@ -408,6 +414,8 @@ export function planTitleWork(this: TitleTown): void {
   else if (!count(Structure.Farm)) wanted = Structure.Farm;
   else if (!count(Structure.Tent)) wanted = Structure.Tent;
   else if (!count(Structure.Storehouse)) wanted = Structure.Storehouse;
+  else if (!count(Structure.Sawmill)) wanted = Structure.Sawmill;
+  else if (!count(Structure.Stoneworks)) wanted = Structure.Stoneworks;
   else {
     if (needsPeople || treasury.food < this.population() * 8 || treasury.water < this.population() * 5)
       return;

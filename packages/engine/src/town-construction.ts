@@ -11,7 +11,7 @@ import {
   faithName,
   describe,
 } from './building-catalog';
-import { Activity, Person, Role } from './person';
+import { Activity, Person, Role, TreeWorkKind } from './person';
 import { CampEconomy } from './camp-economy';
 import { Tile, Terrain, DungeonKind, isWater, isStone } from './world-types';
 import {
@@ -652,8 +652,13 @@ export function regrow(this: ConstructionTown): void {
         tile.trees < tile.wild &&
         !taken[f32(f32(y * this.world.width()) + x)] &&
         hash01(this.world.seed(), x, y, this.days >>> 0) < f32(0.2)
-      )
+      ) {
         ++tile.trees;
+        const at = point(x + 0.5, y + 0.5);
+        if (this.world.revealed(at) && this.timberEvents.length < 512)
+          this.timberEvents.push({ serial: this.nextTreeEvent++, kind: TreeWorkKind.Regrow,
+            person: -1, cell: y * this.world.width() + x, index: tile.trees - 1, worker: at, at: this.time });
+      }
     }
 }
 export function setWorkers(this: ConstructionTown, id: number, workers: number): boolean {

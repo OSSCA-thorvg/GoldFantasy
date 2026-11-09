@@ -28,6 +28,11 @@ export enum Tool {
   Portal,
   Demolish,
   Torch,
+  Sawmill,
+  Stoneworks,
+  WoodStore,
+  Granary,
+  StoneStore,
   Count,
 }
 export enum PointerButton {
@@ -60,6 +65,11 @@ export class Preview {
 }
 export function toolStructure(tool: Tool): Structure | undefined {
   switch (tool) {
+    case Tool.Sawmill: return Structure.Sawmill;
+    case Tool.Stoneworks: return Structure.Stoneworks;
+    case Tool.WoodStore: return Structure.WoodStore;
+    case Tool.Granary: return Structure.Granary;
+    case Tool.StoneStore: return Structure.StoneStore;
     case Tool.Torch:
       return Structure.Torch;
     case Tool.Camp:

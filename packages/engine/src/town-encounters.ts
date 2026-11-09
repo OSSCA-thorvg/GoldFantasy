@@ -36,7 +36,7 @@ export function stir(this: EncounterTown, dt: number): void {
   if (
     fire &&
     this.days >= 1 &&
-    roaming < Math.min(8, 2 + Math.trunc(this.days / 6)) &&
+    roaming < Math.min(8, 2 + Math.trunc(this.days / 7)) &&
     this.roll() < (dt / TownState.secondsPerDay) * 1.5
   ) {
     for (let attempt = 0; attempt < 12; ++attempt) {
@@ -103,7 +103,7 @@ export function stir(this: EncounterTown, dt: number): void {
         )
           beast.position = next;
       } else if (this.time >= beast.ready) {
-        let bite = f(breed.bite * (prey.calling === Calling.Warrior ? f(0.6) : 1));
+        let bite = f(breed.bite * beast.strength * (prey.calling === Calling.Warrior ? f(0.6) : 1));
         if (prey.role === Role.Resident && this.staffed(Structure.Armorer)) bite = f(bite * f(0.6));
         bite = f(bite / f(1 + f(f(0.3) * prey.gear)));
         prey.health = f(prey.health - f(bite / prey.vitalityMultiplier()));

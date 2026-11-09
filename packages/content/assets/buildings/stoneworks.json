@@ -1,0 +1,223 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "stoneworks",
+  "name": "Stoneworks",
+  "footprint": 1.4,
+  "variants": [
+    {
+      "blocks": [
+        {
+          "bounds": [
+            0.1,
+            0.08,
+            0.64,
+            0.7
+          ],
+          "wall": 18,
+          "roof": 8,
+          "shape": "gable-y",
+          "wallLit": [
+            148,
+            145,
+            128
+          ],
+          "wallShade": [
+            92,
+            96,
+            91
+          ],
+          "roofLit": [
+            121,
+            115,
+            100
+          ],
+          "roofShade": [
+            76,
+            78,
+            72
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.7,
+            0.12,
+            0.93,
+            0.48
+          ],
+          "wall": 5,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            148,
+            145,
+            128
+          ],
+          "wallShade": [
+            92,
+            96,
+            91
+          ],
+          "roofLit": [
+            121,
+            115,
+            100
+          ],
+          "roofShade": [
+            76,
+            78,
+            72
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.14,
+            0.78,
+            0.45,
+            0.91
+          ],
+          "wall": 4,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            148,
+            145,
+            128
+          ],
+          "wallShade": [
+            92,
+            96,
+            91
+          ],
+          "roofLit": [
+            121,
+            115,
+            100
+          ],
+          "roofShade": [
+            76,
+            78,
+            72
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.61,
+            0.71,
+            0.91,
+            0.9
+          ],
+          "wall": 7,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            148,
+            145,
+            128
+          ],
+          "wallShade": [
+            92,
+            96,
+            91
+          ],
+          "roofLit": [
+            121,
+            115,
+            100
+          ],
+          "roofShade": [
+            76,
+            78,
+            72
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ],
+      "patches": [
+        {
+          "bounds": [
+            0.05,
+            0.05,
+            0.95,
+            0.95
+          ],
+          "color": [
+            133,
+            126,
+            106
+          ],
+          "furrows": 0,
+          "furrow": [
+            77,
+            65,
+            43
+          ],
+          "delay": 0
+        }
+      ]
+    }
+  ]
+}

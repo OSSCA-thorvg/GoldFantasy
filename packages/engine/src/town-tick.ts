@@ -1,4 +1,4 @@
-// Direct native Town::tick translation. The caller uses the original 0.1 second simulation step.
+// Fixed-step activity execution. Resident priorities are selected by unit-scheduler.
 import { PeopleTown } from './town-people';
 import { TownState } from './town-state';
 import { Person, Activity, Role, TreeWorkKind } from './person';
@@ -17,7 +17,15 @@ import { DungeonKind } from './world-types';
 import { f32 as f, clamp } from './numeric';
 import * as mining from './mining';
 import { animalSpec } from './wildlife';
+import { prepareFarmWork } from './farm-work';
+import { separatePeople, roadWorkSpot, buildingWorkSpot } from './person-navigation';
+import type { Town } from './town';
+import type { Building } from './town-models';
+import { resourceAmount } from './construction-materials';
+import { processingRecipe } from './town-production';
+import { prepareBuildingRepair, restoreBuildingHealth } from './building-repair';
 export interface TickTown extends PeopleTown {
+  processProduction(place: Building, dt: number): void;
   prepareConstruction(p: Person, work: Activity, id: number): boolean;
   admitGuests(dt: number): void;
   stir(dt: number): void;
@@ -92,8 +100,11 @@ export function tick(this: TickTown, dt: number): void {
     this.refreshShelter(p);
     const asleep = p.activity === Activity.Sleeping && !p.moving() && !p.crossingDoorway(),
       sheltered = p.inside;
-    p.food = Math.max(0, f(p.food - f(f(0.9) * days)));
-    p.rest = clamp(f(p.rest + f((asleep ? (sheltered ? f(2.4) : f(1.4)) : f(-0.75)) * days)), 0, 1);
+    // A full meal reaches .25 after 7.5 days; a drink after 3.75 days.
+    // Normal fatigue is one quarter per day, with sheltered sleep recovery.
+    p.hydration = Math.max(0, f(p.hydration - f(f(0.2) * days)));
+    p.food = Math.max(0, f(p.food - f(f(0.1) * days)));
+    p.rest = clamp(f(p.rest + f((asleep ? (sheltered ? f(2.4) : f(1.4)) : f(-0.25)) * days)), 0, 1);
     let strain = f(-0.1);
     if (p.food < f(0.2)) strain = f(strain + f(0.5));
     if (p.rest < f(0.15)) strain = f(strain + f(0.3));
@@ -127,7 +138,7 @@ export function tick(this: TickTown, dt: number): void {
     if (p.role === Role.Resident && p.home < 0) strain = f(strain + f(0.1));
     p.stress = clamp(f(p.stress + f(strain * days)), 0, 1);
     p.breaking = p.stress >= f(0.95) ? f(p.breaking + days) : 0;
-    if (this.parched(this.settlementOf(p))) {
+    if (p.hydration < f(.1)) {
       p.stress = Math.min(1, f(p.stress + f(f(0.3) * days)));
       p.health = f(p.health - f(f(0.1) * days));
     }
@@ -141,6 +152,15 @@ export function tick(this: TickTown, dt: number): void {
       p.health = -1;
     }
     if (p.health < f(-0.5)) continue;
+    if (p.crossingDoorway()) {
+      const length = distance(p.entrance, p.threshold),
+        step = f(f(this.walkingSpeed(p) * f(dt)) / Math.max(f(0.001), length));
+      p.doorway = clamp(f(p.doorway + (p.inside ? step : -step)), 0, 1);
+      p.position = lerp(p.entrance, p.threshold, p.doorway);
+      continue;
+    }
+    this.fight(p, dt);
+    if (p.activity === Activity.Fighting || p.crossingDoorway()) continue;
     if (
       p.role === Role.Resident &&
       !p.autoMode &&
@@ -154,19 +174,11 @@ export function tick(this: TickTown, dt: number): void {
       p.activity = Activity.Holding;
       continue;
     }
-    if (p.crossingDoorway()) {
-      const length = distance(p.entrance, p.threshold),
-        step = f(f(this.walkingSpeed(p) * f(dt)) / Math.max(f(0.001), length));
-      p.doorway = clamp(f(p.doorway + (p.inside ? step : -step)), 0, 1);
-      p.position = lerp(p.entrance, p.threshold, p.doorway);
-      continue;
-    }
     if (p.role === Role.Resident && p.autoMode && this.time >= p.scheduleAt) {
       p.scheduleAt = this.time + 0.5;
       this.scheduleAutomatic(p);
     }
-    this.fight(p, dt);
-    if (p.activity === Activity.Fighting || p.crossingDoorway()) continue;
+    if (Number(p.activity) === Activity.Fighting || p.crossingDoorway()) continue;
     if (
       !p.moving() &&
       [Activity.Building, Activity.Roadwork, Activity.Working, Activity.Felling, Activity.Mining].includes(
@@ -183,6 +195,7 @@ export function tick(this: TickTown, dt: number): void {
         p.role === Role.Resident &&
         p.autoMode &&
         p.job < 0 &&
+        p.rest >= f(2 / 3) &&
         !p.ordered &&
         p.task === Activity.Idle &&
         p.activity === Activity.Idle &&
@@ -199,12 +212,13 @@ export function tick(this: TickTown, dt: number): void {
     switch (Number(p.activity)) {
       case Activity.Building: {
         if (!place || (place.built() && place.health >= 1)) {
+          // Keep the direct transaction until resumeOrder returns surplus cargo
+          // and switches the resident back to Auto.
           p.activity = Activity.Idle;
-          p.ordered = false;
           break;
         }
-        if (distance(p.position, place.door()) > f(0.02)) {
-          if (!this.walkTo(p, place.door())) {
+        if (distance(p.position, buildingWorkSpot(this,p,place)) > f(0.02)) {
+          if (!this.walkTo(p, buildingWorkSpot(this,p,place))) {
             p.activity = Activity.Idle;
             p.until = this.time + 3;
           }
@@ -222,16 +236,19 @@ export function tick(this: TickTown, dt: number): void {
           }
           break;
         }
-        if (!place.built() && this.prepareConstruction(p, Activity.Building, place.id)) break;
-        if (place.built()) {
-          place.health = Math.min(1, f(place.health + f(f(2 * f(dt)) / buildWork(place.kind))));
+        const repairing = place.built();
+        if (repairing) {
+          if (prepareBuildingRepair(this as Town, p, place)) break;
+          restoreBuildingHealth(place, f(f(2 * f(dt)) / buildWork(place.kind)));
           if (place.health >= 1) this.notify(structureSpec(place.kind).name + ' is repaired');
-        } else
+        } else {
+          if (this.prepareConstruction(p, Activity.Building, place.id)) break;
           place.progress = Math.min(
             place.materials.limit(),
             f(place.progress + f(f(dt) / buildWork(place.kind))),
           );
-        if (place.built()) {
+        }
+        if (!repairing && place.built()) {
           this.notify(structureSpec(place.kind).name + ' is finished');
           if (place.kind === Structure.Guild)
             for (let d = 0; d < this.world.dungeons().length; ++d) {
@@ -263,7 +280,7 @@ export function tick(this: TickTown, dt: number): void {
           }
           if (next !== p.target) {
             p.target = next;
-            if (!this.walkTo(p, this.network.road(next)!.workPoint())) p.activity = Activity.Idle;
+            if (!this.walkTo(p, roadWorkSpot(this,p,this.network.road(next)!))) p.activity = Activity.Idle;
             break;
           }
         }
@@ -276,11 +293,13 @@ export function tick(this: TickTown, dt: number): void {
         const paving = !!road && road.built >= 1;
         if (!road || (paving && road.paving < 0 && road.wear <= 0)) {
           p.activity = Activity.Idle;
-          if (p.task !== Activity.Building) p.ordered = false;
+          // Keep the direct-order marker until resumeOrder performs completion,
+          // cargo delivery and the Auto handoff (including orders from Auto OFF).
+          p.until = this.time;
           break;
         }
-        if (distance(p.position, road.workPoint()) > f(0.0001)) {
-          if (this.walkTo(p, road.workPoint())) this.walk(p, dt);
+        if (distance(p.position, roadWorkSpot(this,p,road)) > f(0.0001)) {
+          if (this.walkTo(p, roadWorkSpot(this,p,road))) this.walk(p, dt);
           else {
             p.activity = Activity.Idle;
             p.until = this.time + 3;
@@ -317,8 +336,8 @@ export function tick(this: TickTown, dt: number): void {
         if (!paving && before < turn && road[shareKey] >= turn && turn < 1) {
           road[shareKey] = turn;
           p.position = road.along(1);
-          this.walkTo(p, road.workPoint());
-        } else p.position = paving ? road.along(road[shareKey]) : road.constructionPoint(road[shareKey]);
+          this.walkTo(p, roadWorkSpot(this,p,road));
+        } else p.position = roadWorkSpot(this,p,road);
         if (road[shareKey] >= 1) {
           if (paving) {
             road.paved = true;
@@ -327,11 +346,9 @@ export function tick(this: TickTown, dt: number): void {
           } else this.notify('A road is laid');
           this.roadChanged();
         } else if (Math.trunc(f(road[shareKey] * 20)) !== Math.trunc(f(before * 20))) {
+          // Reaching the building does not finish a prerequisite road. Keep the
+          // selected front until its entire road is laid, then resume the building.
           this.roadChanged();
-          if (p.task === Activity.Building && this.constructionRoad(p.taskSite) !== p.target) {
-            p.activity = Activity.Idle;
-            p.until = this.time;
-          }
         }
         break;
       }
@@ -359,7 +376,8 @@ export function tick(this: TickTown, dt: number): void {
             p.task === Activity.Working &&
             !p.ordered &&
             job &&
-            job.kind !== (stone ? Structure.Quarry : Structure.Lumberyard)) ||
+            job.kind !== (stone ? Structure.Quarry : Structure.Lumberyard) &&
+            processingRecipe(job.kind)?.input !== (stone ? Product.Stone : Product.Wood)) ||
           full
         ) {
           p.tree = -1;
@@ -419,16 +437,38 @@ export function tick(this: TickTown, dt: number): void {
         if (this.time >= p.until) this.arrive(p);
         break;
       case Activity.Working:
-        if (place && distance(p.position, place.door()) > f(0.02)) {
-          if (!this.walkTo(p, place.door())) {
+        if (place?.kind === Structure.Farm && prepareFarmWork(this as Town, p, place)) {
+          if (!p.moving() && distance(p.position,p.goal) <= .04) {
+            if (p.task === Activity.Working) { p.ordered = false; p.autoMode = true; }
+            place.workedSeconds = f(place.workedSeconds + f(dt));
+          }
+          break;
+        }
+        if (place && distance(p.position, buildingWorkSpot(this,p,place)) > f(0.02)) {
+          if (!this.walkTo(p, buildingWorkSpot(this,p,place))) {
             p.activity = Activity.Idle;
             p.until = this.time + 3;
           }
           break;
         }
-        if (place) place.workedSeconds = f(place.workedSeconds + f(dt));
-        if (place && place.kind === Structure.Lumberyard && this.startFelling(p, place.center, f(4.6))) break;
-        if (place && place.kind === Structure.Quarry && this.startMining(p, place.center, f(4.6))) break;
+        if (place) {
+          if (p.task === Activity.Working) { p.ordered = false; p.autoMode = true; }
+          place.workedSeconds = f(place.workedSeconds + f(dt));
+          const recipe = processingRecipe(place.kind);
+          if (recipe && p.rest >= f(2 / 3) && resourceAmount(this.stock(this.settlementOf(place)),recipe.input) < 2 &&
+              this.startHarvest(p,place.center,12,recipe.input)) break;
+          this.processProduction(place,dt);
+          const product = structureSpec(place.kind).product;
+          if ((p.task === Activity.Building || p.task === Activity.Roadwork) &&
+              (product === Product.Planks || product === Product.CutStone)) {
+            if (resourceAmount(this.stock(this.settlementOf(place)), product) > 0) {
+              p.activity = Activity.Idle; p.until = this.time; this.resumeOrder(p);
+            }
+            break;
+          }
+        }
+        if (place && p.rest >= f(2 / 3) && place.kind === Structure.Lumberyard && this.startFelling(p, place.center, f(4.6))) break;
+        if (place && p.rest >= f(2 / 3) && place.kind === Structure.Quarry && this.startMining(p, place.center, f(4.6))) break;
         if (place && (place.kind === Structure.Farm || place.kind === Structure.MageTower)) {
           p.load = f(p.load + f(dt));
           const store = this.nearest(
@@ -466,13 +506,16 @@ export function tick(this: TickTown, dt: number): void {
           p.until = this.time;
         }
         break;
+      case Activity.Drinking:
+        if (this.time >= p.until) { p.activity = Activity.Idle; p.until = this.time; }
+        break;
       case Activity.Sleeping:
         if (p.task === Activity.Sleeping && !p.ordered && p.autoMode && p.food < f(0.25) && this.eat(p))
           break;
         if (
           p.rest >= f(0.95) &&
           (!p.recoveringHealth || p.health >= 1) &&
-          p.task !== Activity.Sleeping &&
+          (!p.ordered || p.task === Activity.Sleeping) &&
           (!p.autoMode || this.climate().night <= f(0.5))
         ) {
           if (dangerNear(this, p)) break;
@@ -498,7 +541,10 @@ export function tick(this: TickTown, dt: number): void {
           p.relaxedAt = this.time;
           this.charge(p, place, p.role === Role.Guest ? 3 : 1);
         }
-        if (p.task === Activity.Idle) p.ordered = false;
+        if (p.task === Activity.Idle) {
+          if (p.ordered && p.role === Role.Resident) p.autoMode = true;
+          p.ordered = false;
+        }
         p.activity = Activity.Idle;
         p.inside = false;
         p.until = this.time;
@@ -528,6 +574,7 @@ export function tick(this: TickTown, dt: number): void {
         break;
     }
   }
+  separatePeople(this, dt);
   if (this.timberEvents.length > 512) this.timberEvents.splice(0, this.timberEvents.length - 512);
   const before = this.folk.length;
   this.folk = this.folk.filter((p) => p.health >= f(-0.5));

@@ -1,0 +1,176 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "wood-store",
+  "name": "Timber store",
+  "footprint": 1.2,
+  "variants": [
+    {
+      "blocks": [
+        {
+          "bounds": [
+            0.1,
+            0.1,
+            0.71,
+            0.72
+          ],
+          "wall": 15,
+          "roof": 10,
+          "shape": "gable-y",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.12,
+            0.78,
+            0.68,
+            0.91
+          ],
+          "wall": 7,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.78,
+            0.16,
+            0.91,
+            0.81
+          ],
+          "wall": 10,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ],
+      "patches": [
+        {
+          "bounds": [
+            0.05,
+            0.05,
+            0.95,
+            0.95
+          ],
+          "color": [
+            113,
+            96,
+            65
+          ],
+          "furrows": 0,
+          "furrow": [
+            77,
+            65,
+            43
+          ],
+          "delay": 0
+        }
+      ]
+    }
+  ]
+}

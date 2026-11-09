@@ -9,7 +9,9 @@ import { Point, point, add, sub, scale, normalized, rotated, distance } from './
 import { f32 as f, lround } from './numeric';
 import { CampEconomy } from './camp-economy';
 import { animalSpec } from './wildlife';
+import { spreadFighter } from './person-navigation';
 import { planRaiderApproach } from './monster-navigation';
+import { dungeonThreat } from './raid-progression';
 export interface CombatTown extends TownState {
   walk(p: Person, dt: number): void;
   reveal(x: number, y: number, radius: number): void;
@@ -25,6 +27,7 @@ export interface CombatTown extends TownState {
   rewardExperience(p: Person, points: number): void;
   creatureTarget(id: number): Monster | null;
   strike(p: Person, foe: Monster): void;
+  hurtGuest(p: Person, killed: boolean): void;
   raiding(): boolean;
   arrive(p: Person): void;
   changeRenown(village: number, amount: number): void;
@@ -121,7 +124,8 @@ export function summonRaid(this: CombatTown): void {
   if (lair < 0) return;
   const site = this.world.dungeons()[lair],
     prowling = this.beasts.filter((m) => m.raider).length,
-    count = Math.min(10, 2 + Math.trunc(this.days / 8), TownState.maxRaiders - prowling);
+    pressure = dungeonThreat(this.days, lairOf(site), this.placed),
+    count = Math.min(pressure.count, TownState.maxRaiders - prowling);
   if (count <= 0) return;
   for (let i = 0; i < count; ++i) {
     const beast = new Monster(
@@ -130,7 +134,8 @@ export function summonRaid(this: CombatTown): void {
       this.grid.nearestWalkable(add(monsterEntrance(site), rotated(point(0.6, 0), f(i * f(1.3))))),
     );
     beast.raider = true;
-    beast.health = f(breedOf(site.kind).health * f(1 + f(this.days / 80)));
+    beast.health = f(breedOf(site.kind).health * pressure.health);
+    beast.strength = pressure.damage;
     this.beasts.push(beast);
     planRaiderApproach(this, beast);
   }
@@ -311,153 +316,60 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
         this.rewardExperience(ally, points);
   }
 }
+// Threats interrupt an order without replacing its task/site. When combat ends,
+// the original move, resource or construction transaction resumes.
 export function fight(this: CombatTown, p: Person, dt: number): void {
-  if (p.activity === Activity.Expedition || p.activity === Activity.Leaving || p.crossingDoorway()) return;
-  if (p.task === Activity.Sleeping || (p.activity === Activity.Sleeping && p.rest < f(0.95))) return;
-  if (p.approachingOrder) {
+  if (p.health <= 0 || p.activity === Activity.Expedition || p.activity === Activity.Leaving || p.crossingDoorway()) return;
+  const notice = this.raiding() ? 10 : 5;
+  const threats = [...this.beasts, ...this.animals].filter(m =>
+    m.health > 0 && !m.insideLair && (!m.giant() || m.angry) &&
+    (m.animal === null || (m.angry && animalSpec(m.animal).defends)) &&
+    this.world.revealed(m.position) && distance(m.position, p.position) <= notice &&
+    (m.raider || m.angry || distance(m.position,p.position) < 2.5));
+  threats.sort((a,b) => distance(a.position,p.position)-distance(b.position,p.position) || a.id-b.id);
+  let foe: Monster | null = threats.find(m => m.id === p.foe) ?? threats[0] ?? null;
+  let person: Person | null = null;
+  if (foe && p.hunting && foe.id !== p.foe) p.hunting = false;
+  if (!foe && p.ordered && p.task === Activity.Fighting) {
+    if (p.attackPerson >= 0) person = this.person(p.attackPerson);
+    else foe = this.creatureTarget(p.taskSite);
+  }
+  if (!foe && !person && p.hunting) foe = this.creatureTarget(p.foe);
+  if (foe && (foe.health <= 0 || foe.insideLair)) foe = null;
+  if (person && (person.health <= 0 || person.id === p.id || person.activity === Activity.Leaving)) person = null;
+  if (!foe && !person) {
     p.foe = -1;
+    if (p.activity === Activity.Fighting) { p.path = []; p.activity = Activity.Idle; p.until = this.time; }
     return;
   }
-  if (p.ordered && p.task !== Activity.Fighting && !(p.task === Activity.Moving && p.aggressive)) {
-    p.foe = -1;
-    return;
-  }
-  const commanded = p.ordered || p.task !== Activity.Idle;
-  if (p.ordered && p.task === Activity.Moving && !p.aggressive) {
-    p.foe = -1;
-    return;
-  }
-  if (p.role === Role.Resident && !p.autoMode && !commanded) {
-    p.foe = -1;
-    return;
-  }
-  if (p.foe >= 0) {
-    const chosen = this.creatureTarget(p.foe);
-    if (!chosen || chosen.health <= 0 || chosen.insideLair) {
-      p.foe = -1;
-      p.path = [];
-      p.activity = Activity.Idle;
-      p.until = this.time;
-      return;
-    }
-    if (chosen.animal !== null && (!p.ordered || p.task !== Activity.Fighting || p.taskSite !== p.foe)) {
-      p.foe = -1;
-      p.activity = Activity.Idle;
-      p.until = this.time;
-      return;
-    }
-    const gap = distance(chosen.position, p.position);
-    if (gap > reachOf(p)) {
-      if (chosen.animal !== null) {
-        if (!p.path.length || distance(p.path[p.path.length - 1], chosen.position) > f(0.7)) {
-          if (!this.walkTo(p, chosen.position)) {
-            p.foe = -1;
-            p.task = Activity.Idle;
-            p.taskSite = -1;
-            p.ordered = false;
-            p.activity = Activity.Idle;
-            p.until = this.time;
-            p.path = [];
-            return;
-          }
-        }
-        this.walk(p, dt);
-        if (!this.world.revealedWithin(p.position, f(3.5))) this.reveal(p.position.x, p.position.y, f(7.5));
-        p.activity = Activity.Fighting;
-        return;
-      }
-      const next = add(
-        p.position,
-        scale(normalized(sub(chosen.position, p.position)), Math.min(gap, f(f(1.6) * f(dt)))),
-      );
-      if (!steps(this.world, next)) {
-        p.foe = -1;
-        p.activity = Activity.Idle;
-        p.until = this.time;
-        return;
-      }
-      p.position = next;
-    } else {
-      if (chosen.animal !== null) p.path = [];
-      if (this.time >= p.ready) this.strike(p, chosen);
-    }
-    p.activity = Activity.Fighting;
-    return;
-  }
-  const raid = this.raiding(),
-    fighter = commanded || ((p.autoMode || p.role === Role.Guest) && adventurer(p)),
-    raiders = this.beasts.filter((m) => m.raider).length;
-  let backed = this.folk.some((o) => (o.autoMode || o.role === Role.Guest) && adventurer(o));
-  const able = this.folk.filter(
-    (o) => o.role === Role.Resident && o.health > f(0.35) && o.stress < f(0.9),
-  ).length;
-  backed ||= raid && able >= 2 * raiders;
-  const armed =
-      fighter ||
-      (p.role === Role.Resident &&
-        p.health > f(0.35) &&
-        p.stress < f(0.9) &&
-        (!raid || backed || raiders <= 2)),
-    near = this.beasts.some((m) => m.raider && distance(m.position, p.position) < 10);
-  if (raid && armed && p.inside && (commanded || near)) {
-    p.inside = false;
-    p.activity = Activity.Idle;
-    return;
-  }
-  if (p.inside) return;
-  let notice = commanded ? 6 : !armed ? 5 : p.role === Role.Guest ? 8 : raid ? 10 : 5;
-  if (p.aggressive) notice = Math.max(notice, 6);
-  let foe: Monster | null = null;
-  for (const group of [this.beasts, this.animals])
-    for (const beast of group) {
-      const gap = distance(beast.position, p.position),
-        threat = commanded || beast.raider || beast.angry || gap < f(2.5);
-      if (beast.animal !== null) continue;
-      if (beast.insideLair || (beast.giant() && !beast.angry)) continue;
-      const approachable =
-        gap <= reachOf(p) ||
-        steps(
-          this.world,
-          add(p.position, scale(normalized(sub(beast.position, p.position)), Math.min(gap, f(0.6)))),
-        );
-      if (
-        beast.health > 0 &&
-        this.world.revealed(beast.position) &&
-        threat &&
-        approachable &&
-        gap <= notice &&
-        (!foe || gap < distance(foe.position, p.position))
-      )
-        foe = beast;
-    }
-  if (!foe) {
-    if (p.activity === Activity.Fighting) {
-      p.activity = Activity.Idle;
-      p.until = this.time;
-    }
-    return;
-  }
-  if (!armed) {
-    if (p.activity === Activity.Sleeping && p.moving()) return;
-    let shelter = this.building(p.role === Role.Resident ? p.home : p.bed);
-    if (!shelter) shelter = this.camp(this.settlementOf(p));
-    if (shelter && shelter.built() && this.walkTo(p, shelter.door())) {
-      p.activity = Activity.Sleeping;
-      p.target = shelter.id;
-      if (!p.moving()) this.arrive(p);
-    }
-    return;
-  }
+  // Explicit Stop holds position, but does not make a resident ignore an attacker.
+  const target = foe ?? person!, at = target.position, gap = distance(at,p.position);
+  p.foe = foe?.id ?? -1;
   p.activity = Activity.Fighting;
-  p.path = [];
-  const gap = distance(foe.position, p.position);
+  if (p.inside) {
+    this.walkTo(p, at);
+    return;
+  }
   if (gap > reachOf(p)) {
-    const next = add(
-      p.position,
-      scale(normalized(sub(foe.position, p.position)), Math.min(gap, f(f(1.6) * f(dt)))),
-    );
-    if (steps(this.world, next)) p.position = next;
-  } else if (this.time >= p.ready) this.strike(p, foe);
+    if (!p.path.length || distance(p.path[p.path.length-1],at) > .7) {
+      if (!this.walkTo(p, at)) { p.foe = -1; p.activity = Activity.Idle; p.until = this.time + .5; return; }
+    }
+    this.walk(p,dt);
+    if (!this.world.revealedWithin(p.position, f(3.5))) this.reveal(p.position.x,p.position.y,f(7.5));
+    return;
+  }
+  p.path = [];
+  spreadFighter(this,p,target,reachOf(p),dt);
+  if (this.time < p.ready) return;
+  if (foe) this.strike(p,foe);
+  else {
+    const damage = f(f(blowOf(p) * f(1 + f(.25 * p.gear))) * p.attackMultiplier() * .1 / person!.vitalityMultiplier());
+    person!.health = f(person!.health - damage);
+    p.ready = this.time + 1;
+    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:p.calling===Calling.Ranger||p.calling===Calling.Mage,at:this.time,person:person!.id});
+    this.hurtGuest(person!,person!.health <= 0);
+    if (person!.health <= 0) { person!.health = -1; person!.activity = Activity.Leaving; this.notify(person!.name + ' was killed'); }
+  }
 }
 export function releaseMonster(this: CombatTown, at: Point): void {
   let lair = -1;
@@ -470,7 +382,9 @@ export function releaseMonster(this: CombatTown, at: Point): void {
       lair = d;
   if (lair < 0) return;
   const beast = new Monster(this.nextMonster++, lair, this.grid.nearestWalkable(at));
-  beast.health = f(breedOf(this.world.dungeons()[lair].kind).health * f(1 + f(this.days / 80)));
+  const pressure = dungeonThreat(this.days, lairOf(this.world.dungeons()[lair]), this.placed);
+  beast.health = f(breedOf(this.world.dungeons()[lair].kind).health * pressure.health);
+  beast.strength = pressure.damage;
   beast.home = { ...beast.position };
   this.beasts.push(beast);
 }
@@ -498,7 +412,7 @@ export function wreck(this: CombatTown, beast: Monster, dt: number): void {
   const nearby = target ? [target, ...this.placed.filter(item => item !== target)] : this.placed;
   for (const item of nearby) {
     if (!item.footprint().contains(beast.position, f(0.7))) continue;
-    const blow = f(breed.bite * f(0.25));
+    const blow = f(breed.bite * beast.strength * f(0.25));
     beast.ready = this.time + breed.pause;
     this.blows.push({
       serial: this.nextBlow++,

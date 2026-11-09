@@ -1,4 +1,4 @@
-// Direct translation of native unit_orders.cpp. Absolute order timers remain double precision.
+// Explicit resident commands. Absolute order timers remain double precision.
 import { TownState } from './town-state';
 import { Building } from './town-models';
 import { Activity, Person, Role, Monster } from './person';
@@ -7,6 +7,9 @@ import { Point, point, add, rotated, distance, segmentDistance } from './geometr
 import { f32 as f } from './numeric';
 import { treePosition } from './world-map';
 import * as mining from './mining';
+import { prepareFarmWork } from './farm-work';
+import { roadWorkSpot, buildingWorkSpot } from './person-navigation';
+import type { Town } from './town';
 export interface OrderTown extends TownState {
   recount(): void;
   staff(): void;
@@ -41,6 +44,7 @@ export interface OrderTown extends TownState {
 }
 export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1): void {
   p.approachingOrder = false;
+  p.hunting = false; p.attackPerson = p.workField = -1;
   p.recoveringRest = p.recoveringHealth = false;
   p.supplyTarget = -1;
   p.supplyRoad = false;
@@ -57,6 +61,7 @@ export function orderStop(this: OrderTown, ids: number[]): void {
   for (const p of this.folk) {
     if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     p.approachingOrder = false;
+    p.hunting = false; p.attackPerson = p.workField = -1;
     p.recoveringRest = p.recoveringHealth = false;
     p.autoMode = false;
     p.ordered = false;
@@ -119,6 +124,7 @@ export function approachOrder(this: OrderTown, ids: number[], to: Point): void {
     if (!p.ordered || p.task === Activity.Idle || p.task === Activity.Moving || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, this.grid.nearestWalkable(to))) continue;
     p.approachingOrder = true;
+    p.goal = { ...this.grid.nearestWalkable(to) };
     p.activity = Activity.Moving;
     p.foe = -1;
     if (!p.moving()) this.arrive(p);
@@ -129,6 +135,18 @@ export function orderMove(this: OrderTown, ids: number[], to: Point): void {
 }
 export function orderAttackMove(this: OrderTown, ids: number[], to: Point): void {
   this.moveOrder(ids, to, true);
+}
+export function orderAttackPerson(this: OrderTown, ids: number[], target: number): boolean {
+  const other = this.person(target);
+  if (!other || other.health <= 0 || other.activity === Activity.Leaving) return false;
+  let accepted = false;
+  for (const p of this.folk) {
+    if (!ids.includes(p.id) || p.id === target || p.health <= 0 || p.activity === Activity.Expedition) continue;
+    if (!this.walkTo(p, other.inside ? other.entrance : other.position)) continue;
+    this.setOrder(p, Activity.Fighting, target);
+    p.attackPerson = target; p.activity = Activity.Fighting; accepted = true;
+  }
+  return accepted;
 }
 export function orderAttack(this: OrderTown, ids: number[], monster: number): boolean {
   const target = this.creature(monster);
@@ -192,8 +210,10 @@ export function orderBuild(this: OrderTown, ids: number[], id: number): boolean 
     if (!this.walkTo(p, place.door())) continue;
     this.setOrder(p, Activity.Building, id);
     any = true;
-    p.path = [];
-    this.resumeOrder(p);
+    // A click first brings the resident to the site. Supply gathering starts
+    // only after arrival; it must not silently redirect the initial command.
+    p.goal = place.door(); p.approachingOrder = true; p.activity = Activity.Moving;
+    if (!p.moving()) this.arrive(p);
   }
   return any;
 }
@@ -229,7 +249,7 @@ export function orderRoadwork(this: OrderTown, ids: number[], id: number): boole
   let any = false;
   for (const p of this.folk) {
     if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
-    if (!this.walkTo(p, road.workPoint())) continue;
+    if (!this.walkTo(p, roadWorkSpot(this,p,road))) continue;
     this.setOrder(p, Activity.Roadwork, id);
     p.activity = Activity.Roadwork;
     p.target = road.id;
@@ -310,6 +330,14 @@ export function orderRelax(this: OrderTown, ids: number[], id: number): boolean 
 }
 export function resumeOrder(this: OrderTown, p: Person): boolean {
   if (p.task === Activity.Idle) return false;
+  if (p.approachingOrder && distance(p.position, p.goal) > f(.2)) {
+    if (this.walkTo(p, p.goal)) p.activity = Activity.Moving;
+    return true;
+  }
+  if (p.task === Activity.Fighting && p.attackPerson >= 0) {
+    const target = this.person(p.attackPerson);
+    if (target && target.health > 0 && target.activity !== Activity.Leaving) { p.activity = Activity.Fighting; return true; }
+  }
   const wait = (): void => {
     p.activity = Activity.Holding;
     p.path = [];
@@ -324,6 +352,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
         if (!p.moving()) this.arrive(p);
       }
     } else {
+      if (p.task !== Activity.Holding) p.autoMode = true;
       p.task = Activity.Idle;
       p.taskSite = -1;
       p.ordered = false;
@@ -333,7 +362,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     }
     return true;
   }
-  const foe = this.creature(p.taskSite);
+  const foe = p.attackPerson < 0 ? this.creature(p.taskSite) : null;
   if (p.task === Activity.Fighting && foe && foe.health > 0 && !foe.insideLair) {
     p.foe = p.taskSite;
     p.activity = Activity.Fighting;
@@ -342,8 +371,10 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
   const construction = p.task === Activity.Building || p.task === Activity.Roadwork;
   if (p.carrying > 0 && !construction) {
     if (!this.haulCargo(p)) {
-      wait();
-      p.until = this.time + 3;
+      // A completed gather order cannot wait forever for a depot that does not
+      // exist yet. Retain the cargo for the next automatic construction task.
+      p.autoMode = true; p.ordered = false; p.task = Activity.Idle; p.taskSite = -1;
+      wait(); p.until = this.time + 1;
     }
     return true;
   }
@@ -359,7 +390,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
   switch (p.task) {
     case Activity.Sleeping: {
       const home = this.building(p.taskSite);
-      if (home && home.built() && isHome(home.kind) && p.home === home.id) {
+      if (home && home.built() && isHome(home.kind) && p.home === home.id && (p.rest < f(.95) || p.health < 1)) {
         start(Activity.Sleeping, home.id, home.door());
         return true;
       }
@@ -400,7 +431,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
           return true;
         }
         if (!place.built() && this.prepareConstruction(p, Activity.Building, place.id)) return true;
-        start(Activity.Building, place.id, place.door());
+        start(Activity.Building, place.id, buildingWorkSpot(this,p,place));
         return true;
       }
       if (p.carrying && this.haulCargo(p)) return true;
@@ -417,7 +448,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
           if (tree >= 0) {
             if (!this.fellTree(p, tree)) wait();
           } else if (!this.prepareConstruction(p, Activity.Roadwork, road.id))
-            start(Activity.Roadwork, road.id, road.workPoint());
+            start(Activity.Roadwork, road.id, roadWorkSpot(this,p,road));
         } else wait();
         return true;
       }
@@ -428,13 +459,16 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     case Activity.Working: {
       const place = this.site(p.taskSite);
       if (place && place.built() && p.job === place.id) {
-        start(Activity.Working, place.id, place.door());
+        if (place.kind === Structure.Farm && prepareFarmWork(this as Town,p,place)) {
+          p.activity = Activity.Working; p.target = place.id; return true;
+        }
+        start(Activity.Working, place.id, buildingWorkSpot(this,p,place));
         return true;
       }
       break;
     }
     case Activity.Fighting: {
-      const target = this.creature(p.taskSite);
+      const target = p.attackPerson < 0 ? this.creature(p.taskSite) : null;
       if (target && target.health > 0 && !target.insideLair) {
         p.foe = p.taskSite;
         p.activity = Activity.Fighting;
@@ -445,6 +479,8 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     default:
       break;
   }
+  p.autoMode = true;
+  p.hunting = false; p.attackPerson = -1;
   p.task = Activity.Idle;
   p.taskSite = -1;
   p.ordered = false;

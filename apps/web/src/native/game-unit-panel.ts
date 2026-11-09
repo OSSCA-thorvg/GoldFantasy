@@ -196,10 +196,11 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
         f32(3 * scale),
       );
     };
-    bar(38, 'Food', p.food, true);
-    bar(55, 'Rest', p.rest, true);
-    bar(72, 'Health', p.health, true);
-    bar(89, 'Stress', p.stress, false);
+    bar(30, 'Food', p.food, true);
+    bar(45, 'Water', p.hydration, true);
+    bar(60, 'Rest', p.rest, true);
+    bar(75, 'Health', p.health, true);
+    bar(90, 'Stress', p.stress, false);
     const needed = p.experienceToNextLevel(),
       progress = needed ? 'XP ' + p.experience + ' / ' + needed : 'Max level';
     text(new Rect(12, 112, 112, 18), progress, t.accent, 11, true);

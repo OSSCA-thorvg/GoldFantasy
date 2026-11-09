@@ -208,13 +208,27 @@ export function render(
       const stone = event.kind === TreeWorkKind.Mine || event.kind === TreeWorkKind.Shatter,
         x = event.cell % this.town.map().width(),
         y = Math.trunc(event.cell / this.town.map().width()),
-        at = stone ? mining.position(x, y) : treePosition(this.town.map(), x, y, event.index);
+        at =
+          event.kind === TreeWorkKind.Produced
+            ? event.worker
+            : stone
+              ? mining.position(x, y)
+              : treePosition(this.town.map(), x, y, event.index);
       if (!this.renderer.visible(at)) continue;
       const sound = this.spatial(
-        stone ? Cue.Mine : event.kind === TreeWorkKind.Chop ? Cue.Chop : Cue.TreeFall,
+        event.kind === TreeWorkKind.Regrow || event.kind === TreeWorkKind.Produced
+          ? Cue.Growth
+          : stone
+            ? Cue.Mine
+            : event.kind === TreeWorkKind.Chop
+              ? Cue.Chop
+              : Cue.TreeFall,
         at,
       );
-      sound.gain = f(sound.gain * f(0.4));
+      sound.gain = f(
+        sound.gain *
+          f(event.kind === TreeWorkKind.Regrow || event.kind === TreeWorkKind.Produced ? 0.22 : 0.4),
+      );
       sound.speaker = event.person;
       this.cues.push(sound);
       ++timberHeard;

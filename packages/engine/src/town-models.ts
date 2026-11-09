@@ -5,7 +5,7 @@ import { buildingEntranceModel } from './building-appearance';
 import { ConstructionMaterials } from './construction-materials';
 export class Building {
   materials = new ConstructionMaterials();
-  workers = 0; wanted = -1; growth = 0; version = 0; replaced: Stage[] = []; progress = 1; workedSeconds = 0; attendance = 1; earned = 0; registered = 0; faith = Faith.Dawn; owner = -1; health = 1; village = -1;
+  repairPending = false; repairCredit = 0; productionProgress = 0; workers = 0; wanted = -1; growth = 0; version = 0; replaced: Stage[] = []; progress = 1; workedSeconds = 0; attendance = 1; earned = 0; registered = 0; faith = Faith.Dawn; owner = -1; health = 1; village = -1;
   constructor(public id: number, public kind: Structure, public center: Point, public angle: number, public variant: number) {}
   built(): boolean { return this.progress >= 1; }
   footprint(): Footprint { return new Footprint(this.center, f(structureSpec(this.kind).size / 2), this.angle); }

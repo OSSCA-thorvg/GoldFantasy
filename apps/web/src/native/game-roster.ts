@@ -324,9 +324,9 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
     text(y + (short ? 17 : 23), activityName(p.activity), ink, 11);
     text(
       y + (short ? 34 : 46),
-      `Rest ${Math.round(p.rest * 100)}% · Food ${Math.round(p.food * 100)}%`,
+      `Food ${Math.round(p.food * 100)}% · Water ${Math.round(p.hydration * 100)}% · Rest ${Math.round(p.rest * 100)}%`,
       t.muted,
-      11,
+      10,
     );
     button(
       c,

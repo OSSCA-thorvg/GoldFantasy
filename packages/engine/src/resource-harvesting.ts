@@ -1,3 +1,4 @@
+import { roadWorkSpot } from './person-navigation';
 import { TownState } from './town-state';
 import { Building } from './town-models';
 import { Person, Activity } from './person';
@@ -6,6 +7,8 @@ import { Point, point, add, distance, segmentDistance } from './geometry';
 import { f32 as f } from './numeric';
 import { treePosition } from './world-map';
 import * as mining from './mining';
+import { acceptsCargo } from './town-production';
+import { resourceAmount } from './construction-materials';
 export interface HarvestTown extends TownState {
   settlementAt(p: Point): number;
   settlementOf(b: Building | Person): number;
@@ -23,16 +26,12 @@ export function cargoStorage(this: HarvestTown, from: Point, kind = Product.None
   const village = this.settlementAt(from),
     stock = this.stock(village),
     room = this.capacity(village);
-  if (
-    (kind === Product.Wood && stock.wood >= room.wood) ||
-    (kind === Product.Stone && stock.stone >= room.stone)
-  )
-    return null;
+  if (kind !== Product.None && resourceAmount(stock, kind) >= resourceAmount(room, kind)) return null;
   const depots = this.placed.filter(
     (b) =>
       b.built() &&
       this.settlementOf(b) === village &&
-      (isSeat(b.kind) || b.kind === Structure.Storehouse || isMarket(b.kind)),
+      (isSeat(b.kind) || b.kind === Structure.Storehouse || isMarket(b.kind) || acceptsCargo(b.kind, kind)),
   );
   depots.sort((a, b) => distance(from, a.door()) - distance(from, b.door()));
   for (const depot of depots)
@@ -182,7 +181,7 @@ export function storageFoundation(this: HarvestTown, p: Person): boolean {
 }
 export function layRoadFirst(this: HarvestTown, p: Person, site: number): boolean {
   const road = this.network.road(this.constructionRoad(site));
-  if (!road || !this.walkTo(p, road.workPoint())) return false;
+  if (!road || !this.walkTo(p, roadWorkSpot(this,p,road))) return false;
   if (p.task === Activity.Idle) {
     p.task = Activity.Building;
     p.taskSite = site;

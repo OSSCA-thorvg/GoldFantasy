@@ -1,13 +1,17 @@
-// Native town_people.cpp activity selection and arrival handlers.
+// Resident arrivals and guest activities; resident priorities live in unit-scheduler.
 import { TownState } from './town-state';
 import { Person, Activity, Role, Calling, adventurer } from './person';
 import { Building } from './town-models';
-import { Product, Structure, Resources, isOutfitter, isLodging } from './building-catalog';
-import { Point, point, add, sub, scale, normalized, rotated, distance } from './geometry';
+import { Product, Structure, Resources, isOutfitter, isLodging, isHome } from './building-catalog';
+import { Point, point, add, distance } from './geometry';
 import { f32 as f } from './numeric';
 import { DungeonKind, Dungeon } from './world-types';
 import { CampEconomy } from './camp-economy';
 import { enter } from './town-residents';
+import { prepareFarmWork } from './farm-work';
+import { buildingWorkSpot } from './person-navigation';
+import type { Town } from './town';
+import { resourceAmount, resourceBundle } from './construction-materials';
 export interface PeopleTown extends TownState {
   fetchConstructionMaterials(p: Person): void;
   deliverConstructionMaterials(p: Person): void;
@@ -40,6 +44,12 @@ export function think(this: PeopleTown, p: Person): void {
     p.until = Infinity;
     return;
   }
+  if (p.role === Role.Resident) {
+    if (p.ordered && p.task === Activity.Idle) { p.ordered = false; p.autoMode = true; }
+    if (p.ordered && this.resumeOrder(p)) return;
+    this.scheduleAutomatic(p);
+    return;
+  }
   p.target = -1;
   p.tree = -1;
   if (
@@ -68,13 +78,8 @@ export function think(this: PeopleTown, p: Person): void {
       start(Activity.Leaving, null, this.gateway(this.settlementOf(p)));
       return;
     }
-  } else if (p.autoMode && p.breaking > f(0.5)) {
-    this.notify(p.name + ' could not bear it any longer and left');
-    start(Activity.Leaving, null, this.gateway(this.settlementOf(p)));
-    return;
   }
   if (p.ordered && this.resumeOrder(p)) return;
-  if (this.scheduleAutomatic(p)) return;
   if (this.takeBreak(p)) return;
   if (this.resumeOrder(p)) return;
   if (p.food < f(0.35) && this.eat(p)) return;
@@ -118,44 +123,7 @@ export function think(this: PeopleTown, p: Person): void {
     start(Activity.Relaxing, tavern, tavern.door());
     return;
   }
-  if (p.role === Role.Resident) {
-    let best: Building | null = null;
-    for (const item of this.placed) {
-      if (item.built() && item.health >= 1) continue;
-      const builders = this.folk.filter(
-        (o) => o.activity === Activity.Building && o.target === item.id,
-      ).length;
-      if (builders < 3 && (!best || distance(item.center, p.position) < distance(best.center, p.position)))
-        best = item;
-    }
-    let lane: ReturnType<TownState['network']['road']> = null;
-    for (const road of this.network.roads()) {
-      if ((road.built >= 1 && road.paving < 0 && road.wear <= 0) || !this.roadReady(road.id)) continue;
-      const crew = this.folk.filter((o) => o.activity === Activity.Roadwork && o.target === road.id).length;
-      if (
-        crew < 2 &&
-        (!lane || distance(road.workPoint(), p.position) < distance(lane.workPoint(), p.position))
-      )
-        lane = road;
-    }
-    const laneFront = lane ? lane.workPoint() : point();
-    if (lane && (!best || distance(laneFront, p.position) < distance(best.center, p.position))) {
-      p.activity = Activity.Roadwork;
-      p.target = lane.id;
-      if (this.walkTo(p, laneFront)) return;
-    }
-    const job = this.building(p.job);
-    if (best && (this.layRoadFirst(p, best.id) || start(Activity.Building, best, best.door()))) return;
-    if (job && job.built() && start(Activity.Working, job, job.door())) return;
-    if (
-      !this.titleAutoplay &&
-      p.job < 0 &&
-      p.task === Activity.Idle &&
-      !p.ordered &&
-      this.startHarvest(p, p.position, 5)
-    )
-      return;
-  }
+
   if (
     p.role === Role.Guest &&
     tavern &&
@@ -165,29 +133,9 @@ export function think(this: PeopleTown, p: Person): void {
     start(Activity.Relaxing, tavern, tavern.door());
     return;
   }
-  if (p.role === Role.Resident) {
-    const home = this.building(p.home),
-      seat = this.camp(this.settlementOf(p)),
-      anchor = home ? home.door() : seat ? seat.door() : this.world.camp();
-    p.activity = Activity.Idle;
-    p.path = [];
-    p.until = this.time + 2;
-    if (p.job < 0)
-      for (let attempt = 0; attempt < 8; ++attempt) {
-        const angle = f(this.roll() * f(6.2831853)),
-          radius = f(2 + f(this.roll() * f(2.5)));
-        let goal = add(p.position, rotated(point(radius, 0), angle));
-        if (distance(goal, anchor) > 10)
-          goal = add(anchor, scale(normalized(sub(goal, anchor)), f(4 + f(this.roll() * 4))));
-        goal = this.grid.nearestWalkable(goal);
-        if (distance(goal, p.position) < f(0.8) || !this.walkTo(p, goal)) continue;
-        p.until = this.time + 0.8;
-        break;
-      }
-    return;
-  }
+
   let anchor = p.calling === Calling.Bard ? tavern : null;
-  if (!anchor) anchor = this.building(Number(p.role) === Role.Resident ? p.home : p.bed);
+  if (!anchor) anchor = this.building(p.bed);
   if (!anchor && p.role === Role.Guest)
     anchor = this.nearest(
       p.position,
@@ -218,6 +166,7 @@ export function arrive(this: PeopleTown, p: Person): void {
       [
         Activity.Treating,
         Activity.Eating,
+        Activity.Drinking,
         Activity.Sleeping,
         Activity.Relaxing,
         Activity.Praying,
@@ -225,11 +174,13 @@ export function arrive(this: PeopleTown, p: Person): void {
         Activity.Hauling,
         Activity.Building,
         Activity.Working,
-      ].includes(p.activity) ||
+      ].includes(p.activity) && !(p.activity === Activity.Working && place?.kind === Structure.Farm && p.workField >= 0) ||
       (p.activity === Activity.FetchingMaterials && p.target >= 0) ||
       (p.activity === Activity.DeliveringMaterials && !p.supplyRoad);
-  if (atBuilding && place && distance(p.position, place.door()) > f(0.02)) {
-    if (!this.walkTo(p, place.door())) {
+  const arrival = place && (p.activity === Activity.Building || p.activity === Activity.Working)
+    ? buildingWorkSpot(this,p,place) : place?.door();
+  if (atBuilding && place && arrival && distance(p.position, arrival) > f(0.02)) {
+    if (!this.walkTo(p, arrival)) {
       p.activity = Activity.Idle;
       p.until = this.time + 3;
     }
@@ -255,9 +206,20 @@ export function arrive(this: PeopleTown, p: Person): void {
         ++today.eaten;
         p.food = 1;
         if (p.role === Role.Guest) this.charge(p, place, 2);
-        enter(p, place.threshold());
+        // Food can be served at a residential doorway, but a meal does not grant
+        // residency or permission to enter somebody else's home.
+        if (p.role === Role.Guest || !isHome(place.kind) || p.home === place.id)
+          enter(p, place.threshold());
         p.until = this.time + 3;
       } else p.activity = Activity.Idle;
+      break;
+    case Activity.Drinking:
+      if (place?.built() && place.kind === Structure.Well) {
+        p.hydration = 1;
+        if (treasury.water > 0) --treasury.water;
+        ++today.drunk;
+        p.until = this.time + 2;
+      } else { p.activity = Activity.Idle; p.until = this.time; }
       break;
     case Activity.Treating:
       if (place && place.built() && place.kind === Structure.Apothecary && place.workers > 0)
@@ -268,7 +230,8 @@ export function arrive(this: PeopleTown, p: Person): void {
       }
       break;
     case Activity.Sleeping:
-      if (place) enter(p, place.threshold());
+      if (place && (p.role === Role.Guest || place.id === p.home)) enter(p, place.threshold());
+      else if (place) { p.activity = Activity.Idle; break; }
       p.sleptOutside = !place;
       if (place && p.role === Role.Guest && isLodging(place.kind) && !this.charge(p, place, 2))
         p.stress = Math.min(1, f(p.stress + f(0.05)));
@@ -297,11 +260,10 @@ export function arrive(this: PeopleTown, p: Person): void {
         break;
       }
       p.load = 0;
-      const stone = p.carriedProduct === Product.Stone,
-        limit = this.capacity(village),
-        room = stone ? limit.stone - treasury.stone : limit.wood - treasury.wood,
+      const limit = this.capacity(village),
+        room = resourceAmount(limit, p.carriedProduct) - resourceAmount(treasury, p.carriedProduct),
         delivered = Math.min(p.carrying, Math.max(0, room));
-      this.store(new Resources(0, stone ? 0 : delivered, stone ? delivered : 0), village);
+      this.store(resourceBundle(p.carriedProduct, delivered), village);
       p.carrying -= delivered;
       p.activity = Activity.Idle;
       p.until = this.time + (p.carrying ? 2 : 0);
@@ -319,8 +281,14 @@ export function arrive(this: PeopleTown, p: Person): void {
     case Activity.Arriving:
       p.activity = Activity.Idle;
       break;
-    case Activity.Building:
     case Activity.Working:
+      // Assigning a workplace completes upon arrival. The job remains assigned,
+      // while Auto can handle its meals, sleep, threats and higher-priority roads.
+      if (p.task === Activity.Working) { p.ordered = false; p.autoMode = true; }
+      if (place?.kind === Structure.Farm) prepareFarmWork(this as Town,p,place);
+      if (!place) p.activity = Activity.Idle;
+      break;
+    case Activity.Building:
       if (!place) p.activity = Activity.Idle;
       break;
     case Activity.Roadwork:

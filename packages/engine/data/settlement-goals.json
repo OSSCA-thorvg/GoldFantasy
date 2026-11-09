@@ -50,14 +50,14 @@
   },
   {
     "title": "Build a hostel",
-    "description": "Welcome travellers who may settle here.",
+    "description": "Provide traveller lodging. Open Unit \u2192 Guests to inspect and hire newcomers.",
     "kind": "Building",
     "building": "Hostel",
     "residents": 0
   },
   {
     "title": "Reach 4 residents",
-    "description": "Keep homes and food available for settlers.",
+    "description": "Keep homes and food available, then hire guests from the Unit menu.",
     "kind": "Population",
     "building": "Count",
     "residents": 4
@@ -74,6 +74,20 @@
     "description": "Increase room for delivered resources.",
     "kind": "Building",
     "building": "Storehouse",
+    "residents": 0
+  },
+  {
+    "title": "Build a sawmill",
+    "description": "Assign a worker to turn two logs into one plank for advanced construction.",
+    "kind": "Building",
+    "building": "Sawmill",
+    "residents": 0
+  },
+  {
+    "title": "Build stoneworks",
+    "description": "Dress two rough stones into one cut stone for advanced construction.",
+    "kind": "Building",
+    "building": "Stoneworks",
     "residents": 0
   },
   {

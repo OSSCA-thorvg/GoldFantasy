@@ -220,6 +220,7 @@ export function command(this: GameCommandApp): void {
 }
 export function issueOrder(this: GameCommandApp, order: Order): void {
   this.status = '';
+  const personTarget = order === Order.Attack ? this.personAt(this.mouse) : -1;
   const animal = this.animalAtScreen(this.mouse);
   const monster = animal >= 0 ? animal : this.town.monsterAt(this.cursor, f(1.2)),
     tree = this.treeAtScreen(this.mouse),
@@ -227,13 +228,8 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
     id = this.buildingAtScreen(this.mouse),
     place = this.town.building(id),
     moving: number[] = [];
-  const target = this.town.creature(monster);
-  if (target && target.animal !== null && order !== Order.Attack) {
-    this.town.orderMove(this.chosen, this.cursor);
-    this.cue(Cue.Order);
-    return;
-  }
   if (order === Order.Move) this.town.orderMove(this.chosen, this.cursor);
+  else if (order === Order.Attack && personTarget >= 0) this.town.orderAttackPerson(this.chosen, personTarget);
   else if (order === Order.Attack && monster < 0 && tree < 0 && rock < 0)
     this.town.orderAttackMove(this.chosen, this.cursor);
   else

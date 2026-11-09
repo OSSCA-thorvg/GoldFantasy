@@ -3,6 +3,7 @@ import { TownState } from './town-state';
 import { Building, Calendar, Forecast, GrowthStatus, Season, seasonName } from './town-models';
 import {
   Resources,
+  storedResourceKeys,
   Product,
   Structure,
   GrowthNeed,
@@ -92,6 +93,8 @@ export function dailyOutput(this: EconomyTown, item: Building): Resources {
   if (!item.built()) return out;
   const amount = lround(f(f(item.workers * item.attendance) * spec.perWorker));
   switch (spec.product) {
+    case Product.Planks:
+    case Product.CutStone:
     case Product.Wood:
     case Product.Stone:
       break;
@@ -155,15 +158,9 @@ export function newDay(this: EconomyTown): void {
   }
   for (const item of this.placed)
     if (this.settlementOf(item) >= 0) this.store(this.dailyOutput(item), this.settlementOf(item));
-  const drink = (village: CampEconomy) => {
-    const mouths = this.population(village.camp) + this.guests(village.camp);
-    village.parched = village.stock.water < mouths;
-    village.stock.water = Math.max(0, village.stock.water - mouths);
-    village.today.drunk += mouths;
-    if (village.parched) this.notify(`Camp ${village.camp + 1} has run out of water`);
-  };
-  if (!this.villages.length) drink(this.provisions);
-  else for (const village of this.villages) drink(village);
+  // Water is consumed at a water facility by individual thirsty residents.
+  // Daily stock deductions would charge the same drink twice and ignore hydration.
+  for (const village of [this.provisions, ...this.villages]) village.parched = false;
   this.settleAccounts();
   for (const person of this.folk) ++person.days;
   for (const village of this.villages) {
@@ -210,7 +207,20 @@ export function capacity(this: EconomyTown, village = this.camp()?.id ?? -1): Re
             : 0;
   for (const item of this.placed)
     if (item.built() && this.settlementOf(item) === village) room += structureSpec(item.kind).storage;
-  return new Resources(0, room, room, room, 0, room);
+  const capacity = new Resources(0, room, room, room, 0, room, room, room);
+  for (const item of this.placed) {
+    if (!item.built() || this.settlementOf(item) !== village) continue;
+    if (item.kind === Structure.WoodStore) {
+      capacity.wood += 240;
+      capacity.planks += 240;
+    }
+    if (item.kind === Structure.StoneStore) {
+      capacity.stone += 240;
+      capacity.cutStone += 240;
+    }
+    if (item.kind === Structure.Granary) capacity.food += 240;
+  }
+  return capacity;
 }
 export function store(this: EconomyTown, gain: Resources, village: number): void {
   const room = this.capacity(village),
@@ -218,7 +228,7 @@ export function store(this: EconomyTown, gain: Resources, village: number): void
     treasury = ledger.stock,
     accepted = gain.clone();
   let spoiled = false;
-  for (const key of ['wood', 'stone', 'food', 'water'] as const) {
+  for (const key of storedResourceKeys) {
     const kept = Math.min(Math.max(0, room[key] - treasury[key]), Math.max(0, accepted[key]));
     spoiled = spoiled || kept < accepted[key];
     accepted[key] = kept;
@@ -226,7 +236,7 @@ export function store(this: EconomyTown, gain: Resources, village: number): void
   this.credit(accepted, village);
   if (spoiled && ledger.spoiledDay !== this.days) {
     ledger.spoiledDay = this.days;
-    this.notify('The stores are full: build a storehouse');
+    this.notify('The stores are full: build a suitable depot or storehouse');
   }
 }
 export function wageOf(_person: Person): number {
@@ -255,8 +265,8 @@ export function forecast(this: EconomyTown, village = this.camp()?.id ?? -1): Fo
   for (const item of this.placed)
     if (this.settlementOf(item) === village) day.made.add(this.dailyOutput(item));
   const mouths = this.population(village) + this.guests(village);
-  day.used.food = yesterday.eaten || lround(mouths * 1.4);
-  day.used.water = mouths;
+  day.used.food = yesterday.eaten || Math.ceil(mouths / 7.5);
+  day.used.water = yesterday.drunk || Math.ceil(mouths / 3.75);
   return day;
 }
 export function settleAccounts(this: EconomyTown): void {

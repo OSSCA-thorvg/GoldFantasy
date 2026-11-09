@@ -1,12 +1,14 @@
 import { TownState } from './town-state';
+import type { CampEconomy } from './camp-economy';
 import { Person, Monster, AnimalKind, Activity } from './person';
-import { Resources } from './building-catalog';
+import { Resources, Product } from './building-catalog';
 import { Region } from './world-types';
 import { Point, point, add, sub, scale, normalized, rotated, distance, lerp } from './geometry';
 import { f32 as f, hash01, clamp, lround } from './numeric';
 import { animalKindCount, animalSpec } from './wildlife';
 export interface WildlifeTown extends TownState {
   settlementOf(p: Person): number;
+  economy(village: number): CampEconomy;
   settlementAt(at: Point): number;
   stock(id?: number): Resources;
   store(gain: Resources, village: number): void;
@@ -76,6 +78,14 @@ export function stirWildlife(this: WildlifeTown, dt: number): void {
       const hunter = this.person(animal.provokedBy),
         village = hunter ? this.settlementOf(hunter) : this.settlementAt(animal.position),
         before = this.stock(village).food;
+      if (hunter?.hunting && hunter.foe === animal.id) {
+        hunter.hunting = false; hunter.foe = -1; hunter.path = [];
+        hunter.carriedProduct = Product.Food; hunter.carrying += spec.food;
+        if (hunter.food < f(.25)) { --hunter.carrying; hunter.food = 1; ++this.economy(village).today.eaten; }
+        hunter.activity = Activity.Idle; hunter.until = this.time;
+        this.notify(spec.name + ' hunted (carrying ' + hunter.carrying + ' food)');
+        continue;
+      }
       this.store(new Resources(0, 0, 0, spec.food), village);
       const gained = this.stock(village).food - before;
       this.notify(spec.name + ' hunted (+' + gained + ' food)');

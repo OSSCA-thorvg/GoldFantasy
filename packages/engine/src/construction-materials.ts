@@ -7,6 +7,8 @@ export const constructionProducts = [
   Product.Food,
   Product.Water,
   Product.Mana,
+  Product.Planks,
+  Product.CutStone,
 ] as const;
 export function resourceAmount(resources: Resources, product: Product): number {
   switch (product) {
@@ -20,6 +22,10 @@ export function resourceAmount(resources: Resources, product: Product): number {
       return resources.water;
     case Product.Mana:
       return resources.mana;
+    case Product.Planks:
+      return resources.planks;
+    case Product.CutStone:
+      return resources.cutStone;
     case Product.Goods:
       return resources.gold;
     case Product.None:
@@ -44,6 +50,12 @@ export function resourceBundle(product: Product, amount: number): Resources {
       break;
     case Product.Mana:
       result.mana = amount;
+      break;
+    case Product.Planks:
+      result.planks = amount;
+      break;
+    case Product.CutStone:
+      result.cutStone = amount;
       break;
     case Product.Goods:
       result.gold = amount;

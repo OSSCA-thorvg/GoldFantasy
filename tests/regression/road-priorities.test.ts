@@ -66,6 +66,8 @@ function advanceUntil(app: GameCommandApp, done: () => boolean, seconds: number)
   expect(done(), diagnostics(app)).toBe(true);
 }
 let firstCamp: Town;
+// Building the full designed map and its first Camp can exceed 30s on a shared
+// CI runner. Keep all completion assertions and simulated deadlines unchanged.
 beforeAll(() => {
   // Match the shipped New Game: designed seed 5, full default 176×176 terrain,
   // two founders, no invented resources, flattened land, revealed map or instant build.
@@ -80,7 +82,7 @@ beforeAll(() => {
   expect(camp.materials.delivered.wood).toBeGreaterThanOrEqual(camp.materials.required.wood);
   expect(town.roads().roads()).toHaveLength(0);
   firstCamp = copyNative(town);
-}, 30000);
+}, 120000);
 function fixture(delay = 3) {
   const app = controls(copyNative(firstCamp));
   for (let i = 0; i < delay * 10; ++i) step(app);

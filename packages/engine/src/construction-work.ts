@@ -88,6 +88,9 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
     return true;
   };
   if (p.carrying > 0) {
+    // Raw inputs gathered for a refined material belong in the depot, not as
+    // unusable surplus at the construction site. Keep the builder's task intact.
+    if (!resourceAmount(materials.required, p.carriedProduct) && this.haulCargo(p)) return true;
     if (go(Activity.DeliveringMaterials, id, at)) return true;
     p.activity = Activity.WaitingMaterials;
     p.path = [];
@@ -172,6 +175,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
     this.startHarvest(p, at, f(Math.hypot(f(this.world.width()), f(this.world.height()))), wanted)
   )
     return true;
+  if (this.produceConstructionMaterial(p, wanted)) return true;
   if (this.titleAutoplay && this.seekTitleMaterials(p, wanted)) return true;
   p.activity = Activity.WaitingMaterials;
   p.target = id;
@@ -204,7 +208,9 @@ export function fetchConstructionMaterials(this: Town, p: Person): void {
         ? this.constructionMaterials(Activity.Roadwork, -p.target - 2)
         : this.constructionMaterials(Activity.Building, p.target);
   let wanted = target ? target.missing(p.carriedProduct) : 0;
-  if (source === target && source) wanted = source.surplus(p.carriedProduct);
+  // A Camp can supply its own maintenance batch from its treasury. Same-site
+  // surplus collection applies only when that site's material need is already met.
+  if (source === target && source && wanted === 0) wanted = source.surplus(p.carriedProduct);
   let count = 0;
   if (source && source.surplus(p.carriedProduct) > 0) {
     count = Math.min(3, wanted, source.surplus(p.carriedProduct));

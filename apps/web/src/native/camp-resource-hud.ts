@@ -6,8 +6,20 @@ import type { Point } from '../../../../packages/engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../../../packages/engine/src/numeric';
 import { resourceIcons, nativeFixed } from './hud-assets';
 const duration = 0.75,
-  names = ['Gold', 'Wood', 'Stone', 'Food', 'Water', 'Mana', 'Renown', 'Residents', 'Guests'],
-  artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7];
+  names = [
+    'Gold',
+    'Wood',
+    'Stone',
+    'Food',
+    'Water',
+    'Mana',
+    'Renown',
+    'Residents',
+    'Guests',
+    'Planks',
+    'Cut stone',
+  ],
+  artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7, 1, 2];
 const amount = (value: number) =>
   value < 10000
     ? String(value)
@@ -136,6 +148,8 @@ export class CampResourceHud {
           receipt.renown,
           receipt.residents,
           receipt.guests,
+          receipt.gain.planks,
+          receipt.gain.cutStone,
         ];
         for (let kind = 0; kind < gains.length; kind++) {
           if (gains[kind] <= 0) continue;
@@ -200,7 +214,7 @@ export class CampResourceHud {
     if (this.moving) context.requestAnimationFrame();
     const anchor = marker(hovered),
       seat = town.camp(hovered);
-    if (!anchor || !seat || viewport.w < 240 || viewport.h < 145) return;
+    if (!anchor || !seat || viewport.w < 240 || viewport.h < 36 + 36 * Math.ceil(names.length / 3)) return;
     const stock = town.stock(hovered),
       capacity = town.capacity(hovered),
       values = [
@@ -213,6 +227,8 @@ export class CampResourceHud {
         town.renown(hovered),
         town.population(hovered),
         town.guests(hovered),
+        stock.planks,
+        stock.cutStone,
       ],
       limits = [
         0,
@@ -224,10 +240,12 @@ export class CampResourceHud {
         100,
         town.housing(hovered),
         town.guestBeds(hovered),
+        capacity.planks,
+        capacity.cutStone,
       ],
       w = Math.min(336, viewport.w),
-      row = viewport.h < 184 ? 36 : 46,
-      h = f(36 + f(row * 3));
+      row = viewport.h < 220 ? 36 : 46,
+      h = f(36 + f(row * Math.ceil(names.length / 3)));
     let x = f(anchor.roof.x + 30);
     if (f(x + w) > f(viewport.x + viewport.w)) x = f(f(anchor.roof.x - w) - 30);
     x = clamp(x, viewport.x, f(f(viewport.x + viewport.w) - w));

@@ -1,270 +1,129 @@
-import { TownState } from './town-state';
-import { Person, Role, Activity, Monster } from './person';
+import type { Town } from './town';
+import { Person, Role, Activity } from './person';
 import { Building } from './town-models';
-import { Product, Structure } from './building-catalog';
-import * as mining from './mining';
-import { Point, distance } from './geometry';
+import { Structure } from './building-catalog';
+import { add, distance, normalized, point, rotated, scale, sub } from './geometry';
 import { f32 as f } from './numeric';
-export interface SchedulerTown extends TownState {
-  creature(id: number): Monster | null;
-  haulCargo(p: Person): boolean;
-  eat(p: Person): boolean;
-  resumeOrder(p: Person): boolean;
-  orderBuild(ids: number[], id: number): boolean;
-  orderRoadwork(ids: number[], id: number): boolean;
-  walkTo(p: Person, at: Point): boolean;
-  arrive(p: Person): void;
-  nearest(at: Point, match: (b: Building) => boolean): Building | null;
-  startHarvest(p: Person, around: Point, reach: number): boolean;
-  harvest(p: Person, cell: number, kind: Product): boolean;
-  scheduleAutomatic(p: Person): boolean;
-}
-export function orderAutomatic(this: SchedulerTown, ids: number[]): void {
+
+export function orderAutomatic(this: Town, ids: number[]): void {
   for (const p of this.folk) {
-    if (
-      p.role !== Role.Resident ||
-      p.health <= 0 ||
-      p.activity === Activity.Expedition ||
-      !ids.includes(p.id)
-    )
-      continue;
-    p.ordered = p.approachingOrder = false;
+    if (p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    p.autoMode = true;
+    p.ordered = p.approachingOrder = p.hunting = false;
     p.recoveringRest = p.recoveringHealth = false;
-    p.task = Activity.Idle;
-    p.taskSite = -1;
-    p.supplyTarget = -1;
-    p.supplyRoad = false;
-    p.foe = p.tree = -1;
-    p.path = [];
-    p.activity = Activity.Idle;
-    p.until = this.time;
-    p.scheduleAt = this.time + 0.5;
-    if (!this.scheduleAutomatic(p)) {
-      p.activity = Activity.Holding;
-      p.until = this.time + 0.5;
-    }
+    p.task = Activity.Idle; p.taskSite = p.supplyTarget = p.attackPerson = p.foe = p.tree = -1;
+    p.supplyRoad = false; p.path = []; p.activity = Activity.Idle; p.until = this.time;
+    p.scheduleAt = this.time + .5;
+    this.scheduleAutomatic(p);
   }
 }
-export function scheduleAutomatic(this: SchedulerTown, p: Person): boolean {
-  if (
-    p.role !== Role.Resident ||
-    p.health <= 0 ||
-    p.activity === Activity.Expedition ||
-    p.activity === Activity.Leaving
-  )
-    return false;
+
+// Resident policy has one entry point. An active enemy interrupts everything;
+// direct targets otherwise run to completion. Auto keeps a construction/supply
+// chain intact, and selects roads before buildings. Needs suspend that chain,
+// rather than erasing the assignment. Explicit Stop/Auto OFF is the sole idle hold.
+export function scheduleAutomatic(this: Town, p: Person): boolean {
+  if (p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || p.activity === Activity.Leaving) return false;
+  if (p.activity === Activity.Fighting) return true;
+  if (p.ordered || p.approachingOrder) return true;
+  if (!p.autoMode) return false;
+  const night = this.climate().night > f(.5);
   if (p.health >= 1) p.recoveringHealth = false;
-  if (p.rest >= f(0.95)) p.recoveringRest = false;
-  else if (p.activity === Activity.Sleeping && p.autoMode) p.recoveringRest = true;
-  // Care interrupts an assignment, rather than replacing it. The assignment and its
-  // construction cargo remain available when the resident has recovered.
-  if (p.activity === Activity.Fighting && p.foe >= 0) {
-    const target = this.creature(p.foe);
-    if (target && target.health > 0 && !target.insideLair) return true;
-    p.foe = -1;
-    p.activity = Activity.Idle;
-    p.path = [];
-  }
-  const enterCare = (b: Building, activity: Activity): boolean => {
-    if (p.activity === activity && p.target === b.id) return true;
-    if (!this.walkTo(p, b.door())) return false;
-    if (activity === Activity.Sleeping && p.rest < f(0.95)) p.recoveringRest = true;
-    p.activity = activity;
-    p.target = b.id;
-    p.tree = -1;
-    p.approachingOrder = false;
+  if (p.rest >= f(.95)) p.recoveringRest = false;
+  const care = (place: Building | null, activity: Activity): boolean => {
+    if (p.activity === activity && p.target === (place?.id ?? -1)) return true;
+    if (place && !this.walkTo(p, place.door())) return false;
+    if (!place) { p.path = []; p.inside = false; p.sleptOutside = true; }
+    p.activity = activity; p.target = place?.id ?? -1; p.tree = -1;
     if (!p.moving()) this.arrive(p);
     return true;
   };
-  const finishCare = (): void => {
-    if (!p.ordered && (p.task === Activity.Treating || p.task === Activity.Sleeping)) {
-      p.task = Activity.Idle;
-      p.taskSite = -1;
-    }
-    p.activity = Activity.Idle;
-    p.path = [];
-    p.until = this.time;
-  };
+  if (p.activity === Activity.Eating || p.activity === Activity.Drinking) return true;
   if (p.activity === Activity.Treating) {
     const clinic = this.building(p.target);
-    if (p.health < 1 && clinic?.built() && clinic.kind === Structure.Apothecary && clinic.workers > 0)
-      return true;
-    finishCare();
+    if (p.health < 1 && clinic?.built() && clinic.workers > 0) return true;
+    p.activity = Activity.Idle;
   }
-  let committed =
-    p.ordered ||
-    p.recoveringRest ||
-    p.recoveringHealth ||
-    p.carrying > 0 ||
-    [
-      Activity.Eating,
-      Activity.Collecting,
-      Activity.Hauling,
-      Activity.FetchingMaterials,
-      Activity.DeliveringMaterials,
-    ].includes(p.activity);
-  if (p.task === Activity.Building) {
-    const b = this.building(p.taskSite);
-    committed ||= !!b && (!b.built() || b.health < 1);
-  } else if (p.task === Activity.Roadwork) {
-    const road = this.network.road(p.taskSite);
-    committed ||= !!road && (road.built < 1 || road.paving >= 0 || road.wear > 0);
-  } else if (p.task === Activity.Working) {
-    const job = this.building(p.taskSite);
-    committed ||= !!job && job.built() && job.id === p.job;
-  } else if (p.task === Activity.Felling || p.task === Activity.Mining) {
-    const x = p.taskSite % this.world.width(),
-      y = Math.trunc(p.taskSite / this.world.width());
-    committed ||=
-      p.taskSite >= 0 &&
-      this.world.inside(x, y) &&
-      (p.task === Activity.Mining ? mining.deposit(this.world, x, y) : this.world.at(x, y).trees > 0);
-  }
-  // Match the existing severe-injury walking-speed threshold for interrupting
-  // committed work. Minor cold damage must not send a worker back every two seconds.
-  const treatmentThreshold = committed ? f(0.4) : f(0.999);
-  if ((!p.ordered || p.autoMode) && (p.health < treatmentThreshold || p.recoveringHealth)) {
-    if (p.health < f(0.4)) p.recoveringHealth = true;
-    const clinic = this.nearest(
-      p.position,
-      (b) => b.kind === Structure.Apothecary && b.built() && b.workers > 0,
-    );
-    if (clinic && enterCare(clinic, Activity.Treating)) return true;
-  }
-  if (p.activity === Activity.Eating) return true;
-  if (p.autoMode && p.food < f(0.25) && this.eat(p)) {
-    p.approachingOrder = false;
-    return true;
-  }
-  if (p.activity === Activity.Sleeping && !p.ordered) {
-    const home = this.building(p.target);
-    if (
-      (p.rest < f(0.95) || (p.recoveringHealth && p.health < 1)) &&
-      (p.target < 0 || (home?.built() && home.id === p.home))
-    )
-      return true;
-    finishCare();
-  }
-  if (
-    p.autoMode &&
-    (p.rest < f(0.2) || (p.recoveringRest && p.rest < f(0.95)) || (p.recoveringHealth && p.health < 1))
-  ) {
+  // Hunger may interrupt recovery; its stored flags survive the meal.
+  if (p.food < f(.25) && (p.food < f(.05) || p.recoveringHealth || p.recoveringRest || p.activity === Activity.Sleeping) && (this.eat(p) || this.huntFood(p))) return true;
+  // Dehydration must not keep a wounded sleeper trapped in slow recovery.
+  // A short visit to an existing Well preserves both recovery flags and work.
+  if (p.hydration < f(.1) && (p.recoveringHealth || p.recoveringRest || p.health < f(.4)) &&
+      this.placed.some(b => b.built() && b.kind === Structure.Well && this.settlementOf(b) === this.settlementOf(p)) &&
+      this.drink(p)) return true;
+  if (p.health < f(.4)) p.recoveringHealth = true;
+  if (p.rest < f(.2)) p.recoveringRest = true;
+  if (p.recoveringHealth || p.recoveringRest || night) {
+    if (p.recoveringHealth) {
+      const clinic = this.nearest(p.position, b => b.kind === Structure.Apothecary && b.built() && b.workers > 0);
+      if (clinic && care(clinic, Activity.Treating)) return true;
+    }
     const home = this.building(p.home);
-    if (home?.built() && enterCare(home, Activity.Sleeping)) return true;
-    if (p.rest < f(0.95)) p.recoveringRest = true;
-    p.activity = Activity.Sleeping;
-    p.target = -1;
-    p.tree = -1;
-    p.path = [];
-    p.approachingOrder = false;
-    p.inside = false;
-    p.sleptOutside = true;
+    if (home?.built() && care(home, Activity.Sleeping)) return true;
+    // Homeless residents recover outside; they never enter somebody else's home.
+    if ((p.recoveringHealth || p.recoveringRest) && care(null, Activity.Sleeping)) return true;
+  }
+  if (p.activity === Activity.Sleeping) {
+    p.activity = Activity.Idle; p.until = this.time;
+  }
+
+  const roadTask = p.task === Activity.Roadwork ? this.network.road(p.taskSite) : null,
+    buildingTask = p.task === Activity.Building ? this.building(p.taskSite) : null,
+    unfinished = (roadTask && (roadTask.built < 1 || roadTask.paving >= 0 || roadTask.wear > 0)) ||
+      (buildingTask && (!buildingTask.built() || buildingTask.health < 1));
+  if (unfinished) {
+    if ([Activity.Idle, Activity.Holding].includes(p.activity) || (p.activity === Activity.WaitingMaterials && this.time >= p.until)) this.resumeOrder(p);
+    // An unavailable supply chain keeps its target, but does not forbid eating
+    // or drinking while waiting. Successful delivery resumes this same site.
+    if (p.activity === Activity.WaitingMaterials) {
+      if (p.food < f(.25) && (this.eat(p) || this.huntFood(p))) return true;
+      if (p.hydration < f(.25) && this.drink(p)) return true;
+    }
     return true;
   }
-  if (p.ordered) return false;
-  if (
-    [Activity.Brooding, Activity.Relaxing, Activity.Praying, Activity.Shopping].includes(p.activity) &&
-    (p.moving() || this.time < p.until)
-  )
-    return true;
-  if (p.task === Activity.Building) {
-    const b = this.building(p.taskSite);
-    if (b && (!b.built() || b.health < 1)) {
-      if (
-        p.activity === Activity.Idle ||
-        p.activity === Activity.Holding ||
-        (p.activity === Activity.WaitingMaterials && this.time >= p.until)
-      )
-        this.resumeOrder(p);
-      return true;
-    }
+  if (p.task === Activity.Building || p.task === Activity.Roadwork) {
+    if (this.resumeOrder(p) && Number(p.task) !== Activity.Idle) return true;
   }
-  if (p.task === Activity.Roadwork) {
-    const road = this.network.road(p.taskSite);
-    if (road && (road.built < 1 || road.paving >= 0 || road.wear > 0)) {
-      if (
-        p.activity === Activity.Idle ||
-        p.activity === Activity.Holding ||
-        (p.activity === Activity.WaitingMaterials && this.time >= p.until)
-      )
-        this.resumeOrder(p);
-      return true;
-    }
-  }
-  if (p.carrying > 0 || p.activity === Activity.Hauling || p.activity === Activity.Collecting) {
-    if (p.activity === Activity.Hauling || p.activity === Activity.Collecting) return true;
-    return this.haulCargo(p);
-  }
-  if (p.task === Activity.Working) {
-    const job = this.building(p.taskSite);
-    if (job && job.built() && job.id === p.job) {
-      if (p.activity === Activity.Idle || p.activity === Activity.Holding) this.resumeOrder(p);
-      return true;
-    }
-  }
-  if (p.task === Activity.Felling || p.task === Activity.Mining) {
-    const stone = p.task === Activity.Mining,
-      x = p.taskSite % this.world.width(),
-      y = Math.trunc(p.taskSite / this.world.width()),
-      exists =
-        p.taskSite >= 0 &&
-        this.world.inside(x, y) &&
-        (stone ? mining.deposit(this.world, x, y) : this.world.at(x, y).trees > 0);
-    if (exists) {
-      if (p.activity === p.task && p.tree === p.taskSite) return true;
-      if (this.harvest(p, p.taskSite, stone ? Product.Stone : Product.Wood)) return true;
-    }
-    p.task = Activity.Idle;
-    p.taskSite = -1;
-  }
-  const automatic = (accepted: boolean): boolean => {
-    if (accepted) p.ordered = false;
-    return accepted;
-  };
-  for (const b of this.placed)
-    if (!b.built() || b.health < 1) {
-      if (p.task === Activity.Building && p.taskSite === b.id) {
-        if (p.activity === Activity.Idle || p.activity === Activity.Holding) this.resumeOrder(p);
-        return true;
-      }
-      if (automatic(this.orderBuild([p.id], b.id))) return true;
-    }
+  if (p.activity === Activity.Collecting || p.activity === Activity.Hauling) return true;
+  if (p.carrying > 0 && this.haulCargo(p)) return true;
+  const automatic = (accepted: boolean): boolean => { if (accepted) p.ordered = false; return accepted; };
   for (const road of this.network.roads())
-    if (road.built < 1 || road.paving >= 0 || road.wear > 0) {
-      if (p.task === Activity.Roadwork && p.taskSite === road.id) {
-        if (p.activity === Activity.Idle || p.activity === Activity.Holding) this.resumeOrder(p);
-        return true;
-      }
-      if (automatic(this.orderRoadwork([p.id], road.id))) return true;
-    }
-  const enterTask = (b: Building, activity: Activity): boolean => {
-    if (p.activity === activity && p.target === b.id) return true;
-    if (!this.walkTo(p, b.door())) return false;
-    p.task = activity;
-    p.taskSite = b.id;
-    p.activity = activity;
-    p.target = b.id;
-    if (!p.moving()) this.arrive(p);
-    return true;
-  };
-  const job = this.building(p.job);
-  if (job && job.built() && distance(p.position, job.door()) <= 5 && enterTask(job, Activity.Working))
-    return true;
-  if (this.titleAutoplay) {
-    p.task = Activity.Idle;
-    p.taskSite = -1;
-    p.activity = Activity.Holding;
-    p.path = [];
-    p.tree = -1;
-    p.until = this.time + 0.5;
-    return true;
+    if ((road.built < 1 || road.paving >= 0 || road.wear > 0) && automatic(this.orderRoadwork([p.id], road.id))) return true;
+  for (const b of this.placed)
+    if ((!b.built() || b.health < 1) && automatic(this.orderBuild([p.id], b.id))) return true;
+
+  if (p.food < f(.25) && (this.eat(p) || this.huntFood(p))) return true;
+  if (p.hydration < f(.25) && this.drink(p)) return true;
+
+  // The selected resource is a finite transaction: gather, deliver, then reevaluate.
+  if ((p.task === Activity.Felling || p.task === Activity.Mining) && p.rest >= f(2 / 3)) {
+    if (p.activity === p.task) return true;
+    if (this.resumeOrder(p) && Number(p.task) !== Activity.Idle) return true;
   }
-  if (p.activity === Activity.Felling || p.activity === Activity.Mining) return true;
-  p.task = Activity.Idle;
-  p.taskSite = -1;
-  if (!this.startHarvest(p, p.position, 5)) return false;
-  p.task = p.activity;
-  p.taskSite = p.tree;
-  p.goal = { ...p.position };
+  const job = this.building(p.job);
+  if (job?.built() && (p.rest >= f(2 / 3) || (job.kind !== Structure.Lumberyard && job.kind !== Structure.Quarry))) {
+    if (p.task !== Activity.Working || p.taskSite !== job.id) {
+      p.task = Activity.Working; p.taskSite = job.id; p.activity = Activity.Idle;
+    }
+    if (p.activity === Activity.Working || ((p.activity === Activity.Felling || p.activity === Activity.Mining) && p.tree >= 0)) return true;
+    return this.resumeOrder(p);
+  }
+  if (p.task !== Activity.Idle) { p.task = Activity.Idle; p.taskSite = -1; p.tree = -1; p.path = []; p.activity = Activity.Idle; }
+  if (!this.titleAutoplay && p.rest >= f(2 / 3) && this.startHarvest(p, p.position, 5)) {
+    p.task = p.activity; p.taskSite = p.tree; p.goal = { ...p.position }; return true;
+  }
+  // Keep an existing wander route until its destination; reevaluation never
+  // creates a fresh random waypoint every half second.
+  if (p.moving() || this.time < p.until) return true;
+  const home = this.building(p.home), seat = this.camp(this.settlementOf(p)),
+    anchor = home?.door() ?? seat?.door() ?? this.world.camp();
+  p.activity = Activity.Idle; p.until = this.time + 3;
+  for (let attempt = 0; attempt < 8; ++attempt) {
+    const angle = f(this.roll() * f(6.2831853)), radius = f(2 + f(this.roll() * f(2.5)));
+    let goal = add(p.position, rotated(point(radius, 0), angle));
+    if (distance(goal, anchor) > 10) goal = add(anchor, scale(normalized(sub(goal, anchor)), 4));
+    goal = this.grid.nearestWalkable(goal);
+    if (distance(goal, p.position) >= .8 && this.walkTo(p, goal)) break;
+  }
   return true;
 }
