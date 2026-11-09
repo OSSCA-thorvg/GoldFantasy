@@ -12,6 +12,7 @@ import { poly, oval, stroke, opaque, scale, fill, glow } from './sprite-primitiv
 import { ArmRig, connectArm, poseArm } from './idle-gesture';
 import { stoneGiantSprite } from './stone-giant';
 import { createEquipment } from './person-equipment';
+import { createWorkProps } from './work-motion';
 import { characterFigure } from './character-assets';
 import { Mood } from './person-portrait';
 export interface TextBounds {
@@ -33,12 +34,22 @@ export class PersonParts {
   arrow: PaintNode | null = null;
   ring: PaintNode | null = null;
   alert: PaintNode | null = null;
+  hoe: PaintNode | null = null;
+  wateringCan: PaintNode | null = null;
+  saw: PaintNode | null = null;
+  chisel: PaintNode | null = null;
+  waterDrops: SceneNode | null = null;
+  soilDust: SceneNode | null = null;
+  sawLog: SceneNode | null = null;
+  workStone: SceneNode | null = null;
   hammer: PaintNode | null = null;
   axe: PaintNode | null = null;
   pickaxe: PaintNode | null = null;
   sack: PaintNode | null = null;
   logs: PaintNode | null = null;
   stone: PaintNode | null = null;
+  planks: PaintNode | null = null;
+  cutStone: PaintNode | null = null;
   arms: [ArmRig, ArmRig] = [new ArmRig(), new ArmRig()];
   feet: (PaintNode | null)[] = [null, null];
 }
@@ -1041,6 +1052,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   streetHead(sprite, look, hair, head);
   for (const arm of parts.arms) sprite.add(arm.forearm!);
   createEquipment(parts, person.calling);
+  createWorkProps(root, parts);
   // Loads carried on the back.
   let sack = new SceneNode();
   sack.add(oval([-f32(4.5), -11], f32(3.6), f32(4.2), [176, 150, 96]));
@@ -1071,6 +1083,88 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   stones.opacity(0);
   sprite.add(stones);
   parts.stone = stones;
+  const planks = new SceneNode(),
+    cutStone = new SceneNode();
+  for (let i = 0; i < 3; i++) {
+    const x = -9 + i * 2.2,
+      y = -14 + (i % 2) * 1.1;
+    planks.add(
+      poly(
+        [
+          [x, y],
+          [x + 5, y - 2],
+          [x + 7, y],
+          [x + 2, y + 2],
+        ],
+        [181, 139, 88],
+      ),
+    );
+    planks.add(
+      poly(
+        [
+          [x, y],
+          [x + 2, y + 2],
+          [x + 2, y + 3.4],
+          [x, y + 1.4],
+        ],
+        [115, 79, 46],
+      ),
+    );
+    planks.add(
+      poly(
+        [
+          [x + 2, y + 2],
+          [x + 7, y],
+          [x + 7, y + 1.4],
+          [x + 2, y + 3.4],
+        ],
+        [148, 103, 59],
+      ),
+    );
+  }
+  for (let i = 0; i < 2; i++) {
+    const x = -8 + i * 3.1,
+      y = -12 - i * 1.2;
+    cutStone.add(
+      poly(
+        [
+          [x, y],
+          [x + 3, y - 1.5],
+          [x + 5, y],
+          [x + 2, y + 1.5],
+        ],
+        [166, 163, 158],
+      ),
+    );
+    cutStone.add(
+      poly(
+        [
+          [x, y],
+          [x + 2, y + 1.5],
+          [x + 2, y + 4],
+          [x, y + 2.5],
+        ],
+        [117, 115, 116],
+      ),
+    );
+    cutStone.add(
+      poly(
+        [
+          [x + 2, y + 1.5],
+          [x + 5, y],
+          [x + 5, y + 2.5],
+          [x + 2, y + 4],
+        ],
+        [87, 88, 95],
+      ),
+    );
+  }
+  planks.add(stroke([-7, -14], [-3, -10], 0.7, [84, 65, 43]));
+  planks.opacity(0);
+  cutStone.opacity(0);
+  sprite.add(planks).add(cutStone);
+  parts.planks = planks;
+  parts.cutStone = cutStone;
   let mark = oval([0, -22], f32(2.4), f32(2.4), [230, 80, 64, 255]);
   mark.opacity(0);
   sprite.add(mark);

@@ -157,7 +157,7 @@ export class WorldRendererState {
   rowBuildings: SceneNode[] = [];
   rowLamps: SceneNode[] = [];
   rowTrees: SceneNode[] = [];
-  rowCanopies: (SceneNode | null)[] = [];
+  rowCanopies: SceneNode[][] = [];
   swayAt = -1;
   swaying = false;
   treeKeys: bigint[] = [];

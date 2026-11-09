@@ -18,7 +18,7 @@ import { SceneNode, ShapeNode, AnimationNode, type Rgb } from './paint';
 import { ellipse, glow, opaque, detach } from './vector-paint';
 import { buildingAppearanceRevision, riseAnimation } from './building-assets';
 import { WorldRendererState, pool, type Pool, type Landmark, type Visual } from './world-renderer-state';
-import { rowOf, drawRow, giantFootprint, volcanoFootprint } from './world-depth';
+import { rowOf, drawRow, giantFootprint, volcanoFootprint, registerDepth } from './world-depth';
 import { lightYmir, paintYmir } from './ymir-statue';
 import { lightVolcano, paintVolcano, paintSteam } from './volcano-painter';
 import { Flicker } from './light-flicker';
@@ -26,6 +26,7 @@ import { dungeonSprite } from './world-sprites';
 import { paintOrnaments } from './world-ground';
 import { sprout, buildTreeRow } from './world-trees';
 import { Rect } from '../../native-ui/src/types';
+import { damagePaint } from './building-damage';
 const arcaneWisp: Rgb = [130, 240, 220],
   violetWisp: Rgb = [200, 150, 255],
   warmLight: Rgb = [232, 150, 64];
@@ -115,10 +116,9 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       for (const list of [s.rowBuildings, s.rowLamps, s.rowTrees, s.rows]) {
         const scene = new SceneNode();
         list.push(scene);
-        s.objects.add(scene);
       }
     s.treeKeys = Array(count).fill(-1n);
-    s.rowCanopies = Array(count).fill(null);
+    s.rowCanopies = Array.from({ length: count }, () => []);
     s.treeBounds = Array.from({ length: count }, () => new Rect());
   }
   for (const scene of s.rowBuildings) scene.remove();
@@ -159,6 +159,7 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
           (BigInt(giant!.origin.y >>> 0) << 32n);
       if (renew(s.ymirPaint, key))
         s.ymirLight = paintYmir(s.ymirPaint.paint!, project(heart.x, heart.y), climate, inWater);
+      registerDepth(s.ymirPaint.paint!, giantFootprint(giant!), 'landmark:ymir');
       here.add(s.ymirPaint.paint!);
       lightYmir(s.lights, project(heart.x, heart.y));
       addPool(s, pool(s.ymirLight!.dais, 190, 95));
@@ -174,6 +175,7 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
           (BigInt(volcano!.origin.y >>> 0) << 48n);
       if (renew(s.volcanoPaint, key))
         s.volcanoLight = paintVolcano(s.volcanoPaint.paint!, project(heart.x, heart.y), map.seed());
+      registerDepth(s.volcanoPaint.paint!, volcanoFootprint(volcano!), 'landmark:volcano');
       here.add(s.volcanoPaint.paint!);
       lightVolcano(s.lights, s.volcanoLight!);
       addPool(s, pool(s.volcanoLight!.crater, 260, 130, [200, 80, 30], Flicker.Fire));
@@ -186,7 +188,21 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       addPool(s, pool(deep, 180, 80));
     }
     for (const b of buildingRows[row]) {
-      here.add(s.visuals.get(b.id)!.picture);
+      const here = new SceneNode(),
+        visual = s.visuals.get(b.id)!;
+      s.rowBuildings[row].add(here);
+      registerDepth(
+        here,
+        b.footprint(),
+        `building:${b.id}`,
+        new Rect(
+          visual.picture.matrix[2],
+          visual.picture.matrix[5],
+          visual.layout.width,
+          visual.layout.height,
+        ),
+      );
+      here.add(visual.picture).add(damagePaint(s, b));
       const size = structureSpec(b.kind).size,
         middle = b.center;
       if (b.kind === Structure.Torch && b.built()) {
@@ -261,6 +277,13 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       }
     }
     for (const site of dungeonRows[row]) {
+      const here = new SceneNode();
+      s.rowBuildings[row].add(here);
+      registerDepth(
+        here,
+        point(site.origin.x + 1, site.origin.y + 1),
+        `dungeon:${site.origin.x}:${site.origin.y}`,
+      );
       const pulse = dungeonSprite(here, s.lights, site, s.measureText);
       if (pulse) s.pulses.push(pulse);
       addPool(s, pool(project(f32(site.origin.x + 1), f32(site.origin.y + 1)), 90, 45));

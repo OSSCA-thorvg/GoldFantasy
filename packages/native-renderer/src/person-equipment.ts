@@ -5,7 +5,18 @@ import { SceneNode, ShapeNode } from './paint';
 import { poly, oval, stroke } from './sprite-primitives';
 import type { PersonParts } from './world-sprites';
 
-export const heldTools = ['axe', 'pickaxe', 'hammer', 'sword', 'bow', 'staff', 'mace'] as const;
+export const heldTools = [
+  'axe',
+  'pickaxe',
+  'hammer',
+  'sword',
+  'bow',
+  'staff',
+  'mace',
+  'hoe',
+  'wateringCan',
+  'saw',
+] as const;
 export type HeldTool = (typeof heldTools)[number];
 
 export function callingEquipment(calling: Calling): HeldTool | null {
@@ -101,6 +112,50 @@ export function createEquipment(parts: PersonParts, calling: Calling): void {
   bow.add(arrow);
   parts.arrow = arrow;
   attach('bow', bow);
+  const hoe = new SceneNode();
+  hoe.add(stroke(p(-1, 1), p(6, -9), 1.2, wood));
+  hoe.add(poly([p(5, -10), p(9, -8), p(9, -5.8), p(5, -7.5)], steel));
+  attach('hoe', hoe);
+  const can = new SceneNode();
+  can.add(poly([p(0, -1), p(5, -1.3), p(6, 3.4), p(0.5, 3.8)], [101, 140, 143]));
+  can.add(poly([p(3, -1.2), p(5, -1.3), p(6, 3.4), p(3, 3.6)], [71, 111, 117]));
+  can.add(stroke(p(4, 1), p(9, -1.5), 1.6, [126, 163, 161]));
+  can.add(oval(p(9, -1.5), 1.3, 0.8, [161, 181, 165]));
+  const handle = new ShapeNode()
+    .moveTo(wrist.x + 0.7, wrist.y)
+    .cubicTo(wrist.x - 3, wrist.y - 5, wrist.x + 5, wrist.y - 5, wrist.x + 4.5, wrist.y);
+  handle.strokeWidth(0.85).strokeFill(155, 175, 159);
+  can.add(handle);
+  attach('wateringCan', can);
+  const saw = new SceneNode();
+  saw.add(
+    poly(
+      [
+        p(1, -1),
+        p(12, -2.5),
+        p(11, 0),
+        p(10, 1),
+        p(9, 0.3),
+        p(8, 1.5),
+        p(7, 0.8),
+        p(6, 2),
+        p(5, 1.3),
+        p(4, 2.5),
+        p(2, 2.7),
+      ],
+      steel,
+    ),
+  );
+  saw.add(oval(p(0, 0), 2, 2.5, [119, 78, 46]));
+  saw.add(oval(p(0, 0), 0.85, 1.25, [47, 40, 31]));
+  attach('saw', saw);
+  const chisel = new SceneNode(),
+    left = parts.arms[0].wrist;
+  chisel.add(stroke(left, add(left, point(5, 3)), 0.9, steel));
+  chisel.add(stroke(add(left, point(-1, -0.6)), add(left, point(1, 0.6)), 1.6, wood));
+  chisel.opacity(0);
+  parts.arms[0].hand!.add(chisel);
+  parts.chisel = chisel;
   poseBow(parts, 0);
   showEquipment(parts, callingEquipment(calling));
 }

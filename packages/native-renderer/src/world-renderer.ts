@@ -1,5 +1,4 @@
-// Literal orchestration from the native WorldRenderer. Paint ownership is adapted
-// to WebCanvas; authored geometry, layer order, culling and simulation inputs are unchanged.
+// Retained WebCanvas world rendering with ground-baseline object ordering and cached geometry.
 import { Camera, point, project, tileHalfHeight, type Point } from '../../engine/src/geometry';
 import { f32 as f } from '../../engine/src/numeric';
 import { Preview } from '../../engine/src/game-tools';
@@ -22,6 +21,7 @@ import { animate } from './world-animation';
 import { paintStorm } from './world-weather';
 import { ymirHeight } from './ymir-statue';
 import { volcanoHeight, volcanoSmoke } from './volcano-painter';
+import { sortWorldObjects, footprintBaseline, baselineDepthAt } from './world-depth';
 
 const samePoint = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
 const samePreview = (a: Preview, b: Preview): boolean =>
@@ -147,7 +147,8 @@ export class WorldRenderer extends WorldRendererState {
         anchor = project(corner.x, corner.y),
         top = Math.min(f(anchor.y - item.layout.originY), bottom);
       if (at.x < left || at.x > right || at.y < top || at.y > bottom) continue;
-      const depth = project(building.center.x, building.center.y).y;
+      const baseline = footprintBaseline(building.footprint()),
+        depth = baselineDepthAt(baseline, at.x);
       if (depth > front) {
         front = depth;
         found = building.id;
@@ -284,6 +285,7 @@ export class WorldRenderer extends WorldRendererState {
       updateGrowth(this, town, seconds);
       animate(this, town, seconds);
     }
+    sortWorldObjects(this);
     this.adapter.sync(this.root);
     // Native caches hold independent references even while their rows are culled.
     this.adapter.collect([

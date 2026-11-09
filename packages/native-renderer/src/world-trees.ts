@@ -1,4 +1,4 @@
-import { point, project, tileHalfHeight, type Point } from '../../engine/src/geometry';
+import { point, project, type Point } from '../../engine/src/geometry';
 import { f32, clamp } from '../../engine/src/numeric';
 import { WorldMap } from '../../engine/src/world-map';
 import { Town } from '../../engine/src/town';
@@ -12,8 +12,40 @@ import { appendStone, stoneLit, stoneShade } from './mining-stone';
 import { TreeBatch, treeAt } from './tree-painter';
 import { PeakBatch, peakAt } from './mountain-peaks';
 import { WorldRendererState } from './world-renderer-state';
+import { registerDepth } from './world-depth';
+const canopyBases = new WeakMap<SceneNode, number>();
 export const sprouting = (s: WorldRendererState, cell: number, index: number): boolean =>
   s.growingTrees.some((tree) => tree.cell === cell && tree.index === index);
+function shapesBounds(shapes: readonly ShapeNode[]): Rect {
+  let left = Infinity,
+    top = Infinity,
+    right = -Infinity,
+    bottom = -Infinity;
+  const include = (x: number, y: number) => {
+    left = Math.min(left, x);
+    top = Math.min(top, y);
+    right = Math.max(right, x);
+    bottom = Math.max(bottom, y);
+  };
+  for (const shape of shapes)
+    for (const command of shape.commands) {
+      if (command[0] === 'M' || command[0] === 'L') include(command[1], command[2]);
+      else if (command[0] === 'C') {
+        include(command[1], command[2]);
+        include(command[3], command[4]);
+        include(command[5], command[6]);
+      } else if (command[0] === 'E') {
+        include(command[1] - command[3], command[2] - command[4]);
+        include(command[1] + command[3], command[2] + command[4]);
+      } else if (command[0] === 'R') {
+        include(command[1], command[2]);
+        include(command[1] + command[3], command[2] + command[4]);
+      }
+    }
+  return Number.isFinite(left)
+    ? new Rect(left - 10, top, right - left + 20, Math.max(1, bottom - top))
+    : new Rect();
+}
 export function buildTreeRow(
   s: WorldRendererState,
   map: WorldMap,
@@ -22,72 +54,58 @@ export function buildTreeRow(
 ): void {
   const trees = s.rowTrees[row];
   trees.remove();
-  s.rowCanopies[row] = null;
-  const woods = new TreeBatch(climate),
-    peaks = new PeakBatch(climate),
-    rockLit = new ShapeNode(),
-    rockShade = new ShapeNode();
-  for (let x = Math.max(0, f32(f32(row - map.height()) + 1)); x <= Math.min(row, f32(map.width() - 1)); x++) {
-    const y = f32(row - x),
+  s.rowCanopies[row] = [];
+  const bounds: Rect[] = [];
+  const append = (at: Point, key: string, shapes: ShapeNode[], canopy = false) => {
+    const scene = new SceneNode(),
+      box = shapesBounds(shapes);
+    for (const shape of shapes) if (shape.commands.length) scene.add(shape);
+    if (!scene.children.length) return;
+    trees.add(scene);
+    bounds.push(box);
+    registerDepth(scene, at, key, box);
+    if (canopy) {
+      s.rowCanopies[row].push(scene);
+      canopyBases.set(scene, project(at.x, at.y).y);
+    }
+  };
+  for (let x = Math.max(0, row - map.height() + 1); x <= Math.min(row, map.width() - 1); x++) {
+    const y = row - x,
       tile = map.at(x, y);
-    for (let i = 0; i < tile.trees; i++)
-      if (!sprouting(s, f32(f32(y * map.width()) + x), i)) woods.add(treeAt(map, x, y, i));
+    for (let i = 0; i < tile.trees; i++) {
+      if (sprouting(s, y * map.width() + x, i)) continue;
+      const tree = treeAt(map, x, y, i),
+        batch = new TreeBatch(climate);
+      batch.add(tree);
+      append(tree.foot, `tree:${x}:${y}:${i}`, batch.finish(project(tree.foot.x, tree.foot.y).y), true);
+    }
     const peak = peakAt(map, x, y);
-    if (peak) peaks.add(peak);
+    if (peak) {
+      const batch = new PeakBatch(climate);
+      batch.add(peak);
+      append(peak.foot, `peak:${x}:${y}`, batch.finish(project(peak.foot.x, peak.foot.y).y));
+    }
     if (mining.deposit(map, x, y)) {
       const foot = mining.position(x, y),
-        b = project(foot.x, foot.y),
-        size = mining.size(map, x, y);
-      appendStone(rockLit, rockShade, b, size);
+        lit = new ShapeNode(),
+        shade = new ShapeNode();
+      appendStone(lit, shade, project(foot.x, foot.y), mining.size(map, x, y));
+      fill(lit, opaque(stoneLit));
+      fill(shade, opaque(stoneShade));
+      append(foot, `stone:${x}:${y}`, [lit, shade]);
     }
   }
-  const base = f32(f32(row * tileHalfHeight) + tileHalfHeight);
-  fill(rockLit, opaque(stoneLit));
-  fill(rockShade, opaque(stoneShade));
-  const wood = woods.finish(base),
-    drawn = [rockLit, rockShade, ...peaks.finish(base)],
-    low = point(1e9, 1e9),
-    high = point(-1e9, -1e9);
-  const include = (x: number, y: number) => {
-    low.x = Math.min(low.x, x);
-    low.y = Math.min(low.y, y);
-    high.x = Math.max(high.x, x);
-    high.y = Math.max(high.y, y);
-  };
-  const hull = (shape: ShapeNode) => {
-    for (const c of shape.commands) {
-      if (c[0] === 'M' || c[0] === 'L') include(c[1], c[2]);
-      else if (c[0] === 'C') {
-        include(c[1], c[2]);
-        include(c[3], c[4]);
-        include(c[5], c[6]);
-      } else if (c[0] === 'E') {
-        include(f32(c[1] - c[3]), f32(c[2] - c[4]));
-        include(f32(c[1] + c[3]), f32(c[2] + c[4]));
-      } else if (c[0] === 'R') {
-        include(c[1], c[2]);
-        include(f32(c[1] + c[3]), f32(c[2] + c[4]));
-      }
-    }
-  };
-  if (wood.length) {
-    const canopy = new SceneNode();
-    for (const shape of wood) {
-      hull(shape);
-      canopy.add(shape);
-    }
-    trees.add(canopy);
-    s.rowCanopies[row] = canopy;
+  if (!bounds.length) {
+    s.treeBounds[row] = new Rect();
+    return;
   }
-  for (const shape of drawn) {
-    hull(shape);
-    trees.add(shape);
-  }
+  const left = Math.min(...bounds.map((b) => b.x)),
+    top = Math.min(...bounds.map((b) => b.y));
   s.treeBounds[row] = new Rect(
-    f32(low.x - 10),
-    low.y,
-    f32(Math.max(0, f32(high.x - low.x)) + 20),
-    Math.max(0, f32(high.y - low.y)),
+    left,
+    top,
+    Math.max(...bounds.map((b) => b.x + b.w)) - left,
+    Math.max(...bounds.map((b) => b.y + b.h)) - top,
   );
 }
 export function cullTrees(s: WorldRendererState): void {
@@ -106,7 +124,9 @@ export function cullTrees(s: WorldRendererState): void {
 export function swayTrees(s: WorldRendererState, wind: number, seconds: number): void {
   const active = wind > f32(0.2) && s.view.zoom >= f32(0.45);
   if (!active) {
-    if (s.swaying) for (const canopy of s.rowCanopies) canopy?.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+    if (s.swaying)
+      for (const canopies of s.rowCanopies)
+        for (const canopy of canopies) canopy.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);
     s.swaying = false;
     return;
   }
@@ -119,8 +139,8 @@ export function swayTrees(s: WorldRendererState, wind: number, seconds: number):
     pace = f32(f32(0.35) + f32(f32(0.3) * wind)),
     t = f32(seconds);
   for (let i = 0; i < s.rowCanopies.length; i++) {
-    const canopy = s.rowCanopies[i];
-    if (!canopy || s.rowTrees[i].alpha === 0) continue;
+    const canopies = s.rowCanopies[i];
+    if (!canopies.length || s.rowTrees[i].alpha === 0) continue;
     const phase = f32(i * f32(0.45)),
       k = f32(
         lean +
@@ -134,9 +154,11 @@ export function swayTrees(s: WorldRendererState, wind: number, seconds: number):
                   ),
               ),
           ),
-      ),
-      base = f32(f32(i + 1) * tileHalfHeight);
-    canopy.transform([1, -k, f32(k * base), 0, 1, 0, 0, 0, 1]);
+      );
+    for (const canopy of canopies) {
+      const base = canopyBases.get(canopy)!;
+      canopy.transform([1, -k, f32(k * base), 0, 1, 0, 0, 0, 1]);
+    }
   }
 }
 export function sprout(
@@ -180,6 +202,7 @@ export function sprout(
   }
   leaves.fill(126, 156, 98).opacity(0);
   paint.add(leaves).add(body);
+  registerDepth(paint, tree.foot, `sprout:${x}:${y}:${index}`);
   s.rows[row].add(paint);
   s.growingTrees.push({
     paint,
@@ -276,6 +299,7 @@ export function updateFelling(s: WorldRendererState, town: Town): void {
     dust.fill(160, 132, 88).opacity(0);
     paint.add(body).add(dust);
     const row = clamp(f32(x + y), 0, f32(s.rows.length - 1));
+    registerDepth(paint, tree.foot, `fall:${event.serial}`);
     s.rows[row].add(paint);
     const worker = project(event.worker.x, event.worker.y);
     s.fallingTrees.push({ paint, body, dust, pivot, row, at: event.at, side: pivot.x < worker.x ? -1 : 1 });

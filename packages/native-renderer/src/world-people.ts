@@ -4,6 +4,7 @@ import { Traffic, Agent, AgentKind } from '../../engine/src/traffic';
 import { point, sub, add, mul, distance, normalized, project } from '../../engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../engine/src/numeric';
 import { Activity } from '../../engine/src/person';
+import { farmWorkPhase } from '../../engine/src/farm-work';
 import { breedOf } from '../../engine/src/town-monsters';
 import { injuryOf, Injury } from '../../engine/src/person-look';
 import { Product, Structure, structureSpec } from '../../engine/src/building-catalog';
@@ -14,12 +15,14 @@ import * as mining from '../../engine/src/mining';
 import * as woodcutting from '../../engine/src/woodcutting';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
-import { standingRow } from './world-depth';
+import { standingRow, registerDepth } from './world-depth';
 import { agentSprite, personSprite, PersonParts, stridePose, monsterParts } from './world-sprites';
 import { animalSprite } from './wildlife-sprites';
 import { moodOf } from './person-portrait';
 import { canIdleGesture, idleGesture, animateGesture, IdleGesture } from './idle-gesture';
 import { line, opaque } from './vector-paint';
+import { updateBuildingDamage } from './building-damage';
+import { clearWorkProps, animateFieldWork, animateProcessingWork } from './work-motion';
 import { callingEquipment, combatEquipment, showEquipment, poseBow } from './person-equipment';
 import { animateAction, animateMonsterAttack, strikePhase } from './action-motion';
 const inSight = (s: WorldRendererState, p: { x: number; y: number }) => s.currentVisibility.sample(p) >= 119;
@@ -39,6 +42,7 @@ export function moveAgents(
       s.sprites.set(agent.id, sprite);
     }
     sprite.seen = true;
+    registerDepth(sprite.paint, agent.position(), `traveller:${agent.id}`);
     const at = agent.position(),
       row = standingRow(town, at, count);
     if (row !== sprite.row) {
@@ -101,6 +105,7 @@ export function moveAgents(
       s.rows[row].add(figure.paint);
       figure.row = row;
     }
+    registerDepth(figure.paint, crossing ? person.entrance : person.position, `person:${person.id}`);
     const screen = project(person.position.x, person.position.y),
       strike = strikes.get(person.id),
       followingThrough = !!strike && town.clock() - strike.at < 0.25,
@@ -127,7 +132,12 @@ export function moveAgents(
         ahead = sub(treePosition(town.map(), x, y, town.map().at(x, y).trees - 1), person.position);
     }
     if (fighting && !combatTravel && !person.moving()) {
-      const foe = person.foe >= 0 ? town.creatureTarget(person.foe) : null;
+      const foe =
+        person.foe >= 0
+          ? town.creatureTarget(person.foe)
+          : person.attackPerson >= 0
+            ? town.person(person.attackPerson)
+            : null;
       if (foe) ahead = sub(foe.position, person.position);
       else if (strike) ahead = sub(strike.to, person.position);
     }
@@ -179,21 +189,48 @@ export function moveAgents(
       !person.moving() &&
       !crossing &&
       (person.activity === Activity.Building || person.activity === Activity.Roadwork);
+    const workplace = person.activity === Activity.Working ? town.building(person.target) : null,
+      working = !s.sceneView && !striding && !person.inside && !crossing,
+      farming = working && workplace?.kind === Structure.Farm && person.workField >= 0,
+      watering = farming && farmWorkPhase(person, town.clock()) === 1,
+      processing =
+        working &&
+        workplace &&
+        workplace.productionProgress > 0 &&
+        (workplace.kind === Structure.Sawmill || workplace.kind === Structure.Stoneworks);
+    clearWorkProps(figure.parts);
     const tool = chopping
       ? 'axe'
       : miningNow
         ? 'pickaxe'
         : hammering
           ? 'hammer'
-          : fighting
-            ? combatEquipment(person, town.building(person.job)?.kind)
-            : callingEquipment(person.calling);
+          : farming
+            ? watering
+              ? 'wateringCan'
+              : 'hoe'
+            : processing
+              ? workplace.kind === Structure.Sawmill
+                ? 'saw'
+                : 'hammer'
+              : fighting
+                ? combatEquipment(person, town.building(person.job)?.kind)
+                : callingEquipment(person.calling);
     showEquipment(figure.parts, tool);
-    figure.parts.lute?.opacity(fighting || chopping || miningNow || hammering ? 0 : 255);
+    figure.parts.lute?.opacity(
+      fighting || chopping || miningNow || hammering || farming || processing ? 0 : 255,
+    );
     if (tool === 'bow') poseBow(figure.parts, 0);
     figure.parts.arrow?.opacity(0);
     if (!s.sceneView && tool) {
-      if (chopping || miningNow)
+      if (farming) animateFieldWork(figure.parts, watering, town.clock() + person.id * 0.31);
+      else if (processing)
+        animateProcessingWork(
+          figure.parts,
+          workplace.kind === Structure.Sawmill,
+          town.clock() + person.id * 0.31,
+        );
+      else if (chopping || miningNow)
         animateAction(
           figure.parts,
           tool,
@@ -210,8 +247,14 @@ export function moveAgents(
       carrying = person.carrying > 0 && person.activity !== Activity.Collecting;
     figure.parts.logs?.opacity(carrying && person.carriedProduct === Product.Wood ? 255 : 0);
     figure.parts.stone?.opacity(carrying && person.carriedProduct === Product.Stone ? 255 : 0);
+    figure.parts.planks?.opacity(carrying && person.carriedProduct === Product.Planks ? 255 : 0);
+    figure.parts.cutStone?.opacity(carrying && person.carriedProduct === Product.CutStone ? 255 : 0);
     figure.parts.sack?.opacity(
-      job && carried !== Structure.Lumberyard && carried !== Structure.Quarry ? 255 : 0,
+      (job && carried !== Structure.Lumberyard && carried !== Structure.Quarry) ||
+        (carrying &&
+          ![Product.Wood, Product.Stone, Product.Planks, Product.CutStone].includes(person.carriedProduct))
+        ? 255
+        : 0,
     );
   }
   for (const [id, figure] of s.figures) {
@@ -237,6 +280,7 @@ export function moveAgents(
         s.beasts.set(beast.id, sprite);
       }
       sprite.seen = true;
+      registerDepth(sprite.paint, beast.position, `beast:${beast.id}`);
       const row = standingRow(town, beast.position, count);
       if (row !== sprite.row) {
         if (sprite.row >= 0) s.rows[sprite.row].remove(sprite.paint);
@@ -280,6 +324,7 @@ export function moveAgents(
   }
 }
 export function markDamage(s: WorldRendererState, town: Town): void {
+  updateBuildingDamage(s, town);
   if (!s.damageBack) {
     s.damageBack = new ShapeNode();
     s.damageLeft = new ShapeNode();
