@@ -26,6 +26,11 @@ import { resourceAmount } from './construction-materials';
 import { processingRecipe } from './town-production';
 import { prepareBuildingRepair, restoreBuildingHealth } from './building-repair';
 export interface TickTown extends PeopleTown {
+  updateStress(p: Person, dt: number): boolean;
+  advanceNeutralSettlements(dt: number): void;
+  processDevotion(): void;
+  completeAltarPrayer(p: Person): boolean;
+  completeGuildTraining(p: Person): boolean;
   huntFood(p: Person): boolean;
   processProduction(place: Building, dt: number): void;
   prepareConstruction(p: Person, work: Activity, id: number): boolean;
@@ -91,6 +96,7 @@ export function tick(this: TickTown, dt: number): void {
     this.grid.rebuild(this.world, this.network, walls);
   }
   this.admitGuests(dt);
+  this.processDevotion();
   if (!this.titleAutoplay) this.stir(dt);
   const sky = this.climate(),
     days = f(dt / TownState.secondsPerDay),
@@ -98,6 +104,7 @@ export function tick(this: TickTown, dt: number): void {
     healers = this.staffed(Structure.Apothecary);
   for (let i = 0; i < this.folk.length; ++i) {
     const p = this.folk[i];
+    if (p.faction !== this.controlFaction) continue;
     if (p.activity === Activity.Exploring) {
       p.path = [];
       if (p.inside || p.crossingDoorway()) this.walkTo(p, p.entrance);
@@ -135,6 +142,8 @@ export function tick(this: TickTown, dt: number): void {
         Activity.Collecting,
       ].includes(p.activity);
     if (working) strain = f(strain + f(0.12));
+    // Repeated long shifts accumulate pressure even when food is available.
+    if (working && p.worked >= TownState.secondsPerDay * .45) strain = f(strain + f(.35));
     if (
       !p.crossingDoorway() &&
       (working ||
@@ -164,11 +173,17 @@ export function tick(this: TickTown, dt: number): void {
       p.health = -1;
     }
     if (p.health < f(-0.5)) continue;
+    const stressHandled = this.updateStress(p, dt);
+    if (p.faction !== this.controlFaction) continue;
     if (p.crossingDoorway()) {
       const length = distance(p.entrance, p.threshold),
         step = f(f(this.walkingSpeed(p) * f(dt)) / Math.max(f(0.001), length));
       p.doorway = clamp(f(p.doorway + (p.inside ? step : -step)), 0, 1);
       p.position = lerp(p.entrance, p.threshold, p.doorway);
+      continue;
+    }
+    if (stressHandled) {
+      if (p.moving()) { this.walk(p, dt); if (!p.moving()) this.arrive(p); }
       continue;
     }
     this.fight(p, dt);
@@ -263,19 +278,6 @@ export function tick(this: TickTown, dt: number): void {
         if (place.health > previousHealth || place.progress > previousProgress) hammerContact(this,p,dt);
         if (!repairing && place.built()) {
           this.notify(structureSpec(place.kind).name + ' is finished');
-          if (place.kind === Structure.Guild)
-            for (let d = 0; d < this.world.dungeons().length; ++d) {
-              const dungeon = this.world.dungeons()[d];
-              if (
-                !this.open[d] &&
-                dungeon.kind !== DungeonKind.GiantHall &&
-                dungeon.discovered &&
-                distance(place.center, point(f(dungeon.origin.x + 1), f(dungeon.origin.y + 1))) <= 10
-              ) {
-                this.open[d] = 1;
-                this.notify(dungeon.name + ' is open to adventurers');
-              }
-            }
           this.assignHomes();
           this.staff();
           ++this.changes;
@@ -551,11 +553,20 @@ export function tick(this: TickTown, dt: number): void {
         }
         break;
       }
+      case Activity.Training:
+        if (this.time >= p.until) {
+          if (!this.completeGuildTraining(p)) { p.activity = Activity.Idle; p.until = this.time; this.think(p); }
+        }
+        break;
       case Activity.Eating:
       case Activity.Relaxing:
       case Activity.Praying:
       case Activity.Shopping:
         if (this.time < p.until) break;
+        if (p.activity === Activity.Praying && p.task === Activity.Praying) {
+          if (!this.completeAltarPrayer(p)) { p.activity = Activity.Idle; p.until = this.time; this.think(p); }
+          break;
+        }
         if (p.activity === Activity.Praying) {
           const faithful = !!place && place.faith === p.faith;
           p.stress = Math.max(0, f(p.stress - (faithful ? f(0.4) : f(0.2))));
@@ -585,7 +596,6 @@ export function tick(this: TickTown, dt: number): void {
       case Activity.Idle:
       case Activity.Brooding:
         if (this.time >= p.until) {
-          p.stress = Math.max(0, f(p.stress - f(0.2)));
           p.activity = Activity.Idle;
           this.think(p);
         }
@@ -601,6 +611,7 @@ export function tick(this: TickTown, dt: number): void {
         break;
     }
   }
+  if (this.controlFaction === 0) this.advanceNeutralSettlements(dt);
   separatePeople(this, dt);
   if (this.timberEvents.length > 512) this.timberEvents.splice(0, this.timberEvents.length - 512);
   const before = this.folk.length;

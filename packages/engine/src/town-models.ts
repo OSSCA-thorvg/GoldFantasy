@@ -4,6 +4,9 @@ import { f32 as f, lround } from './numeric';
 import { buildingEntranceModel } from './building-appearance';
 import { ConstructionMaterials } from './construction-materials';
 export class Building {
+  faction = 0;
+  devotionDueDay = -1;
+  trainingCount = 0;
   materials = new ConstructionMaterials();
   repairPending = false; repairCredit = 0; productionProgress = 0; workers = 0; wanted = -1; growth = 0; version = 0; replaced: Stage[] = []; progress = 1; workedSeconds = 0; attendance = 1; earned = 0; registered = 0; faith = Faith.Dawn; owner = -1; health = 1; village = -1;
   constructor(public id: number, public kind: Structure, public center: Point, public angle: number, public variant: number) {}
@@ -19,7 +22,7 @@ export class Building {
   door(): Point { const local = this.entrance(); local.y = f(Math.max(local.y, f(structureSpec(this.kind).size / 2)) + f(.25)); const walls = this.footprint(); let p = add(this.center, rotated(local, this.angle)); for (let step = 0; step < 20; ++step) { const cell = point(f(Math.floor(p.x) + f(.5)), f(Math.floor(p.y) + f(.5))); if (!walls.contains(cell, f(.05))) break; local.y = f(local.y + f(.05)); p = add(this.center, rotated(local, this.angle)); } return p; }
   threshold(): Point { return add(this.center, rotated(this.entrance(), this.angle)); }
 }
-export class Field { constructor(public id: number, public outline: Outline, public village = -1) {} acres(): number { return lround(area(this.outline)); } }
+export class Field { faction = 0; constructor(public id: number, public outline: Outline, public village = -1) {} acres(): number { return lround(area(this.outline)); } }
 export class Placement { constructor(public center: Point = point(), public angle = 0, public snapped = false) {} }
 export class Check { constructor(public ok = false, public reason = '', public cost = new Resources()) {} }
 export enum Season { Spring, Summer, Autumn, Winter }

@@ -1,5 +1,6 @@
 import { project, point, distance } from '../../engine/src/geometry';
 import { f32 } from '../../engine/src/numeric';
+import { belongsToFaction, isPlayerBuilding } from '../../engine/src/faction';
 import { Town } from '../../engine/src/town';
 import { WorldMap } from '../../engine/src/world-map';
 import { VisibilityRegion } from '../../engine/src/visibility-map';
@@ -79,9 +80,10 @@ export function updateVision(s: WorldRendererState, town: Town): void {
     blend = (day: number, dark: number) => f32(day + f32(f32(dark - day) * night));
   s.vision = [];
   for (const p of town.people())
-    if (p.visibility() > 0) s.vision.push({ center: { ...p.position }, radius: blend(f32(8.5), 5) });
+    if (belongsToFaction(p) && p.visibility() > 0)
+      s.vision.push({ center: { ...p.position }, radius: blend(f32(8.5), 5) });
   for (const b of town.buildings()) {
-    if (!b.built()) continue;
+    if (!isPlayerBuilding(b) || !b.built()) continue;
     if (b.kind === Structure.Torch) {
       s.vision.push({ center: { ...b.center }, radius: blend(4, f32(6.5)) });
       continue;

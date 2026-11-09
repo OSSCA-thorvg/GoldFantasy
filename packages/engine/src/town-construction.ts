@@ -40,7 +40,7 @@ import { worldName } from './world-map';
 import { ConstructionMaterials, constructionProducts, resourceBundle } from './construction-materials';
 export interface ConstructionTown extends TownState {
   camp(id?: number): Building | null;
-  settlementAt(p: Point): number;
+  settlementAt(p: Point, faction?: number): number;
   settlementOf(p: Person | Building): number;
   stock(camp?: number): Resources;
   reserves(camp: number): Resources;
@@ -62,6 +62,7 @@ export interface ConstructionTown extends TownState {
   borrowWorker(b: Building): void;
   buildingAt(p: Point): number;
   fieldAt(p: Point): number;
+  field(id: number): Field | null;
   touchesSettlement(p: Point): boolean;
   roadSettlement(path: RoadPath, ignore?: number): number;
   connectRoad(road: Road): boolean;
@@ -192,7 +193,7 @@ export function roomToGrow(this: ConstructionTown, item: Building, next: Structu
   return true;
 }
 export function staffed(this: ConstructionTown, kind: Structure): boolean {
-  return this.placed.some((b) => b.kind === kind && b.built() && b.workers > 0);
+  return this.placed.some((b) => b.faction === this.controlFaction && b.kind === kind && b.built() && b.workers > 0);
 }
 export function charge(
   this: ConstructionTown,
@@ -212,7 +213,7 @@ export function charge(
 }
 export function setFaith(this: ConstructionTown, id: number, faith: Faith): boolean {
   for (const item of this.placed)
-    if (item.id === id && item.kind === Structure.Chapel && item.faith !== faith) {
+    if (item.id === id && item.faction === this.controlFaction && item.kind === Structure.Chapel && item.faith !== faith) {
       item.replaced = [{ kind: item.kind, variant: item.variant, dx: 0, dy: 0 }];
       item.faith = faith;
       item.variant = ((item.variant & ~3) | faith) >>> 0;
@@ -332,8 +333,6 @@ export function canPlace(this: ConstructionTown, kind: Structure, center: Point,
       );
   if (founding && !nearDungeon(TownState.campReach))
     return refuse(check, 'Must be within 12 paces of a dungeon');
-  if (kind === Structure.Guild && !nearDungeon(10))
-    return refuse(check, 'Must be within 10 paces of a dungeon');
   if (kind === Structure.Torch) {
     let onRoad = false;
     for (const segment of this.network.builtSegments())
@@ -368,6 +367,7 @@ export function place(this: ConstructionTown, kind: Structure, center: Point, an
   const variant = placementVariant(this.world, kind, center),
     item = new Building(this.nextId++, kind, { ...center }, angle, variant);
   item.progress = 0;
+  item.faction = this.controlFaction;
   item.village = kind === Structure.Camp ? item.id : village;
   item.materials.required = spec.cost.clone();
   this.placed.push(item);
@@ -392,17 +392,6 @@ export function completeConstruction(this: ConstructionTown): void {
       road.paving = -1;
     }
   }
-  for (const item of this.placed)
-    if (item.kind === Structure.Guild)
-      for (let d = 0; d < this.world.dungeons().length; ++d) {
-        const site = this.world.dungeons()[d];
-        if (
-          site.kind !== DungeonKind.GiantHall &&
-          site.discovered &&
-          distance(item.center, point(f32(site.origin.x + 1), f32(site.origin.y + 1))) <= 10
-        )
-          this.open[d] = 1;
-      }
   for (const item of this.placed)
     this.credit(new Resources(0, this.clearTrees(samples(item.footprint()))), this.settlementOf(item));
   for (const road of this.network.roads())
@@ -474,6 +463,7 @@ export function checkRoad(this: ConstructionTown, path: RoadPath, ignore: number
   }
   const village = this.roadSettlement(path, ignore);
   if (village < 0) return refuse(check, 'Must connect to a camp or its roads');
+  if (this.camp(village)?.faction !== this.controlFaction) return refuse(check, 'This road belongs to a neutral settlement');
   const duplicate = flatten(path, f32(0.2));
   if (duplicate.length && duplicate.every((p) => this.network.distance(p, ignore).distance <= f32(0.12)))
     return refuse(check, 'Road already exists');
@@ -490,6 +480,7 @@ export function buildRoad(this: ConstructionTown, path: RoadPath): boolean {
   const id = this.network.add(path),
     road = this.network.road(id)!;
   road.village = village;
+  road.faction = this.controlFaction;
   road.materials.required = check.cost;
   if (!this.connectRoad(road)) {
     this.network.remove(id);
@@ -505,6 +496,7 @@ export function canPave(this: ConstructionTown, id: number): Check {
   const check = new Check(),
     road = this.network.road(id);
   if (!road) return refuse(check, 'No road there');
+  if (road.faction !== this.controlFaction) return refuse(check, 'This road belongs to a neutral settlement');
   if (road.paved || road.paving >= 0) return refuse(check, 'Already paved');
   if (road.built < 1) return refuse(check, 'Lay the road first');
   const length = road.length();
@@ -572,7 +564,9 @@ export function canPlantField(this: ConstructionTown, outline: Outline): Check {
 export function plantField(this: ConstructionTown, outline: Outline): boolean {
   if (!this.canPlantField(outline).ok) return false;
   const village = this.settlementAt(centroid(outline));
-  this.farmland.push(new Field(this.nextId++, structuredClone(outline), village));
+  const field = new Field(this.nextId++, structuredClone(outline), village);
+  field.faction = this.controlFaction;
+  this.farmland.push(field);
   this.credit(new Resources(0, this.clearTrees(samples(outline))), village);
   ++this.changes;
   return true;
@@ -581,29 +575,35 @@ export function canDemolish(this: ConstructionTown, p: Point): Check {
   const check = new Check(),
     id = this.buildingAt(p);
   if (id >= 0) {
+    if (this.building(id)!.faction !== this.controlFaction) return refuse(check, 'This building belongs to a neutral settlement');
     if (isSeat(this.building(id)!.kind)) return refuse(check, 'The seat of the settlement stays');
     check.ok = true;
-  } else if (
-    this.fieldAt(p) >= 0 ||
-    this.network.distance(p).distance < f32(TownState.roadHalfWidth + f32(0.15))
-  )
-    check.ok = true;
-  else check.reason = 'Nothing to clear';
+  } else {
+    const field = this.field(this.fieldAt(p)), match = this.network.distance(p), road = this.network.road(match.id ?? -1);
+    if (field) {
+      if (field.faction !== this.controlFaction) return refuse(check, 'This field belongs to a neutral settlement');
+      check.ok = true;
+    } else if (road && match.distance < f32(TownState.roadHalfWidth + f32(0.15))) {
+      if (road.faction !== this.controlFaction) return refuse(check, 'This road belongs to a neutral settlement');
+      check.ok = true;
+    } else check.reason = 'Nothing to clear';
+  }
   return check;
 }
 export function raze(this: ConstructionTown, id: number): void {
   const lostCamp = !!this.camp(id);
   this.placed = this.placed.filter((b) => b.id !== id);
   if (lostCamp) {
+    for (const state of this.neutralSettlements) if (state.camp === id) state.camp = -1;
     this.villages = this.villages.filter((v) => v.camp !== id);
-    for (const b of this.placed) if (b.village === id) b.village = this.settlementAt(b.center);
+    for (const b of this.placed) if (b.village === id) b.village = this.settlementAt(b.center, b.faction);
     for (const r of this.network.list)
-      if (r.village === id) r.village = this.settlementAt(r.along(r.constructionStart));
+      if (r.village === id) r.village = this.settlementAt(r.along(r.constructionStart), r.faction);
     for (const field of this.farmland)
-      if (field.village === id) field.village = this.settlementAt(centroid(field.outline));
+      if (field.village === id) field.village = this.settlementAt(centroid(field.outline), field.faction);
   }
   for (const person of this.folk) {
-    if (lostCamp && person.village === id) person.village = this.settlementAt(person.position);
+    if (lostCamp && person.village === id) person.village = this.settlementAt(person.position, person.faction);
     if (person.home === id) person.home = -1;
     if (person.job === id) person.job = -1;
     if (person.bed === id) person.bed = -1;
@@ -663,7 +663,7 @@ export function regrow(this: ConstructionTown): void {
 }
 export function setWorkers(this: ConstructionTown, id: number, workers: number): boolean {
   for (const item of this.placed) {
-    if (item.id !== id) continue;
+    if (item.id !== id || item.faction !== this.controlFaction) continue;
     const jobs = structureSpec(item.kind).jobs,
       before = item.workers;
     item.wanted = clamp(workers, 0, jobs);
@@ -712,7 +712,7 @@ export function borrowWorker(this: ConstructionTown, to: Building): void {
   for (let i = f32(this.folk.length - 1); i >= 0; --i) {
     const p = this.folk[i];
     if (
-      p.job === donor.id &&
+      p.job === donor.id && !p.stressRecovery && p.faction === to.faction &&
       p.role === Role.Resident &&
       p.autoMode &&
       !p.ordered &&
@@ -737,11 +737,11 @@ export function borrowWorker(this: ConstructionTown, to: Building): void {
 export function recount(this: ConstructionTown): void {
   for (const item of this.placed) item.workers = 0;
   for (const person of this.folk)
-    if (person.job >= 0) for (const item of this.placed) if (item.id === person.job) ++item.workers;
+    if (person.job >= 0 && !person.stressRecovery) for (const item of this.placed) if (item.id === person.job && item.faction === person.faction) ++item.workers;
 }
 export function employed(this: ConstructionTown): number {
   let total = 0;
-  for (const item of this.placed) total = f32(total + item.workers);
+  for (const item of this.placed) if (item.faction === this.controlFaction) total = f32(total + item.workers);
   return total;
 }
 export function staff(this: ConstructionTown): void {
@@ -756,6 +756,7 @@ export function staff(this: ConstructionTown): void {
         if (item.workers >= cap) break;
         if (
           person.role !== Role.Resident ||
+          person.stressRecovery || person.faction !== item.faction ||
           person.job >= 0 ||
           !person.autoMode ||
           person.ordered ||
@@ -812,8 +813,9 @@ export function near(
   center: Point,
   radius: number,
   match: (kind: Structure) => boolean,
+  faction = this.controlFaction,
 ): boolean {
-  return this.placed.some((b) => match(b.kind) && distance(b.center, center) <= radius);
+  return this.placed.some((b) => b.faction === faction && match(b.kind) && distance(b.center, center) <= radius);
 }
 export function nearbyTiles(
   this: ConstructionTown,

@@ -3,6 +3,7 @@ import type { Town } from './town';
 import { Structure, structureSpec } from './building-catalog';
 import { Tool, toolStructure } from './game-tools';
 import rows from '../data/settlement-goals.json';
+import { belongsToFaction } from './faction';
 export interface Unlock {
   available: boolean;
   reason: string;
@@ -27,7 +28,7 @@ const goals: SettlementGoal[] = rows.map((row) => ({
 }));
 export function completedFacility(town: Town, kind: Structure): boolean {
   for (const b of town.buildings())
-    if (b.built())
+    if (b.built() && belongsToFaction(b, town.controlFaction))
       for (let stage = kind; stage !== Structure.Count; stage = structureSpec(stage).next)
         if (b.kind === stage) return true;
   return false;
@@ -102,8 +103,7 @@ export function buildingUnlock(town: Town, kind: Structure): Unlock {
       population = 18;
       break;
     case Structure.Shrine:
-      first = Structure.Tavern;
-      population = 26;
+      first = Structure.Camp;
       break;
     case Structure.Chapel:
       first = Structure.Shrine;
@@ -126,7 +126,12 @@ export function buildingUnlock(town: Town, kind: Structure): Unlock {
     !town
       .roads()
       .roads()
-      .some((r) => r.built >= 1)
+      .some(
+        (r) =>
+          r.built >= 1 &&
+          !!town.camp(r.village) &&
+          belongsToFaction(town.camp(r.village)!, town.controlFaction),
+      )
   )
     return { available: false, reason: 'Complete a road' };
   const cost = structureSpec(kind).cost;
@@ -155,7 +160,12 @@ export function goalComplete(town: Town, goal: SettlementGoal): boolean {
       return town
         .roads()
         .roads()
-        .some((r) => r.built >= 1);
+        .some(
+          (r) =>
+            r.built >= 1 &&
+            !!town.camp(r.village) &&
+            belongsToFaction(town.camp(r.village)!, town.controlFaction),
+        );
     case GoalKind.Field:
       return town.fieldAcres() > 0;
     case GoalKind.Population:

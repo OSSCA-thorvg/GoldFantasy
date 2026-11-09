@@ -51,6 +51,7 @@ import {
 import { CampEconomy, Ledger } from './camp-economy';
 import { point } from './geometry';
 import { defaultAppearance } from './person-look';
+import { NeutralSettlement } from './neutral-state';
 export interface SaveTown extends TownState {
   camp(id?: number): Building | null;
   settlement(id: number): CampEconomy;
@@ -336,6 +337,24 @@ function personFields(a: SaveArchive, v: Person): void {
     if (a.reading && (!Number.isFinite(v.hydration) || v.hydration < 0 || v.hydration > 1))
       throw new Error('Invalid hydration');
   }
+  if (a.formatVersion >= 10) {
+    a.fields(v, {
+      faction: i32,
+      stressRecovery: boolean,
+      lastBreakdownAt: f64,
+      trained: boolean,
+      trainingCalling: i32,
+    });
+    if (
+      a.reading &&
+      (v.faction < 0 ||
+        !Number.isFinite(v.lastBreakdownAt) ||
+        v.lastBreakdownAt < -1 ||
+        v.trainingCalling < -1 ||
+        v.trainingCalling > Calling.Bard)
+    )
+      throw new Error('Invalid resident allegiance');
+  }
   if (
     a.reading &&
     (v.level < 1 ||
@@ -379,6 +398,7 @@ function campFields(a: SaveArchive, v: CampEconomy): void {
   });
   const dry = a.value(u8, v.parched ? 1 : 0);
   a.fields(v, { spoiledDay: i32, arrivalTimer: f64, bardDue: f64 });
+  if (a.formatVersion >= 10) a.fields(v, { faction: i32 });
   if (a.reading) {
     if (
       dry > 1 ||
@@ -388,12 +408,38 @@ function campFields(a: SaveArchive, v: CampEconomy): void {
       !Number.isFinite(v.arrivalTimer) ||
       !Number.isFinite(v.bardDue) ||
       !Number.isFinite(v.growingTended) ||
-      !v.stock.covers(new Resources())
+      !v.stock.covers(new Resources()) ||
+      v.faction < 0
     )
       throw new Error('Invalid camp economy');
     v.parched = dry !== 0;
   }
 }
+const neutralCodec = record(
+  () => new NeutralSettlement(),
+  {
+    faction: i32,
+    founder: i32,
+    destination: pointCodec,
+    camp: i32,
+    stock: resourcesCodec,
+    planAt: f64,
+    builder: i32,
+    foodUntil: f64,
+    dice: u32,
+  },
+  (v) => {
+    if (
+      v.faction <= 0 ||
+      v.founder < 0 ||
+      v.camp < -1 ||
+      v.builder < -1 ||
+      ![v.destination.x, v.destination.y, v.planAt, v.foodUntil].every(Number.isFinite) ||
+      !v.stock.covers(new Resources())
+    )
+      throw new Error('Invalid neutral settlement');
+  },
+);
 function townFields(a: SaveArchive, v: SaveTown): void {
   const legacy = a.reading ? new CampEconomy() : v.settlement(v.camp()?.id ?? -1);
   a.fields(v, {
@@ -481,6 +527,16 @@ function townFields(a: SaveArchive, v: SaveTown): void {
           throw new Error('Invalid repair credit');
       }
     }
+    if (a.formatVersion >= 10) {
+      for (const building of v.placed) {
+        a.fields(building, { faction: i32, devotionDueDay: i32, trainingCount: i32 });
+        if (a.reading && (building.faction < 0 || building.devotionDueDay < -1 || building.trainingCount < 0))
+          throw new Error('Invalid altar or building allegiance');
+      }
+      for (const road of v.network.list) a.fields(road, { faction: i32 });
+      for (const field of v.farmland) a.fields(field, { faction: i32 });
+      a.fields(v, { neutralSettlements: vector(neutralCodec) });
+    }
     const extent = a.cursor - start,
       stored = a.value(u32, extent);
     if (a.reading) {
@@ -497,19 +553,51 @@ function townFields(a: SaveArchive, v: SaveTown): void {
       const camps = new Set<number>();
       for (const village of v.villages) {
         if (!v.camp(village.camp) || camps.has(village.camp)) throw new Error('Invalid camp stockpile');
+        if (v.camp(village.camp)!.faction !== village.faction) throw new Error('Invalid camp allegiance');
         camps.add(village.camp);
       }
       if (v.provisions.camp !== -1 || camps.size !== v.placed.filter((b) => isSeat(b.kind)).length)
         throw new Error('Missing camp stockpile');
       for (const b of v.placed)
-        if ((isSeat(b.kind) && b.village !== b.id) || (b.village >= 0 && !camps.has(b.village)))
+        if (
+          (isSeat(b.kind) && b.village !== b.id) ||
+          (b.village >= 0 && (!camps.has(b.village) || v.camp(b.village)?.faction !== b.faction))
+        )
           throw new Error('Invalid building village');
       for (const road of v.network.list)
-        if (road.village >= 0 && !camps.has(road.village)) throw new Error('Invalid road village');
+        if (
+          road.faction < 0 ||
+          (road.village >= 0 && (!camps.has(road.village) || v.camp(road.village)?.faction !== road.faction))
+        )
+          throw new Error('Invalid road village');
       for (const field of v.farmland)
-        if (field.village >= 0 && !camps.has(field.village)) throw new Error('Invalid field village');
+        if (
+          field.faction < 0 ||
+          (field.village >= 0 &&
+            (!camps.has(field.village) || v.camp(field.village)?.faction !== field.faction))
+        )
+          throw new Error('Invalid field village');
       for (const person of v.folk)
-        if (person.village >= 0 && !camps.has(person.village)) throw new Error('Invalid character village');
+        if (
+          person.village >= 0 &&
+          (!camps.has(person.village) || v.camp(person.village)?.faction !== person.faction)
+        )
+          throw new Error('Invalid character village');
+      for (const person of v.folk)
+        for (const id of [person.home, person.bed, person.job]) {
+          const place = v.building(id);
+          if (place && place.faction !== person.faction) throw new Error('Invalid resident affiliation');
+        }
+      const factions = new Set<number>();
+      for (const neutral of v.neutralSettlements) {
+        if (
+          factions.has(neutral.faction) ||
+          !v.world.inside(neutral.destination) ||
+          (neutral.camp >= 0 && v.camp(neutral.camp)?.faction !== neutral.faction)
+        )
+          throw new Error('Invalid neutral settlement allegiance');
+        factions.add(neutral.faction);
+      }
     }
   } else if (a.reading) {
     v.provisions = legacy;
@@ -590,7 +678,7 @@ export function encodeTown(town: SaveTown): string {
         (p.carrying > 0 && (p.carriedProduct === Product.Planks || p.carriedProduct === Product.CutStone)),
     ) ||
     town.beasts.some((m) => m.strength !== 1) ||
-    town.timberEvents.some(event => event.kind >= TreeWorkKind.Regrow) ||
+    town.timberEvents.some((event) => event.kind >= TreeWorkKind.Regrow) ||
     town.placed.some(
       (b) =>
         b.kind >= Structure.Sawmill ||
@@ -601,7 +689,28 @@ export function encodeTown(town: SaveTown): string {
     ) ||
     town.network.list.some((r) => newMaterials(r.materials)) ||
     [town.provisions, ...town.villages].some((v) => refined(v.stock));
-  a.formatVersion = extended ? 9 : town.folk.some((p) => p.recoveringRest || p.recoveringHealth) ? 8 : 7;
+  const allegiance =
+    town.neutralSettlements.length > 0 ||
+    town.folk.some(
+      (p) =>
+        p.faction !== 0 ||
+        p.stressRecovery ||
+        p.lastBreakdownAt !== -1 ||
+        p.trained ||
+        p.trainingCalling !== -1 ||
+        p.activity === Activity.Training,
+    ) ||
+    town.placed.some((b) => b.faction !== 0 || b.devotionDueDay !== -1 || b.trainingCount !== 0) ||
+    town.network.list.some((r) => r.faction !== 0) ||
+    town.farmland.some((field) => field.faction !== 0) ||
+    [town.provisions, ...town.villages].some((v) => v.faction !== 0);
+  a.formatVersion = allegiance
+    ? 10
+    : extended
+      ? 9
+      : town.folk.some((p) => p.recoveringRest || p.recoveringHealth)
+        ? 8
+        : 7;
   a.fields(
     {
       version: a.formatVersion,
@@ -640,10 +749,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 9) climateSize = u32.read(a);
+  if (version >= 2 && version <= 10) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 9 ||
+    version > 10 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

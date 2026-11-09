@@ -7,10 +7,16 @@ import {
   activityName,
   type Person,
 } from '../../../../packages/engine/src/person';
-import { structureSpec, describe, isSeat } from '../../../../packages/engine/src/building-catalog';
+import { structureSpec } from '../../../../packages/engine/src/building-catalog';
 import { personPortrait, moodOf } from '../../../../packages/native-renderer/src/person-portrait';
 import { portraitBackdrop } from '../../../../packages/native-renderer/src/portrait-background';
 import { injuryOf } from '../../../../packages/engine/src/person-look';
+import {
+  isPlayerResident,
+  canControl,
+  controlReason,
+  belongsToFaction,
+} from '../../../../packages/engine/src/faction';
 import { hudPaint } from './hud-paint';
 import type { GameHudApp } from './game-hud-contract';
 
@@ -41,7 +47,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
   });
   c.text(
     new Rect(panel.x + 16, panel.y + (short ? 13 : 21), panel.w - 58, short ? 21 : 25),
-    'HALL OF OATHS',
+    'SETTLEMENT HALL',
     ink,
     17,
     true,
@@ -73,16 +79,14 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       this.rosterTab === tab ? ButtonStyle.Primary : ButtonStyle.Quiet,
     );
   }
-  const selectedBuilding = this.town.building(this.selected);
-  const village = selectedBuilding && isSeat(selectedBuilding.kind) ? selectedBuilding.id : undefined;
-  const offers = this.town.recruitmentOffers(village);
-  const entries =
-    this.rosterTab === 'guests'
-      ? offers.map((offer) => ({ key: offer.key, person: offer.person, offer }))
-      : this.town
-          .people()
-          .filter((p) => p.role === Role.Resident && p.health > 0 && p.activity !== Activity.Leaving)
-          .map((person) => ({ key: `unit:${person.id}`, person, offer: undefined }));
+  const entries = this.town
+    .people()
+    .filter((p) =>
+      this.rosterTab === 'guests'
+        ? p.role === Role.Guest && belongsToFaction(p) && p.health > 0 && p.activity !== Activity.Leaving
+        : isPlayerResident(p),
+    )
+    .map((person) => ({ key: `${this.rosterTab}:${person.id}`, person }));
   const listX = panel.x + 14,
     top = panel.y + (short ? 68 : 91),
     leftW = Math.max(108, Math.min(252, panel.w * 0.36));
@@ -223,7 +227,14 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
   c.line(detail.x - 7, top, detail.x - 7, panel.y + panel.h - 15, rgba(176, 151, 101, 80));
   const selected = entries.find((entry) => entry.key === this.rosterSelected);
   if (!selected) {
-    c.text(detail, 'No residents have joined this hall.', ochre, 12);
+    c.text(
+      detail,
+      this.rosterTab === 'guests'
+        ? 'No guests are visiting the settlement.'
+        : 'No player residents are available.',
+      ochre,
+      12,
+    );
     return;
   }
   const p = selected.person,
@@ -267,10 +278,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       ink,
       compact ? 11 : 13,
     );
-  const powerProfile = selected.offer
-    ? Object.assign(Object.create(Object.getPrototypeOf(p)), p, { role: Role.Resident })
-    : p;
-  stat(0, `Power ${this.town.power(powerProfile).toFixed(1)}`);
+  stat(0, `Power ${this.town.power(p).toFixed(1)}`);
   stat(1, `Vitality ${p.vitalityMultiplier().toFixed(1)}x`);
   stat(2, `Health ${Math.round(p.health * 100)}%`);
   if (!compact) {
@@ -279,49 +287,31 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
   }
   const y = split ? top + 43 : top + (micro ? 84 : short ? 92 : compact ? 144 : 182);
   const footer = new Rect(meta.x, panel.y + panel.h - 43, meta.w, 29);
-  if (selected.offer) {
-    const reason = this.town.recruitmentReason(selected.offer);
-    const seat = this.town.camp(selected.offer.village);
-    const beds = seat ? Math.max(0, this.town.housing(seat.id) - this.town.population(seat.id)) : 0;
-    text(y, `Oath: ${describe(selected.offer.cost)}`, ochre, 11, true);
-    text(y + (short ? 17 : 22), `Resident beds: ${beds} free · 1 needed`, ink, 11);
-    // Reserve the action area before wrapping requirements on narrow viewports.
-    const words = (reason || 'A place at your hearth, in return for service.').split(' ');
-    const lineHeight = short ? 14 : 17;
-    const reasonY = y + (short ? 36 : 48);
-    const maxLines = Math.max(1, Math.floor((footer.y - reasonY) / lineHeight));
-    let line = '',
-      row = 0;
-    for (let i = 0; i < words.length; ++i) {
-      const next = line ? `${line} ${words[i]}` : words[i];
-      if (line && c.textWidth(next, 11) > meta.w) {
-        if (row === maxLines - 1) {
-          line += ' ' + words.slice(i).join(' ');
-          break;
-        }
-        text(reasonY + row++ * lineHeight, line, reason ? t.danger : t.muted, 11);
-        line = words[i];
-      } else line = next;
-    }
-    if (line) text(reasonY + row * lineHeight, line, reason ? t.danger : t.muted, 11);
+  if (p.role === Role.Guest) {
+    const lodging = this.town.building(p.bed);
+    text(y, lodging ? `Lodging: ${structureSpec(lodging.kind).name}` : 'Looking for lodging', ochre, 12);
+    text(y + (short ? 17 : 23), `${activityName(p.activity)} · Purse ${p.purse} gold`, ink, 11);
+    text(y + (short ? 34 : 46), 'Visitors pay for lodging and services.', t.muted, 10);
     button(
       c,
-      'roster-hire',
+      'roster-focus',
       footer,
-      'Hire guest',
+      'Inspect guest',
       () => {
-        if (this.town.hireGuest(selected.offer!.key)) {
-          this.rosterSelected = '';
-          this.rosterPage = 0;
-        } else this.status = 'The oath could not be signed. Check supplies and housing.';
+        this.rosterOpen = false;
+        this.selectPeople([p.id]);
       },
       ButtonStyle.Primary,
-      !reason,
     );
   } else {
     const job = this.town.building(p.job);
     text(y, job ? structureSpec(job.kind).name : 'Available for settlement work', ochre, 12);
-    text(y + (short ? 17 : 23), activityName(p.activity), ink, 11);
+    text(
+      y + (short ? 17 : 23),
+      controlReason(p) || activityName(p.activity),
+      canControl(p) ? ink : t.danger,
+      11,
+    );
     text(
       y + (short ? 34 : 46),
       `Food ${Math.round(p.food * 100)}% · Water ${Math.round(p.hydration * 100)}% · Rest ${Math.round(p.rest * 100)}%`,
@@ -332,7 +322,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       c,
       'roster-focus',
       footer,
-      'Select unit',
+      canControl(p) ? 'Select unit' : 'Inspect unit',
       () => {
         this.rosterOpen = false;
         this.selectPeople([p.id]);

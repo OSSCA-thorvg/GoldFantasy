@@ -5,11 +5,11 @@ import type { Appearance } from './person-appearance';
 export enum Role { Resident, Guest }
 export enum Calling { Settler, Traveller, Warrior, Ranger, Mage, Cleric, Bard }
 export enum Race { Human, God, Giant }
-export enum Activity { Idle, Moving, Holding, Building, Roadwork, Working, Eating, Sleeping, Relaxing, Exploring, Brooding, Arriving, Leaving, Guarding, Fighting, Expedition, Praying, Shopping, Hauling, Felling, Collecting, Mining, Treating, FetchingMaterials, DeliveringMaterials, WaitingMaterials, Drinking }
+export enum Activity { Idle, Moving, Holding, Building, Roadwork, Working, Eating, Sleeping, Relaxing, Exploring, Brooding, Arriving, Leaving, Guarding, Fighting, Expedition, Praying, Shopping, Hauling, Felling, Collecting, Mining, Treating, FetchingMaterials, DeliveringMaterials, WaitingMaterials, Drinking, Training }
 export enum AnimalKind { Cow, Pig, Chicken, Wolf, Dog, Cat, Count }
 export const callingName = (calling: Calling): string => ['Settler', 'Traveller', 'Warrior', 'Ranger', 'Mage', 'Cleric', 'Bard'][calling] || '';
 export const raceName = (race: Race): string => ['Human', 'God', 'Giant'][race] || '';
-export const activityName = (activity: Activity): string => ['Idle', 'Moving on orders', 'Holding position', 'Building', 'Working on a road', 'Working', 'Eating', 'Sleeping', 'Relaxing at the tavern', 'Delving the dungeon', 'Brooding', 'Arriving', 'Leaving', 'On watch', 'Fighting', 'On an expedition', 'Praying at the chapel', 'Buying gear', 'Carrying goods', 'Felling a tree', 'Collecting resources', 'Mining stone', 'Receiving treatment', 'Fetching supplies', 'Delivering materials', 'Waiting for materials', 'Drinking water'][activity] || '';
+export const activityName = (activity: Activity): string => ['Idle', 'Moving on orders', 'Holding position', 'Building', 'Working on a road', 'Working', 'Eating', 'Sleeping', 'Relaxing at the tavern', 'Delving the dungeon', 'Brooding', 'Arriving', 'Leaving', 'On watch', 'Fighting', 'On an expedition', 'Praying', 'Buying gear', 'Carrying goods', 'Felling a tree', 'Collecting resources', 'Mining stone', 'Receiving treatment', 'Fetching supplies', 'Delivering materials', 'Waiting for materials', 'Drinking water', 'Training at the guild'][activity] || '';
 export class Monster {
   health = 3; strength = 1; raider = false; angry = false; ready = 0; home = point(); prey = -1; race: Race | null = null; insideLair = false; provokedBy = -1; animal: AnimalKind | null = null;
   constructor(public id: number, public lair: number, public position: Point, public path: Point[] = []) {}
@@ -19,6 +19,11 @@ export interface Hit { serial: bigint; from: Point; to: Point; damage: number; o
 export interface Expedition { dungeon: number; members: number[]; returnAt: number; }
 export class Person {
   static readonly maximumLevel = 30;
+  faction = 0;
+  stressRecovery = false;
+  lastBreakdownAt = -1;
+  trained = false;
+  trainingCalling = -1;
   // Temporary rest can span a meal or combat without replacing the assigned work.
   recoveringRest = false;
   recoveringHealth = false;

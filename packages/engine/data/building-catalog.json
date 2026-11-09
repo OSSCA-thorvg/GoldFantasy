@@ -433,20 +433,20 @@
     "storage": 300
   },
   {
-    "name": "Shrine",
-    "description": "A rune-carved obelisk. Homes within 6 paces grow twice as fast.",
+    "name": "Altar",
+    "description": "A sacred altar. A resident prays here with 4 food; a new resident appears here the next day if a home is free. Nearby homes grow twice as fast.",
     "size": 1,
     "cost": {
       "gold": 0,
-      "wood": 0,
-      "stone": 20,
+      "wood": 6,
+      "stone": 4,
       "food": 0,
       "mana": 0,
       "water": 0
     },
     "residents": 0,
     "jobs": 0,
-    "requiredPopulation": 4,
+    "requiredPopulation": 0,
     "buildable": true,
     "product": 0,
     "perWorker": 0,
@@ -570,7 +570,7 @@
   },
   {
     "name": "Hostel",
-    "description": "A long tent and a cook shed: three guest beds. Residents use their own homes. Once guests have paid it 40 gold it becomes an inn.",
+    "description": "Three beds for paying travellers. Guests stay temporarily and never become residents. Earning 40 gold makes this an inn.",
     "size": 2,
     "cost": {
       "gold": 0,
@@ -603,7 +603,7 @@
   },
   {
     "name": "Inn",
-    "description": "Six guest beds under a timber roof. Earning 150 gold more makes it a grand inn.",
+    "description": "Six beds for paying temporary guests. Earning 150 gold more makes it a grand inn.",
     "size": 2,
     "cost": {
       "gold": 0,
@@ -636,7 +636,7 @@
   },
   {
     "name": "Grand inn",
-    "description": "Ten guest beds, a stable and a hall where adventurers trade tales.",
+    "description": "Ten beds, a stable and a hall for paying temporary guests.",
     "size": 2,
     "cost": {
       "gold": 0,
@@ -668,8 +668,8 @@
     "storage": 0
   },
   {
-    "name": "Adventurers' guild",
-    "description": "Opens a dungeon within 10 paces. With eight adventurers on its rolls it becomes a guild hall.",
+    "name": "Guild",
+    "description": "A hall of professional oaths. Residents visit to train once as a Warrior, Ranger, Mage, Cleric or Bard. Eight trained residents make it a guild hall.",
     "size": 2,
     "cost": {
       "gold": 0,
@@ -680,7 +680,7 @@
       "water": 0
     },
     "residents": 0,
-    "jobs": 1,
+    "jobs": 0,
     "requiredPopulation": 0,
     "buildable": true,
     "product": 0,
@@ -702,7 +702,7 @@
   },
   {
     "name": "Guild hall",
-    "description": "Renowned across the land: adventurers come twice as often and pay a larger cut.",
+    "description": "A grand hall for residents to take their one-time professional oath.",
     "size": 2,
     "cost": {
       "gold": 0,
@@ -713,7 +713,7 @@
       "water": 0
     },
     "residents": 0,
-    "jobs": 2,
+    "jobs": 0,
     "requiredPopulation": 0,
     "buildable": false,
     "product": 0,
@@ -735,7 +735,7 @@
   },
   {
     "name": "Chapel",
-    "description": "A house of prayer. Choose its faith: each draws more of one people and calms the faithful.",
+    "description": "A house of prayer. Choose its faith to calm the faithful; new residents are born only at an altar.",
     "size": 2,
     "cost": {
       "gold": 0,

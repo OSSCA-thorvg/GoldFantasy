@@ -10,7 +10,9 @@ import * as mining from './mining';
 import { prepareFarmWork } from './farm-work';
 import { roadWorkSpot, buildingWorkSpot } from './person-navigation';
 import type { Town } from './town';
+import { canControl } from './faction';
 export interface OrderTown extends TownState {
+  resumeDevotionOrder(p: Person): boolean;
   recount(): void;
   staff(): void;
   walkTo(p: Person, to: Point): boolean;
@@ -43,6 +45,7 @@ export interface OrderTown extends TownState {
   fellTree(p: Person, cell: number): boolean;
 }
 export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1): void {
+  if (task !== Activity.Training) p.trainingCalling = -1;
   p.approachingOrder = false;
   p.hunting = false; p.attackPerson = p.workField = -1;
   p.recoveringRest = p.recoveringHealth = false;
@@ -59,12 +62,13 @@ export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1):
 }
 export function orderStop(this: OrderTown, ids: number[]): void {
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     p.approachingOrder = false;
     p.hunting = false; p.attackPerson = p.workField = -1;
     p.recoveringRest = p.recoveringHealth = false;
     p.autoMode = false;
     p.ordered = false;
+    p.trainingCalling = -1;
     p.task = Activity.Idle;
     p.taskSite = -1;
     p.supplyTarget = -1;
@@ -81,7 +85,7 @@ export function orderStop(this: OrderTown, ids: number[]): void {
 }
 export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
   for (const p of this.folk) {
-    if (p.id !== id || p.role !== Role.Resident || p.activity === Activity.Expedition) continue;
+    if (p.id !== id || !canControl(p, this.controlFaction) || p.activity === Activity.Expedition) continue;
     p.autoMode = enabled;
     p.recoveringRest = p.recoveringHealth = false;
     if (enabled || !p.ordered) {
@@ -91,7 +95,8 @@ export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
       p.aggressive = false;
       p.approachingOrder = false;
       p.ordered = false;
-      p.task = Activity.Idle;
+      p.trainingCalling = -1;
+    p.task = Activity.Idle;
       p.taskSite = -1;
       p.supplyTarget = -1;
       p.supplyRoad = false;
@@ -106,7 +111,7 @@ export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
 export function moveOrder(this: OrderTown, ids: number[], to: Point, attack: boolean): void {
   let k = 0;
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     const spot = k
       ? add(to, rotated(point(f(f(0.6) + f(f(0.25) * Math.trunc(k / 6))), 0), f(k * f(1.047))))
       : to;
@@ -182,7 +187,7 @@ export function orderHarvest(this: OrderTown, ids: number[], cell: number, kind:
   if (!this.world.revealed(foot)) return false;
   let any = false;
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     if (
       this.folk.some(
         (other) =>
@@ -203,10 +208,10 @@ export function orderHarvest(this: OrderTown, ids: number[], cell: number, kind:
 }
 export function orderBuild(this: OrderTown, ids: number[], id: number): boolean {
   const place = this.building(id);
-  if (!place || (place.built() && place.health >= 1)) return false;
+  if (!place || place.faction !== this.controlFaction || (place.built() && place.health >= 1)) return false;
   let any = false;
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, place.door())) continue;
     this.setOrder(p, Activity.Building, id);
     any = true;
@@ -219,11 +224,11 @@ export function orderBuild(this: OrderTown, ids: number[], id: number): boolean 
 }
 export function assignJob(this: OrderTown, ids: number[], id: number): boolean {
   const place = this.site(id);
-  if (!place || !place.built() || structureSpec(place.kind).jobs === 0) return false;
+  if (!place || place.faction !== this.controlFaction || !place.built() || structureSpec(place.kind).jobs === 0) return false;
   let any = false;
   for (const p of this.folk) {
     if (
-      p.role !== Role.Resident ||
+      !canControl(p, this.controlFaction) ||
       p.activity === Activity.Expedition ||
       p.health <= 0 ||
       !ids.includes(p.id)
@@ -246,9 +251,10 @@ export function orderRoadwork(this: OrderTown, ids: number[], id: number): boole
   const wanted = this.network.road(id),
     road = this.network.road(this.roadWorkTarget(id));
   if (!wanted || !road || (wanted.built >= 1 && wanted.paving < 0 && wanted.wear <= 0)) return false;
+  if (wanted.faction !== this.controlFaction) return false;
   let any = false;
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, roadWorkSpot(this,p,road))) continue;
     this.setOrder(p, Activity.Roadwork, id);
     p.activity = Activity.Roadwork;
@@ -320,7 +326,7 @@ export function orderRelax(this: OrderTown, ids: number[], id: number): boolean 
   if (!place || !place.built() || place.kind !== Structure.Tavern) return false;
   let any = false;
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, place.door())) continue;
     this.setOrder(p, Activity.Idle, id);
     p.activity = Activity.Relaxing;
@@ -329,6 +335,7 @@ export function orderRelax(this: OrderTown, ids: number[], id: number): boolean 
   return any;
 }
 export function resumeOrder(this: OrderTown, p: Person): boolean {
+  if (p.stressRecovery || p.faction !== this.controlFaction) return false;
   if (p.task === Activity.Idle) return false;
   if (p.approachingOrder && distance(p.position, p.goal) > f(.2)) {
     if (this.walkTo(p, p.goal)) p.activity = Activity.Moving;
@@ -338,6 +345,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     const target = this.person(p.attackPerson);
     if (target && target.health > 0 && target.activity !== Activity.Leaving) { p.activity = Activity.Fighting; return true; }
   }
+  if (p.task === Activity.Praying || p.task === Activity.Training) return this.resumeDevotionOrder(p);
   const wait = (): void => {
     p.activity = Activity.Holding;
     p.path = [];
@@ -353,7 +361,8 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
       }
     } else {
       if (p.task !== Activity.Holding) p.autoMode = true;
-      p.task = Activity.Idle;
+      p.trainingCalling = -1;
+    p.task = Activity.Idle;
       p.taskSite = -1;
       p.ordered = false;
       p.aggressive = false;

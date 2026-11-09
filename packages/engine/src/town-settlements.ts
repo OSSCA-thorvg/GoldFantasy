@@ -24,11 +24,11 @@ export function campById(this: TownState, id: number): Building | null {
   const b = this.building(id);
   return b && isSeat(b.kind) ? b : null;
 }
-export function settlementAt(this: TownState, at: Point): number {
+export function settlementAt(this: TownState, at: Point, faction = this.controlFaction): number {
   let result = -1,
     best = 3.4028234663852886e38;
   for (const b of this.placed)
-    if (isSeat(b.kind)) {
+    if (isSeat(b.kind) && b.faction === faction) {
       const gap = distance(at, b.center);
       if (gap < best) {
         best = gap;
@@ -40,14 +40,14 @@ export function settlementAt(this: TownState, at: Point): number {
 export function settlementOf(this: SettlementTown, item: Building | Person): number {
   if (item instanceof Building) {
     if (isSeat(item.kind)) return item.id;
-    return this.camp(item.village) ? item.village : this.settlementAt(item.center);
+    return this.camp(item.village)?.faction === item.faction ? item.village : settlementAt.call(this, item.center, item.faction);
   }
   const home = this.building(item.role === Role.Resident ? item.home : item.bed);
-  if (home) return this.settlementOf(home);
-  if (this.camp(item.village)) return item.village;
+  if (home && home.faction === item.faction) return this.settlementOf(home);
+  if (this.camp(item.village)?.faction === item.faction) return item.village;
   const work = this.building(item.job);
-  if (work) return this.settlementOf(work);
-  return this.settlementAt(item.position);
+  if (work && work.faction === item.faction) return this.settlementOf(work);
+  return settlementAt.call(this, item.position, item.faction);
 }
 const empty = new CampEconomy();
 empty.renown = 0;
@@ -90,16 +90,19 @@ export function foundSettlement(this: SettlementTown, id: number): void {
     this.provisions = new CampEconomy();
   }
   village.camp = id;
+  village.faction = this.building(id)?.faction ?? this.controlFaction;
   this.villages.push(village);
-  for (const p of this.folk) if (p.village < 0) p.village = this.settlementAt(p.position);
+  for (const road of this.network.list) if (road.village < 0 && road.faction === village.faction) road.village = settlementAt.call(this, road.along(road.constructionStart), road.faction);
+  for (const field of this.farmland) if (field.village < 0 && field.faction === village.faction) field.village = settlementAt.call(this, centroid(field.outline), field.faction);
+  for (const p of this.folk) if (p.village < 0 && p.faction === village.faction) p.village = settlementAt.call(this, p.position, p.faction);
 }
 export function migrateSettlements(this: SettlementTown): void {
   this.villages = [];
   for (const b of this.placed) if (isSeat(b.kind)) this.foundSettlement(b.id);
-  for (const b of this.placed) b.village = this.settlementAt(b.center);
+  for (const b of this.placed) b.village = settlementAt.call(this, b.center, b.faction);
   for (const road of this.network.roads())
-    road.village = this.settlementAt(road.along(road.constructionStart));
-  for (const field of this.farmland) field.village = this.settlementAt(centroid(field.outline));
+    road.village = settlementAt.call(this, road.along(road.constructionStart), road.faction);
+  for (const field of this.farmland) field.village = settlementAt.call(this, centroid(field.outline), field.faction);
   for (const p of this.folk) p.village = this.settlementOf(p);
 }
 export function credit(this: SettlementTown, gain: Resources, id: number): void {
@@ -136,10 +139,12 @@ export function reward(this: SettlementTown, prize: Resources, id = this.camp()?
   this.credit(prize, id);
 }
 export function population(this: SettlementTown, id: number): number {
-  return this.folk.filter((p) => p.role === Role.Resident && this.settlementOf(p) === id).length;
+  const faction = this.camp(id)?.faction ?? this.controlFaction;
+  return this.folk.filter((p) => p.role === Role.Resident && p.faction === faction && this.settlementOf(p) === id).length;
 }
 export function guests(this: SettlementTown, id: number): number {
-  return this.folk.filter((p) => p.role === Role.Guest && this.settlementOf(p) === id).length;
+  const faction = this.camp(id)?.faction ?? this.controlFaction;
+  return this.folk.filter((p) => p.role === Role.Guest && p.faction === faction && this.settlementOf(p) === id).length;
 }
 export function housing(this: SettlementTown, id: number): number {
   let total = 0;

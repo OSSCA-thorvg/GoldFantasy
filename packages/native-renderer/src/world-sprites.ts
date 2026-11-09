@@ -33,6 +33,8 @@ export class PersonParts {
   bowString: ShapeNode | null = null;
   arrow: PaintNode | null = null;
   alert: PaintNode | null = null;
+  stressRecovery: PaintNode | null = null;
+  affiliation: PaintNode | null = null;
   hoe: PaintNode | null = null;
   wateringCan: PaintNode | null = null;
   saw: PaintNode | null = null;
@@ -1162,6 +1164,39 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   mark.opacity(0);
   sprite.add(mark);
   parts.alert = mark;
+  const recovery = new SceneNode();
+  recovery.add(
+    poly(
+      [
+        [0, -27],
+        [4, -23],
+        [0, -19],
+        [-4, -23],
+      ],
+      [224, 172, 84],
+    ),
+  );
+  recovery.add(stroke([-1, -25], [-1, -21], 1, [49, 41, 31]));
+  recovery.add(stroke([1, -25], [1, -21], 1, [49, 41, 31]));
+  recovery.opacity(0);
+  root.add(recovery);
+  parts.stressRecovery = recovery;
+  const affiliation = new SceneNode();
+  affiliation.add(stroke([-7, -19], [-7, -27], 1, [44, 49, 48]));
+  affiliation.add(
+    poly(
+      [
+        [-7, -27],
+        [-2, -26],
+        [-3, -23],
+        [-7, -24],
+      ],
+      [145, 179, 173],
+    ),
+  );
+  affiliation.opacity(0);
+  root.add(affiliation);
+  parts.affiliation = affiliation;
   return root;
 }
 export function personSprite(person: Person, parts: PersonParts): SceneNode {

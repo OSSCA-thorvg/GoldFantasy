@@ -4,11 +4,18 @@ import { Tool, Order } from '../../../../packages/engine/src/game-tools';
 import { type Point, point, distance, unproject } from '../../../../packages/engine/src/geometry';
 import { f32 as f } from '../../../../packages/engine/src/numeric';
 import { animalSpec } from '../../../../packages/engine/src/wildlife';
-import { Activity, Role } from '../../../../packages/engine/src/person';
+import { Activity } from '../../../../packages/engine/src/person';
 import { isHome, structureSpec } from '../../../../packages/engine/src/building-catalog';
 import { treePosition } from '../../../../packages/engine/src/world-map';
 import * as mining from '../../../../packages/engine/src/mining';
 import { treeAt } from '../../../../packages/native-renderer/src/tree-painter';
+import {
+  canControl,
+  isPlayerBuilding,
+  buildingControlReason,
+  belongsToFaction,
+} from '../../../../packages/engine/src/faction';
+import { controllableIds, selectionControlReason } from './game-control';
 import { Cue } from '../../../../packages/native-audio/src/sound-types';
 import { Rect } from '../../../../packages/native-ui/src';
 export interface GameCommandApp extends GameInputApp {
@@ -106,7 +113,9 @@ export function rockAtScreen(this: GameCommandApp, screen: Point): number {
 export function buildingAtScreen(this: GameCommandApp, screen: Point): number {
   const at = this.camera.toWorld(screen, this.viewWidth, this.viewHeight),
     id = this.renderer.buildingDrawnAt(this.town, at);
-  return id >= 0 ? id : this.town.buildingAt(unproject(at.x, at.y));
+  const found = id >= 0 ? id : this.town.buildingAt(unproject(at.x, at.y));
+  const building = this.town.building(found);
+  return building && building.faction > 0 && !this.town.map().revealed(building.center) ? -1 : found;
 }
 export function animalAtScreen(this: GameCommandApp, screen: Point): number {
   let found = -1,
@@ -138,14 +147,7 @@ export function prepare(this: GameCommandApp, order: Order): void {
         candidates: { busy: boolean; distance: number; id: number }[] = [];
       if (animal && animal.animal !== null && animal.health > 0)
         for (const p of this.town.people()) {
-          if (
-            p.role !== Role.Resident ||
-            p.health <= 0 ||
-            p.inside ||
-            p.ordered ||
-            !interruptible(p.activity)
-          )
-            continue;
+          if (!canControl(p) || p.inside || p.ordered || !interruptible(p.activity)) continue;
           const idle = !p.moving() && (p.activity === Activity.Idle || p.activity === Activity.Holding);
           candidates.push({ busy: !idle, distance: distance(p.position, animal.position), id: p.id });
         }
@@ -162,6 +164,10 @@ export function prepare(this: GameCommandApp, order: Order): void {
       this.queueWork(Activity.Mining, this.selectedRock);
       this.cue(Cue.Order);
     }
+    return;
+  }
+  if (!controllableIds(this.town, this.chosen).length) {
+    this.status = selectionControlReason(this.town, this.chosen);
     return;
   }
   this.selectTool(Tool.Select);
@@ -181,7 +187,7 @@ export function targetingCursor(this: GameCommandApp): boolean {
   );
 }
 export function openUnitBuild(this: GameCommandApp): void {
-  if (!this.chosen.length) return;
+  if (!controllableIds(this.town, this.chosen).length) return;
   this.selectTool(Tool.Select);
   this.card = 0;
   this.globalCard = -1;
@@ -189,26 +195,29 @@ export function openUnitBuild(this: GameCommandApp): void {
   this.drawerSuppressed = false;
 }
 export function toggleAuto(this: GameCommandApp): void {
-  const enabled = this.chosen.some((id) => {
+  const ids = controllableIds(this.town, this.chosen);
+  const enabled = ids.some((id) => {
     const person = this.town.person(id);
     return person && !person.autoMode;
   });
-  for (const id of this.chosen) {
+  for (const id of ids) {
     if (enabled) this.stoppedWork.delete(id);
     this.town.setAuto(id, enabled);
   }
 }
 export function stopSelected(this: GameCommandApp): void {
-  this.town.orderStop(this.chosen);
-  for (const id of this.chosen) this.stoppedWork.set(id, this.workSerial);
+  const ids = controllableIds(this.town, this.chosen);
+  this.town.orderStop(ids);
+  for (const id of ids) this.stoppedWork.set(id, this.workSerial);
   this.selectTool(Tool.Select);
   this.card = this.globalCard = -1;
   this.pending = Order.None;
   this.cancelPointer();
 }
 export function leaveSelected(this: GameCommandApp): void {
-  if (!this.town.orderLeave(this.chosen)) return;
-  for (const id of this.chosen) this.stoppedWork.set(id, this.workSerial);
+  const ids = controllableIds(this.town, this.chosen);
+  if (!this.town.orderLeave(ids)) return;
+  for (const id of ids) this.stoppedWork.set(id, this.workSerial);
   this.selectTool(Tool.Select);
   this.card = this.globalCard = -1;
   this.pending = Order.None;
@@ -219,6 +228,11 @@ export function command(this: GameCommandApp): void {
   this.issueOrder(Order.Work);
 }
 export function issueOrder(this: GameCommandApp, order: Order): void {
+  const ids = controllableIds(this.town, this.chosen);
+  if (!ids.length) {
+    this.status = selectionControlReason(this.town, this.chosen);
+    return;
+  }
   this.status = '';
   const personTarget = order === Order.Attack ? this.personAt(this.mouse) : -1;
   const animal = this.animalAtScreen(this.mouse);
@@ -228,17 +242,18 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
     id = this.buildingAtScreen(this.mouse),
     place = this.town.building(id),
     moving: number[] = [];
-  if (order === Order.Move) this.town.orderMove(this.chosen, this.cursor);
-  else if (order === Order.Attack && personTarget >= 0) this.town.orderAttackPerson(this.chosen, personTarget);
+  if (order === Order.Move) this.town.orderMove(ids, this.cursor);
+  else if (order === Order.Attack && personTarget >= 0) this.town.orderAttackPerson(ids, personTarget);
   else if (order === Order.Attack && monster < 0 && tree < 0 && rock < 0)
-    this.town.orderAttackMove(this.chosen, this.cursor);
+    this.town.orderAttackMove(ids, this.cursor);
   else
-    for (const person of this.chosen) {
+    for (const person of ids) {
       const unit = [person];
       let accepted = false;
       if (monster >= 0) accepted = this.town.orderAttack(unit, monster);
       else if (tree >= 0) accepted = this.town.orderChop(unit, tree);
       else if (rock >= 0) accepted = this.town.orderMine(unit, rock);
+      else if (place && !isPlayerBuilding(place)) this.status = buildingControlReason(place);
       else if (place && (!place.built() || place.health < 1)) accepted = this.town.orderBuild(unit, id);
       else if (place && isHome(place.kind)) accepted = this.town.orderRest(unit, id);
       else if (place && structureSpec(place.kind).jobs > 0) accepted = this.town.assignJob(unit, id);
@@ -270,11 +285,11 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
       done = false;
     if (work.activity === Activity.Building) {
       const place = this.town.building(work.target);
-      done = !place || (place.built() && place.health >= 1);
+      done = !place || !isPlayerBuilding(place) || (place.built() && place.health >= 1);
       if (place) where = place.door();
     } else if (work.activity === Activity.Roadwork) {
       const road = this.town.roads().road(work.target);
-      done = !road || (road.built >= 1 && road.paving < 0 && road.wear <= 0);
+      done = !road || !belongsToFaction(road) || (road.built >= 1 && road.paving < 0 && road.wear <= 0);
       where = this.town.roadWorkPosition(work.target);
     } else {
       const map = this.town.map(),
@@ -293,7 +308,7 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
         .people()
         .some(
           (p) =>
-            p.health > 0 &&
+            canControl(p) &&
             p.activity !== Activity.Leaving &&
             p.task === work.activity &&
             p.taskSite === work.target,
@@ -303,13 +318,7 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
     if (where && !assigned)
       for (const p of this.town.people()) {
         const stopped = this.stoppedWork.get(p.id);
-        if (
-          p.role !== Role.Resident ||
-          p.health <= 0 ||
-          p.ordered ||
-          (stopped !== undefined && stopped >= work.serial)
-        )
-          continue;
+        if (!canControl(p) || p.ordered || (stopped !== undefined && stopped >= work.serial)) continue;
         // A newly queued site must not abandon an unfinished construction job.
         // Explicit commands to selected residents still replace their orders.
         const building = p.task === Activity.Building ? this.town.building(p.taskSite) : null;

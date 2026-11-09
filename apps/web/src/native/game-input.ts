@@ -34,6 +34,12 @@ import { structureSpec } from '../../../../packages/engine/src/building-catalog'
 import type { Check } from '../../../../packages/engine/src/town-models';
 import { buildingUnlock, toolAvailable } from '../../../../packages/engine/src/settlement-progression';
 import { Activity } from '../../../../packages/engine/src/person';
+import {
+  isPlayerResident,
+  isPlayerBuilding,
+  buildingControlReason,
+} from '../../../../packages/engine/src/faction';
+import { controllableIds } from './game-control';
 import { Cue } from '../../../../packages/native-audio/src/sound-types';
 import { Key } from '../../../../packages/native-ui/src';
 import type { AppEvent } from './application-contracts';
@@ -72,7 +78,8 @@ export function personAt(this: GameInputApp, screen: Point): number {
   let best = -1,
     bestGap = f(13 * Math.max(this.camera.zoom, f(0.7)));
   for (const person of this.town.people()) {
-    if (person.visibility() <= f(0.05)) continue;
+    if (person.visibility() <= f(0.05) || (person.faction > 0 && !this.renderer.visible(person.position)))
+      continue;
     const feet = this.toScreen(person.position),
       gap = distance(screen, point(feet.x, f(feet.y - f(9 * this.camera.zoom))));
     if (gap < bestGap) {
@@ -253,7 +260,8 @@ export function finishRoad(this: GameInputApp): void {
     return;
   }
   const id = this.town.roads().roads().at(-1)!.id;
-  if (this.crew.length) this.town.orderRoadwork(this.crew, id);
+  if (controllableIds(this.town, this.crew).length)
+    this.town.orderRoadwork(controllableIds(this.town, this.crew), id);
   else this.queueWork(Activity.Roadwork, id);
   this.cue(Cue.Place);
   this.selectTool(Tool.Select);
@@ -348,7 +356,7 @@ export function selectTool(this: GameInputApp, value: Tool, useSelection = false
   this.tool = value;
   this.dismissBuildDrawer();
   if (value !== Tool.Select) this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
-  this.crew = useSelection ? [...this.chosen] : [];
+  this.crew = useSelection ? controllableIds(this.town, this.chosen) : [];
   this.pending = Order.None;
   this.roadStroke = [];
   this.roadPress = null;
@@ -367,6 +375,7 @@ export function selectBuilding(this: GameInputApp, id: number): void {
   this.selectTool(Tool.Select);
   this.selected = id;
   this.residentPage = 0;
+  this.inspectorPerson = -1;
   this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
   this.chosen = [];
 }
@@ -448,6 +457,7 @@ export function cancelPointer(this: GameInputApp): void {
 export function select(this: GameInputApp): void {
   this.selected = this.town.buildingAt(this.cursor);
   this.residentPage = 0;
+  this.inspectorPerson = -1;
   this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
   if (this.selected >= 0) return;
   this.selectedAnimal = this.animalAtScreen(this.mouse);
@@ -506,7 +516,8 @@ export function press(this: GameInputApp): void {
       const id = this.hoveredRoad(),
         check = this.town.canPave(id);
       if (!this.town.pave(id)) this.status = check.reason;
-      else if (this.crew.length) this.town.orderRoadwork(this.crew, id);
+      else if (controllableIds(this.town, this.crew).length)
+        this.town.orderRoadwork(controllableIds(this.town, this.crew), id);
       else this.queueWork(Activity.Roadwork, id);
       return;
     }
@@ -516,6 +527,11 @@ export function press(this: GameInputApp): void {
       else this.outline.push({ ...this.cursor });
       return;
     case Tool.Demolish: {
+      const target = this.town.building(this.town.buildingAt(this.cursor));
+      if (target && !isPlayerBuilding(target)) {
+        this.status = buildingControlReason(target);
+        return;
+      }
       const check = this.town.canDemolish(this.cursor);
       if (this.town.demolish(this.cursor)) this.cueAt(Cue.Demolish, this.cursor);
       else this.status = check.reason;
@@ -529,7 +545,8 @@ export function press(this: GameInputApp): void {
       check = this.town.canPlace(kind, spot.center, spot.angle);
     if (this.town.place(kind, spot.center, spot.angle)) {
       this.selected = this.town.buildings().at(-1)!.id;
-      if (this.crew.length) this.town.orderBuild(this.crew, this.selected);
+      if (controllableIds(this.town, this.crew).length)
+        this.town.orderBuild(controllableIds(this.town, this.crew), this.selected);
       else this.queueWork(Activity.Building, this.selected);
       this.cueAt(Cue.Place, spot.center);
       this.selectTool(Tool.Select);
@@ -573,7 +590,8 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
         this.treeAtScreen(this.mouse) < 0 &&
         this.rockAtScreen(this.mouse) < 0 &&
         this.buildingAtScreen(this.mouse) < 0;
-      if (dungeonClick && this.town.sendExpedition(this.chosen, tile.dungeon)) this.cue(Cue.Order);
+      if (dungeonClick && this.town.sendExpedition(controllableIds(this.town, this.chosen), tile.dungeon))
+        this.cue(Cue.Order);
       else this.issueOrder(this.pending === Order.None ? Order.Work : this.pending);
       this.pending = Order.None;
     } else if (click && this.tool === Tool.Field) this.finish();
@@ -600,7 +618,14 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
       this.chosen = [];
       for (const person of this.town.people()) {
         const s = this.toScreen(person.position);
-        if (person.visibility() > f(0.05) && s.x >= x0 && s.x <= x1 && f(s.y - 8) >= y0 && f(s.y - 8) <= y1)
+        if (
+          isPlayerResident(person) &&
+          person.visibility() > f(0.05) &&
+          s.x >= x0 &&
+          s.x <= x1 &&
+          f(s.y - 8) >= y0 &&
+          f(s.y - 8) <= y1
+        )
           this.chosen.push(person.id);
       }
       if (this.chosen.length)

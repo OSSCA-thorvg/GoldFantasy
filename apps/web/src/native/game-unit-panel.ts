@@ -22,6 +22,7 @@ import { injuryOf } from '../../../../packages/engine/src/person-look';
 import { personPortrait, moodOf } from '../../../../packages/native-renderer/src/person-portrait';
 import { portraitBackdrop } from '../../../../packages/native-renderer/src/portrait-background';
 import { f32, clamp } from '../../../../packages/engine/src/numeric';
+import { canControl, controlReason } from '../../../../packages/engine/src/faction';
 import { hudPaint } from './hud-paint';
 import type { GameHudApp } from './game-hud-contract';
 interface Badge {
@@ -44,12 +45,12 @@ function badges(context: Context, conditions: readonly Condition[], width: numbe
   return result;
 }
 export function residentSelection(this: GameHudApp): boolean {
-  return this.chosen.some((id) => this.town.person(id)?.role === Role.Resident);
+  return this.chosen.some((id) => canControl(this.town.person(id)));
 }
 export function shelteredSelection(this: GameHudApp): boolean {
   return this.chosen.some((id) => {
     const p = this.town.person(id);
-    return !!p && (p.inside || p.crossingDoorway() || p.task === Activity.Sleeping);
+    return canControl(p) && (p.inside || p.crossingDoorway() || p.task === Activity.Sleeping);
   });
 }
 export function personPanelBounds(this: GameHudApp, width: number, height: number, commands: boolean): Rect {
@@ -161,14 +162,21 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     text(new Rect(f32(118 + nameWidth), 12, 40, 18), 'Lv. ' + p.level, t.accent, 11, true);
     text(
       new Rect(104, 34, 252, 18),
-      raceName(p.race) + ' ' + callingName(p.calling) + (p.role === Role.Guest ? ' · guest' : ' · resident'),
+      raceName(p.race) +
+        ' ' +
+        callingName(p.calling) +
+        (p.role === Role.Guest ? ' · guest' : p.faction > 0 ? ` · neutral #${p.faction}` : ' · resident'),
       t.accent,
     );
     const action =
       p.autoMode && !p.ordered && p.job < 0 && p.activity === Activity.Idle && p.moving()
         ? 'Looking for work'
         : (p.moving() ? 'on the way: ' : '') + activityName(p.activity);
-    text(new Rect(104, 53, 252, 18), 'Action: ' + action, t.text);
+    text(
+      new Rect(104, 53, 252, 18),
+      controlReason(p) || 'Action: ' + action,
+      canControl(p) ? t.text : t.danger,
+    );
     const home = this.town.building(p.role === Role.Resident ? p.home : p.bed);
     const shelter =
       (p.role === Role.Resident ? 'Home: ' : 'Bed: ') + (home ? structureSpec(home.kind).name : 'none');
@@ -260,7 +268,9 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     }
   }
   if (commands) {
-    const allAuto = this.chosen.every((id) => this.town.person(id)?.autoMode);
+    const allAuto = this.chosen
+      .filter((id) => canControl(this.town.person(id)))
+      .every((id) => this.town.person(id)?.autoMode);
     button(
       c,
       'unit-auto',

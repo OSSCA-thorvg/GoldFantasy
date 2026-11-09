@@ -14,6 +14,13 @@
     "residents": 0
   },
   {
+    "title": "Build an altar",
+    "description": "Choose a resident to pray at the altar. Offer 4 food and keep a home free; a new resident appears here the next day.",
+    "kind": "Building",
+    "building": "Shrine",
+    "residents": 0
+  },
+  {
     "title": "Build a lumberyard",
     "description": "Establish a timber supply near trees.",
     "kind": "Building",
@@ -50,14 +57,14 @@
   },
   {
     "title": "Build a hostel",
-    "description": "Provide traveller lodging. Open Unit \u2192 Guests to inspect and hire newcomers.",
+    "description": "Earn lodging income from temporary visitors. Guests never become residents.",
     "kind": "Building",
     "building": "Hostel",
     "residents": 0
   },
   {
     "title": "Reach 4 residents",
-    "description": "Keep homes and food available, then hire guests from the Unit menu.",
+    "description": "Pray at the altar and keep homes and food available for next-day residents.",
     "kind": "Population",
     "building": "Count",
     "residents": 4
@@ -113,7 +120,7 @@
   },
   {
     "title": "Build a guild",
-    "description": "Welcome adventurers to a guild.",
+    "description": "Choose a resident to take a one-time professional oath at the guild.",
     "kind": "Building",
     "building": "Guild",
     "residents": 0
@@ -180,13 +187,6 @@
     "kind": "Population",
     "building": "Count",
     "residents": 26
-  },
-  {
-    "title": "Build a shrine",
-    "description": "Support the settlement's faith.",
-    "kind": "Building",
-    "building": "Shrine",
-    "residents": 0
   },
   {
     "title": "Build a chapel",

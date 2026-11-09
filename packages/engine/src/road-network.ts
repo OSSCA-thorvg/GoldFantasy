@@ -109,6 +109,7 @@ export function flatten(path: RoadPath, step = f32(.3)): Point[] {
 export function pathLength(path: RoadPath): number { const line = flatten(path, f32(.1)); let total = 0; for (let i = 1; i < line.length; ++i)
     total = f32(total + distance(line[f32(i - 1)], line[i])); return total; }
 export class Road {
+    faction = 0;
     materials = new ConstructionMaterials();
     paved = false;
     paving = -1;

@@ -23,7 +23,7 @@ import {
   faithName,
   describe,
 } from '../../../../packages/engine/src/building-catalog';
-import { Role, Activity } from '../../../../packages/engine/src/person';
+import { Activity } from '../../../../packages/engine/src/person';
 import { DungeonKind } from '../../../../packages/engine/src/world-types';
 import { worldName } from '../../../../packages/engine/src/world-map';
 import { point, project, sub, distance } from '../../../../packages/engine/src/geometry';
@@ -33,6 +33,8 @@ import { structureIcon } from '../../../../packages/native-renderer/src/building
 import { constructionIcon } from '../../../../packages/native-renderer/src/construction-icon';
 import { buildingAppearanceRevision } from '../../../../packages/native-renderer/src/building-assets';
 import type { GameHudApp } from './game-hud-contract';
+import { canControl, isPlayerBuilding } from '../../../../packages/engine/src/faction';
+import { civicInspector } from './game-civic-panel';
 import { hudPaint } from './hud-paint';
 import type { CampMarker } from './camp-resource-hud';
 interface ToolInfo {
@@ -204,7 +206,7 @@ export function hud(this: GameHudApp, width: number, height: number): void {
 export function campSupplies(this: GameHudApp, width: number, height: number): void {
   const markers: CampMarker[] = [];
   for (const b of this.town.buildings())
-    if (isSeat(b.kind) && this.town.map().revealed(b.center)) {
+    if (isPlayerBuilding(b) && isSeat(b.kind) && this.town.map().revealed(b.center)) {
       const roof = this.camera.toScreen(
         this.renderer.buildingRoof(b) ?? project(b.center.x, b.center.y, 32),
         width,
@@ -223,7 +225,7 @@ export function campSupplies(this: GameHudApp, width: number, height: number): v
     this.personAt(this.mouse) < 0
   ) {
     const b = this.town.building(this.buildingAtScreen(this.mouse));
-    if (b && isSeat(b.kind)) hovered = b.id;
+    if (isPlayerBuilding(b) && isSeat(b.kind)) hovered = b.id;
   }
   const top = width < 900 && this.timeExpanded ? 100 : 60;
   this.campResources.draw(
@@ -246,6 +248,8 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     t = this.theme,
     building = this.selected >= 0 ? this.town.building(this.selected) : null;
   if (!building && this.selectedDungeon < 0) return 0;
+  if (building?.built() && [Structure.Shrine, Structure.Guild, Structure.GuildHall].includes(building.kind))
+    return civicInspector.call(this, building, panel, draw);
   let y = 12;
   const left = f32(panel.x + 112),
     inner = f32(panel.w - 128),
@@ -259,6 +263,8 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
   if (building) {
     const spec = structureSpec(building.kind);
     textRow(spec.name, t.text, 17, true);
+    if (building.faction > 0)
+      textRow(`Neutral settlement #${building.faction} · inspection only`, t.accent, 12, true);
     if (building.built() && building.health < 1)
       textRow(
         `Damaged: ${Math.trunc(f32(building.health * 100))}%  -  builders will mend it`,
@@ -297,7 +303,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
         pages = Math.max(1, Math.trunc(f32(f32(f32(residents.length + pageSize) - 1) / pageSize)));
       this.residentPage = Math.min(this.residentPage, f32(pages - 1));
       textRow(
-        `${isLodging(building.kind) ? 'Guests ' : 'Residents '}${residents.length}${isLodging(building.kind) ? '  -  click a name to inspect' : '  -  click a name to control'}`,
+        `${isLodging(building.kind) ? 'Guests ' : 'Residents '}${residents.length}${isLodging(building.kind) ? '  -  click a name to inspect' : '  -  click a name to inspect'}`,
         t.accent,
         12,
         true,
@@ -344,7 +350,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
               this.leaveSelected();
             },
             ButtonStyle.Default,
-            p.role === Role.Resident && (present || resting),
+            canControl(p) && (present || resting),
           );
         });
         y = f32(y + 32);
@@ -404,9 +410,10 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
             new Rect(f32(left + f32(i * f32(w + 3))), f32(top + at), w, 26),
             tabs[i],
             () => {
-              this.town.setFaith(id, i);
+              if (isPlayerBuilding(this.town.building(id))) this.town.setFaith(id, i);
             },
             current === i ? ButtonStyle.Primary : ButtonStyle.Default,
+            isPlayerBuilding(building),
           );
       });
       y = f32(y + 32);
@@ -424,10 +431,10 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
           new Rect(f32(left + 200), f32(top + at), 30, 26),
           '-',
           () => {
-            this.town.setWorkers(id, f32(workers - 1));
+            if (isPlayerBuilding(this.town.building(id))) this.town.setWorkers(id, f32(workers - 1));
           },
           ButtonStyle.Default,
-          workers > 0,
+          isPlayerBuilding(building) && workers > 0,
         );
         button(
           c,
@@ -435,10 +442,10 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
           new Rect(f32(left + 234), f32(top + at), 30, 26),
           '+',
           () => {
-            this.town.setWorkers(id, f32(workers + 1));
+            if (isPlayerBuilding(this.town.building(id))) this.town.setWorkers(id, f32(workers + 1));
           },
           ButtonStyle.Default,
-          workers < spec.jobs && hands,
+          isPlayerBuilding(building) && workers < spec.jobs && hands,
         );
       });
       y = f32(y + 32);

@@ -24,15 +24,15 @@ import { hash01, f32 as f } from './numeric';
 import { sharpAnchor, type RoadPath } from './road-network';
 import { treePosition } from './world-map';
 import * as mining from './mining';
-import type { HireOffer } from './town-hiring';
+import type { AltarStatus } from './town-devotion';
 export interface TitleTown extends TownState {
   prepareTitlePreview(): void;
   site(id: number): Building | null;
   recount(): void;
   staff(): void;
-  settle(id: number): boolean;
-  recruitmentOffers(): HireOffer[];
-  hireGuest(key: string): boolean;
+  altarStatus(id: number): AltarStatus;
+  orderPrayAtAltar(ids: number[], altarId: number): boolean;
+  prayerReason(personId: number, altarId: number): string;
   walkTo(p: Person, to: Point): boolean;
   roadAccess(footprint: Footprint): boolean;
   maintainTitleBuilder(): void;
@@ -163,7 +163,13 @@ export function advanceTitleAutoplay(this: TitleTown, seconds: number): void {
     planTitleWork.call(this);
     this.titlePlanTimer = f(6 + f(this.roll() * 6));
     for (const p of this.folk)
-      if (p.role === Role.Resident && p.task !== Activity.Moving && p.task !== Activity.Fighting)
+      if (
+        p.role === Role.Resident &&
+        p.task !== Activity.Moving &&
+        p.task !== Activity.Fighting &&
+        p.task !== Activity.Praying &&
+        p.task !== Activity.Training
+      )
         p.ordered = false;
   }
   this.advance(seconds);
@@ -177,13 +183,27 @@ export function planTitleWork(this: TitleTown): void {
   const completed = (kind: Structure): boolean => this.placed.some((b) => b.kind === kind && b.built());
   const basicsReady = completed(Structure.Farm) && completed(Structure.Well);
   if (basicsReady && this.population() < workforceNeeded && this.population() < this.housing()) {
-    const offer = this.recruitmentOffers().find(
-      (item) => item.person.calling === Calling.Settler || item.person.calling === Calling.Traveller,
-    );
-    if (offer && this.hireGuest(offer.key)) this.staff();
+    for (const altar of this.placed) {
+      if (altar.kind !== Structure.Shrine || this.altarStatus(altar.id).reason) continue;
+      const worshipper = this.folk.find(
+        (p) =>
+          p.role === Role.Resident &&
+          p.health > 0.4 &&
+          p.food > 0.35 &&
+          p.rest > 0.25 &&
+          !p.ordered &&
+          p.task !== Activity.Building &&
+          p.task !== Activity.Roadwork &&
+          p.task !== Activity.Praying &&
+          p.task !== Activity.Training &&
+          !this.prayerReason(p.id, altar.id),
+      );
+      if (worshipper && this.orderPrayAtAltar([worshipper.id], altar.id)) break;
+    }
   }
   const treasury = this.stock();
   const essential = (p: Person): boolean => {
+    if (p.task === Activity.Praying || p.task === Activity.Training) return true;
     if (p.id === this.titleBuilder) {
       const job = this.building(p.job);
       return !!job && job.kind === Structure.Farm;
@@ -407,8 +427,7 @@ export function planTitleWork(this: TitleTown): void {
   )
     wanted = Structure.MarketStalls;
   else if (needsPeople && this.housing() < supportedPopulation) wanted = Structure.Tent;
-  else if (needsPeople && !count(Structure.Hostel) && !count(Structure.Inn) && !count(Structure.GrandInn))
-    wanted = Structure.Hostel;
+  else if (needsPeople && !count(Structure.Shrine)) wanted = Structure.Shrine;
   else if (!count(Structure.Lumberyard)) wanted = Structure.Lumberyard;
   else if (!count(Structure.Quarry)) wanted = Structure.Quarry;
   else if (!count(Structure.Well)) wanted = Structure.Well;

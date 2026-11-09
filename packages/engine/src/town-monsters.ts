@@ -1,3 +1,4 @@
+import { canControl } from './faction';
 // Native town_monsters.cpp combat, raids, expeditions and damage. Native RNG order is retained.
 import { TownState } from './town-state';
 import { Person, Monster, Expedition, Role, Calling, Activity, adventurer } from './person';
@@ -153,7 +154,7 @@ export function canSendExpedition(this: CombatTown, ids: number[], dungeon: numb
     return check;
   }
   const any = this.folk.some(
-    (p) => p.role === Role.Resident && p.activity !== Activity.Expedition && ids.includes(p.id),
+    (p) => canControl(p, this.controlFaction) && ids.includes(p.id),
   );
   if (!any) {
     check.reason = 'Select residents to send';
@@ -166,7 +167,7 @@ export function sendExpedition(this: CombatTown, ids: number[], dungeon: number)
   if (!this.canSendExpedition(ids, dungeon).ok) return false;
   const party: Expedition = { dungeon, members: [], returnAt: -1 };
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, monsterEntrance(this.world.dungeons()[dungeon]))) continue;
     p.activity = Activity.Expedition;
     p.target = dungeon;
@@ -175,6 +176,7 @@ export function sendExpedition(this: CombatTown, ids: number[], dungeon: number)
     party.members.push(p.id);
   }
   if (!party.members.length) return false;
+  this.open[dungeon] = 1;
   this.parties.push(party);
   this.notify(party.members.length + ' set out for ' + this.world.dungeons()[dungeon].name);
   ++this.changes;

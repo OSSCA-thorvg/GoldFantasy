@@ -18,6 +18,9 @@ import * as needs from './unit-needs';
 import * as housing from './unit-housing';
 import * as residents from './town-residents';
 import * as hiring from './town-hiring';
+import * as devotion from './town-devotion';
+import * as stress from './stress-control';
+import * as neutral from './neutral-settlements';
 import * as harvesting from './resource-harvesting';
 import * as people from './town-people';
 import * as ticking from './town-tick';
@@ -32,7 +35,10 @@ import * as settlements from './town-settlements';
 import * as title from './title-autoplay';
 const { population: scopedPopulation, guests: scopedGuests, housing: scopedHousing, guestBeds: scopedGuestBeds, fieldAcres: scopedFields, tendedFieldAcres: scopedTended, roadSettlement: scopedRoadSettlement, ...settlementMethods } = settlements;
 const { fieldAcres: totalFields, tendedFieldAcres: totalTended, ...economyMethods } = economy;
-const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...production, ...settlementMethods, ...title };
+const { finishCeremony: unusedCeremonyHelper, ceremonySeconds: unusedCeremonySeconds, ...devotionMethods } = devotion;
+const { stressPolicy: unusedStressPolicy, ...stressMethods } = stress;
+const { defectionPolicy: unusedDefectionPolicy, ...neutralMethods } = neutral;
+const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...devotionMethods, ...stressMethods, ...neutralMethods, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...production, ...settlementMethods, ...title };
 type Bound<T> = { [K in keyof T]: T[K] extends (...args: infer A) => infer R ? (...args: A) => R : never };
 export interface Town extends Bound<typeof methods> {}
 export class Town extends TownState {
@@ -46,12 +52,12 @@ export class Town extends TownState {
     for (let i = 0; i < gathered.length; ++i) { const founder = this.makePerson(Role.Resident, Calling.Settler, add(start, gathered[i])); founder.name = foundingPeople[i].name; founder.race = Race.Human; founder.past = foundingPeople[i].past; founder.customLook = founderAppearance(founder, foundingPeople[i].bodyType); this.folk.push(founder); }
     this.notify(birthNotice);
   }
-  camp(id?: number): Building | null { return id === undefined ? this.placed.find(item => isSeat(item.kind)) ?? null : settlements.campById.call(this, id); }
-  population(id?: number): number { return id === undefined ? this.folk.filter(p => p.role === Role.Resident).length : scopedPopulation.call(this, id); }
-  guests(id?: number): number { return id === undefined ? this.folk.length - this.population() : scopedGuests.call(this, id); }
-  housing(id?: number): number { return id === undefined ? this.placed.reduce((n, b) => n + (b.built() ? structureSpec(b.kind).residents : 0), 0) : scopedHousing.call(this, id); }
-  guestBeds(id?: number): number { return id === undefined ? this.placed.reduce((n, b) => n + (b.built() ? structureSpec(b.kind).beds : 0), 0) : scopedGuestBeds.call(this, id); }
-  fieldAcres(id?: number): number { return id === undefined ? totalFields.call(this) : scopedFields.call(this, id); }
+  camp(id?: number): Building | null { return id === undefined ? this.placed.find(item => isSeat(item.kind) && item.faction === this.controlFaction) ?? null : settlements.campById.call(this, id); }
+  population(id?: number): number { return id === undefined ? this.folk.filter(p => p.role === Role.Resident && p.faction === this.controlFaction).length : scopedPopulation.call(this, id); }
+  guests(id?: number): number { return id === undefined ? this.folk.filter(p => p.role === Role.Guest && p.faction === this.controlFaction).length : scopedGuests.call(this, id); }
+  housing(id?: number): number { return id === undefined ? this.placed.reduce((n, b) => n + (b.built() && b.faction === this.controlFaction ? structureSpec(b.kind).residents : 0), 0) : scopedHousing.call(this, id); }
+  guestBeds(id?: number): number { return id === undefined ? this.placed.reduce((n, b) => n + (b.built() && b.faction === this.controlFaction ? structureSpec(b.kind).beds : 0), 0) : scopedGuestBeds.call(this, id); }
+  fieldAcres(id?: number): number { return id === undefined ? this.farmland.reduce((n, field) => n + (field.faction === this.controlFaction ? field.acres() : 0), 0) : scopedFields.call(this, id); }
   tendedFieldAcres(id?: number): number { return id === undefined ? totalTended.call(this) : scopedTended.call(this, id); }
   roadSettlement(path: Parameters<typeof scopedRoadSettlement>[0], ignore = -1): number { return scopedRoadSettlement.call(this, path, ignore); }
   gold(): number { return this.stock().gold; } wood(): number { return this.stock().wood; } idle(): number { return this.population() - this.employed(); }

@@ -1,3 +1,4 @@
+import { canControl } from './faction';
 import type { Town } from './town';
 import { Person, Role, Activity } from './person';
 import { Building } from './town-models';
@@ -7,10 +8,11 @@ import { f32 as f } from './numeric';
 
 export function orderAutomatic(this: Town, ids: number[]): void {
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
     p.autoMode = true;
     p.ordered = p.approachingOrder = p.hunting = false;
     p.recoveringRest = p.recoveringHealth = false;
+    p.trainingCalling = -1;
     p.task = Activity.Idle; p.taskSite = p.supplyTarget = p.attackPerson = p.foe = p.tree = -1;
     p.supplyRoad = false; p.path = []; p.activity = Activity.Idle; p.until = this.time;
     p.scheduleAt = this.time + .5;
@@ -24,6 +26,8 @@ export function orderAutomatic(this: Town, ids: number[]): void {
 // rather than erasing the assignment. Explicit Stop/Auto OFF is the sole idle hold.
 export function scheduleAutomatic(this: Town, p: Person): boolean {
   if (p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || p.activity === Activity.Leaving) return false;
+  if (p.faction !== this.controlFaction) return false;
+  if (p.stressRecovery) return true;
   if (p.activity === Activity.Fighting) return true;
   if (p.ordered || p.approachingOrder) return true;
   if (!p.autoMode) return false;
@@ -55,11 +59,11 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
   if (p.rest < f(.2)) p.recoveringRest = true;
   if (p.recoveringHealth || p.recoveringRest || night) {
     if (p.recoveringHealth) {
-      const clinic = this.nearest(p.position, b => b.kind === Structure.Apothecary && b.built() && b.workers > 0);
+      const clinic = this.nearest(p.position, b => b.faction === p.faction && b.kind === Structure.Apothecary && b.built() && b.workers > 0);
       if (clinic && care(clinic, Activity.Treating)) return true;
     }
     const home = this.building(p.home);
-    if (home?.built() && care(home, Activity.Sleeping)) return true;
+    if (home?.built() && home.faction === p.faction && care(home, Activity.Sleeping)) return true;
     // Homeless residents recover outside; they never enter somebody else's home.
     if ((p.recoveringHealth || p.recoveringRest) && care(null, Activity.Sleeping)) return true;
   }

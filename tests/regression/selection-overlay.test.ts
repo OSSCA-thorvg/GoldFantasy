@@ -255,3 +255,32 @@ it('retires native selection paints after repeated deselection, offscreen cullin
     view.dispose();
   }
 });
+
+it('keeps stress recovery and neutral affiliation indicators tied to the actual visible figure', () => {
+  const view = fixture();
+  try {
+    view.occluder.opacity(0);
+    view.draw([]);
+    const figure = view.state.figures.get(view.p.id)!;
+    expect(figure.parts.stressRecovery!.alpha).toBe(0);
+    expect(figure.parts.affiliation!.alpha).toBe(0);
+    view.p.stressRecovery = true;
+    view.draw([]);
+    expect(figure.parts.stressRecovery!.alpha).toBe(255);
+    expect(figure.parts.alert!.alpha).toBe(0);
+    view.p.faction = 3;
+    view.draw([]);
+    expect(figure.parts.affiliation!.alpha).toBe(255);
+    view.setVisible(false);
+    view.draw([]);
+    expect(figure.paint.alpha).toBe(0);
+    view.p.stressRecovery = false;
+    view.p.faction = 0;
+    view.setVisible(true);
+    view.draw([]);
+    expect(figure.parts.stressRecovery!.alpha).toBe(0);
+    expect(figure.parts.affiliation!.alpha).toBe(0);
+  } finally {
+    view.dispose();
+  }
+});

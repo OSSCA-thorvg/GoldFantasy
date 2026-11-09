@@ -2,7 +2,7 @@ import type { Paint, Scene } from '@thorvg/webcanvas';
 import { Town } from '../../../../packages/engine/src/town';
 import { Camera, point, type Outline, type Point } from '../../../../packages/engine/src/geometry';
 import { Resources } from '../../../../packages/engine/src/building-catalog';
-import { Activity } from '../../../../packages/engine/src/person';
+import { Activity, Calling } from '../../../../packages/engine/src/person';
 import { Tool, Order, Preview } from '../../../../packages/engine/src/game-tools';
 import { Context, Rect } from '../../../../packages/native-ui/src';
 import { Sound } from '../../../../packages/native-audio/src/sound-types';
@@ -86,6 +86,8 @@ export class GameAppState {
   dockGhost: Paint | null = null;
   dockPortraits = new Map<number, { key: string; paint: Paint }>();
   residentPage = 0;
+  inspectorPerson = -1;
+  inspectorCalling = Calling.Warrior;
   rosterOpen = false;
   rosterTab: 'units' | 'guests' = 'units';
   rosterPage = 0;

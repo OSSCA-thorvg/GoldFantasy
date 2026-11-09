@@ -9,6 +9,7 @@ export class Ledger {
   drunk = 0;
 }
 export class CampEconomy {
+  faction = 0;
   renown = 50;
   today = new Ledger();
   yesterday = new Ledger();

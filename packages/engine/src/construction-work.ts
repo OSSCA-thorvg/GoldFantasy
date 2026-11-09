@@ -12,6 +12,26 @@ import {
 import { distance, point, type Point } from './geometry';
 import { f32 as f } from './numeric';
 import { TownState } from './town-state';
+import { belongsToFaction, sameFaction } from './faction';
+
+function constructionOwner(town: Town, work: Activity, id: number): { faction: number } | null {
+  return work === Activity.Roadwork ? town.network.road(id) : town.building(id);
+}
+function ownConstruction(town: Town, work: Activity, id: number, person?: Person): boolean {
+  const owner = constructionOwner(town, work, id);
+  return !!owner && belongsToFaction(owner, town.controlFaction) && (!person || sameFaction(person, owner));
+}
+function cancelForeignSupply(town: Town, person: Person): void {
+  // A saved/in-transit order can outlive the ownership of its source or target.
+  // Keep carried goods with their owner instead of gifting or deleting them.
+  person.task = person.activity = Activity.Idle;
+  person.target = person.taskSite = person.supplyTarget = -1;
+  person.supplyRoad = person.ordered = person.aggressive = person.approachingOrder = false;
+  person.autoMode = true;
+  person.path = [];
+  person.inside = false;
+  person.until = town.time;
+}
 export function constructionMaterials(this: Town, work: Activity, id: number): ConstructionMaterials | null {
   return work === Activity.Roadwork
     ? (this.network.road(id)?.materials ?? null)
@@ -25,11 +45,13 @@ export function constructionPoint(this: Town, work: Activity, id: number): Point
 export function constructionSupplyCamp(this: Town, workOrId: number, target?: number): number {
   const work = target === undefined ? Activity.Building : workOrId,
     id = target ?? workOrId;
+  if (!ownConstruction(this, work, id)) return -1;
   if (work === Activity.Roadwork) {
     const road = this.network.road(id),
       seat = road ? this.camp(road.village) : null;
     return seat &&
       seat.built() &&
+      sameFaction(seat, road!) &&
       this.roadReady(id) &&
       distance(road!.workPoint(), seat.center) <= TownState.campReach
       ? seat.id
@@ -44,6 +66,8 @@ export function constructionSupplyCamp(this: Town, workOrId: number, target?: nu
     if (
       !seat ||
       !seat.built() ||
+      !sameFaction(seat, place) ||
+      !sameFaction(road, place) ||
       seat.id === place.id ||
       road.built < 1 ||
       road.wear >= 1 ||
@@ -73,6 +97,11 @@ export function reserveConstructionMaterials(this: Town, work: Activity, id: num
   }
 }
 export function prepareConstruction(this: Town, p: Person, work: Activity, id: number): boolean {
+  if (!belongsToFaction(p, this.controlFaction)) return true;
+  if (!ownConstruction(this, work, id, p)) {
+    cancelForeignSupply(this, p);
+    return true;
+  }
   const materials = this.constructionMaterials(work, id);
   if (!materials) return false;
   this.reserveConstructionMaterials(work, id);
@@ -110,6 +139,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
       for (const other of this.folk) {
         if (
           other.id === p.id ||
+          !sameFaction(other, p) ||
           other.health <= 0 ||
           (other.task !== Activity.Building && other.task !== Activity.Roadwork) ||
           other.supplyTarget !== id ||
@@ -147,6 +177,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
   for (const b of this.placed)
     if (
       !(work === Activity.Building && b.id === id) &&
+      sameFaction(b, p) &&
       b.materials.surplus(wanted) > 0 &&
       distance(b.center, at) <= TownState.campReach
     )
@@ -154,6 +185,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
   for (const lane of this.network.roads())
     if (
       !(work === Activity.Roadwork && lane.id === id) &&
+      ownConstruction(this, Activity.Roadwork, lane.id, p) &&
       lane.materials.surplus(wanted) > 0 &&
       distance(lane.workPoint(), at) <= TownState.campReach
     )
@@ -166,7 +198,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
   )
     return true;
   const sources = this.placed.filter(
-    (b) => isSeat(b.kind) && b.built() && resourceAmount(this.stock(b.id), wanted) > 0,
+    (b) => isSeat(b.kind) && b.built() && sameFaction(b, p) && resourceAmount(this.stock(b.id), wanted) > 0,
   );
   nativeSort(sources, (a, b) => distance(p.position, a.center) < distance(p.position, b.center));
   for (const source of sources) if (go(Activity.FetchingMaterials, source.id, source.door())) return true;
@@ -184,6 +216,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
   return true;
 }
 export function collectConstructionSurplus(this: Town, p: Person, work: Activity, id: number): boolean {
+  if (!belongsToFaction(p, this.controlFaction) || !ownConstruction(this, work, id, p)) return false;
   const materials = this.constructionMaterials(work, id);
   if (!materials || p.carrying) return false;
   for (const product of constructionProducts)
@@ -201,8 +234,15 @@ export function collectConstructionSurplus(this: Town, p: Person, work: Activity
   return false;
 }
 export function fetchConstructionMaterials(this: Town, p: Person): void {
-  const work = p.supplyRoad ? Activity.Roadwork : Activity.Building,
-    target = this.constructionMaterials(work, p.supplyTarget),
+  if (!belongsToFaction(p, this.controlFaction)) return;
+  const work = p.supplyRoad ? Activity.Roadwork : Activity.Building;
+  const sourceWork = p.target < -1 ? Activity.Roadwork : Activity.Building,
+    sourceId = p.target < -1 ? -p.target - 2 : p.target;
+  if (!ownConstruction(this, work, p.supplyTarget, p) || !ownConstruction(this, sourceWork, sourceId, p)) {
+    cancelForeignSupply(this, p);
+    return;
+  }
+  const target = this.constructionMaterials(work, p.supplyTarget),
     source =
       p.target < -1
         ? this.constructionMaterials(Activity.Roadwork, -p.target - 2)
@@ -224,6 +264,11 @@ export function fetchConstructionMaterials(this: Town, p: Person): void {
   p.until = this.time + (count ? 0 : 3);
 }
 export function deliverConstructionMaterials(this: Town, p: Person): void {
+  if (!belongsToFaction(p, this.controlFaction)) return;
+  if (!ownConstruction(this, p.supplyRoad ? Activity.Roadwork : Activity.Building, p.supplyTarget, p)) {
+    cancelForeignSupply(this, p);
+    return;
+  }
   const target = this.constructionMaterials(
     p.supplyRoad ? Activity.Roadwork : Activity.Building,
     p.supplyTarget,

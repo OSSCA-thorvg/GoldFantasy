@@ -1,3 +1,4 @@
+import { ceremonySeconds } from './town-devotion';
 // Resident arrivals and guest activities; resident priorities live in unit-scheduler.
 import { TownState } from './town-state';
 import { Person, Activity, Role, Calling, adventurer } from './person';
@@ -140,7 +141,7 @@ export function think(this: PeopleTown, p: Person): void {
   if (!anchor && p.role === Role.Guest)
     anchor = this.nearest(
       p.position,
-      (b) => b.built() && (b.kind === Structure.Tavern || b.kind === Structure.Guild || isLodging(b.kind)),
+      (b) => b.built() && (b.kind === Structure.Tavern || isLodging(b.kind)),
     );
   if (!anchor) anchor = this.camp(this.settlementOf(p));
   const around = anchor ? anchor.door() : p.position;
@@ -171,6 +172,7 @@ export function arrive(this: PeopleTown, p: Person): void {
         Activity.Sleeping,
         Activity.Relaxing,
         Activity.Praying,
+        Activity.Training,
         Activity.Shopping,
         Activity.Hauling,
         Activity.Building,
@@ -180,6 +182,15 @@ export function arrive(this: PeopleTown, p: Person): void {
       (p.activity === Activity.DeliveringMaterials && !p.supplyRoad);
   const arrival = place && (p.activity === Activity.Building || p.activity === Activity.Working)
     ? buildingWorkSpot(this,p,place) : place?.door();
+  // Affiliation may change while walking or after loading an interrupted visit.
+  if (atBuilding && place && (place.faction !== p.faction ||
+    (p.role === Role.Guest && this.settlementOf(p) !== this.settlementOf(place)))) {
+    p.path = []; p.activity = Activity.Idle; p.inside = false; p.target = -1;
+    p.ordered = p.approachingOrder = false; p.until = this.time;
+    if (p.taskSite === place.id) { p.task = Activity.Idle; p.taskSite = -1; p.trainingCalling = -1; p.autoMode = true; }
+    if (p.job === place.id && place.faction !== p.faction) p.job = -1;
+    return;
+  }
   if (atBuilding && place && arrival && distance(p.position, arrival) > f(0.02)) {
     if (!this.walkTo(p, arrival)) {
       p.activity = Activity.Idle;
@@ -239,12 +250,13 @@ export function arrive(this: PeopleTown, p: Person): void {
       break;
     case Activity.Relaxing:
     case Activity.Praying:
+    case Activity.Training:
       if (!place) {
         p.activity = Activity.Idle;
         break;
       }
       enter(p, place.threshold());
-      p.until = this.time + (p.activity === Activity.Praying ? 5 : 6);
+      p.until = this.time + ([Activity.Praying, Activity.Training].includes(p.activity) ? ceremonySeconds : 6);
       break;
     case Activity.Shopping:
       if (!place) {

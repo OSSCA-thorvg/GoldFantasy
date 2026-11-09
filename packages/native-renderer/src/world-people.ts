@@ -240,7 +240,11 @@ export function moveAgents(
         marked.add(person.id);
       }
     }
-    figure.parts.alert?.opacity(person.stress > f(0.7) || person.food < f(0.15) ? 255 : 0);
+    figure.parts.alert?.opacity(
+      !person.stressRecovery && (person.stress > f(0.7) || person.food < f(0.15)) ? 255 : 0,
+    );
+    figure.parts.stressRecovery?.opacity(person.stressRecovery ? 255 : 0);
+    figure.parts.affiliation?.opacity(person.faction > 0 ? 255 : 0);
     const hammering =
       !person.moving() &&
       !crossing &&

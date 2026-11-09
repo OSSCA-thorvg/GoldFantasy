@@ -47,11 +47,12 @@ export interface EconomyTown extends TownState {
   assignHomes(): void;
   staff(): void;
   grow(): void;
+  processDevotion(): void;
   capacity(village?: number): Resources;
   credit(gain: Resources, village: number): void;
   wageOf(person: Person): number;
   site(id: number): Building | null;
-  near(center: Point, radius: number, predicate: (kind: Structure) => boolean): boolean;
+  near(center: Point, radius: number, predicate: (kind: Structure) => boolean, faction?: number): boolean;
   needMet(item: Building, reason?: Reason): boolean;
   roomToGrow(item: Building, kind: Structure): boolean;
   mergeManor(seed: Building): boolean;
@@ -191,6 +192,7 @@ export function newDay(this: EconomyTown): void {
   this.assignHomes();
   this.staff();
   this.grow();
+  this.processDevotion();
   ++this.changes;
 }
 export function capacity(this: EconomyTown, village = this.camp()?.id ?? -1): Resources {
@@ -244,8 +246,9 @@ export function wageOf(_person: Person): number {
 }
 export function forecast(this: EconomyTown, village = this.camp()?.id ?? -1): Forecast {
   const day = new Forecast();
+  const faction = this.camp(village)?.faction ?? this.controlFaction;
   for (const p of this.folk) {
-    if (p.role !== Role.Resident || this.settlementOf(p) !== village) continue;
+    if (p.role !== Role.Resident || p.faction !== faction || this.settlementOf(p) !== village) continue;
     const paid = (task: Activity) =>
       task === Activity.Building ||
       task === Activity.Roadwork ||
@@ -263,7 +266,7 @@ export function forecast(this: EconomyTown, village = this.camp()?.id ?? -1): Fo
   day.guests = yesterday.guests;
   day.bounty = yesterday.bounty;
   for (const item of this.placed)
-    if (this.settlementOf(item) === village) day.made.add(this.dailyOutput(item));
+    if (item.faction === faction && this.settlementOf(item) === village) day.made.add(this.dailyOutput(item));
   const mouths = this.population(village) + this.guests(village);
   day.used.food = yesterday.eaten || Math.ceil(mouths / 7.5);
   day.used.water = yesterday.drunk || Math.ceil(mouths / 3.75);
@@ -273,8 +276,11 @@ export function settleAccounts(this: EconomyTown): void {
   const shift = TownState.paidWorkSeconds;
   for (const p of this.folk) {
     if (p.role !== Role.Resident) continue;
-    const village = this.settlementOf(p),
-      today = this.economy(village).today;
+    const village = this.settlementOf(p);
+    // Travelling or orphaned neutral residents have private supplies, not the
+    // player's unassigned stockpile. Their new Camp resumes normal accounting.
+    if (village < 0 && p.faction !== this.controlFaction) { p.worked = 0; continue; }
+    const today = this.economy(village).today;
     p.unpaid = false;
     if (p.worked >= shift) {
       const wage = this.wageOf(p),
@@ -322,7 +328,7 @@ export function needMet(this: EconomyTown, item: Building, reason: Reason = { va
       return treasury.food > 0;
     case GrowthNeed.Market:
       reason.value = 'Needs a market within 8 paces';
-      return this.near(item.center, 8, isMarket);
+      return this.near(item.center, 8, isMarket, item.faction);
     case GrowthNeed.Workers:
       reason.value = `Needs ${spec.needAmount} workers`;
       return item.workers >= spec.needAmount;
@@ -341,8 +347,8 @@ export function needMet(this: EconomyTown, item: Building, reason: Reason = { va
       reason.value = `Needs ${spec.needAmount} gold from guests (${item.earned} so far)`;
       return item.earned >= spec.needAmount;
     case GrowthNeed.Registry:
-      reason.value = `Needs ${spec.needAmount} adventurers on its rolls (${item.registered} so far)`;
-      return item.registered >= spec.needAmount;
+      reason.value = `Needs ${spec.needAmount} residents trained (${item.trainingCount} so far)`;
+      return item.trainingCount >= spec.needAmount;
     case GrowthNeed.None:
       return true;
   }
@@ -377,7 +383,7 @@ export function grow(this: EconomyTown): void {
     const treasury = this.reserves(this.settlementOf(item)),
       spec = structureSpec(item.kind);
     if (spec.next === Structure.Count || !item.built() || !this.needMet(item)) continue;
-    const blessed = isHome(item.kind) && this.near(item.center, 6, (kind) => kind === Structure.Shrine);
+    const blessed = isHome(item.kind) && this.near(item.center, 6, (kind) => kind === Structure.Shrine, item.faction);
     item.growth = Math.min(spec.growthDays, item.growth + (blessed ? 2 : 1));
     if (item.growth < spec.growthDays || !treasury.covers(spec.upgradeCost)) continue;
     if (spec.need === GrowthNeed.Merge) {
