@@ -110,6 +110,18 @@ export function region(
   }
   const edges: Edge[] = [],
     stride = bounds.right - bounds.left + 1;
+  let values: Float32Array | undefined;
+  let read = sample;
+  // Adjacent cells share their scalar-field corners. Evaluate each grid point once
+  // with the same float rounding used by contourCell, without changing edge order.
+  if (Object.values(bounds).every(Number.isInteger)) {
+    values = new Float32Array(stride * (bounds.bottom - bounds.top + 1));
+    let index = 0;
+    for (let j = bounds.top; j <= bounds.bottom; ++j)
+      for (let i = bounds.left; i <= bounds.right; ++i) values[index++] = f(sample(i, j));
+    const field = values;
+    read = (i, j) => field[(j - bounds.top) * stride + i - bounds.left];
+  }
   const node = (i: number, j: number) => (j - bounds.top) * stride + i - bounds.left;
   const vertex = (i: number, j: number) => `v${node(i, j)}`;
   const crossing = (i: number, j: number, side: number) => {
@@ -118,12 +130,23 @@ export function region(
     return `e${node(i, j) * 2 + (side % 2)}`;
   };
   for (let j = bounds.top; j < bounds.bottom; j++)
-    for (let i = bounds.left; i < bounds.right; i++)
-      for (const edge of contourCell(i, j, sample).edges)
+    for (let i = bounds.left; i < bounds.right; i++) {
+      if (values) {
+        const at = (j - bounds.top) * stride + i - bounds.left,
+          inside =
+            Number(values[at] >= 0) +
+            Number(values[at + 1] >= 0) +
+            Number(values[at + stride + 1] >= 0) +
+            Number(values[at + stride] >= 0);
+        // Uniform cells have no contour edges and need no temporary polygons.
+        if (inside === 0 || inside === 4) continue;
+      }
+      for (const edge of contourCell(i, j, read).edges)
         edges.push({ a: edge.a, b: edge.b, from: crossing(i, j, edge.from), to: crossing(i, j, edge.to) });
+    }
   const border = (i: number, j: number, nextI: number, nextJ: number, edge: string) => {
-    const a = f(sample(i, j)),
-      b = f(sample(nextI, nextJ));
+    const a = f(read(i, j)),
+      b = f(read(nextI, nextJ));
     if (a < 0 && b < 0) return;
     let from = { x: f(i * SAMPLE_STEP), y: f(j * SAMPLE_STEP) },
       to = { x: f(nextI * SAMPLE_STEP), y: f(nextJ * SAMPLE_STEP) },

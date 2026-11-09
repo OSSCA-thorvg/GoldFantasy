@@ -3,9 +3,47 @@ import { clamp, f32, hash01, lround, remainder, u32 } from './numeric';
 import { DungeonKind, Giant, Layer, Region, Terrain, Volcano, World, impassable, isStone, isWater, lavaFloor, lavaLevel, makeTile, volcanicCrest, volcanoFoot, type Dungeon, type River, type Sight, type Tile, type TileCoord } from './world-types';
 import { placeDungeons } from './dungeon-sites';
 const smooth = (t: number): number => f32(f32(t * t) * (f32(3 - f32(2 * t))));
+interface NoiseLattice {
+    x: number;
+    y: number;
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+}
+const maxNoiseLattices = 256;
+// Nearby generation samples reuse a lattice cell. Keep only the most recent
+// cell per noise seed, and release the bounded cache when generation ends.
+let generationNoiseLattices: Map<number, NoiseLattice> | undefined;
 function valueNoise(seed: number, x: number, y: number): number {
     const ix = Math.floor(x), iy = Math.floor(y), fx = smooth(f32(x - ix)), fy = smooth(f32(y - iy));
-    const a = hash01(seed, ix, iy), b = hash01(seed, ix + 1, iy), c = hash01(seed, ix, iy + 1), d = hash01(seed, ix + 1, iy + 1);
+    let a: number, b: number, c: number, d: number;
+    const cache = generationNoiseLattices;
+    if (cache) {
+        let cell = cache.get(seed);
+        if (!cell) {
+            if (cache.size >= maxNoiseLattices) cache.clear();
+            cell = { x: NaN, y: NaN, a: 0, b: 0, c: 0, d: 0 };
+            cache.set(seed, cell);
+        }
+        if (cell.x !== ix || cell.y !== iy) {
+            cell.x = ix;
+            cell.y = iy;
+            cell.a = hash01(seed, ix, iy);
+            cell.b = hash01(seed, ix + 1, iy);
+            cell.c = hash01(seed, ix, iy + 1);
+            cell.d = hash01(seed, ix + 1, iy + 1);
+        }
+        a = cell.a;
+        b = cell.b;
+        c = cell.c;
+        d = cell.d;
+    } else {
+        a = hash01(seed, ix, iy);
+        b = hash01(seed, ix + 1, iy);
+        c = hash01(seed, ix, iy + 1);
+        d = hash01(seed, ix + 1, iy + 1);
+    }
     return f32(f32(a + f32((f32(b - a)) * fx)) + f32((f32(f32(c + f32((f32(d - c)) * fx)) - (f32(a + f32((f32(b - a)) * fx))))) * fy));
 }
 export function fractalNoise(seed: number, x: number, y: number): number {
@@ -278,6 +316,15 @@ export class WorldMap {
             found.push(i);
     } return found; }
     static generate(seed: number, width = 176, height = 176): WorldMap {
+        const previous = generationNoiseLattices;
+        generationNoiseLattices = new Map();
+        try {
+            return WorldMap.generateMap(seed, width, height);
+        } finally {
+            generationNoiseLattices = previous;
+        }
+    }
+    private static generateMap(seed: number, width: number, height: number): WorldMap {
         const map = new WorldMap();
         map.columns = width;
         map.rows = height;
