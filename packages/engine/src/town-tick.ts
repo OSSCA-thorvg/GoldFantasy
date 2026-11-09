@@ -26,6 +26,7 @@ import { resourceAmount } from './construction-materials';
 import { processingRecipe } from './town-production';
 import { prepareBuildingRepair, restoreBuildingHealth } from './building-repair';
 export interface TickTown extends PeopleTown {
+  huntFood(p: Person): boolean;
   processProduction(place: Building, dt: number): void;
   prepareConstruction(p: Person, work: Activity, id: number): boolean;
   admitGuests(dt: number): void;
@@ -519,21 +520,37 @@ export function tick(this: TickTown, dt: number): void {
       case Activity.Drinking:
         if (this.time >= p.until) { p.activity = Activity.Idle; p.until = this.time; }
         break;
-      case Activity.Sleeping:
-        if (p.task === Activity.Sleeping && !p.ordered && p.autoMode && p.food < f(0.25) && this.eat(p))
-          break;
+      case Activity.Sleeping: {
+        const restTask = p.task === Activity.Sleeping,
+          needsMeal = restTask && (p.food < f(.25) || (p.health < 1 && p.food <= f(.4)));
+        // A meal is part of recovery when low food prevents passive healing;
+        // preserve the explicit rest target while visiting the pantry.
+        if (needsMeal && (this.eat(p) || this.huntFood(p))) break;
+        // Unavailable food makes further healing impossible; a rested direct
+        // order returns to Auto so ordinary food/work decisions can continue.
+        const cannotHeal = needsMeal && p.health < 1;
         if (
           p.rest >= f(0.95) &&
-          (!p.recoveringHealth || p.health >= 1) &&
-          (!p.ordered || p.task === Activity.Sleeping) &&
-          (!p.autoMode || this.climate().night <= f(0.5))
+          (!(p.recoveringHealth || restTask) || p.health >= 1 || cannotHeal) &&
+          (!p.ordered || p.task === Activity.Sleeping)
         ) {
           if (dangerNear(this, p)) break;
+          p.recoveringRest = false;
+          if (p.health >= 1) p.recoveringHealth = false;
+          // Finish before doorway exit drains rest below the completion threshold.
+          if (p.task === Activity.Sleeping) {
+            p.task = Activity.Idle;
+            p.taskSite = -1;
+            p.ordered = p.aggressive = p.approachingOrder = false;
+            p.autoMode = true;
+          }
+          if (p.autoMode && this.climate().night > f(.5)) break;
           p.activity = Activity.Idle;
           p.inside = false;
           p.until = this.time;
         }
         break;
+      }
       case Activity.Eating:
       case Activity.Relaxing:
       case Activity.Praying:
