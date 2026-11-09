@@ -5,7 +5,7 @@ import { Clip, MusicStream, SoundLibrary, sounds, onsets } from './sound-library
 import { voiceSample } from './spoken-voice';
 import { EffectManager } from './effect-manager';
 import { Score } from './music-score';
-import { cueClips } from './sound-catalog';
+import { animalCallWindows, cueClips } from './sound-catalog';
 import { ambient, voice, clipEnd, effectDuration, type Voice, type Stereo } from './sound-synthesis';
 export enum Playback {
   Playing,
@@ -139,7 +139,8 @@ export class SoundBoard {
         return (this.picking >>> 8) / 16777216;
       },
       group = groups[Math.min(groups.length - 1, Math.trunc(f(next() * groups.length)))],
-      takes = this.library.count(group);
+      calls = animalCallWindows[sound.cue],
+      takes = calls?.length ?? this.library.count(group);
     if (!takes) return { clip: new Clip(), rate: 1 };
     const key = sound.cue % this.lastTake.length;
     let take = Math.trunc(f(next() * takes)) % takes;
@@ -150,6 +151,16 @@ export class SoundBoard {
         f(1 + f(f(f(next() * 2) - 1) * spread)) *
           (Number.isFinite(sound.pitch) && sound.pitch > 0 ? sound.pitch : 1),
       );
+    if (calls) {
+      const call = calls[take],
+        source = this.library.clip(call.source, 0),
+        first = Math.min(source.frames, Math.round(call.from * source.rate)),
+        last = Math.min(source.frames, Math.round(call.to * source.rate));
+      return {
+        clip: new Clip(source.pcm?.subarray(first, last) ?? null, last - first, source.rate),
+        rate: speed,
+      };
+    }
     return { clip: this.library.clip(group, take), rate: speed };
   }
   musicPlaying(): boolean {

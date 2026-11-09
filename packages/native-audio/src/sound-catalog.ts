@@ -29,6 +29,34 @@ export const cueClips: Partial<Record<Cue, string[]>> = {
   [Cue.Dog]: ['wildlife/dog_'],
   [Cue.Cat]: ['wildlife/cat_'],
 };
+/** Individual calls from the existing authored sound banks. The source files contain
+ * whole sequences; an ambient cue should emit one cluck, bark or oink. */
+export interface AnimalCallWindow {
+  source: string;
+  from: number;
+  to: number;
+}
+export const animalCallWindows: Partial<Record<Cue, readonly AnimalCallWindow[]>> = {
+  [Cue.Chicken]: [
+    { source: 'wildlife/chicken_01', from: 0.04, to: 0.32 },
+    { source: 'wildlife/chicken_01', from: 0.6, to: 0.92 },
+    { source: 'wildlife/chicken_01', from: 1.02, to: 1.36 },
+    { source: 'wildlife/chicken_01', from: 1.61, to: 1.88 },
+    { source: 'wildlife/chicken_01', from: 1.88, to: 2.22 },
+    { source: 'wildlife/chicken_01', from: 2.27, to: 2.65 },
+  ],
+  [Cue.Dog]: [
+    { source: 'wildlife/dog_01', from: 0.035, to: 0.48 },
+    { source: 'wildlife/dog_01', from: 0.605, to: 0.98 },
+    { source: 'wildlife/dog_01', from: 1.005, to: 1.5 },
+  ],
+  [Cue.Pig]: [
+    { source: 'wildlife/pig_01', from: 0.045, to: 0.405 },
+    { source: 'wildlife/pig_01', from: 0.44, to: 0.76 },
+    { source: 'wildlife/pig_01', from: 0.93, to: 1.32 },
+    { source: 'wildlife/pig_01', from: 1.34, to: 1.76 },
+  ],
+};
 /** File-backed dependencies of the opening UI and settlement. Ambient weather,
  * birds, leaves, water, fire, and mining are synthesized by SoundBoard. */
 export const initialEffectPrefixes = [

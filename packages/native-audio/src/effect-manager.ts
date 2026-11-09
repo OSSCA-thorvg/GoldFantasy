@@ -84,6 +84,12 @@ function interval(cue: Cue): number {
       return 0.4;
     case Cue.Raven:
       return 4;
+    case Cue.Pig:
+      return 1.25;
+    case Cue.Chicken:
+      return 1.5;
+    case Cue.Dog:
+      return 2;
     case Cue.ThunderCrack:
     case Cue.ThunderStrike:
     case Cue.ThunderClap:
@@ -186,6 +192,9 @@ export class EffectManager {
         sound.cue === Cue.Howl ||
         sound.cue === Cue.TreeFall ||
         sound.cue === Cue.Raven ||
+        sound.cue === Cue.Pig ||
+        sound.cue === Cue.Chicken ||
+        sound.cue === Cue.Dog ||
         sound.cue === Cue.Growth ||
         thunder(sound.cue)
           ? 1

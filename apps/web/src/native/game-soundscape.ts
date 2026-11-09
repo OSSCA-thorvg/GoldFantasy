@@ -6,7 +6,7 @@ import { f32 as f, clamp, hash01 } from '../../../../packages/engine/src/numeric
 import { Weather } from '../../../../packages/engine/src/climate';
 import { Thunderstorm } from '../../../../packages/engine/src/thunderstorm';
 import { Town } from '../../../../packages/engine/src/town';
-import type { Monster } from '../../../../packages/engine/src/person';
+import { AnimalKind, type Monster } from '../../../../packages/engine/src/person';
 import {
   Cue,
   Sound,
@@ -98,11 +98,15 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
       );
     this.nextRaven = seconds + 40 + f(80 * chance);
   }
-  if (seconds >= this.nextAnimal) {
+  const animalCall = (pig: boolean) => {
     let caller: Monster | null = null;
     let best = -1;
     for (const animal of this.town.wildlife())
-      if (animal.health > 0 && this.renderer.visible(animal.position)) {
+      if (
+        animal.health > 0 &&
+        (animal.animal === AnimalKind.Pig) === pig &&
+        this.renderer.visible(animal.position)
+      ) {
         const score = hash01(this.town.map().seed(), animal.id, Math.trunc(seconds / 10), 199);
         if (score > best) {
           best = score;
@@ -114,7 +118,15 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
       sound.gain = f(sound.gain * f(0.4));
       if (sound.gain > f(0.03)) this.cues.push(sound);
     }
+  };
+  if (seconds >= this.nextAnimal) {
+    animalCall(false);
     this.nextAnimal = seconds + 10 + f(12 * roll(11));
+  }
+  // Pigs make brief individual grunts, with quiet gaps instead of a long call sequence.
+  if (seconds >= this.nextPig) {
+    animalCall(true);
+    this.nextPig = seconds + 4 + f(4 * roll(12));
   }
   let animalHeard = 0;
   for (const call of this.town.wildlifeCalls()) {

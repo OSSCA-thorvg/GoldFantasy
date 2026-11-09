@@ -2,6 +2,7 @@
 import { f32, clamp } from '../../engine/src/numeric';
 import { Cue, VoiceLine, type Ambience, type Sound } from './sound-types';
 import type { Clip } from './sound-library';
+import { animalCallWindows } from './sound-catalog';
 export interface Stereo {
   left: number;
   right: number;
@@ -268,6 +269,8 @@ export function voice(this: SynthesisState, v: Voice): number {
       // Faded over its last moments, longer where it is cut short, so no clip ends on a click.
       let end = clipEnd(v.sound.cue, v.clip, v.rate),
         fade = end < f32(f32(v.clip.duration()) / v.rate) ? f32(0.025) : f32(0.006);
+      if (animalCallWindows[v.sound.cue])
+        return f32(v.clip.at(a, v.rate) * clamp(Math.min(a / 0.008, (end - a) / 0.045), 0, 1));
       return f32(v.clip.at(a, v.rate) * clamp(f32(f32(end - a) / fade), 0, 1));
     }
     if (a < 0 || a >= v.sound.duration) return 0;
