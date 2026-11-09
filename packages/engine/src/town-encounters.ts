@@ -8,6 +8,7 @@ import type { CampEconomy } from './camp-economy';
 import { point, add, sub, scale, rotated, normalized, distance, type Point } from './geometry';
 import { f32 as f, lround } from './numeric';
 import { breedOf, steps } from './town-monsters';
+import { planRaiderApproach, separateMonsters } from './monster-navigation';
 export interface EncounterTown extends TownState {
   wakeGiants(): void;
   stirWildlife(dt: number): void;
@@ -136,19 +137,7 @@ export function stir(this: EncounterTown, dt: number): void {
       continue;
     }
     if (beast.raider) {
-      let target: Building | undefined;
-      for (const item of this.placed)
-        if (!target || distance(item.center, beast.position) < distance(target.center, beast.position))
-          target = item;
-      if (
-        target &&
-        (beast.prey !== target.id || !beast.path.length) &&
-        !target.footprint().contains(beast.position, f(0.7))
-      ) {
-        beast.prey = target.id;
-        beast.path = this.grid.path(beast.position, target.door());
-        if (!beast.path.length) beast.path = [target.door()];
-      }
+      planRaiderApproach(this, beast);
     } else if (!beast.path.length && this.roll() < dt * 0.3) {
       beast.path = [
         this.grid.nearestWalkable(
@@ -164,7 +153,8 @@ export function stir(this: EncounterTown, dt: number): void {
           gap <= step
             ? { ...beast.path[0] }
             : add(beast.position, scale(sub(beast.path[0], beast.position), f(step / gap)));
-      if (!beast.raider && !steps(this.world, next)) {
+      if ((!beast.raider && !steps(this.world, next)) ||
+        (beast.raider && this.grid.walkable(beast.position) && !this.grid.clear(beast.position, next, Infinity))) {
         beast.path = [];
         break;
       }
@@ -175,6 +165,7 @@ export function stir(this: EncounterTown, dt: number): void {
       } else step = 0;
     }
   }
+  separateMonsters(this, dt);
   for (const beast of this.beasts) {
     if (beast.health > 0) continue;
     const bounty = lround(

@@ -1,4 +1,4 @@
-// Literal authored silhouettes and rigs from game/world_sprites.cpp.
+// Compact world silhouettes with articulated work and combat equipment.
 import { point, add, sub, mul, lerp, project, type Point } from '../../engine/src/geometry';
 import { f32 } from '../../engine/src/numeric';
 import { Person, Calling } from '../../engine/src/person';
@@ -11,6 +11,7 @@ import { SceneNode, ShapeNode, TextNode, PaintNode, type Matrix, type Rgb } from
 import { poly, oval, stroke, opaque, scale, fill, glow } from './sprite-primitives';
 import { ArmRig, connectArm, poseArm } from './idle-gesture';
 import { stoneGiantSprite } from './stone-giant';
+import { createEquipment } from './person-equipment';
 import { characterFigure } from './character-assets';
 import { Mood } from './person-portrait';
 export interface TextBounds {
@@ -21,6 +22,15 @@ export interface TextBounds {
 }
 export type TextMeasure = (text: string, size: number, font: string) => TextBounds | undefined;
 export class PersonParts {
+  body: SceneNode | null = null;
+  shadow: PaintNode | null = null;
+  sword: PaintNode | null = null;
+  bow: PaintNode | null = null;
+  staff: PaintNode | null = null;
+  mace: PaintNode | null = null;
+  lute: PaintNode | null = null;
+  bowString: ShapeNode | null = null;
+  arrow: PaintNode | null = null;
   ring: PaintNode | null = null;
   alert: PaintNode | null = null;
   hammer: PaintNode | null = null;
@@ -91,7 +101,6 @@ function personFigure(
   width: number,
   parts: PersonParts,
 ): void {
-  shadow(sprite, f32(width + f32(1.3)));
   let boot: Rgb = [58, 44, 36],
     belt: Rgb = [84, 60, 42];
   let foot = f32(width * f32(0.55));
@@ -223,102 +232,516 @@ function bandagedWrist(arm: ArmRig): void {
     );
   }
 }
-function monster(sprite: SceneNode, lair: DungeonKind): void {
-  if (lair == DungeonKind.GiantHall) {
-    sprite.add(stoneGiantSprite());
-    return;
-  }
-  let body: Rgb = [58, 48, 66],
-    eyes: Rgb = [255, 84, 64];
-  switch (lair) {
-    case DungeonKind.Crypt:
-      body = [150, 146, 132];
-      eyes = [120, 200, 255];
-      break;
-    case DungeonKind.Portal:
-      body = [72, 42, 96];
-      eyes = [240, 150, 255];
-      break;
-    case DungeonKind.Ruin:
-      body = [62, 82, 52];
-      eyes = [250, 220, 90];
-      break;
-    case DungeonKind.Cave:
-      break;
-  }
-  sprite.add(oval([0, 0], 9, f32(3.4), [0, 0, 0, 120]));
-  sprite.add(oval([0, -6], 15, 8, opaque(eyes, 30)));
-  if (lair == DungeonKind.Cave) {
-    // Shadow wolf on four legs.
-    for (const x of [-6, -3, 3, 6]) sprite.add(stroke([x, 0], [x, -5], f32(1.6), opaque(body)));
+export interface MonsterParts {
+  body: SceneNode;
+  shadow: PaintNode;
+  last: Point;
+  facing: number;
+}
+const monsterRigs = new WeakMap<SceneNode, MonsterParts>();
+export const monsterParts = (sprite: SceneNode): MonsterParts | undefined => monsterRigs.get(sprite);
+function monster(root: SceneNode, lair: DungeonKind): void {
+  const sprite = lair === DungeonKind.GiantHall ? stoneGiantSprite() : new SceneNode();
+  const shadow = lair === DungeonKind.GiantHall ? sprite.children[0] : oval([0, 0], 9, 3.4, [0, 0, 0, 120]);
+  if (lair === DungeonKind.GiantHall) sprite.remove(shadow);
+  root.add(shadow).add(sprite);
+  monsterRigs.set(root, { body: sprite, shadow, last: point(-1, -1), facing: 1 });
+  if (lair === DungeonKind.GiantHall) return;
+  const dark: Rgb = [23, 25, 29];
+  if (lair === DungeonKind.Cave) {
+    // A low, bristled wolf: the muzzle, folded hind legs and tail read at world scale.
+    const fur: Rgb = [66, 62, 71],
+      lit: Rgb = [86, 82, 91],
+      shade: Rgb = [43, 42, 50];
+    sprite.add(
+      poly(
+        [
+          [-7, -8],
+          [-12, -10],
+          [-15, -7],
+          [-12, -7],
+          [-8, -4],
+        ],
+        shade,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [-6, -6],
+          [-3, -5],
+          [-4, -2],
+          [-3, 0],
+          [-6, 0],
+          [-7, -3],
+        ],
+        shade,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [3, -6],
+          [5, -6],
+          [6, -0.5],
+          [3, 0],
+        ],
+        shade,
+      ),
+    );
     sprite.add(
       poly(
         [
           [-9, -6],
-          [-4, -10],
+          [-6, -10],
+          [-2, -11],
+          [1, -10],
+          [3, -12],
+          [7, -9],
+          [8, -6],
+          [4, -3],
+          [-5, -4],
+        ],
+        fur,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [-8, -7],
+          [-5, -10],
+          [-2, -11],
+          [1, -10],
+          [4, -11],
+          [5, -8],
+          [0, -7],
+          [-4, -8],
+        ],
+        lit,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [-7, -5],
+          [-4, -5],
+          [-5, -2],
+          [-4, -0.4],
+          [-7, 0],
+          [-8, -2],
+        ],
+        fur,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [5, -7],
+          [7, -6],
+          [7, -1],
+          [9, -0.2],
+          [5, 0],
+          [4, -3],
+        ],
+        lit,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
           [5, -10],
-          [8, -6],
-          [4, -4],
-          [-7, -4],
+          [8, -12],
+          [10, -11],
+          [11, -9],
+          [14, -8],
+          [14, -6.7],
+          [10, -5.5],
+          [7, -6],
         ],
-        opaque(body),
+        fur,
       ),
     );
     sprite.add(
       poly(
         [
-          [6, -9],
-          [12, -11],
-          [13, -7],
-          [8, -6],
+          [7, -11],
+          [7.5, -15],
+          [10, -11.5],
         ],
-        opaque(body),
+        shade,
       ),
     );
     sprite.add(
       poly(
         [
-          [8, -10],
-          [9, -14],
-          [11, -f32(10.5)],
+          [8.5, -11.5],
+          [10.2, -14],
+          [11.2, -10],
         ],
-        opaque(body),
+        fur,
       ),
     );
-    sprite.add(oval([11, -9], 3, 3, opaque(eyes, 90)));
-    sprite.add(oval([11, -9], f32(1.2), f32(1.2), opaque(eyes)));
-  } else {
-    // Hunched biped.
-    sprite.add(stroke([-2, 0], [-2, -5], f32(1.8), opaque(body)));
-    sprite.add(stroke([2, 0], [2, -5], f32(1.8), opaque(body)));
     sprite.add(
       poly(
         [
-          [-5, -5],
-          [5, -5],
-          [4, -13],
-          [-3, -14],
+          [8, -8],
+          [10, -7.7],
+          [13.4, -7.5],
+          [12, -6],
+          [9, -5.8],
         ],
-        opaque(body),
+        [109, 103, 103],
       ),
     );
-    sprite.add(oval([2, -16], f32(3.6), f32(3.2), opaque(body)));
-    if (lair == DungeonKind.Portal) {
-      sprite.add(
-        poly(
-          [
-            [-3, -12],
-            [-11, -18],
-            [-8, -10],
-          ],
-          opaque(scale(body, f32(0.7))),
-        ),
-      );
-    }
-    sprite.add(oval([f32(2.3), -f32(16.5)], 4, 3, opaque(eyes, 80)));
-    sprite.add(oval([1, -f32(16.5)], f32(1.1), f32(1.1), opaque(eyes)));
-    sprite.add(oval([f32(3.6), -f32(16.5)], f32(1.1), f32(1.1), opaque(eyes)));
+    sprite.add(
+      poly(
+        [
+          [12.8, -8.4],
+          [14.5, -8],
+          [14.2, -6.8],
+          [12.8, -7],
+        ],
+        dark,
+      ),
+    );
+    sprite.add(stroke([9.1, -9.6], [10.7, -9.2], 0.65, dark));
+    sprite.add(stroke([10.5, -6.3], [12.7, -6.8], 0.35, shade));
+    return;
   }
+  if (lair === DungeonKind.Crypt) {
+    const bone: Rgb = [166, 160, 143],
+      pale: Rgb = [196, 190, 170],
+      shade: Rgb = [110, 108, 99];
+    sprite.add(stroke([-2.5, -5], [-3, -1], 1.5, shade));
+    sprite.add(stroke([2, -5], [3.2, -0.7], 1.5, bone));
+    sprite.add(stroke([-3.3, -0.5], [-1, -0.5], 1.1, shade));
+    sprite.add(stroke([2.5, -0.4], [5, -0.4], 1.2, bone));
+    sprite.add(
+      poly(
+        [
+          [-4, -6],
+          [-3, -12],
+          [0, -14],
+          [4, -12],
+          [4, -6],
+          [1, -7],
+          [-1, -4],
+        ],
+        [62, 60, 62],
+      ),
+    );
+    sprite.add(stroke([0, -12.8], [0, -6], 1.2, bone));
+    for (let rib = 0; rib < 3; ++rib) {
+      sprite.add(stroke([-2.7, -12 + rib * 1.7], [0, -10.9 + rib * 1.7], 0.9, shade));
+      sprite.add(stroke([0, -10.9 + rib * 1.7], [3, -12 + rib * 1.7], 0.9, bone));
+    }
+    sprite.add(
+      poly(
+        [
+          [-3.6, -12],
+          [-5.4, -9],
+          [-5.5, -5],
+          [-4.2, -4],
+          [-4, -8],
+          [-2.4, -11],
+        ],
+        shade,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [3, -12],
+          [5.6, -9],
+          [7, -5.7],
+          [5.7, -4.7],
+          [4.2, -8],
+          [2, -11],
+        ],
+        bone,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [-1.5, -18],
+          [1, -20],
+          [4, -19.6],
+          [5.6, -17.6],
+          [5, -14.5],
+          [3.5, -12.8],
+          [0, -13],
+          [-1.6, -15],
+        ],
+        bone,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [-1.5, -18],
+          [1, -20],
+          [2, -19.5],
+          [1.4, -16.5],
+          [-1.2, -15.5],
+        ],
+        pale,
+      ),
+    );
+    sprite.add(oval([0.2, -16.6], 1.05, 1.2, dark));
+    sprite.add(oval([3.6, -16.8], 1.1, 1.15, dark));
+    sprite.add(
+      poly(
+        [
+          [1.8, -15.8],
+          [2.4, -14.6],
+          [1.2, -14.6],
+        ],
+        shade,
+      ),
+    );
+    sprite.add(stroke([0.3, -13.9], [3.9, -14.1], 0.55, shade));
+    return;
+  }
+  const portal = lair === DungeonKind.Portal,
+    cloth: Rgb = portal ? [64, 49, 77] : [62, 76, 50],
+    lit: Rgb = portal ? [85, 68, 99] : [91, 108, 70],
+    shade: Rgb = portal ? [39, 35, 49] : [42, 51, 36];
+  sprite.add(
+    poly(
+      [
+        [-3.5, -5],
+        [-0.7, -4],
+        [-1, -0.5],
+        [-4, 0],
+        [-4.8, -0.7],
+      ],
+      shade,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [1.5, -5],
+        [4, -5],
+        [5, -0.6],
+        [2, 0],
+        [1.3, -1],
+      ],
+      cloth,
+    ),
+  );
+  if (portal) {
+    sprite.add(
+      poly(
+        [
+          [-3, -14],
+          [-9, -18],
+          [-8, -11],
+          [-11, -7],
+          [-7, -8],
+          [-7, -3],
+          [-3, -5],
+        ],
+        shade,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [2, -14],
+          [7, -17],
+          [8, -10],
+          [10, -7],
+          [6, -8],
+          [7, -3],
+          [3, -5],
+        ],
+        shade,
+      ),
+    );
+  }
+  sprite.add(
+    poly(
+      [
+        [-5, -5],
+        [-5.5, -10],
+        [-3, -14],
+        [1, -15],
+        [5, -12],
+        [5.5, -5],
+        [2, -3],
+        [-1, -5],
+      ],
+      cloth,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [-5.5, -10],
+        [-3, -14],
+        [1, -15],
+        [1.5, -8],
+        [-2, -6],
+      ],
+      lit,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [-4, -11],
+        [-7, -8],
+        [-6.5, -4],
+        [-4.9, -3.5],
+        [-4.8, -7],
+        [-2.4, -10],
+      ],
+      shade,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [4, -11],
+        [7, -8],
+        [7.8, -3.7],
+        [6, -3.4],
+        [5, -6.8],
+        [2, -10],
+      ],
+      lit,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [-4, -6.3],
+        [4.7, -6.3],
+        [4.9, -5.2],
+        [-4, -5.2],
+      ],
+      [79, 61, 46],
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [-1.5, -18.7],
+        [1, -20],
+        [4.8, -19],
+        [6, -16.3],
+        [4.8, -12.7],
+        [1, -12.3],
+        [-1.8, -14.4],
+      ],
+      lit,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [2, -19.5],
+        [4.8, -19],
+        [6, -16.3],
+        [4.8, -12.7],
+        [2.6, -13.2],
+      ],
+      cloth,
+    ),
+  );
+  if (portal) {
+    sprite.add(
+      poly(
+        [
+          [-1.5, -17],
+          [-3.8, -21.7],
+          [-0.2, -19.6],
+          [1, -17.4],
+        ],
+        [115, 107, 116],
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [3.8, -18],
+          [6.5, -21],
+          [5.9, -16.2],
+        ],
+        [84, 79, 92],
+      ),
+    );
+  } else {
+    sprite.add(
+      poly(
+        [
+          [-1.5, -16.7],
+          [-5, -18.8],
+          [-3.7, -15.6],
+          [-1, -14.7],
+        ],
+        lit,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [4.8, -17],
+          [8, -18.1],
+          [6.2, -14.9],
+          [4.8, -14.7],
+        ],
+        cloth,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [0.4, -13.7],
+          [4.7, -14],
+          [4.2, -12.3],
+          [1, -11.8],
+        ],
+        [110, 118, 79],
+      ),
+    );
+  }
+  // Recessed eyes remain dark; there is no eye light, colored halo or emissive paint.
+  sprite.add(
+    poly(
+      [
+        [-0.3, -17.1],
+        [1.5, -16.7],
+        [1.3, -15.8],
+        [-0.2, -16],
+      ],
+      dark,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [3, -16.8],
+        [4.8, -17.1],
+        [4.7, -16],
+        [3.2, -15.8],
+      ],
+      dark,
+    ),
+  );
+  sprite.add(
+    poly(
+      [
+        [2, -16.6],
+        [1.6, -14.5],
+        [3, -14.2],
+      ],
+      shade,
+    ),
+  );
+  sprite.add(stroke([1, -13.6], [4.2, -13.8], 0.5, shade));
 }
 function dungeonCenter(site: Dungeon): Point {
   return project(f32(site.origin.x + 1), f32(site.origin.y + 1));
@@ -517,18 +940,20 @@ function streetHead(sprite: SceneNode, a: Appearance, style: HairStyle, head: Po
 }
 // World walking bodies retain their gameplay rig and their own compact head.
 function figureOf(person: Person, parts: PersonParts): SceneNode {
-  let sprite = new SceneNode();
+  const root = new SceneNode(),
+    sprite = new SceneNode();
+  parts.body = sprite;
   let selection = oval([0, 0], 9, 4, [0, 0, 0, 0]);
   selection.strokeWidth(f32(1.6));
   selection.strokeFill(240, 210, 120, 230);
   selection.opacity(0);
-  sprite.add(selection);
+  root.add(selection);
   parts.ring = selection;
   let look = appearanceOf(person);
   let broad = f32(f32(4.2) * (person.customLook?.bodyWidth ?? 1)),
     height = figureHeight(person);
-  let steel: Rgb = [150, 154, 166],
-    leather: Rgb = [92, 68, 48];
+  parts.shadow = oval([0, 0], broad + 1.3, (broad + 1.3) * 0.42, [0, 0, 0, 110]);
+  root.add(parts.shadow).add(sprite);
   let head = point(0, f32(-height - 3));
   let hair = streetHairStyle(look);
   streetHairBehind(sprite, look, hair, head);
@@ -552,8 +977,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
     case Calling.Settler:
       break;
     case Calling.Traveller:
-      sprite.add(stroke([5, 0], [5, -18], f32(1.2), opaque(wood)));
-      break; // Walking stick.
+      break;
     case Calling.Warrior:
       sprite.add(
         poly(
@@ -578,23 +1002,9 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
         ),
       ); // Shield in the house colours.
       sprite.add(stroke([-f32(4.25), -f32(4.6)], [-f32(4.25), -f32(10.4)], f32(0.7), [212, 172, 82]));
-      sprite.add(stroke([f32(4.5), -4], [7, -19], f32(1.6), [210, 214, 222])); // Sword.
-      sprite.add(stroke([3, -8], [f32(6.5), -9], f32(1.4), opaque(leather)));
       break;
-    case Calling.Ranger: {
-      let bow = new ShapeNode();
-      bow.moveTo(5, -2);
-      bow.cubicTo(10, -8, 10, -14, 5, -20);
-      bow.strokeWidth(f32(1.3));
-      bow.strokeFill(...leather);
-      sprite.add(bow);
-      sprite.add(stroke([5, -2], [5, -20], f32(0.6), [210, 200, 180]));
-      break;
-    }
+    case Calling.Ranger:
     case Calling.Mage:
-      sprite.add(stroke([5, 0], [5, -21], f32(1.2), opaque(wood)));
-      sprite.add(oval([5, -22], f32(3.6), f32(3.6), opaque([196, 146, 250], 90)));
-      sprite.add(oval([5, -22], f32(1.6), f32(1.6), opaque([230, 200, 255])));
       break;
     case Calling.Cleric:
       sprite.add(
@@ -608,20 +1018,21 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
           opaque(color(look.trim)),
         ),
       );
-      sprite.add(stroke([-6, -6], [-6, -15], f32(1.4), opaque(wood))); // Mace.
-      sprite.add(oval([-6, -16], f32(2.4), f32(2.4), opaque(steel)));
       break;
     case Calling.Bard: {
+      const lute = new SceneNode();
+      sprite.add(lute);
+      parts.lute = lute;
       // A lute held by its pear-shaped bowl, the pegbox bent back at the top of the neck.
       let spruce: Rgb = [186, 124, 66],
         walnut: Rgb = [104, 68, 40];
-      sprite.add(stroke([f32(5.7), -f32(6.6)], [6, -f32(14.2)], f32(1.1), opaque(walnut)));
-      sprite.add(stroke([6, -f32(14.2)], [f32(7.4), -f32(15.4)], f32(1.2), opaque(scale(walnut, f32(0.8)))));
-      sprite.add(oval([f32(5.8), -f32(3.4)], f32(2.5), f32(2.6), opaque(spruce)));
-      sprite.add(oval([f32(5.7), -f32(5.5)], f32(1.7), f32(1.6), opaque(spruce)));
-      sprite.add(oval([f32(6.6), -f32(3.3)], f32(1.5), f32(2.2), opaque(scale(spruce, f32(0.8)))));
-      sprite.add(oval([f32(5.5), -f32(4.5)], f32(0.7), f32(0.7), opaque(scale(walnut, f32(0.6)))));
-      sprite.add(
+      lute.add(stroke([f32(5.7), -f32(6.6)], [6, -f32(14.2)], f32(1.1), opaque(walnut)));
+      lute.add(stroke([6, -f32(14.2)], [f32(7.4), -f32(15.4)], f32(1.2), opaque(scale(walnut, f32(0.8)))));
+      lute.add(oval([f32(5.8), -f32(3.4)], f32(2.5), f32(2.6), opaque(spruce)));
+      lute.add(oval([f32(5.7), -f32(5.5)], f32(1.7), f32(1.6), opaque(spruce)));
+      lute.add(oval([f32(6.6), -f32(3.3)], f32(1.5), f32(2.2), opaque(scale(spruce, f32(0.8)))));
+      lute.add(oval([f32(5.5), -f32(4.5)], f32(0.7), f32(0.7), opaque(scale(walnut, f32(0.6)))));
+      lute.add(
         stroke([f32(5.75), -f32(2.4)], [f32(5.98), -f32(13.9)], f32(0.25), opaque([232, 220, 188], 200)),
       );
       break;
@@ -629,58 +1040,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   }
   streetHead(sprite, look, hair, head);
   for (const arm of parts.arms) sprite.add(arm.forearm!);
-  let hammer = new SceneNode();
-  hammer.add(stroke([3, -7], [8, -15], f32(1.3), opaque(wood)));
-  hammer.add(
-    poly(
-      [
-        [6, -17],
-        [10, -14],
-        [11, -f32(15.5)],
-        [7, -f32(18.5)],
-      ],
-      [120, 120, 130],
-    ),
-  );
-  hammer.opacity(0);
-  sprite.add(hammer);
-  parts.hammer = hammer;
-  let axe = new SceneNode();
-  let wrist = parts.arms[1].wrist;
-  axe.add(stroke(wrist, add(wrist, point(6, -8)), f32(1.4), opaque(wood)));
-  axe.add(
-    poly(
-      [
-        add(wrist, point(f32(4.8), -9)),
-        add(wrist, point(f32(9.5), -7)),
-        add(wrist, point(10, -f32(3.7))),
-        add(wrist, point(f32(5.8), -6)),
-      ],
-      opaque(steel),
-    ),
-  );
-  axe.opacity(0);
-  parts.arms[1].forearm!.add(axe);
-  parts.axe = axe;
-  let pickaxe = new SceneNode();
-  pickaxe.add(stroke(wrist, add(wrist, point(6, -8)), f32(1.4), opaque(wood)));
-  pickaxe.add(
-    poly(
-      [
-        add(wrist, point(1, -9)),
-        add(wrist, point(f32(5.5), -11)),
-        add(wrist, point(10, -8)),
-        add(wrist, point(11, -5)),
-        add(wrist, point(7, -8)),
-        add(wrist, point(5, -9)),
-        add(wrist, point(1, -8)),
-      ],
-      opaque(steel),
-    ),
-  );
-  pickaxe.opacity(0);
-  parts.arms[1].forearm!.add(pickaxe);
-  parts.pickaxe = pickaxe;
+  createEquipment(parts, person.calling);
   // Loads carried on the back.
   let sack = new SceneNode();
   sack.add(oval([-f32(4.5), -11], f32(3.6), f32(4.2), [176, 150, 96]));
@@ -715,7 +1075,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   mark.opacity(0);
   sprite.add(mark);
   parts.alert = mark;
-  return sprite;
+  return root;
 }
 export function personSprite(person: Person, parts: PersonParts): SceneNode {
   Object.assign(parts, new PersonParts());

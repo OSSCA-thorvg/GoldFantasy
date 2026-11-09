@@ -9,6 +9,7 @@ import { Point, point, add, sub, scale, normalized, rotated, distance } from './
 import { f32 as f, lround } from './numeric';
 import { CampEconomy } from './camp-economy';
 import { animalSpec } from './wildlife';
+import { planRaiderApproach } from './monster-navigation';
 export interface CombatTown extends TownState {
   walk(p: Person, dt: number): void;
   reveal(x: number, y: number, radius: number): void;
@@ -130,8 +131,8 @@ export function summonRaid(this: CombatTown): void {
     );
     beast.raider = true;
     beast.health = f(breedOf(site.kind).health * f(1 + f(this.days / 80)));
-    beast.path = this.grid.path(beast.position, fire.door());
     this.beasts.push(beast);
+    planRaiderApproach(this, beast);
   }
   ++this.raidCount;
   this.notify('Monsters from ' + site.name + ' raid the settlement!');
@@ -493,7 +494,9 @@ export function wreck(this: CombatTown, beast: Monster, dt: number): void {
     }
   }
   if (this.time < beast.ready) return;
-  for (const item of this.placed) {
+  const target = beast.raider ? this.building(beast.prey) : null;
+  const nearby = target ? [target, ...this.placed.filter(item => item !== target)] : this.placed;
+  for (const item of nearby) {
     if (!item.footprint().contains(beast.position, f(0.7))) continue;
     const blow = f(breed.bite * f(0.25));
     beast.ready = this.time + breed.pause;

@@ -1,9 +1,10 @@
-// Direct translation of WorldRenderer moveAgents, markDamage, sparkle and tread.
+// World agents, articulated action poses, combat feedback and footprints.
 import { Town } from '../../engine/src/town';
 import { Traffic, Agent, AgentKind } from '../../engine/src/traffic';
 import { point, sub, add, mul, distance, normalized, project } from '../../engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../engine/src/numeric';
 import { Activity } from '../../engine/src/person';
+import { breedOf } from '../../engine/src/town-monsters';
 import { injuryOf, Injury } from '../../engine/src/person-look';
 import { Product, Structure, structureSpec } from '../../engine/src/building-catalog';
 import { DungeonKind } from '../../engine/src/world-types';
@@ -14,11 +15,13 @@ import * as woodcutting from '../../engine/src/woodcutting';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
 import { standingRow } from './world-depth';
-import { agentSprite, personSprite, PersonParts, stridePose } from './world-sprites';
+import { agentSprite, personSprite, PersonParts, stridePose, monsterParts } from './world-sprites';
 import { animalSprite } from './wildlife-sprites';
 import { moodOf } from './person-portrait';
-import { canIdleGesture, idleGesture, animateGesture, poseArm, IdleGesture } from './idle-gesture';
+import { canIdleGesture, idleGesture, animateGesture, IdleGesture } from './idle-gesture';
 import { line, opaque } from './vector-paint';
+import { callingEquipment, combatEquipment, showEquipment, poseBow } from './person-equipment';
+import { animateAction, animateMonsterAttack, strikePhase } from './action-motion';
 const inSight = (s: WorldRendererState, p: { x: number; y: number }) => s.currentVisibility.sample(p) >= 119;
 export function moveAgents(
   s: WorldRendererState,
@@ -55,6 +58,8 @@ export function moveAgents(
     if (sprite.row >= 0) s.rows[sprite.row].remove(sprite.paint);
     s.sprites.delete(id);
   }
+  const strikes = new Map<number, ReturnType<Town['hits']>[number]>();
+  for (const hit of town.hits()) if (!hit.onPerson && hit.person >= 0) strikes.set(hit.person, hit);
   for (const figure of s.figures.values()) figure.seen = false;
   for (const person of town.people()) {
     let figure = s.figures.get(person.id);
@@ -96,7 +101,12 @@ export function moveAgents(
       s.rows[row].add(figure.paint);
       figure.row = row;
     }
-    const screen = project(person.position.x, person.position.y);
+    const screen = project(person.position.x, person.position.y),
+      strike = strikes.get(person.id),
+      followingThrough = !!strike && town.clock() - strike.at < 0.25,
+      fighting = person.activity === Activity.Fighting || followingThrough,
+      combatTravel = fighting && figure.last.x >= 0 && distance(figure.last, person.position) > 0.0001;
+
     let ahead = point();
     if (crossing)
       ahead = person.inside ? sub(person.threshold, person.entrance) : sub(person.entrance, person.threshold);
@@ -116,11 +126,16 @@ export function moveAgents(
       if (town.map().inside(x, y) && town.map().at(x, y).trees)
         ahead = sub(treePosition(town.map(), x, y, town.map().at(x, y).trees - 1), person.position);
     }
+    if (fighting && !combatTravel && !person.moving()) {
+      const foe = person.foe >= 0 ? town.creatureTarget(person.foe) : null;
+      if (foe) ahead = sub(foe.position, person.position);
+      else if (strike) ahead = sub(strike.to, person.position);
+    }
     if (Math.abs(f(ahead.x - ahead.y)) > f(0.0001)) figure.facing = f(ahead.x - ahead.y) < 0 ? -1 : 1;
     if (figure.last.x >= 0)
       figure.stride = f(figure.stride + f(Math.min(1, distance(figure.last, person.position)) * f(5.5)));
     figure.last = { ...person.position };
-    const striding = !s.sceneView && (person.moving() || crossing),
+    const striding = !s.sceneView && (person.moving() || crossing || combatTravel),
       bob = striding ? f(-Math.abs(f(Math.sin(figure.stride))) * f(1.1)) : 0,
       collecting =
         !s.sceneView && person.activity === Activity.Collecting
@@ -143,18 +158,10 @@ export function moveAgents(
               ),
             )
           : 0;
-    figure.paint.transform([
-      figure.facing,
-      0,
-      screen.x,
-      0,
-      f(1 - f(f(0.12) * collecting)),
-      f(screen.y + bob),
-      0,
-      0,
-      1,
-    ]);
-    if (striding || figure.striding) stridePose(figure.parts, figure.stride, striding);
+    figure.paint.transform([figure.facing, 0, screen.x, 0, 1, screen.y, 0, 0, 1]);
+    figure.parts.body?.transform([1, 0, 0, 0, f(1 - f(0.12 * collecting)), bob, 0, 0, 1]);
+    figure.parts.shadow?.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+    stridePose(figure.parts, figure.stride, striding);
     if (!striding)
       animateGesture(
         figure.parts.arms,
@@ -162,10 +169,6 @@ export function moveAgents(
           ? idleGesture((person.look ^ Math.imul(person.id, 7919)) >>> 0, moodOf(person), seconds)
           : { kind: IdleGesture.None, phase: 0, mirrored: false },
       );
-    if ((chopping || miningNow) && !s.sceneView) {
-      const angle = woodcutting.axeAngle(town.clock() - (person.until - woodcutting.cutSeconds));
-      poseArm(figure.parts.arms[1], angle, f(angle * f(0.25)), f(-angle * f(0.2)));
-    }
     figure.striding = striding;
     figure.paint.opacity(
       !s.sceneView && !inSight(s, person.position) ? 0 : lround(f(255 * person.visibility())),
@@ -176,9 +179,31 @@ export function moveAgents(
       !person.moving() &&
       !crossing &&
       (person.activity === Activity.Building || person.activity === Activity.Roadwork);
-    figure.parts.hammer?.opacity(hammering ? 255 : 0);
-    figure.parts.axe?.opacity(chopping ? 255 : 0);
-    figure.parts.pickaxe?.opacity(miningNow ? 255 : 0);
+    const tool = chopping
+      ? 'axe'
+      : miningNow
+        ? 'pickaxe'
+        : hammering
+          ? 'hammer'
+          : fighting
+            ? combatEquipment(person, town.building(person.job)?.kind)
+            : callingEquipment(person.calling);
+    showEquipment(figure.parts, tool);
+    figure.parts.lute?.opacity(fighting || chopping || miningNow || hammering ? 0 : 255);
+    if (tool === 'bow') poseBow(figure.parts, 0);
+    figure.parts.arrow?.opacity(0);
+    if (!s.sceneView && tool) {
+      if (chopping || miningNow)
+        animateAction(
+          figure.parts,
+          tool,
+          town.clock() - (person.until - woodcutting.cutSeconds),
+          woodcutting.swingSeconds,
+        );
+      else if (hammering) animateAction(figure.parts, tool, town.clock() + person.id * 0.17, 0.85);
+      else if (fighting && !striding && person.ready > town.clock())
+        animateAction(figure.parts, tool, town.clock() - person.ready + 1 + strikePhase, 1);
+    }
     const job =
         person.activity === Activity.Hauling && person.carrying === 0 ? town.building(person.job) : null,
       carried = job ? job.kind : Structure.Count,
@@ -188,18 +213,6 @@ export function moveAgents(
     figure.parts.sack?.opacity(
       job && carried !== Structure.Lumberyard && carried !== Structure.Quarry ? 255 : 0,
     );
-    if (hammering)
-      figure.parts.hammer?.transform([
-        1,
-        0,
-        0,
-        0,
-        1,
-        f(-Math.abs(f(Math.sin(f(f(f(seconds) * 9) + person.id)))) * f(2.5)),
-        0,
-        0,
-        1,
-      ]);
   }
   for (const [id, figure] of s.figures) {
     if (figure.seen) continue;
@@ -230,14 +243,34 @@ export function moveAgents(
         s.rows[row].add(sprite.paint);
         sprite.row = row;
       }
-      const screen = project(beast.position.x, beast.position.y);
-      let facing = 1;
-      if (beast.path.length) {
-        const ahead = sub(beast.path[0], beast.position);
-        facing = f(ahead.x - ahead.y) < 0 ? -1 : 1;
+      const screen = project(beast.position.x, beast.position.y),
+        rig = monsterParts(sprite.paint);
+      let facing = rig?.facing ?? 1;
+      const moved = rig && rig.last.x >= 0 ? sub(beast.position, rig.last) : point(),
+        walking = beast.path.length > 0 || Math.hypot(moved.x, moved.y) > 0.0001;
+      let ahead = beast.path.length ? sub(beast.path[0], beast.position) : moved;
+      if (rig) {
+        rig.body.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+        if (!walking && !s.sceneView) {
+          const period = breedOf(town.map().dungeons()[beast.lair].kind).pause,
+            hitAt = beast.ready - period;
+          // A ready timestamp can also schedule roaming. Require its actual damage event.
+          const hit = town
+            .hits()
+            .find(
+              (hit) =>
+                hit.onPerson && Math.abs(hit.at - hitAt) < 0.002 && distance(hit.from, beast.position) < 0.03,
+            );
+          if (hit && town.clock() >= hit.at && town.clock() < beast.ready) {
+            ahead = sub(hit.to, beast.position);
+            animateMonsterAttack(rig, town.clock() - hit.at, period);
+          }
+        }
+        rig.last = { ...beast.position };
       }
-      const lunge = beast.raider ? f(-Math.abs(f(Math.sin(f(f(f(seconds) * 6) + beast.id)))) * f(1.5)) : 0;
-      sprite.paint.transform([facing, 0, screen.x, 0, 1, f(screen.y + lunge), 0, 0, 1]);
+      if (Math.abs(ahead.x - ahead.y) > 0.0001) facing = ahead.x - ahead.y < 0 ? -1 : 1;
+      if (rig) rig.facing = facing;
+      sprite.paint.transform([facing, 0, screen.x, 0, 1, screen.y, 0, 0, 1]);
       sprite.paint.opacity(inSight(s, beast.position) ? 255 : 0);
     }
   for (const [id, sprite] of s.beasts) {
@@ -307,7 +340,12 @@ export function sparkle(s: WorldRendererState, town: Town, seconds: number): voi
     number.outline(2, 20, 14, 10);
     number.translate(f(to.x + 4), f(to.y - 14));
     s.combat.add(number);
-    s.sparks.push({ hit: { ...hit, from: { ...hit.from }, to: { ...hit.to } }, shown: seconds, paint, number });
+    s.sparks.push({
+      hit: { ...hit, from: { ...hit.from }, to: { ...hit.to } },
+      shown: seconds,
+      paint,
+      number,
+    });
   }
   s.sparks = s.sparks.filter((spark) => {
     const age = f(seconds - spark.shown);
