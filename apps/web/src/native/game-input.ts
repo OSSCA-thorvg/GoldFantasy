@@ -24,7 +24,12 @@ import {
   Footprint,
 } from '../../../../packages/engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../../../packages/engine/src/numeric';
-import { type RoadPath, freehandRoad } from '../../../../packages/engine/src/road-network';
+import {
+  type RoadPath,
+  flatten,
+  freehandRoad,
+  sharpAnchor,
+} from '../../../../packages/engine/src/road-network';
 import { structureSpec } from '../../../../packages/engine/src/building-catalog';
 import type { Check } from '../../../../packages/engine/src/town-models';
 import { buildingUnlock, toolAvailable } from '../../../../packages/engine/src/settlement-progression';
@@ -124,14 +129,16 @@ export function roadDraft(this: GameInputApp): RoadPath {
     points.push({ ...this.cursor });
   if (points.length < 2) return [];
   const covered = (p: Point) => this.town.roads().distance(p).distance <= f(0.12);
-  if (points.every(covered)) return [];
+  // Sparse pointer events can land on existing roads while crossing new ground.
+  // Check between those samples before treating the gesture as a retrace.
+  if (points.every(covered) && flatten(points.map(sharpAnchor), f(0.2)).every(covered)) return [];
   const nearSameRoad = (p: Point, road: number) => {
     const nearest = this.town.roads().distance(p);
     return nearest.distance <= Town.joinReach && nearest.id === road;
   };
-  const start = this.town.roads().distance(points[0]),
-    end = this.roadPoint(),
-    endRoad = this.town.roads().distance(end).id ?? -1;
+  const start = this.town.roads().distance(points[0]);
+  let end = this.roadPoint();
+  const endRoad = this.town.roads().distance(end).id ?? -1;
   if (start.distance <= Town.joinReach) {
     while (
       points.length > 2 &&
@@ -142,12 +149,60 @@ export function roadDraft(this: GameInputApp): RoadPath {
     points[0] = this.town.roads().distance(points[0]).onRoad ?? point();
   }
   if (covered(end)) {
-    while (
-      points.length > 2 &&
-      nearSameRoad(points[points.length - 2], endRoad) &&
-      nearSameRoad(points[points.length - 1], endRoad)
-    )
-      points.pop();
+    let arrival = -1;
+    for (let i = points.length - 2; i > 0; --i) {
+      if (!nearSameRoad(points[i], endRoad) || !nearSameRoad(points[i + 1], endRoad)) break;
+      if (
+        !flatten([sharpAnchor(points[i]), sharpAnchor(points[i + 1])], f(0.2)).every((p) =>
+          nearSameRoad(p, endRoad),
+        )
+      )
+        break;
+      const incoming = sub(points[i], points[i - 1]),
+        outgoing = sub(points[i + 1], points[i]);
+      const product = length(incoming) * length(outgoing);
+      const cosine = product > 0 ? (incoming.x * outgoing.x + incoming.y * outgoing.y) / product : 1;
+      // A clear corner followed along a snapped road is an arrival, even if
+      // the hand-drawn stroke sits beside its centerline. Short endpoint
+      // adjustments and reversals still collapse to the final cursor.
+      if (
+        Math.abs(cosine) <= Math.SQRT1_2 &&
+        distance(this.toScreen(points[i]), this.toScreen(points[points.length - 1])) >= 12
+      ) {
+        arrival = i;
+        break;
+      }
+    }
+    if (arrival >= 0) {
+      points.length = arrival + 1;
+      end = this.town.roads().distance(points[arrival]).onRoad ?? end;
+    } else {
+      let retraced = false;
+      while (points.length > 2) {
+        const previous = points[points.length - 2],
+          last = points[points.length - 1];
+        if (
+          !covered(previous) ||
+          !covered(last) ||
+          !flatten([sharpAnchor(previous), sharpAnchor(last)], f(0.2)).every(covered)
+        )
+          break;
+        points.pop();
+        retraced = true;
+      }
+      if (retraced) {
+        // Following an existing road after arriving must not turn an L or loop
+        // into a diagonal. End the new segment at its actual arrival point.
+        end = this.town.roads().distance(points[points.length - 1]).onRoad ?? end;
+      } else {
+        while (
+          points.length > 2 &&
+          nearSameRoad(points[points.length - 2], endRoad) &&
+          nearSameRoad(points[points.length - 1], endRoad)
+        )
+          points.pop();
+      }
+    }
     points[points.length - 1] = end;
   }
   const origin = points[0],
@@ -157,7 +212,7 @@ export function roadDraft(this: GameInputApp): RoadPath {
     };
   points = points.map(screen);
   const startOffset = sub(screen(covered(origin) ? origin : this.roadStart), points[0]),
-    endOffset = sub(screen(this.roadPoint()), points[points.length - 1]);
+    endOffset = sub(screen(end), points[points.length - 1]);
   let total = 0;
   for (let i = 1; i < points.length; ++i) total = f(total + distance(points[i - 1], points[i]));
   if (total <= 0) return [];
