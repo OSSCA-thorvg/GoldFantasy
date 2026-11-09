@@ -10,7 +10,7 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let worker: Worker | undefined,
     closed = false;
-  let disposeFallback: (() => void) | undefined, finishFallback: (() => void) | undefined;
+  let disposeFallback: (() => void) | undefined;
   let resizeFallback: (() => void) | undefined;
   const ratio = Math.min(1.5, devicePixelRatio || 1);
   const dimensions = () => ({
@@ -21,7 +21,10 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
     worker?.postMessage({ kind: 'resize', ...dimensions() });
     resizeFallback?.();
   };
-  let finishWorker: (() => void) | undefined;
+  let releasePlayback!: () => void;
+  const playback = new Promise<void>((resolve) => {
+    releasePlayback = resolve;
+  });
   let releaseReady: (() => void) | undefined;
   const ready = (async () => {
     if (target.transferControlToOffscreen && typeof Worker !== 'undefined') {
@@ -31,14 +34,14 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
         const fail = (error: unknown) => {
           worker?.terminate();
           worker = undefined;
-          finishWorker?.();
+          releasePlayback();
           reject(error);
         };
         worker!.onmessage = ({ data }) => {
           if (data.kind === 'ready') {
             element.dataset.ready = 'true';
             resolve();
-          } else if (data.kind === 'finished') finishWorker?.();
+          } else if (data.kind === 'finished') releasePlayback();
           else if (data.kind === 'error') fail(Error(data.message));
         };
         worker!.onerror = fail;
@@ -55,6 +58,7 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
           [canvas],
         );
       });
+      if (closed) return;
       window.addEventListener('resize', resize);
       resize();
     } else {
@@ -78,25 +82,42 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
       resizeFallback();
       window.addEventListener('resize', resize);
       const info = animation.info()!,
-        started = performance.now();
-      let frame = 0;
-      const draw = () => {
+        lastFrame = Math.max(0, Math.ceil(info.totalFrames) - 1),
+        interval = 1000 / info.fps;
+      let frame = 0,
+        nextFrame = reducedMotion ? lastFrame : 0,
+        nextFrameAt = performance.now(),
+        finalFrameDrawn = false;
+      const draw = (now = performance.now()) => {
         if (closed) return;
-        animation.frame(
-          reducedMotion
-            ? info.totalFrames - 1
-            : Math.min(info.totalFrames - 1, ((performance.now() - started) / 1000) * info.fps),
-        );
-        canvas.update().render();
+        try {
+          if (now >= nextFrameAt) {
+            if (finalFrameDrawn) {
+              releasePlayback();
+              return;
+            }
+            animation.frame(nextFrame);
+            canvas.update().render();
+            finalFrameDrawn = nextFrame === lastFrame;
+            if (reducedMotion) {
+              releasePlayback();
+              return;
+            }
+            ++nextFrame;
+            // World generation can block this fallback's main thread. Resume at
+            // the next frame instead of skipping the middle of the animation.
+            if (now - nextFrameAt > interval * 2) nextFrameAt = now;
+            nextFrameAt += interval;
+          }
+        } catch (error) {
+          console.warn('Splash animation is unavailable:', error);
+          releasePlayback();
+          return;
+        }
         frame = requestAnimationFrame(draw);
       };
       draw();
       element.dataset.ready = 'true';
-      finishFallback = () => {
-        cancelAnimationFrame(frame);
-        animation.frame(info.totalFrames - 1);
-        canvas.update().render();
-      };
       disposeFallback = () => {
         cancelAnimationFrame(frame);
         canvas.remove();
@@ -108,12 +129,13 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
     console.warn('Splash animation is unavailable:', error);
     worker?.terminate();
     worker = undefined;
+    releasePlayback();
   });
   function dispose() {
     if (closed) return;
     closed = true;
     releaseReady?.();
-    finishWorker?.();
+    releasePlayback();
     worker?.terminate();
     disposeFallback?.();
     window.removeEventListener('resize', resize);
@@ -125,13 +147,8 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
     ready,
     async finish() {
       await ready;
+      await playback;
       if (closed) return;
-      if (worker)
-        await new Promise<void>((resolve) => {
-          finishWorker = resolve;
-          worker!.postMessage({ kind: 'finish' });
-        });
-      else finishFallback?.();
       element.classList.add('is-ready');
       if (!reducedMotion) await new Promise((resolve) => setTimeout(resolve, 180));
       dispose();
