@@ -146,7 +146,7 @@ export function orderAttackPerson(this: OrderTown, ids: number[], target: number
   if (!other || other.health <= 0 || other.activity === Activity.Leaving) return false;
   let accepted = false;
   for (const p of this.folk) {
-    if (!ids.includes(p.id) || p.id === target || p.health <= 0 || p.activity === Activity.Expedition) continue;
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id) || p.id === target) continue;
     if (!this.walkTo(p, other.inside ? other.entrance : other.position)) continue;
     this.setOrder(p, Activity.Fighting, target);
     p.attackPerson = target; p.activity = Activity.Fighting; accepted = true;
@@ -158,7 +158,7 @@ export function orderAttack(this: OrderTown, ids: number[], monster: number): bo
   if (!target || target.health <= 0 || target.insideLair) return false;
   let any = false;
   for (const p of this.folk) {
-    if (p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
     this.setOrder(p, Activity.Fighting, monster);
     p.foe = monster;
     p.activity = Activity.Fighting;

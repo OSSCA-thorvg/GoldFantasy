@@ -31,6 +31,7 @@ export interface CombatTown extends TownState {
   hurtGuest(p: Person, killed: boolean): void;
   raiding(): boolean;
   arrive(p: Person): void;
+  resumeOrder(p: Person): boolean;
   changeRenown(village: number, amount: number): void;
   raze(id: number): void;
 }
@@ -321,7 +322,10 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
 // Threats interrupt an order without replacing its task/site. When combat ends,
 // the original move, resource or construction transaction resumes.
 export function fight(this: CombatTown, p: Person, dt: number): void {
-  if (p.health <= 0 || p.activity === Activity.Expedition || p.activity === Activity.Leaving || p.crossingDoorway()) return;
+  if (
+    p.faction !== this.controlFaction || p.stressRecovery || p.health <= 0 ||
+    p.activity === Activity.Expedition || p.activity === Activity.Leaving || p.crossingDoorway()
+  ) return;
   const notice = this.raiding() ? 10 : 5;
   const threats = [...this.beasts, ...this.animals].filter(m =>
     m.health > 0 && !m.insideLair && (!m.giant() || m.angry) &&
@@ -341,7 +345,16 @@ export function fight(this: CombatTown, p: Person, dt: number): void {
   if (person && (person.health <= 0 || person.id === p.id || person.activity === Activity.Leaving)) person = null;
   if (!foe && !person) {
     p.foe = -1;
-    if (p.activity === Activity.Fighting) { p.path = []; p.activity = Activity.Idle; p.until = this.time; }
+    if (p.activity === Activity.Fighting || p.task === Activity.Fighting) {
+      p.path = []; p.activity = Activity.Idle; p.until = this.time;
+      // Combat borrows the movement path, including an automatic builder's
+      // approach. Restore that transaction now: its approach marker otherwise
+      // makes the scheduler wait forever for a path that combat discarded.
+      // A dead explicit target completes immediately, without walking to its
+      // obsolete click position. resumeOrder applies the normal return-to-Auto.
+      if (p.task === Activity.Fighting) p.approachingOrder = false;
+      this.resumeOrder(p);
+    }
     return;
   }
   // Explicit Stop holds position, but does not make a resident ignore an attacker.

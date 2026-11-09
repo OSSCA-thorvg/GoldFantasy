@@ -1,3 +1,4 @@
+import { footBoxesOverlap } from '../../packages/engine/src/person-collision';
 import { dispatchWork, queueWork, issueOrder, type GameCommandApp } from '../../apps/web/src/native/game-commands';
 import { Order } from '../../packages/engine/src/game-tools';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -107,7 +108,7 @@ describe('resident automatic policy', () => {
     town.orderMove([p.id],point(42,34));town.orderMove([other.id],point(42,34));
     let last=p.position.x;
     for(let i=0;i<20;++i) { town.advance(.1);expect(p.position.x).toBeGreaterThanOrEqual(last-.001);last=p.position.x; }
-    expect(distance(p.position,other.position)).toBeGreaterThan(.25);
+    expect(footBoxesOverlap(p.position,other.position)).toBe(false);
   });
   it('actually damages a friendly person on an explicit Attack order', () => {
     const town=fixture(),p=town.people()[0],other=copyNative(p);other.id=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
@@ -225,7 +226,7 @@ describe('resident automatic policy', () => {
     const mill=new Building(1,Structure.Sawmill,point(36,34),0,0);mill.village=0;town.placed.push(mill);++town.changes;
     expect(town.assignJob([p.id,other.id],mill.id)).toBe(true);step(town,12);
     expect(p.activity).toBe(Activity.Working);expect(other.activity).toBe(Activity.Working);
-    expect(distance(p.position,other.position)).toBeGreaterThan(.35);
+    expect(footBoxesOverlap(p.position,other.position)).toBe(false);
     const positions=town.people().map(p=>({...p.position}));step(town,3);
     expect(town.people().map(p=>p.position)).toEqual(positions);
     expect(p.inside||other.inside).toBe(false);expect(mill.workedSeconds).toBeGreaterThan(4);
@@ -234,7 +235,7 @@ describe('resident automatic policy', () => {
     const town=fixture(),p=town.people()[0],other=copyNative(p);other.id=1;town.folk.push(other);
     const foe=new Monster(88,-1,add(p.position,point(.5,0)));foe.animal=AnimalKind.Cow;foe.health=100;foe.home={...foe.position};town.animals.push(foe);
     town.orderAttack([p.id,other.id],foe.id);step(town,4);
-    expect(distance(p.position,other.position)).toBeGreaterThan(.3);
+    expect(footBoxesOverlap(p.position,other.position)).toBe(false);
     expect(distance(p.position,foe.position)).toBeLessThan(.91);expect(distance(other.position,foe.position)).toBeLessThan(.91);
     expect(foe.health).toBeLessThanOrEqual(92);
   });
@@ -300,7 +301,8 @@ describe('resident automatic policy', () => {
     app.dispatchWork=dispatchWork.bind(app);app.queueWork=queueWork.bind(app);
     app.queueWork(Activity.Roadwork,parent.id);app.queueWork(Activity.Roadwork,child.id);
     const sites=town.people().map(p=>p.taskSite);let harvested=false;
-    for(let i=0;i<2400&&child.built<1;++i){
+    // Keep the same deadline while the next dispatch retires completed requests.
+    for(let i=0;i<2400&&(child.built<1||app.workQueue.length>0);++i){
       town.advance(.1);app.dispatchWork();
       harvested ||= town.people().some(p=>p.activity===Activity.Felling||p.activity===Activity.Mining);
       for(let j=0;j<sites.length;++j){const r=town.roads().road(sites[j]);if(r&&r.built<1)expect(town.people()[j].taskSite).toBe(sites[j]);}
@@ -341,9 +343,9 @@ describe('resident automatic policy', () => {
     const town=fixture(),mover=town.people()[0],worker=copyNative(mover);worker.id=1;
     mover.position=point(32,35);mover.path=[point(39,35)];mover.activity=Activity.Moving;mover.ordered=true;
     worker.position=point(35,35);worker.path=[];worker.activity=Activity.Working;worker.task=Activity.Working;worker.ordered=true;town.folk.push(worker);
-    let nearest=Infinity,last=mover.position.x;
-    for(let i=0;i<80&&mover.moving();++i){town.walk(mover,.1);separatePeople(town,.1);nearest=Math.min(nearest,distance(mover.position,worker.position));expect(mover.position.x).toBeGreaterThanOrEqual(last-.001);last=mover.position.x;expect(worker.position).toEqual(point(35,35));}
-    expect(nearest).toBeGreaterThan(.25);expect(distance(mover.position,point(39,35))).toBeLessThan(.01);
+    let last=mover.position.x;
+    for(let i=0;i<80&&mover.moving();++i){town.walk(mover,.1);separatePeople(town,.1);expect(footBoxesOverlap(mover.position,worker.position)).toBe(false);expect(mover.position.x).toBeGreaterThanOrEqual(last-.001);last=mover.position.x;expect(worker.position).toEqual(point(35,35));}
+    expect(distance(mover.position,point(39,35))).toBeLessThan(.01);
   });
   for (const kind of ['lay', 'pave', 'repair'] as const)
     it(`returns to Auto after a direct ${kind} road command issued from Auto OFF`, () => {

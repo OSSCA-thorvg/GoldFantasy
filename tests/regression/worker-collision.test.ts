@@ -1,3 +1,4 @@
+import { footBoxesOverlap } from '../../packages/engine/src/person-collision';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Town } from '../../packages/engine/src/town';
 import { WorldMap } from '../../packages/engine/src/world-map';
@@ -47,7 +48,7 @@ function diagnostics(town: Town) {
     .map((p) => ({ activity: Activity[p.activity], position: p.position, path: p.path, target: p.target }));
 }
 
-describe('resident work body bounds', () => {
+describe('resident work foot bounds', () => {
   it('keeps simultaneous builders apart while both make construction progress', () => {
     const town = copyNative(base),
       site = new Building(town.nextId++, Structure.Storehouse, point(19, 18), 0, 0);
@@ -61,7 +62,10 @@ describe('resident work body bounds', () => {
       town.people().every((p) => p.activity === Activity.Building && !p.moving()),
       JSON.stringify(diagnostics(town)),
     ).toBe(true);
-    expect(distance(town.folk[0].position, town.folk[1].position)).toBeGreaterThan(0.28);
+    expect(
+      footBoxesOverlap(town.folk[0].position, town.folk[1].position),
+      JSON.stringify(diagnostics(town)),
+    ).toBe(false);
     const progress = site.progress;
     advance(town, 2);
     expect(site.progress).toBeGreaterThan(progress);
@@ -79,7 +83,10 @@ describe('resident work body bounds', () => {
       town.people().every((p) => p.activity === Activity.Working && !p.moving()),
       JSON.stringify(diagnostics(town)),
     ).toBe(true);
-    expect(distance(town.folk[0].position, town.folk[1].position)).toBeGreaterThan(0.28);
+    expect(
+      footBoxesOverlap(town.folk[0].position, town.folk[1].position),
+      JSON.stringify(diagnostics(town)),
+    ).toBe(false);
     advance(town, 20);
     expect(town.stock().planks).toBeGreaterThan(0);
   });
@@ -95,7 +102,10 @@ describe('resident work body bounds', () => {
       town.people().every((p) => p.activity === Activity.Fighting),
       JSON.stringify(diagnostics(town)),
     ).toBe(true);
-    expect(distance(town.folk[0].position, town.folk[1].position)).toBeGreaterThan(0.28);
+    expect(
+      footBoxesOverlap(town.folk[0].position, town.folk[1].position),
+      JSON.stringify(diagnostics(town)),
+    ).toBe(false);
     expect(foe.health).toBeLessThan(1000);
   });
 });

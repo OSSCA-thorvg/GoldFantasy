@@ -9,4 +9,36 @@ export function shelterOf(this: HousingTown, p: Person): number { if (!p.inside 
 export function enforceGuestLodging(this: HousingTown, p: Person): void { if (p.role !== Role.Resident) return; const lodging = (id: number): boolean => { const place = id < 0 ? null : this.building(id); return !!place && isLodging(place.kind); }, invalidHome = lodging(p.home), staleBed = p.bed >= 0; if (invalidHome) p.home = -1; p.bed = -1; if (invalidHome || staleBed) this.assignHomes(); const invalidOrder = p.task === Activity.Sleeping && lodging(p.taskSite), invalidVisit = lodging(p.target) && [Activity.Sleeping, Activity.Eating, Activity.Relaxing, Activity.Praying, Activity.Shopping].includes(p.activity); if (p.inside && (p.target < 0 || lodging(p.target)) && lodging(this.shelterOf(p))) { const automatic = p.autoMode; this.orderLeave([p.id]); p.autoMode = automatic; return; } if (invalidOrder) { p.task = Activity.Idle; p.taskSite = -1; p.ordered = p.aggressive = p.approachingOrder = false; } if (invalidVisit || invalidOrder && p.activity === Activity.Moving) { p.path = []; p.activity = Activity.Idle; p.target = -1; p.until = this.time; } }
 export function occupants(this: HousingTown, id: number): number[] { const home = this.building(id); if (!home) return []; const out: number[] = []; for (const p of this.folk) { if (p.health <= 0 || p.activity === Activity.Leaving) continue; if (isLodging(home.kind) && p.role !== Role.Guest) continue; const resting = p.task === Activity.Sleeping && p.taskSite === id; if (p.home === id || p.bed === id || resting || this.shelterOf(p) === id) out.push(p.id); } return out; }
 export function orderRest(this: HousingTown, ids: number[], id: number): boolean { const home = this.building(id); if (!home || !home.built() || !isHome(home.kind)) return false; const spec = structureSpec(home.kind), beds = Math.max(spec.residents, spec.beds); let any = false; for (const p of this.folk) { if (!canControl(p, this.controlFaction) || p.home !== id || p.health <= 0 || p.activity === Activity.Leaving || p.activity === Activity.Expedition || !ids.includes(p.id)) continue; const reserved = this.folk.filter(other => other.id !== p.id && other.health > 0 && (other.task === Activity.Sleeping && other.taskSite === id || other.activity === Activity.Sleeping && other.target === id || this.shelterOf(other) === id)).length; if (reserved >= beds) continue; if (p.inside && p.activity === Activity.Sleeping && p.target === id) { this.setOrder(p, Activity.Sleeping, id); any = true; continue; } if (!this.walkTo(p, home.door())) continue; this.setOrder(p, Activity.Sleeping, id); p.activity = Activity.Sleeping; if (!p.moving()) this.arrive(p); any = true; } return any; }
-export function orderLeave(this: HousingTown, ids: number[]): boolean { let any = false; for (const p of this.folk) { if (!canControl(p, this.controlFaction) || p.health <= 0 || p.activity === Activity.Expedition || !ids.includes(p.id)) continue; const inside = p.inside || p.crossingDoorway(), home = p.task === Activity.Sleeping ? this.building(p.taskSite) : null; if (!inside && !home) continue; const outside = inside ? p.entrance : home!.door(), direction = normalized(sub(outside, inside ? p.threshold : home!.threshold())), goal = this.grid.nearestWalkable(add(outside, scale(direction, f(.5)))); if (!this.walkTo(p, goal)) continue; this.setOrder(p, Activity.Holding); p.autoMode = false; p.goal = goal; p.activity = Activity.Moving; if (!p.moving()) this.arrive(p); any = true; } return any; }
+export function orderLeave(this: HousingTown, ids: number[]): boolean {
+  let any = false;
+  for (const p of this.folk) {
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
+    const inside = p.inside || p.crossingDoorway(),
+      home = p.task === Activity.Sleeping ? this.building(p.taskSite) : null;
+    if (!inside && !home) continue;
+    const outside = inside ? p.entrance : home!.door(),
+      direction = normalized(sub(outside, inside ? p.threshold : home!.threshold())),
+      side = point(-direction.y, direction.x);
+    let goal: Point | null = null;
+    // A fixed half-tile step can land inside the house across a narrow road.
+    // Test reachable points on the actual apron, never snap behind that wall.
+    for (const lateral of [0, .2, -.2, .4, -.4]) {
+      for (const forward of [.5, .3, .15, 0]) {
+        const candidate = add(add(outside, scale(direction, f(forward))), scale(side, f(lateral)));
+        if (!this.grid.walkable(candidate) || !this.grid.clear(outside, candidate, Infinity) ||
+          !this.walkTo(p, candidate)) continue;
+        goal = candidate;
+        break;
+      }
+      if (goal) break;
+    }
+    if (!goal) continue;
+    this.setOrder(p, Activity.Holding);
+    p.autoMode = false;
+    p.goal = goal;
+    p.activity = Activity.Moving;
+    if (!p.moving()) this.arrive(p);
+    any = true;
+  }
+  return any;
+}
