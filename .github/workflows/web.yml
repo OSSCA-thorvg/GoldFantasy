@@ -19,5 +19,15 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Test road and work priorities
+        run: npm test
+      - name: Install the validation browser
+        run: npx playwright install --with-deps chromium
+      - name: Draw and complete roads around the first camp
+        run: npm run test:roads
+      - name: Verify splash and priority audio loading
+        run: npm run test:loading
+      - name: Verify mobile audio before background samples finish
+        run: npm run test:audio
       - name: Build the static site
         run: npm run build

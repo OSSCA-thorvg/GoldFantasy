@@ -21,3 +21,44 @@ body {
   white-space: pre-wrap;
   font: 14px sans-serif;
 }
+#startup {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #000;
+  transition:
+    opacity 180ms ease-in,
+    transform 180ms ease-in;
+}
+#startup canvas {
+  display: block;
+  width: 100vw !important;
+  height: 100dvh !important;
+}
+#startup.is-ready {
+  opacity: 0;
+  transform: scale(1.015);
+  pointer-events: none;
+}
+#startup-audio-hint {
+  position: fixed;
+  bottom: 14px;
+  left: 16px;
+  right: 16px;
+  z-index: 11;
+  margin: 0;
+  color: #eee2c4;
+  text-align: center;
+  font:
+    13px system-ui,
+    sans-serif;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #startup {
+    transition: none;
+  }
+  #startup.is-ready {
+    transform: none;
+  }
+}

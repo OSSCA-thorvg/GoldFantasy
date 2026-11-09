@@ -109,6 +109,8 @@ The media above is captured from the actual renderer. The settlement showcase is
 
 Start, Continue, Character Studio and Map Editor are available from the title screen. Browser sound begins after an interaction.
 
+The opening splash uses the supplied Powered by ThorVG animation while the world loads. Tap or click once to enable sound. Opening effects are loaded first; music and the voices in use take priority over the remaining audio downloads.
+
 ## Play locally
 
 Use **Node.js 24** and npm, matching the CI environment.
@@ -155,6 +157,18 @@ VITE_BASE_PATH=/midgard/ npm run build
 
 Serve `dist/` at that path with WebAssembly served as `application/wasm`.
 
+## Regression checks
+
+```sh
+npm test
+npx playwright install chromium
+npm run test:roads
+npm run test:loading
+npm run test:audio
+```
+
+The tracked suite in `tests/regression/` checks work priorities and draws roads through the actual game UI in all four directions around a naturally built first camp. Browser checks also cover the supplied splash, early touch sound activation and playback before background audio finishes. They run headlessly with muted output, use temporary servers and close their own resources. Both build workflows run these checks before publishing.
+
 ## Technology and credits
 
 | Technology / asset                                       | Used for                                                                  |
@@ -180,5 +194,6 @@ Third-party components keep their own licenses:
 - **Lua 5.4.8:** [MIT license](public/licenses/Lua-5.4.8.txt).
 - **DejaVu fonts:** [Bitstream Vera license and DejaVu public-domain changes](public/assets/native-fonts/DejaVuSans.LICENSE).
 - **Audio:** [asset-specific provenance and notices](public/assets/audio/NOTICE.md).
+- **Powered by ThorVG splash:** [supplied animation source and provenance](public/assets/branding/NOTICE.md).
 
 See [all third-party notices](public/THIRD_PARTY_NOTICES.md) for additional bundled material.

@@ -1,4 +1,5 @@
-import ThorVG, { type ThorVGNamespace } from '@thorvg/webcanvas';
+import { type ThorVGNamespace } from '@thorvg/webcanvas';
+import { initializeWebCanvas } from './startup-canvas';
 import { Context, loadNativeFonts, type NativeFontMetrics } from '../../../../packages/native-ui/src';
 import { prepareScriptRuntime } from '../../../../packages/native-ui/src/script';
 import hudScript from '../../../../packages/native-ui/assets/hud.lua?raw';
@@ -95,18 +96,9 @@ export async function startNativeGame(
   element: HTMLCanvasElement,
   options: Partial<LaunchOptions> = {},
   renderer: 'gl' | 'sw' | 'wg' = 'gl',
+  preparedCanvas?: ThorVGNamespace,
 ): Promise<NativeRuntime> {
-  let backend = renderer;
-  if (backend === 'gl') {
-    const probe = document.createElement('canvas'),
-      gl = probe.getContext('webgl2');
-    if (gl) gl.getExtension('WEBGL_lose_context')?.loseContext();
-    else backend = 'sw';
-  }
-  const tvg = await ThorVG.init({
-    renderer: backend,
-    locateFile: (path) => new URL(`${import.meta.env.BASE_URL}vendor/${path}`, document.baseURI).href,
-  });
+  const tvg = preparedCanvas ?? (await initializeWebCanvas(renderer));
   let files: BrowserFiles | undefined, host: BrowserHost | undefined;
   try {
     const fonts = await loadNativeFonts(tvg);
