@@ -1,6 +1,6 @@
 // Platform adapter only. The unchanged game mixer runs on the browser audio thread.
 import { SoundBoard, Playback } from './sound-board';
-import { sounds, type MusicTrack } from './sound-library';
+import { sounds, type MusicTrack, type LoadedClip } from './sound-library';
 import type { Sound, Ambience } from './sound-types';
 declare class AudioWorkletProcessor {
   readonly port: MessagePort;
@@ -13,6 +13,7 @@ type Message =
       clips: { name: string; pcm: Int16Array; rate: number }[];
       tracks: { name: string; track: MusicTrack }[];
     }
+  | { kind: 'clips'; clips: LoadedClip[] }
   | { kind: 'music'; name: string; track: MusicTrack; sound: Sound }
   | { kind: 'play'; sound: Sound }
   | { kind: 'ambience'; ambience: Ambience }
@@ -31,6 +32,10 @@ class NativeMixer extends AudioWorkletProcessor {
         for (const row of data.tracks) sounds.setMusic(row.name, row.track);
         this.board = new SoundBoard();
         this.port.postMessage({ kind: 'ready' });
+        return;
+      }
+      if (data.kind === 'clips') {
+        for (const clip of data.clips) sounds.setClip(clip.name, clip.pcm, clip.rate);
         return;
       }
       if (data.kind === 'dispose') {

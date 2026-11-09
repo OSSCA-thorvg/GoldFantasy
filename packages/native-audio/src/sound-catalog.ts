@@ -1,0 +1,52 @@
+import { Cue } from './sound-types';
+
+export const cueClips: Partial<Record<Cue, string[]>> = {
+  [Cue.Place]: ['ui/rune_'],
+  [Cue.Demolish]: ['sfx/collapse_'],
+  [Cue.Click]: ['ui/click_'],
+  [Cue.Notice]: ['ui/notify_'],
+  [Cue.Alarm]: ['sfx/horn_'],
+  [Cue.Order]: ['ui/confirm_'],
+  [Cue.Clash]: ['sfx/clash_', 'sfx/block_', 'sfx/swing_'],
+  [Cue.Complete]: ['ui/complete_'],
+  [Cue.Chop]: ['sfx/chop_'],
+  [Cue.TreeFall]: ['sfx/tree_fall_'],
+  [Cue.Refuse]: ['ui/error_'],
+  [Cue.Open]: ['ui/click_'],
+  [Cue.Growth]: ['ui/growth_'],
+  [Cue.Coins]: ['sfx/coins_'],
+  [Cue.Raven]: ['wildlife/raven_'],
+  [Cue.ThunderCrack]: ['weather/crack_'],
+  [Cue.ThunderStrike]: ['weather/strike_'],
+  [Cue.ThunderClap]: ['weather/clap_'],
+  [Cue.ThunderRumble]: ['weather/rumble_'],
+  [Cue.Discover]: ['sfx/rune_wake_'],
+  [Cue.Unseal]: ['sfx/stone_door_'],
+  [Cue.Cow]: ['wildlife/cow_'],
+  [Cue.Pig]: ['wildlife/pig_'],
+  [Cue.Chicken]: ['wildlife/chicken_'],
+  [Cue.Wolf]: ['wildlife/wolf_'],
+  [Cue.Dog]: ['wildlife/dog_'],
+  [Cue.Cat]: ['wildlife/cat_'],
+};
+/** File-backed dependencies of the opening UI and settlement. Ambient weather,
+ * birds, leaves, water, fire, and mining are synthesized by SoundBoard. */
+export const initialEffectPrefixes = [
+  ...new Set([
+    'sfx/hammer_',
+    ...[
+      Cue.Place,
+      Cue.Click,
+      Cue.Notice,
+      Cue.Order,
+      Cue.Complete,
+      Cue.Chop,
+      Cue.TreeFall,
+      Cue.Refuse,
+      Cue.Open,
+      Cue.Growth,
+      Cue.Coins,
+      Cue.Raven,
+    ].flatMap((cue) => cueClips[cue] ?? []),
+  ]),
+];

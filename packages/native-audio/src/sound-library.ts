@@ -1,6 +1,7 @@
 // Native sound_library.cpp semantics. Browser decoding is confined to the host loader.
 // Rates/frame counts/captions are captured from the immutable native assets with stb_vorbis.
 import manifest from './data/audio-manifest.json';
+import { initialEffectPrefixes } from './sound-catalog';
 import { f32 as f } from '../../engine/src/numeric';
 export class Clip {
   constructor(
@@ -68,12 +69,25 @@ export interface EffectEndings {
   clips: Record<string, string>;
   sourceSha256: string;
 }
+export interface LoadedClip {
+  name: string;
+  pcm: Int16Array;
+  rate: number;
+}
+interface LoadJob {
+  name: string;
+  priority: number;
+  run: () => Promise<void>;
+}
 export class SoundLibrary {
   readonly entries = manifest;
   private clips = new Map<string, Clip>();
   private tracks = new Map<string, MusicTrack>();
   private loading = new Map<string, Promise<void>>();
   private decoders = new Map<string, OfflineAudioContext>();
+  private activeLoads = 0;
+  private jobs: LoadJob[] = [];
+  private clipListeners = new Set<(clip: LoadedClip) => void>();
   private effectsLoading: Promise<void> | undefined;
   constructor(private readonly endings?: EffectEndings) {}
   count(prefix: string): number {
@@ -100,6 +114,48 @@ export class SoundLibrary {
   }
   setClip(name: string, pcm: Int16Array, rate: number): void {
     this.clips.set(name, new Clip(pcm, pcm.length, rate));
+    for (const listener of this.clipListeners) listener({ name, pcm, rate });
+  }
+  onClip(listener: (clip: LoadedClip) => void): () => void {
+    this.clipListeners.add(listener);
+    return () => this.clipListeners.delete(listener);
+  }
+  hasClip(name: string): boolean {
+    return this.clips.has(name);
+  }
+  private drain(): void {
+    this.jobs.sort((a, b) => b.priority - a.priority);
+    while (this.activeLoads < 4 && this.jobs.length) {
+      const job = this.jobs.shift()!;
+      ++this.activeLoads;
+      void job.run().finally(() => {
+        --this.activeLoads;
+        this.drain();
+      });
+    }
+  }
+  private schedule(name: string, priority: number, run: () => Promise<void>): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.jobs.push({
+        name,
+        priority,
+        run: async () => {
+          try {
+            await run();
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        },
+      });
+      this.drain();
+    });
+  }
+  async loadInitialEffects(context?: BaseAudioContext, base?: string, signal?: AbortSignal): Promise<void> {
+    const names = this.entries
+      .filter((entry) => initialEffectPrefixes.some((prefix) => entry.name.startsWith(prefix)))
+      .map((entry) => entry.name);
+    await Promise.all(names.map((name) => this.load(context, name, base, signal, 2)));
   }
   setMusic(name: string, track: MusicTrack): void {
     this.tracks.delete(name);
@@ -114,14 +170,20 @@ export class SoundLibrary {
     name: string,
     base = `${import.meta.env?.BASE_URL ?? '/'}assets/audio/`,
     signal?: AbortSignal,
+    priority = 0,
   ): Promise<void> {
     signal?.throwIfAborted();
     if (this.clips.has(name) || this.tracks.has(name)) return;
     const existing = this.loading.get(name);
-    if (existing) return existing;
+    if (existing) {
+      const job = this.jobs.find((job) => job.name === name);
+      if (job) job.priority = Math.max(job.priority, priority);
+      return existing;
+    }
     const entry = this.entries.find((entry) => entry.name === name);
     if (!entry) return;
-    const task = (async () => {
+    const task = this.schedule(name, priority, async () => {
+      signal?.throwIfAborted();
       const response = await fetch(base + name + '.ogg', { signal });
       if (!response.ok) throw new Error(`Cannot load audio ${name}: ${response.status}`);
       const bytes = await response.arrayBuffer();
@@ -173,7 +235,7 @@ export class SoundLibrary {
         }
         this.setClip(name, pcm, entry.rate);
       }
-    })();
+    });
     this.loading.set(name, task);
     try {
       await task;
@@ -196,7 +258,7 @@ export class SoundLibrary {
       // Bound the entire fetch/decode operation, not just the network request.
       await Promise.all(
         Array.from({ length: Math.min(4, effects.length) }, async () => {
-          while (!failed && next < effects.length) {
+          while (!signal?.aborted && next < effects.length) {
             const entry = effects[next++];
             try {
               await this.load(context, entry.name, base, signal);

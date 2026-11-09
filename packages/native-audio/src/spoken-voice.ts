@@ -22,7 +22,7 @@ const lines = [
   'alarm',
   'death',
 ];
-function prefix(line: VoiceLine, voice: VoiceKind): string {
+export function voicePrefix(line: VoiceLine, voice: VoiceKind): string {
   return line < 0 || line >= VoiceLine.Count || voice < 0 || voice >= VoiceKind.Count
     ? ''
     : `voice/${voices[voice]}/${lines[line]}_`;
@@ -47,15 +47,15 @@ export function voiceKind(body: BodyType, look: number, id: number): VoiceKind {
   return (body === BodyType.Female ? VoiceKind.Maiden : 0) + pick;
 }
 export function voiceTakes(line: VoiceLine, voice: VoiceKind): number {
-  const key = prefix(line, voice);
+  const key = voicePrefix(line, voice);
   return key ? sounds.count(key) : 0;
 }
 export function voiceSample(line: VoiceLine, voice: VoiceKind, take: number): Clip {
-  const key = prefix(line, voice);
+  const key = voicePrefix(line, voice);
   return key ? sounds.clip(key, take) : new Clip();
 }
 export function voiceWords(line: VoiceLine, voice: VoiceKind, take: number): string {
-  const key = prefix(line, voice);
+  const key = voicePrefix(line, voice);
   return key ? sounds.caption(sounds.name(key, take)) : '';
 }
 export function characterVoicePitch(look: number, id: number): number {

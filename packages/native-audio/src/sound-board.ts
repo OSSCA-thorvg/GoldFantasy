@@ -5,6 +5,7 @@ import { Clip, MusicStream, SoundLibrary, sounds, onsets } from './sound-library
 import { voiceSample } from './spoken-voice';
 import { EffectManager } from './effect-manager';
 import { Score } from './music-score';
+import { cueClips } from './sound-catalog';
 import { ambient, voice, clipEnd, effectDuration, type Voice, type Stereo } from './sound-synthesis';
 export enum Playback {
   Playing,
@@ -18,35 +19,6 @@ const rate = 44100,
   musicEnding = 6,
   thunderReleaseFrames = (rate * 3) / 4,
   thunderRainFloor = f(0.15);
-const clips: Partial<Record<Cue, string[]>> = {
-  [Cue.Place]: ['ui/rune_'],
-  [Cue.Demolish]: ['sfx/collapse_'],
-  [Cue.Click]: ['ui/click_'],
-  [Cue.Notice]: ['ui/notify_'],
-  [Cue.Alarm]: ['sfx/horn_'],
-  [Cue.Order]: ['ui/confirm_'],
-  [Cue.Clash]: ['sfx/clash_', 'sfx/block_', 'sfx/swing_'],
-  [Cue.Complete]: ['ui/complete_'],
-  [Cue.Chop]: ['sfx/chop_'],
-  [Cue.TreeFall]: ['sfx/tree_fall_'],
-  [Cue.Refuse]: ['ui/error_'],
-  [Cue.Open]: ['ui/click_'],
-  [Cue.Growth]: ['ui/growth_'],
-  [Cue.Coins]: ['sfx/coins_'],
-  [Cue.Raven]: ['wildlife/raven_'],
-  [Cue.ThunderCrack]: ['weather/crack_'],
-  [Cue.ThunderStrike]: ['weather/strike_'],
-  [Cue.ThunderClap]: ['weather/clap_'],
-  [Cue.ThunderRumble]: ['weather/rumble_'],
-  [Cue.Discover]: ['sfx/rune_wake_'],
-  [Cue.Unseal]: ['sfx/stone_door_'],
-  [Cue.Cow]: ['wildlife/cow_'],
-  [Cue.Pig]: ['wildlife/pig_'],
-  [Cue.Chicken]: ['wildlife/chicken_'],
-  [Cue.Wolf]: ['wildlife/wolf_'],
-  [Cue.Dog]: ['wildlife/dog_'],
-  [Cue.Cat]: ['wildlife/cat_'],
-};
 const interfaceCue = (cue: Cue) =>
     [Cue.Click, Cue.Order, Cue.Place, Cue.Refuse, Cue.Open, Cue.Notice].includes(cue),
   thunderCue = (cue: Cue) => cue >= Cue.ThunderCrack && cue <= Cue.ThunderRumble;
@@ -160,7 +132,7 @@ export class SoundBoard {
   private pick(sound: Sound): { clip: Clip; rate: number } {
     if (sound.cue === Cue.Speech)
       return { clip: voiceSample(sound.line, sound.voice, sound.take), rate: sound.pitch };
-    const groups = clips[sound.cue];
+    const groups = cueClips[sound.cue];
     if (!groups?.length) return { clip: new Clip(), rate: 1 };
     const next = () => {
         this.picking = (Math.imul(this.picking, 1664525) + 1013904223) >>> 0;
