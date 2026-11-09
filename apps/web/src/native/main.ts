@@ -59,7 +59,7 @@ void (async () => {
   // Native main chooses random entropy once, so the title and Start share the same world.
   if (options.world === 'Random' && options.seed === undefined)
     options.seed = crypto.getRandomValues(new Uint32Array(1))[0];
-  runtime = await startNativeGame(element, options, backend, tvg);
+  runtime = await startNativeGame(element, options, backend, tvg, false);
   if (abandoned) {
     await runtime.dispose();
     return;
@@ -69,6 +69,7 @@ void (async () => {
   await splash.finish();
   startupFinished = true;
   startupSound?.dispose();
+  runtime.host.start();
   return runtime;
 })()
   .then((runtime) => {

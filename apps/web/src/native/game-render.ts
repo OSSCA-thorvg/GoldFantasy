@@ -131,7 +131,9 @@ export function render(
   }
   if (this.atlas && this.mapDecision !== null) {
     if (this.mapDecision) this.startMap(this.atlas.document().gameMap());
-    this.atlas.dispose();
+    const atlas = this.atlas;
+    // The previous UI clip still holds the preview Scene until Context.end().
+    this.context.deferRelease(() => atlas.dispose());
     this.atlas = null;
     this.mapDecision = null;
     this.renderer.scene().opacity(255);

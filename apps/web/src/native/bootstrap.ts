@@ -97,6 +97,7 @@ export async function startNativeGame(
   options: Partial<LaunchOptions> = {},
   renderer: 'gl' | 'sw' | 'wg' = 'gl',
   preparedCanvas?: ThorVGNamespace,
+  autoStart = true,
 ): Promise<NativeRuntime> {
   const tvg = preparedCanvas ?? (await initializeWebCanvas(renderer));
   let files: BrowserFiles | undefined, host: BrowserHost | undefined;
@@ -108,7 +109,7 @@ export async function startNativeGame(
     await prepareScriptRuntime();
     const services = createNativeServices(tvg, fonts, files),
       app = services.createApplication({ ...defaultLaunchOptions(), titleScreen: true, ...options });
-    host = new BrowserHost(element, tvg, app);
+    host = new BrowserHost(element, tvg, app, { autoStart });
     let closed = false;
     const runtime: NativeRuntime = {
       host,

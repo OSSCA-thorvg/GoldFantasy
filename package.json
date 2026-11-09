@@ -19,7 +19,10 @@
     "test:audio": "node tests/regression/audio-priority.browser.mjs",
     "postinstall": "node scripts/prepare-assets.mjs",
     "predev": "node scripts/prepare-assets.mjs",
-    "prebuild": "node scripts/prepare-assets.mjs"
+    "prebuild": "node scripts/prepare-assets.mjs",
+    "test:lifetime": "node tests/regression/webcanvas-lifetime.browser.mjs",
+    "test:editor": "node tests/regression/map-editor-lifecycle.browser.mjs",
+    "test:splash": "node tests/regression/splash-runtime.browser.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",
