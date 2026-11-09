@@ -41,12 +41,23 @@ function matrix(value: Matrix) {
     e33: value[8],
   };
 }
+let rasterGeneration = 0;
+/** A restored WebGL context cannot reuse textures uploaded by the lost context. */
+export function invalidateWebCanvasRasterResources(): void {
+  rasterGeneration++;
+}
 /** Mechanical native-paint API adaptation; it does not invent rendering geometry or style. */
 export class WebCanvasAdapter {
   private entries = new Map<PaintNode, Entry>();
   private parents = new WeakMap<Paint, Entry>();
+  private rasterGeneration = rasterGeneration;
   constructor(readonly tvg: ThorVGNamespace) {}
   sync(node: PaintNode): Paint {
+    if (this.rasterGeneration !== rasterGeneration) {
+      this.rasterGeneration = rasterGeneration;
+      for (const [paint, entry] of this.entries)
+        if (paint instanceof PictureNode) entry.dataVersion = undefined;
+    }
     let entry = this.entries.get(node);
     if (!entry) {
       let animation: Animation | undefined;
@@ -77,10 +88,15 @@ export class WebCanvasAdapter {
       this.entries.set(node, entry);
     }
     if (node instanceof PictureNode && entry.dataVersion !== node.dataVersion) {
-      // WebCanvas's public raw loader copies its pixels. Native's borrowed-buffer
-      // reload cannot be expressed there, so replace the copied picture while its
-      // parent owns the previous reference until scene reconciliation below.
+      // WebCanvas's public raw loader copies its pixels. Detach the old picture
+      // before replacing it, so its clip/mask targets can be rebound safely.
       const replacement = this.rawPicture(node);
+      const parent = this.parents.get(entry.paint);
+      if (parent) {
+        (parent.paint as Scene).remove(entry.paint);
+        parent.children = undefined;
+        this.parents.delete(entry.paint);
+      }
       entry.paint.dispose();
       entry.paint = replacement;
       entry.dataVersion = node.dataVersion;
@@ -88,6 +104,9 @@ export class WebCanvasAdapter {
       entry.matrix = undefined;
       entry.opacity = undefined;
       entry.blending = undefined;
+      entry.clipper = undefined;
+      entry.masking = undefined;
+      entry.maskMethod = undefined;
     }
     if (node instanceof SceneNode) {
       const children = node.children.map((child) => this.sync(child));

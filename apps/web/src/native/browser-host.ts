@@ -2,6 +2,7 @@ import type { Canvas, ThorVGNamespace } from '@thorvg/webcanvas';
 import { Key } from '../../../../packages/native-ui/src';
 import { emptyEvent, type Application, type AppEvent } from './application-contracts';
 import { applicationCursor } from './browser-cursor';
+import { invalidateWebCanvasRasterResources } from '../../../../packages/native-renderer/src/webcanvas-adapter';
 
 const keys = new Map<string, Key>([
   ['Tab', Key.Tab],
@@ -31,28 +32,30 @@ export interface BrowserHostOptions {
 }
 /** Browser event/device boundary. Every visible control is painted by the original ThorVG UI. */
 export class BrowserHost {
-  private readonly canvas: Canvas;
+  private canvas: Canvas;
+  private readonly devicePixelRatio: boolean;
   private readonly events = new AbortController();
   private readonly resizeObserver: ResizeObserver;
   private readonly textInput: HTMLTextAreaElement;
   private composing = false;
   private frame = 0;
+  private running = false;
   private closed = false;
+  private surfaceLost = false;
+  private resumeAfterRestore = false;
+  private renderedAt = 0;
   private width = 0;
   private height = 0;
   private readonly pressed = new Set<string>();
   private readonly started = performance.now();
   constructor(
     private readonly element: HTMLCanvasElement,
-    tvg: ThorVGNamespace,
+    private readonly tvg: ThorVGNamespace,
     readonly app: Application,
     options: BrowserHostOptions = {},
   ) {
-    this.canvas = new tvg.Canvas(element, {
-      width: Math.max(1, element.clientWidth),
-      height: Math.max(1, element.clientHeight),
-      enableDevicePixelRatio: options.devicePixelRatio ?? true,
-    });
+    this.devicePixelRatio = options.devicePixelRatio ?? true;
+    this.canvas = this.createCanvas();
     this.canvas.add(app.scene());
     element.tabIndex = 0;
     this.textInput = document.createElement('textarea');
@@ -75,6 +78,37 @@ export class BrowserHost {
           this.syncTextInput();
         }
       };
+    element.addEventListener(
+      'webglcontextlost',
+      (event) => {
+        if (this.closed || this.surfaceLost || this.canvas.renderer !== 'gl') return;
+        event.preventDefault();
+        const running = this.running;
+        this.stop();
+        this.resumeAfterRestore = running;
+        this.surfaceLost = true;
+        this.releaseInput();
+        this.canvas.remove();
+        this.canvas.destroy();
+      },
+      { signal },
+    );
+    element.addEventListener(
+      'webglcontextrestored',
+      () => {
+        if (this.closed || !this.surfaceLost) return;
+        this.canvas = this.createCanvas();
+        invalidateWebCanvasRasterResources();
+        this.canvas.add(this.app.scene());
+        this.surfaceLost = false;
+        const resume = this.resumeAfterRestore;
+        this.resumeAfterRestore = false;
+        // Repaint the same simulation instant before resuming any animation loop.
+        this.render(this.renderedAt);
+        if (resume) this.start();
+      },
+      { signal },
+    );
     const pointer = (type: AppEvent['type'], e: PointerEvent) => {
       const bounds = element.getBoundingClientRect(),
         event = emptyEvent(type);
@@ -247,7 +281,15 @@ export class BrowserHost {
     this.pressed.clear();
     this.app.event(emptyEvent('PointerCancel'));
   }
+  private createCanvas(): Canvas {
+    return new this.tvg.Canvas(this.element, {
+      width: Math.max(1, this.element.clientWidth),
+      height: Math.max(1, this.element.clientHeight),
+      enableDevicePixelRatio: this.devicePixelRatio,
+    });
+  }
   private resize(): void {
+    if (this.closed || this.surfaceLost) return;
     const width = Math.max(1, this.element.clientWidth),
       height = Math.max(1, this.element.clientHeight);
     if (width === this.width && height === this.height) return;
@@ -256,24 +298,34 @@ export class BrowserHost {
     this.canvas.resize(width, height);
   }
   render(seconds = (performance.now() - this.started) / 1000): void {
-    if (this.closed) return;
+    if (this.closed || this.surfaceLost) return;
     this.resize();
+    this.renderedAt = seconds;
     this.app.render(this.width, this.height, seconds);
+    if (this.closed || this.surfaceLost) return;
     this.syncTextInput();
     this.canvas.update().render();
     this.element.style.cursor = applicationCursor(this.app);
   }
   start(): void {
-    if (this.closed || this.frame) return;
+    if (this.closed) return;
+    this.running = true;
+    if (this.frame) return;
+    if (this.surfaceLost) {
+      this.resumeAfterRestore = true;
+      return;
+    }
     const draw = () => {
       this.frame = 0;
       if (this.closed) return;
       this.render();
-      this.frame = requestAnimationFrame(draw);
+      if (this.running && !this.closed && !this.surfaceLost) this.frame = requestAnimationFrame(draw);
     };
     this.frame = requestAnimationFrame(draw);
   }
   stop(): void {
+    this.running = false;
+    this.resumeAfterRestore = false;
     if (this.frame) cancelAnimationFrame(this.frame);
     this.frame = 0;
   }
@@ -284,8 +336,8 @@ export class BrowserHost {
     this.events.abort();
     this.resizeObserver.disconnect();
     this.textInput.remove();
-    this.canvas.remove();
+    if (!this.surfaceLost) this.canvas.remove();
     this.app.dispose();
-    this.canvas.destroy();
+    if (!this.surfaceLost) this.canvas.destroy();
   }
 }
