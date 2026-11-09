@@ -41,6 +41,7 @@ export interface OrderTown extends TownState {
 }
 export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1): void {
   p.approachingOrder = false;
+  p.recoveringRest = false;
   p.supplyTarget = -1;
   p.supplyRoad = false;
   p.task = task;
@@ -56,6 +57,7 @@ export function orderStop(this: OrderTown, ids: number[]): void {
   for (const p of this.folk) {
     if (p.role !== Role.Resident || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
     p.approachingOrder = false;
+    p.recoveringRest = false;
     p.autoMode = false;
     p.ordered = false;
     p.task = Activity.Idle;
@@ -76,6 +78,7 @@ export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
   for (const p of this.folk) {
     if (p.id !== id || p.role !== Role.Resident || p.activity === Activity.Expedition) continue;
     p.autoMode = enabled;
+    p.recoveringRest = false;
     if (enabled || !p.ordered) {
       if (!enabled) p.job = -1;
       p.path = [];

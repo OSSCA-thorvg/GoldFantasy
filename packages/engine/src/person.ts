@@ -19,6 +19,8 @@ export interface Hit { serial: bigint; from: Point; to: Point; damage: number; o
 export interface Expedition { dungeon: number; members: number[]; returnAt: number; }
 export class Person {
   static readonly maximumLevel = 30;
+  // Temporary rest can span a meal or combat without replacing the assigned work.
+  recoveringRest = false;
   activity = Activity.Idle; target = -1; until = 0; inside = false; ordered = false; task = Activity.Idle; taskSite = -1;
   food = f32(.8); rest = f32(.9); stress = f32(.15); health = 1; home = -1; job = -1; bed = -1; autoMode = true;
   ready = 0; foe = -1; tree = -1; carrying = 0; carriedProduct = Product.Wood; aggressive = false; approachingOrder = false; goal = point(); days = 0; loot = 0;

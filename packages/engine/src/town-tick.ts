@@ -161,7 +161,7 @@ export function tick(this: TickTown, dt: number): void {
       p.position = lerp(p.entrance, p.threshold, p.doorway);
       continue;
     }
-    if (!p.ordered && p.role === Role.Resident && p.autoMode && this.time >= p.scheduleAt) {
+    if (p.role === Role.Resident && p.autoMode && this.time >= p.scheduleAt) {
       p.scheduleAt = this.time + 0.5;
       this.scheduleAutomatic(p);
     }
@@ -447,8 +447,10 @@ export function tick(this: TickTown, dt: number): void {
         break;
       case Activity.Treating:
         if (!place || !place.built() || place.kind !== Structure.Apothecary || place.workers <= 0) {
-          p.task = Activity.Idle;
-          p.taskSite = -1;
+          if (p.task === Activity.Treating) {
+            p.task = Activity.Idle;
+            p.taskSite = -1;
+          }
           p.inside = false;
           p.activity = Activity.Idle;
           p.until = this.time;
@@ -456,8 +458,10 @@ export function tick(this: TickTown, dt: number): void {
         }
         p.health = Math.min(1, f(p.health + f(f(dt) * f(0.05))));
         if (p.health >= 1) {
-          p.task = Activity.Idle;
-          p.taskSite = -1;
+          if (p.task === Activity.Treating) {
+            p.task = Activity.Idle;
+            p.taskSite = -1;
+          }
           p.activity = Activity.Idle;
           p.until = this.time;
         }

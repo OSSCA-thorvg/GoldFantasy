@@ -301,6 +301,13 @@ function personFields(a: SaveArchive, v: Person): void {
     past: string,
   });
   if (a.formatVersion >= 3) a.fields(v, { level: i32, experience: i32 });
+  if (a.formatVersion >= 8) {
+    if (a.reading) {
+      const flag = u8.read(a);
+      if (flag > 1) throw new Error('Invalid rest recovery flag');
+      v.recoveringRest = flag !== 0;
+    } else boolean.write(a, v.recoveringRest);
+  }
   if (
     a.reading &&
     (v.level < 1 ||
@@ -510,8 +517,15 @@ function townFields(a: SaveArchive, v: SaveTown): void {
 }
 export function encodeTown(town: SaveTown): string {
   const a = new SaveArchive();
+  // Keep historical v7 bytes unchanged when no new recovery state is needed.
+  a.formatVersion = town.folk.some((p) => p.recoveringRest) ? 8 : 7;
   a.fields(
-    { version: 7, endian: 0x01020304, appearanceSize: nativeAppearanceSize, climateSize: nativeClimateSize },
+    {
+      version: a.formatVersion,
+      endian: 0x01020304,
+      appearanceSize: nativeAppearanceSize,
+      climateSize: nativeClimateSize,
+    },
     { version: u32, endian: u32, appearanceSize: u32, climateSize: u32 },
   );
   townFields(a, town);
@@ -543,10 +557,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 7) climateSize = u32.read(a);
+  if (version >= 2 && version <= 8) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 7 ||
+    version > 8 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

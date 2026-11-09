@@ -314,6 +314,32 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
           (stopped !== undefined && stopped >= work.serial)
         )
           continue;
+        // A newly queued site must not abandon an unfinished construction job.
+        // Explicit commands to selected residents still replace their orders.
+        const building = p.task === Activity.Building ? this.town.building(p.taskSite) : null;
+        const road = p.task === Activity.Roadwork ? this.town.roads().road(p.taskSite) : null;
+        if (
+          (building && (!building.built() || building.health < 1)) ||
+          (road && (road.built < 1 || road.paving >= 0 || road.wear > 0))
+        )
+          continue;
+        if (p.task === Activity.Felling || p.task === Activity.Mining) {
+          const map = this.town.map(),
+            x = p.taskSite % map.width(),
+            y = Math.trunc(p.taskSite / map.width());
+          if (
+            p.taskSite >= 0 &&
+            map.inside(x, y) &&
+            (p.task === Activity.Mining ? mining.deposit(map, x, y) : map.at(x, y).trees > 0)
+          )
+            continue;
+        }
+        if (
+          p.task === Activity.Working &&
+          (p.carrying > 0 ||
+            [Activity.Felling, Activity.Mining, Activity.Collecting, Activity.Hauling].includes(p.activity))
+        )
+          continue;
         const idle = !p.moving() && (p.activity === Activity.Idle || p.activity === Activity.Holding);
         if (idle || (clicked && interruptible(p.activity)))
           candidates.push({ busy: !idle, gap: distance(p.position, where), worker: p.id });
