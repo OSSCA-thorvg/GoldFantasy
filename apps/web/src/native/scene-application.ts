@@ -27,6 +27,7 @@ import {
 import { Cue, Sound } from '../../../../packages/native-audio/src/sound-types';
 import { gameTheme, reducedMotionPreferred } from './game-theme';
 import { TitleCamera } from './title-camera';
+import { drawTitleWordmark } from './title-wordmark';
 import { structureSpec } from '../../../../packages/engine/src/building-catalog';
 import { Activity, activityName } from '../../../../packages/engine/src/person';
 const f = Math.fround;
@@ -132,22 +133,20 @@ export class SceneApplication implements Application {
     }
     this.overlay.begin(theme, new Rect(0, 0, width, height), seconds);
     if (this.current === 'Title') {
+      const narrow = width < 680,
+        titleCenter = f(width * (narrow ? 0.5 : 0.8)),
+        titleWidth = Math.min(520, narrow ? width - 36 : f(width * f(0.36))),
+        tagline = 'A WORLD WAITING FOR YOUR STORY',
+        taglineSize = Math.min(12, (12 * (titleWidth - 8)) / this.overlay.textWidth(tagline, 12, true));
       this.overlay.text(
-        new Rect(f(width * f(0.62)), f(height * f(0.17)), f(width * f(0.36)), 28),
-        'A WORLD WAITING FOR YOUR STORY',
+        new Rect(f(titleCenter - titleWidth / 2), f(height * f(0.17)), titleWidth, 28),
+        tagline,
         { r: 205, g: 217, b: 207, a: 255 },
-        12,
+        taglineSize,
         true,
         Align.Center,
       );
-      this.overlay.text(
-        new Rect(f(width * f(0.62)), f(height * f(0.22)), f(width * f(0.36)), 90),
-        'Midgard',
-        { r: 244, g: 231, b: 187, a: 255 },
-        Math.min(54, f(width / 23)),
-        true,
-        Align.Center,
-      );
+      drawTitleWordmark(this.overlay, titleCenter, f(height * f(0.22)), titleWidth);
       const subject = this.preview?.state().titleAutoplaySubject();
       if (subject) {
         let activity = activityName(subject.activity);
@@ -169,8 +168,8 @@ export class SceneApplication implements Application {
           11,
         );
       }
-      const bw = Math.min(300, f(width * f(0.32)));
-      const left = f(f(width * f(0.8)) - f(bw / 2)),
+      const bw = Math.min(300, narrow ? width - 48 : f(width * f(0.32)));
+      const left = f(titleCenter - f(bw / 2)),
         top = f(height * f(0.42));
       let hoveredItem = '';
       const menu = (id: string, bounds: Rect, label: string, activate: () => void, enabled = true) => {
