@@ -13,14 +13,20 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.regression.config.ts",
+    "test:roads": "node tests/regression/road-quadrants.browser.mjs",
+    "test:loading": "node tests/regression/loading.browser.mjs",
+    "test:audio": "node tests/regression/audio-priority.browser.mjs",
     "postinstall": "node scripts/prepare-assets.mjs",
     "predev": "node scripts/prepare-assets.mjs",
     "prebuild": "node scripts/prepare-assets.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.0",
     "@types/node": "^24.0.0",
     "typescript": "^5.9.3",
-    "vite": "^7.2.2"
+    "vite": "^7.2.2",
+    "vitest": "4.1.12"
   },
   "dependencies": {
     "@thorvg/webcanvas": "1.1.3"

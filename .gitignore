@@ -6,7 +6,8 @@
 # Local migration, research, verification, and capture material
 /docs/
 /migration/
-/tests/
+/tests/*
+!/tests/regression/
 /artifacts/
 /playwright-report/
 /test-results/

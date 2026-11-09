@@ -323,25 +323,24 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
           (road && (road.built < 1 || road.paving >= 0 || road.wear > 0))
         )
           continue;
-        if (p.task === Activity.Felling || p.task === Activity.Mining) {
-          const map = this.town.map(),
-            x = p.taskSite % map.width(),
-            y = Math.trunc(p.taskSite / map.width());
-          if (
-            p.taskSite >= 0 &&
-            map.inside(x, y) &&
-            (p.task === Activity.Mining ? mining.deposit(map, x, y) : map.at(x, y).trees > 0)
-          )
-            continue;
-        }
+        // Finish care and an active delivery before accepting another request.
+        // Blocked cargo can accompany construction: prepareConstruction deposits
+        // it in the site's material inventory, preserving it even with full storage.
         if (
-          p.task === Activity.Working &&
-          (p.carrying > 0 ||
-            [Activity.Felling, Activity.Mining, Activity.Collecting, Activity.Hauling].includes(p.activity))
+          p.recoveringRest ||
+          p.recoveringHealth ||
+          p.activity === Activity.Collecting ||
+          p.activity === Activity.Hauling ||
+          (p.carrying > 0 &&
+            ((work.activity !== Activity.Building && work.activity !== Activity.Roadwork) ||
+              this.town.cargoStorage(p.position, p.carriedProduct)))
         )
           continue;
         const idle = !p.moving() && (p.activity === Activity.Idle || p.activity === Activity.Holding);
-        if (idle || (clicked && interruptible(p.activity)))
+        // A pending player request outranks routine automatic work, including
+        // after a meal or delivery. Admission makes an ordered assignment, so
+        // later dispatches cannot repeatedly replace the chosen target.
+        if (idle || ((clicked || p.autoMode) && interruptible(p.activity)))
           candidates.push({ busy: !idle, gap: distance(p.position, where), worker: p.id });
       }
     candidates.sort((a, b) => Number(a.busy) - Number(b.busy) || a.gap - b.gap || a.worker - b.worker);
