@@ -6,11 +6,7 @@ import demoScript from '../../../../packages/native-ui/assets/demo.lua?raw';
 import { WorldRenderer } from '../../../../packages/native-renderer/src/world-renderer';
 import { createCharacterPreview } from '../../../../packages/native-renderer/src/character-preview';
 import { sounds } from '../../../../packages/native-audio/src/sound-library';
-import {
-  BrowserSoundDevice,
-  prepareNativeAudio,
-  disposeNativeAudio,
-} from '../../../../packages/native-audio/src/browser-audio';
+import { BrowserSoundDevice, disposeNativeAudio } from '../../../../packages/native-audio/src/browser-audio';
 import { Town } from '../../../../packages/engine/src/town';
 import { decodeTown } from '../../../../packages/engine/src/save-game';
 import { designedWorldSeed } from '../../../../packages/engine/src/ymir-born';
@@ -115,7 +111,9 @@ export async function startNativeGame(
   try {
     const fonts = await loadNativeFonts(tvg);
     files = await BrowserFiles.open();
-    await Promise.all([prepareNativeAudio(), prepareScriptRuntime()]);
+    // Sound devices prepare asynchronously when the scene creates them. The
+    // first frame must not wait for the complete effects sample download.
+    await prepareScriptRuntime();
     const services = createNativeServices(tvg, fonts, files),
       app = services.createApplication({ ...defaultLaunchOptions(), titleScreen: true, ...options });
     host = new BrowserHost(element, tvg, app);

@@ -1,7 +1,70 @@
 {
-  "decoder": "Original native stb_vorbis",
-  "packedSha256": "5102e33f0394d09fe7c4736edf71e8bcdff47885ca7d3a0c287f9b3dc4b47631",
+  "format": "Ogg Vorbis",
   "sources": [
+    {
+      "path": "music/battle/raid_last_stand.ogg",
+      "sha256": "a7c755fb9815834d3875dd70761ff6df38297584a811e352148ebd16697ead32"
+    },
+    {
+      "path": "music/battle/raid_night_raid.ogg",
+      "sha256": "e5d4cee861c7a6bdabe471c8d8afe8656c1548fdcc6a861e9d2e18ae1aa99b55"
+    },
+    {
+      "path": "music/battle/raid_village_aflame.ogg",
+      "sha256": "0e8ad77d2d562d3ba8b2ea2b6aa7fadb9ca265968bb821cdbbc3c50dd5e0b5af"
+    },
+    {
+      "path": "music/battle/saga_shieldwall.ogg",
+      "sha256": "ce519fe1a7dcc92c5f45230ef68f198af86b6a61f356e6bced171691839a62ae"
+    },
+    {
+      "path": "music/build/day_hammer_harvest.ogg",
+      "sha256": "bee74afa83c109e95d64a3618b9d213e82eacc11bcde0e69c07d641c254ece21"
+    },
+    {
+      "path": "music/build/day_market_day.ogg",
+      "sha256": "5a98a50d1c6be62c666ab822a749c141832a1eb981ef5eaa39abb35914efbb86"
+    },
+    {
+      "path": "music/build/saga_still_sanctuary.ogg",
+      "sha256": "7196dddea203eda2504b72bbaa2c7d2a253b3a95b5f45d2280c686c2a4841bb5"
+    },
+    {
+      "path": "music/build/saga_to_the_hall.ogg",
+      "sha256": "4ff8387b590ba7689372a7f5813b03a2b0defee0f2ab2558fea45e601dd26fab"
+    },
+    {
+      "path": "music/dawn/classic_morning_mood_low.ogg",
+      "sha256": "3e2e4233f675c2d645b1d0c463ce7e06a31e9c4502ed2b7db9abc63a038696d1"
+    },
+    {
+      "path": "music/dawn/day_workers_morning.ogg",
+      "sha256": "baa382aee9f548fc681c8d35274d5d41d5b5c127145e3357a15597ec4c790718"
+    },
+    {
+      "path": "music/dawn/saga_groeney_song.ogg",
+      "sha256": "914ef59fcabeb053ab4f990d7ed14f715afce8b9d468a85e19a54b687ddcc23d"
+    },
+    {
+      "path": "music/dawn/saga_world_tree.ogg",
+      "sha256": "5155a4a04963840ca1b44ddfbfce0ad4e75538bf5f346091a1c59ce026f7eadd"
+    },
+    {
+      "path": "music/dusk/night_moonlit_fjord.ogg",
+      "sha256": "4d7947cdff69c22eca7c81bf1c78ebe0e88b2d7d99007a66db6c66306f22b062"
+    },
+    {
+      "path": "music/dusk/night_quiet_night.ogg",
+      "sha256": "1e640e6c88b45469e242626cda5438d108f522d09821901e014904eabef28797"
+    },
+    {
+      "path": "music/dusk/night_starlit_watch.ogg",
+      "sha256": "27860375d3ac4b838a58082e24954df90dddfb23a30d68585fa0998d2b774262"
+    },
+    {
+      "path": "music/dusk/saga_dusk_wood.ogg",
+      "sha256": "b9b67b2c5cacb8303c0f99b4ed8174ee92e21c5f57b5148573e99fb22f62dd09"
+    },
     {
       "path": "sfx/block_01.ogg",
       "sha256": "502f5661ce3320c94018e0f5d3edd40579ba9613448bfdc6f7c786b1bb9af7ee"
@@ -1162,5 +1225,6 @@
       "path": "wildlife/wolf_02.ogg",
       "sha256": "65ab89ce2b9ff0f4e1e4c35697b5552b861dc843fd047e9214b3d755d137a62a"
     }
-  ]
+  ],
+  "endingsSha256": "ef8cca8e975c347bd62e8e838c514d8f993fa6b16862a793953eefd2e64f2294"
 }

@@ -63,11 +63,19 @@ export class MusicStream {
     return got;
   }
 }
+export interface EffectEndings {
+  frames: number;
+  clips: Record<string, string>;
+  sourceSha256: string;
+}
 export class SoundLibrary {
   readonly entries = manifest;
   private clips = new Map<string, Clip>();
   private tracks = new Map<string, MusicTrack>();
   private loading = new Map<string, Promise<void>>();
+  private decoders = new Map<string, OfflineAudioContext>();
+  private effectsLoading: Promise<void> | undefined;
+  constructor(private readonly endings?: EffectEndings) {}
   count(prefix: string): number {
     return this.entries.filter((entry) => entry.name.startsWith(prefix)).length;
   }
@@ -102,22 +110,36 @@ export class SoundLibrary {
     return new MusicStream(this.tracks.get(name) ?? null);
   }
   async load(
-    context: BaseAudioContext,
+    context: BaseAudioContext | undefined,
     name: string,
     base = `${import.meta.env?.BASE_URL ?? '/'}assets/audio/`,
+    signal?: AbortSignal,
   ): Promise<void> {
+    signal?.throwIfAborted();
     if (this.clips.has(name) || this.tracks.has(name)) return;
     const existing = this.loading.get(name);
     if (existing) return existing;
     const entry = this.entries.find((entry) => entry.name === name);
     if (!entry) return;
     const task = (async () => {
-      const response = await fetch(base + name + '.ogg');
+      const response = await fetch(base + name + '.ogg', { signal });
       if (!response.ok) throw new Error(`Cannot load audio ${name}: ${response.status}`);
-      // An OfflineAudioContext at the authored rate prevents browser output-rate resampling.
-      const decoder =
-        context.sampleRate === entry.rate ? context : new OfflineAudioContext(entry.channels, 1, entry.rate);
-      const buffer = await decoder.decodeAudioData(await response.arrayBuffer());
+      const bytes = await response.arrayBuffer();
+      signal?.throwIfAborted();
+      // Reuse an authored-rate decoder: device-rate decoding would resample the clips.
+      let decoder: BaseAudioContext | undefined = context?.sampleRate === entry.rate ? context : undefined;
+      if (!decoder) {
+        const key = `${entry.rate}:${entry.channels}`;
+        decoder = this.decoders.get(key);
+        if (!decoder) {
+          const offline = new OfflineAudioContext(entry.channels, 1, entry.rate);
+          this.decoders.set(key, offline);
+          decoder = offline;
+        }
+      }
+      const buffer = await decoder.decodeAudioData(bytes);
+      // decodeAudioData cannot be canceled; discard a completed decode after disposal.
+      signal?.throwIfAborted();
       if (name.startsWith('music/')) {
         const pcm = new Float32Array(entry.frames * 2),
           left = buffer.getChannelData(0),
@@ -136,6 +158,19 @@ export class SoundLibrary {
             sum += Math.max(-32768, Math.min(32767, Math.floor((channel[i] ?? 0) * 32768 + 0.5)));
           pcm[i] = Math.trunc(sum / channels.length);
         }
+        // Some browser Vorbis decoders omit up to the final 256 authored samples.
+        // Restore only that missing suffix; keep every decoded sample unchanged.
+        const ending = this.endings?.clips[name];
+        if (ending && buffer.length < entry.frames) {
+          const bytes = Uint8Array.from(atob(ending), (character) => character.charCodeAt(0)),
+            frames = Math.min(this.endings!.frames, entry.frames),
+            begin = entry.frames - frames;
+          if (bytes.byteLength === frames * 2) {
+            const tail = new DataView(bytes.buffer);
+            for (let i = Math.max(buffer.length, begin); i < entry.frames; ++i)
+              pcm[i] = tail.getInt16((i - begin) * 2, true);
+          }
+        }
         this.setClip(name, pcm, entry.rate);
       }
     })();
@@ -147,23 +182,40 @@ export class SoundLibrary {
     }
   }
   async loadEffects(
-    _context?: BaseAudioContext,
+    context?: BaseAudioContext,
     base = `${import.meta.env?.BASE_URL ?? '/'}assets/audio/`,
+    signal?: AbortSignal,
   ): Promise<void> {
-    const response = await fetch(base + 'native-effects.pcm.gz');
-    if (!response.ok) throw new Error(`Cannot load native sound samples: ${response.status}`);
-    // Static hosts may set Content-Encoding:gzip for .gz assets; fetch already decodes that.
-    const received = await response.arrayBuffer();
-    const header = new Uint8Array(received, 0, Math.min(2, received.byteLength));
-    const bytes =
-      header[0] === 0x1f && header[1] === 0x8b
-        ? await new Response(
-            new Blob([received]).stream().pipeThrough(new DecompressionStream('gzip')),
-          ).arrayBuffer()
-        : received;
-    for (const entry of this.entries)
-      if ('pcmOffset' in entry)
-        this.setClip(entry.name, new Int16Array(bytes, entry.pcmOffset!, entry.frames), entry.rate);
+    signal?.throwIfAborted();
+    if (this.effectsLoading) return this.effectsLoading;
+    const effects = this.entries.filter((entry) => !entry.name.startsWith('music/'));
+    const task = (async () => {
+      let next = 0,
+        failed = false,
+        failure: unknown;
+      // Bound the entire fetch/decode operation, not just the network request.
+      await Promise.all(
+        Array.from({ length: Math.min(4, effects.length) }, async () => {
+          while (!failed && next < effects.length) {
+            const entry = effects[next++];
+            try {
+              await this.load(context, entry.name, base, signal);
+            } catch (error) {
+              if (!failed) failure = error;
+              failed = true;
+            }
+          }
+        }),
+      );
+      // Let active workers settle before a caller retries the missing clips.
+      if (failed) throw failure;
+    })();
+    this.effectsLoading = task;
+    try {
+      await task;
+    } finally {
+      this.effectsLoading = undefined;
+    }
   }
   snapshot(): {
     clips: { name: string; pcm: Int16Array; rate: number }[];
