@@ -92,8 +92,14 @@ try {
   assert.equal(await read('probe.ready'), false);
   await page.touchscreen.tap(70, 50);
   await until('probe.device.session.context.state === "running"');
+  const isMusicRequest = (url) => url.includes('/music/build/day_hammer_harvest.ogg');
+  // AudioContext state and request events arrive independently in Playwright.
+  if (!requests.some(isMusicRequest)) {
+    await page.waitForRequest((request) => isMusicRequest(request.url()), { timeout: 15000 });
+  }
+  assert.equal(await read('probe.ready'), false, 'Critical effects remain blocked during music fetch');
   assert.ok(
-    requests.some((url) => url.includes('/music/build/day_hammer_harvest.ogg')),
+    requests.some(isMusicRequest),
     'Music fetch starts before critical effects finish',
   );
   releaseHammer();
