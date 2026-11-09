@@ -1,4 +1,4 @@
-import { Rect, EventType, button, setTransform } from '../../../../packages/native-ui/src';
+import { Rect, ButtonStyle, button, setTransform } from '../../../../packages/native-ui/src';
 import { Tool, Order } from '../../../../packages/engine/src/game-tools';
 import { f32 as f, clamp } from '../../../../packages/engine/src/numeric';
 import { DockView } from './game-app-state';
@@ -20,6 +20,7 @@ export function reducedMotion(): boolean {
   return reducedMotionPreferred();
 }
 export function dismissBuildDrawer(this: GameHudApp): void {
+  this.rosterOpen = false;
   this.card = this.globalCard = -1;
   this.drawerOpen = this.drawerPinned = false;
   this.drawerSuppressed = true;
@@ -34,10 +35,10 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
       this.dockBounds.w = Math.min(lerp(this.dockFrom.w, this.dockTarget.w, t), Math.max(1, f(width - 24)));
       this.dockBounds.h = lerp(this.dockFrom.h, this.dockTarget.h, t);
       this.dockBounds.x = f(f(width - this.dockBounds.w) / 2);
-      this.dockBounds.y = f(f(height - 12) - this.dockBounds.h);
+      this.dockBounds.y = f(f(height - (this.dockView === DockView.Handle ? 12 : 56)) - this.dockBounds.h);
     };
   if (this.dockKey) advance();
-  const handle = new Rect(f(f(width - 152) / 2), height - 30, 152, 26),
+  const handle = new Rect(f(f(width - 236) / 2), height - 48, 116, 36),
     atHandle = handle.contains(this.mouse.x, this.mouse.y);
   if (!atHandle) this.drawerSuppressed = false;
   const eligible =
@@ -70,13 +71,14 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
       (this.drawerPinned || atHandle || (this.globalCard >= 0 && inMenu));
   if (global && this.globalCard < 0) this.globalCard = 0;
   let next = DockView.Handle;
-  if (eligible && ((this.chosen.length > 0 && this.card >= 0) || global)) next = DockView.Build;
+  if (eligible && this.rosterOpen) next = DockView.Roster;
+  else if (eligible && ((this.chosen.length > 0 && this.card >= 0) || global)) next = DockView.Build;
   else if (this.chosen.length) next = DockView.Unit;
   else if (this.selected >= 0 || this.selectedDungeon >= 0) next = DockView.Inspector;
   else if (this.selectedTree >= 0 || this.selectedRock >= 0 || this.selectedAnimal >= 0)
     next = DockView.Resource;
   else if (this.tool !== Tool.Select) next = DockView.Placement;
-  let target = new Rect(f(f(width - 112) / 2), height - 20, 112, 8),
+  let target = new Rect(f(f(width - 236) / 2), height - 48, 236, 36),
     key = String(next);
   if (next === DockView.Build) {
     const shared = !this.chosen.length;
@@ -97,9 +99,12 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
   } else if (next === DockView.Placement) {
     target = this.placementPanelBounds(width, height);
     key += ':' + this.tool;
+  } else if (next === DockView.Roster) {
+    target = this.rosterBounds(width, height);
+    key += ':' + this.rosterTab;
   }
   target.x = f(f(width - target.w) / 2);
-  target.y = f(f(height - 12) - target.h);
+  target.y = f(f(height - (next === DockView.Handle ? 12 : 56)) - target.h);
   if (key !== this.dockKey || target.w !== this.dockTarget.w || target.h !== this.dockTarget.h) {
     if (this.dockKey) {
       if (this.dockGhost) {
@@ -143,18 +148,6 @@ export function renderDockContent(this: GameHudApp, panel: Rect): void {
     t = this.theme;
   switch (this.dockView) {
     case DockView.Handle:
-      c.rect(
-        new Rect(f(f(panel.x + f(panel.w / 2)) - 22), f(f(panel.y + f(panel.h / 2)) - 1), 44, 2),
-        t.muted,
-        1,
-      );
-      c.control('build-handle', new Rect(panel.x - 20, panel.y - 10, panel.w + 40, panel.h + 20), (e) => {
-        if (e.type === EventType.Activate) {
-          this.globalCard = 0;
-          this.drawerPinned = true;
-          this.drawerSuppressed = false;
-        }
-      });
       break;
     case DockView.Build:
       this.commandCard(panel, 1, !this.chosen.length, true);
@@ -170,6 +163,9 @@ export function renderDockContent(this: GameHudApp, panel: Rect): void {
       break;
     case DockView.Resource:
       this.worldObjectPanel(panel);
+      break;
+    case DockView.Roster:
+      this.rosterPanel(panel);
       break;
   }
 }
@@ -210,7 +206,9 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
     if (reveal > f(0.01) || this.dockProgress === 1) {
       const body = copy(this.dockTarget);
       body.x = f(f(width - body.w) / 2);
-      body.y = f(f(f(height - 12) - body.h) + f(8 * f(1 - reveal)));
+      body.y = f(
+        f(f(height - (this.dockView === DockView.Handle ? 12 : 56)) - body.h) + f(8 * f(1 - reveal)),
+      );
       c.layer(this.dockBounds.inset(1), () => this.renderDockContent(body), Math.trunc(f(255 * reveal)));
     }
   });
@@ -218,4 +216,33 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
   // previous-frame snapshot for the same transition instead of retaining a borrowed wrapper.
   this.dockContent?.dispose();
   this.dockContent = layer?.duplicate() ?? null;
+  const nav = new Rect(f((width - 236) / 2), height - 48, 236, 36);
+  c.rect(nav, this.theme.surface, 3, this.theme.border);
+  button(
+    c,
+    'build-handle',
+    new Rect(nav.x + 3, nav.y + 3, 112, 30),
+    'Build',
+    () => {
+      this.selectTool(Tool.Select, true);
+      this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+      this.card = this.chosen.length ? 0 : -1;
+      this.globalCard = this.chosen.length ? -1 : 0;
+      this.drawerPinned = true;
+      this.drawerSuppressed = false;
+    },
+    this.dockView === DockView.Build ? ButtonStyle.Primary : ButtonStyle.Quiet,
+  );
+  button(
+    c,
+    'unit-roster',
+    new Rect(nav.x + 121, nav.y + 3, 112, 30),
+    'Unit',
+    () => {
+      const open = !this.rosterOpen;
+      this.selectTool(Tool.Select, true);
+      this.rosterOpen = open;
+    },
+    this.dockView === DockView.Roster ? ButtonStyle.Primary : ButtonStyle.Quiet,
+  );
 }

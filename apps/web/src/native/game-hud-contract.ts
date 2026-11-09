@@ -36,6 +36,8 @@ export interface GameHudApp extends GameAppState {
   renderDockContent(panel: Rect): void;
   worldObjectPanel(panel: Rect): void;
   taskbar(width: number, height: number): void;
+  rosterBounds(width: number, height: number): Rect;
+  rosterPanel(panel: Rect): void;
   objectives(width: number, height: number, top: number): void;
   skyMural(width: number): void;
   calendarDetails(width: number): void;

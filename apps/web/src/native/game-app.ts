@@ -25,6 +25,7 @@ import * as buildingEditors from './game-building-editor';
 import * as hud from './game-hud';
 import * as dock from './game-context-dock';
 import * as units from './game-unit-panel';
+import * as roster from './game-roster';
 import * as worldSelection from './game-selection-panel';
 import * as objectives from './game-objectives';
 import * as skyHud from './game-sky-hud';
@@ -50,6 +51,7 @@ const methods = {
   ...hudMethods,
   ...dock,
   ...units,
+  ...roster,
   ...worldSelection,
   ...objectives,
   ...skyHud,

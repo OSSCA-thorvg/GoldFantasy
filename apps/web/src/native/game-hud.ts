@@ -169,7 +169,6 @@ export function hud(this: GameHudApp, width: number, height: number): void {
       y = f32(y + 17);
     }
   }
-  this.taskbar(width, height);
   if (this.notice && c.time() < this.noticeUntil && height >= 540) {
     const w = Math.min(560, f32(width - 24), Math.max(360, f32(c.textWidth(this.notice, 13, true) + 36))),
       toast = new Rect(f32(f32(width - w) / 2), f32(this.dockBounds.y - 46), w, 36);
@@ -188,6 +187,7 @@ export function hud(this: GameHudApp, width: number, height: number): void {
   this.timeControls(width);
   this.campSupplies(width, height);
   this.calendarDetails(width);
+  this.taskbar(width, height);
 }
 export function campSupplies(this: GameHudApp, width: number, height: number): void {
   const markers: CampMarker[] = [];
@@ -529,7 +529,7 @@ export function buildMenuBounds(this: GameHudApp, width: number, height: number,
     h = f32(
       f32(f32(48 + f32(rows * (page === 0 ? 32 : 64))) + f32(f32(rows - 1) * 6)) + (page === 0 ? 6 : 30),
     );
-  return new Rect(f32(f32(width - w) / 2), f32(f32(height - 12) - h), w, h);
+  return new Rect(f32(f32(width - w) / 2), f32(f32(height - 56) - h), w, h);
 }
 export function commandCard(
   this: GameHudApp,

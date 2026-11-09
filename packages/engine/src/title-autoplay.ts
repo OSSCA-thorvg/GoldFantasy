@@ -23,12 +23,15 @@ import { hash01, f32 as f } from './numeric';
 import { sharpAnchor, type RoadPath } from './road-network';
 import { treePosition } from './world-map';
 import * as mining from './mining';
+import type { HireOffer } from './town-hiring';
 export interface TitleTown extends TownState {
   prepareTitlePreview(): void;
   site(id: number): Building | null;
   recount(): void;
   staff(): void;
   settle(id: number): boolean;
+  recruitmentOffers(): HireOffer[];
+  hireGuest(key: string): boolean;
   walkTo(p: Person, to: Point): boolean;
   roadAccess(footprint: Footprint): boolean;
   maintainTitleBuilder(): void;
@@ -173,17 +176,8 @@ export function planTitleWork(this: TitleTown): void {
   const completed = (kind: Structure): boolean => this.placed.some((b) => b.kind === kind && b.built());
   const basicsReady = completed(Structure.Farm) && completed(Structure.Well);
   if (basicsReady && this.population() < workforceNeeded && this.population() < this.housing()) {
-    for (const p of this.folk)
-      if (
-        p.role === Role.Guest &&
-        p.calling === Calling.Traveller &&
-        p.health >= f(0.5) &&
-        p.activity !== Activity.Leaving &&
-        this.settle(p.id)
-      ) {
-        this.staff();
-        break;
-      }
+    const offer = this.recruitmentOffers().find(item => item.person.calling === Calling.Settler || item.person.calling === Calling.Traveller);
+    if (offer && this.hireGuest(offer.key)) this.staff();
   }
   const treasury = this.stock();
   const essential = (p: Person): boolean => {

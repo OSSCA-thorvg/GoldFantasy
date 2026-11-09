@@ -31,6 +31,7 @@ export enum DockView {
   Inspector,
   Resource,
   Placement,
+  Roster,
 }
 export class Plan {
   preview = new Preview();
@@ -85,6 +86,10 @@ export class GameAppState {
   dockGhost: Paint | null = null;
   dockPortraits = new Map<number, { key: string; paint: Paint }>();
   residentPage = 0;
+  rosterOpen = false;
+  rosterTab: 'units' | 'guests' = 'units';
+  rosterPage = 0;
+  rosterSelected = '';
   campResources = new CampResourceHud();
   pending = Order.None;
   crew: number[] = [];
@@ -96,6 +101,7 @@ export class GameAppState {
   soundscaping = false;
   nextRaven = 30;
   nextAnimal = 4;
+  nextPig = 6;
   heardAnimal = 0n;
   heardRaids = 0;
   heardBlow = 0n;

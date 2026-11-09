@@ -371,6 +371,10 @@ export function selectBuilding(this: GameInputApp, id: number): void {
   this.chosen = [];
 }
 export function cancel(this: GameInputApp): void {
+  if (this.rosterOpen) {
+    this.rosterOpen = false;
+    return;
+  }
   if (this.timeExpanded) {
     this.timeExpanded = false;
     return;

@@ -17,6 +17,7 @@ import * as scheduler from './unit-scheduler';
 import * as needs from './unit-needs';
 import * as housing from './unit-housing';
 import * as residents from './town-residents';
+import * as hiring from './town-hiring';
 import * as harvesting from './resource-harvesting';
 import * as people from './town-people';
 import * as ticking from './town-tick';
@@ -30,7 +31,7 @@ import * as settlements from './town-settlements';
 import * as title from './title-autoplay';
 const { population: scopedPopulation, guests: scopedGuests, housing: scopedHousing, guestBeds: scopedGuestBeds, fieldAcres: scopedFields, tendedFieldAcres: scopedTended, roadSettlement: scopedRoadSettlement, ...settlementMethods } = settlements;
 const { fieldAcres: totalFields, tendedFieldAcres: totalTended, ...economyMethods } = economy;
-const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...settlementMethods, ...title };
+const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...settlementMethods, ...title };
 type Bound<T> = { [K in keyof T]: T[K] extends (...args: infer A) => infer R ? (...args: A) => R : never };
 export interface Town extends Bound<typeof methods> {}
 export class Town extends TownState {
