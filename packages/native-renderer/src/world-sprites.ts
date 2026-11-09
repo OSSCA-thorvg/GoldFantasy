@@ -32,7 +32,6 @@ export class PersonParts {
   lute: PaintNode | null = null;
   bowString: ShapeNode | null = null;
   arrow: PaintNode | null = null;
-  ring: PaintNode | null = null;
   alert: PaintNode | null = null;
   hoe: PaintNode | null = null;
   wateringCan: PaintNode | null = null;
@@ -954,12 +953,6 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   const root = new SceneNode(),
     sprite = new SceneNode();
   parts.body = sprite;
-  let selection = oval([0, 0], 9, 4, [0, 0, 0, 0]);
-  selection.strokeWidth(f32(1.6));
-  selection.strokeFill(240, 210, 120, 230);
-  selection.opacity(0);
-  root.add(selection);
-  parts.ring = selection;
   let look = appearanceOf(person);
   let broad = f32(f32(4.2) * (person.customLook?.bodyWidth ?? 1)),
     height = figureHeight(person);

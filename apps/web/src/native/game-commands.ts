@@ -355,46 +355,6 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
   }
 }
 export function commandOverlay(this: GameCommandApp): void {
-  if (this.selectedAnimal >= 0) {
-    const animal = this.town.creature(this.selectedAnimal);
-    if (!animal || animal.animal === null || animal.health <= 0) this.selectedAnimal = -1;
-    else {
-      const p = this.toScreen(animal.position),
-        radius = f(f(animalSpec(animal.animal).width * f(0.45)) * this.camera.zoom);
-      this.context.paint(JSON.stringify(['selected-animal', p.x, p.y, radius]), () =>
-        new this.context.tvg.Shape()
-          .appendCircle(p.x, p.y, radius, f(radius * f(0.4)))
-          .fill(0, 0, 0, 0)
-          .stroke({
-            width: f(1.5),
-            color: [this.theme.accent.r, this.theme.accent.g, this.theme.accent.b, 255],
-          }),
-      );
-    }
-  }
-  const ring = (name: string, p: Point) =>
-    this.context.paint(JSON.stringify([name, p.x, p.y]), () =>
-      new this.context.tvg.Shape()
-        .appendCircle(p.x, p.y, 11, 5)
-        .fill(0, 0, 0, 0)
-        .stroke({ width: 1.5, color: [this.theme.accent.r, this.theme.accent.g, this.theme.accent.b, 255] }),
-    );
-  if (this.selectedRock >= 0) {
-    const x = this.selectedRock % this.town.map().width(),
-      y = Math.trunc(this.selectedRock / this.town.map().width());
-    if (!mining.deposit(this.town.map(), x, y)) this.selectedRock = -1;
-    else ring('selected-rock', this.toScreen(mining.position(x, y)));
-  }
-  if (this.selectedTree >= 0) {
-    const x = this.selectedTree % this.town.map().width(),
-      y = Math.trunc(this.selectedTree / this.town.map().width());
-    if (!this.town.map().inside(x, y) || !this.town.map().at(x, y).trees) this.selectedTree = -1;
-    else
-      ring(
-        'selected-tree',
-        this.toScreen(treePosition(this.town.map(), x, y, this.town.map().at(x, y).trees - 1)),
-      );
-  }
   if (!this.targetingCursor()) return;
   const p = this.mouse,
     color =

@@ -96,6 +96,8 @@ export class WorldRenderer extends WorldRendererState {
     this.currentVisibility = new VisibilityMap();
     this.visibilityPixels = new Uint32Array();
     this.vision = [];
+    this.selection.remove();
+    this.selectionMarkers.clear();
     this.combat.remove();
     this.damageBack = this.damageLeft = null;
     this.sparks = [];

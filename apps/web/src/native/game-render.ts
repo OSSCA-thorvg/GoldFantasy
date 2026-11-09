@@ -11,6 +11,7 @@ import { Cue, Sound, SpeechChannel, noticeCue } from '../../../../packages/nativ
 import { Moment } from '../../../../packages/native-audio/src/music-director';
 import { Rect } from '../../../../packages/native-ui/src';
 import { queueWorkSounds } from './work-audio';
+import { objectSelectionOverlay } from './selection-overlay';
 import {
   type CharacterEditor,
   type BuildingEditor,
@@ -224,6 +225,7 @@ export function render(
   );
   if (simulate || this.town.isTitleAutoplay()) this.updateSpeech(seconds);
   this.context.begin(this.theme, new Rect(0, 0, width, height), uiSeconds >= 0 ? uiSeconds : seconds);
+  if (!editing) objectSelectionOverlay(this);
   if (
     !editing &&
     this.tool === Tool.Select &&

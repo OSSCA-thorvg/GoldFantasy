@@ -15,9 +15,17 @@ import * as mining from '../../engine/src/mining';
 import * as woodcutting from '../../engine/src/woodcutting';
 import { harvestTiming, hammerTiming, workElapsed } from '../../engine/src/work-timing';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
+import { SelectionMarker, selectionFrame } from './selection-marker';
 import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
 import { standingRow, registerDepth } from './world-depth';
-import { agentSprite, personSprite, PersonParts, stridePose, monsterParts } from './world-sprites';
+import {
+  agentSprite,
+  personSprite,
+  personSpeechAnchor,
+  PersonParts,
+  stridePose,
+  monsterParts,
+} from './world-sprites';
 import { animalSprite } from './wildlife-sprites';
 import { moodOf } from './person-portrait';
 import { canIdleGesture, idleGesture, animateGesture, IdleGesture } from './idle-gesture';
@@ -49,6 +57,7 @@ export function moveAgents(
   seconds: number,
   selected: readonly number[],
 ): void {
+  const marked = new Set<number>();
   for (const sprite of s.sprites.values()) sprite.seen = false;
   const count = s.rows.length;
   for (const agent of traffic.agents()) {
@@ -209,7 +218,28 @@ export function moveAgents(
     figure.paint.opacity(
       !s.sceneView && !inSight(s, person.position) ? 0 : lround(f(255 * person.visibility())),
     );
-    figure.parts.ring?.opacity(selected.includes(person.id) ? 255 : 0);
+    if (selected.includes(person.id) && figure.paint.alpha > 0) {
+      const at = s.view.toScreen(screen, s.viewWidth, s.viewHeight),
+        halfWidth = Math.max(5.8, 4.2 * (person.customLook?.bodyWidth ?? 1) + 1.6) * s.view.zoom,
+        top = personSpeechAnchor(person).y * s.view.zoom,
+        bounds = { x: at.x - halfWidth, y: at.y + top, w: halfWidth * 2, h: -top },
+        frame = selectionFrame(bounds);
+      if (
+        frame.x + frame.w >= 0 &&
+        frame.y + frame.h >= 0 &&
+        frame.x <= s.viewWidth &&
+        frame.y <= s.viewHeight
+      ) {
+        let marker = s.selectionMarkers.get(person.id);
+        if (!marker) {
+          marker = new SelectionMarker();
+          s.selectionMarkers.set(person.id, marker);
+          s.selection.add(marker);
+        }
+        marker.update(bounds, figure.paint.alpha);
+        marked.add(person.id);
+      }
+    }
     figure.parts.alert?.opacity(person.stress > f(0.7) || person.food < f(0.15) ? 255 : 0);
     const hammering =
       !person.moving() &&
@@ -298,6 +328,11 @@ export function moveAgents(
     if (figure.seen) continue;
     if (figure.row >= 0) s.rows[figure.row].remove(figure.paint);
     s.figures.delete(id);
+  }
+  for (const [id, marker] of s.selectionMarkers) {
+    if (marked.has(id)) continue;
+    s.selection.remove(marker);
+    s.selectionMarkers.delete(id);
   }
   for (const sprite of s.beasts.values()) sprite.seen = false;
   for (const group of [town.monsters(), town.wildlife()])
