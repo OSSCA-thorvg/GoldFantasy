@@ -247,6 +247,24 @@ export class WalkGrid {
                         }
                     }
                     if (valid && length <= f32(f32(span * f32(1.25)) + f32(1.5))) {
+                        // A* cell centers only identify where a road is reached. Joining
+                        // through that cell center before its projected road point can
+                        // overshoot the road and make walkers double back. Connect the
+                        // preceding/following ground legs directly when they are clear.
+                        if (smooth.length > 1 && route.length > 2) {
+                            const previous = smooth[smooth.length - 2];
+                            if (this.clear(previous, route[1], Math.max(costAt(previous), roadCost))) {
+                                smooth.pop();
+                                route[0] = previous;
+                            }
+                        }
+                        if (end + 1 < cellsOnPath.length && route.length > 2) {
+                            const next = cellsOnPath[end + 1], exit = route[route.length - 2];
+                            if (this.clear(exit, next, Math.max(costAt(next), roadCost))) {
+                                route.pop();
+                                cellsOnPath[end] = exit;
+                            }
+                        }
                         const keep = new Uint8Array(route.length);
                         keep[0] = keep[f32(keep.length - 1)] = 1;
                         const pending: [
