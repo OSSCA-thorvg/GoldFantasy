@@ -1,0 +1,995 @@
+{
+  "Rgb": {
+    "size": 3,
+    "fields": [
+      {
+        "name": "r",
+        "type": "u8",
+        "offset": 0,
+        "size": 1
+      },
+      {
+        "name": "g",
+        "type": "u8",
+        "offset": 1,
+        "size": 1
+      },
+      {
+        "name": "b",
+        "type": "u8",
+        "offset": 2,
+        "size": 1
+      }
+    ]
+  },
+  "Point": {
+    "size": 8,
+    "fields": [
+      {
+        "name": "x",
+        "type": "f32",
+        "offset": 0,
+        "size": 4
+      },
+      {
+        "name": "y",
+        "type": "f32",
+        "offset": 4,
+        "size": 4
+      }
+    ]
+  },
+  "TileCoord": {
+    "size": 8,
+    "fields": [
+      {
+        "name": "x",
+        "type": "i32",
+        "offset": 0,
+        "size": 4
+      },
+      {
+        "name": "y",
+        "type": "i32",
+        "offset": 4,
+        "size": 4
+      }
+    ]
+  },
+  "Resources": {
+    "size": 24,
+    "fields": [
+      {
+        "name": "gold",
+        "type": "i32",
+        "offset": 0,
+        "size": 4
+      },
+      {
+        "name": "wood",
+        "type": "i32",
+        "offset": 4,
+        "size": 4
+      },
+      {
+        "name": "stone",
+        "type": "i32",
+        "offset": 8,
+        "size": 4
+      },
+      {
+        "name": "food",
+        "type": "i32",
+        "offset": 12,
+        "size": 4
+      },
+      {
+        "name": "mana",
+        "type": "i32",
+        "offset": 16,
+        "size": 4
+      },
+      {
+        "name": "water",
+        "type": "i32",
+        "offset": 20,
+        "size": 4
+      }
+    ]
+  },
+  "CampEconomy::Ledger": {
+    "size": 28,
+    "fields": [
+      {
+        "name": "wages",
+        "type": "i32",
+        "offset": 0,
+        "size": 4
+      },
+      {
+        "name": "rent",
+        "type": "i32",
+        "offset": 4,
+        "size": 4
+      },
+      {
+        "name": "sales",
+        "type": "i32",
+        "offset": 8,
+        "size": 4
+      },
+      {
+        "name": "guests",
+        "type": "i32",
+        "offset": 12,
+        "size": 4
+      },
+      {
+        "name": "bounty",
+        "type": "i32",
+        "offset": 16,
+        "size": 4
+      },
+      {
+        "name": "eaten",
+        "type": "i32",
+        "offset": 20,
+        "size": 4
+      },
+      {
+        "name": "drunk",
+        "type": "i32",
+        "offset": 24,
+        "size": 4
+      }
+    ]
+  },
+  "Tile": {
+    "size": 7,
+    "fields": [
+      {
+        "name": "terrain",
+        "type": "u8",
+        "offset": 0,
+        "size": 1
+      },
+      {
+        "name": "shade",
+        "type": "u8",
+        "offset": 1,
+        "size": 1
+      },
+      {
+        "name": "trees",
+        "type": "u8",
+        "offset": 2,
+        "size": 1
+      },
+      {
+        "name": "wild",
+        "type": "u8",
+        "offset": 3,
+        "size": 1
+      },
+      {
+        "name": "revealed",
+        "type": "bool",
+        "offset": 4,
+        "size": 1
+      },
+      {
+        "name": "dungeon",
+        "type": "i8",
+        "offset": 5,
+        "size": 1
+      },
+      {
+        "name": "quarried",
+        "type": "bool",
+        "offset": 6,
+        "size": 1
+      }
+    ]
+  },
+  "Sight": {
+    "size": 12,
+    "fields": [
+      {
+        "name": "center",
+        "type": "Point",
+        "offset": 0,
+        "size": 8
+      },
+      {
+        "name": "radius",
+        "type": "f32",
+        "offset": 8,
+        "size": 4
+      }
+    ]
+  },
+  "Giant": {
+    "size": 8,
+    "fields": [
+      {
+        "name": "origin",
+        "type": "TileCoord",
+        "offset": 0,
+        "size": 8
+      }
+    ]
+  },
+  "Volcano": {
+    "size": 8,
+    "fields": [
+      {
+        "name": "origin",
+        "type": "TileCoord",
+        "offset": 0,
+        "size": 8
+      }
+    ]
+  },
+  "Climate": {
+    "size": 36,
+    "fields": [
+      {
+        "name": "weather",
+        "type": "u8",
+        "offset": 0,
+        "size": 1
+      },
+      {
+        "name": "intensity",
+        "type": "f32",
+        "offset": 4,
+        "size": 4
+      },
+      {
+        "name": "wind",
+        "type": "f32",
+        "offset": 8,
+        "size": 4
+      },
+      {
+        "name": "temperature",
+        "type": "f32",
+        "offset": 12,
+        "size": 4
+      },
+      {
+        "name": "snow",
+        "type": "f32",
+        "offset": 16,
+        "size": 4
+      },
+      {
+        "name": "summer",
+        "type": "f32",
+        "offset": 20,
+        "size": 4
+      },
+      {
+        "name": "autumn",
+        "type": "f32",
+        "offset": 24,
+        "size": 4
+      },
+      {
+        "name": "frost",
+        "type": "f32",
+        "offset": 28,
+        "size": 4
+      },
+      {
+        "name": "night",
+        "type": "f32",
+        "offset": 32,
+        "size": 4
+      }
+    ]
+  },
+  "RoadAnchor": {
+    "size": 24,
+    "fields": [
+      {
+        "name": "point",
+        "type": "Point",
+        "offset": 0,
+        "size": 8
+      },
+      {
+        "name": "in",
+        "type": "Point",
+        "offset": 8,
+        "size": 8
+      },
+      {
+        "name": "out",
+        "type": "Point",
+        "offset": 16,
+        "size": 8
+      }
+    ]
+  },
+  "Stage": {
+    "size": 16,
+    "fields": [
+      {
+        "name": "kind",
+        "type": "u8",
+        "offset": 0,
+        "size": 1
+      },
+      {
+        "name": "variant",
+        "type": "u32",
+        "offset": 4,
+        "size": 4
+      },
+      {
+        "name": "dx",
+        "type": "f32",
+        "offset": 8,
+        "size": 4
+      },
+      {
+        "name": "dy",
+        "type": "f32",
+        "offset": 12,
+        "size": 4
+      }
+    ]
+  },
+  "Hit": {
+    "size": 48,
+    "fields": [
+      {
+        "name": "serial",
+        "type": "u64",
+        "offset": 0,
+        "size": 8
+      },
+      {
+        "name": "from",
+        "type": "Point",
+        "offset": 8,
+        "size": 8
+      },
+      {
+        "name": "to",
+        "type": "Point",
+        "offset": 16,
+        "size": 8
+      },
+      {
+        "name": "damage",
+        "type": "i32",
+        "offset": 24,
+        "size": 4
+      },
+      {
+        "name": "onPerson",
+        "type": "bool",
+        "offset": 28,
+        "size": 1
+      },
+      {
+        "name": "ranged",
+        "type": "bool",
+        "offset": 29,
+        "size": 1
+      },
+      {
+        "name": "at",
+        "type": "f64",
+        "offset": 32,
+        "size": 8
+      },
+      {
+        "name": "person",
+        "type": "i32",
+        "offset": 40,
+        "size": 4
+      }
+    ]
+  },
+  "TreeWorkEvent": {
+    "size": 40,
+    "fields": [
+      {
+        "name": "serial",
+        "type": "u64",
+        "offset": 0,
+        "size": 8
+      },
+      {
+        "name": "kind",
+        "type": "u8",
+        "offset": 8,
+        "size": 1
+      },
+      {
+        "name": "person",
+        "type": "i32",
+        "offset": 12,
+        "size": 4
+      },
+      {
+        "name": "cell",
+        "type": "i32",
+        "offset": 16,
+        "size": 4
+      },
+      {
+        "name": "index",
+        "type": "i32",
+        "offset": 20,
+        "size": 4
+      },
+      {
+        "name": "worker",
+        "type": "Point",
+        "offset": 24,
+        "size": 8
+      },
+      {
+        "name": "at",
+        "type": "f64",
+        "offset": 32,
+        "size": 8
+      }
+    ]
+  },
+  "Appearance": {
+    "size": 252,
+    "fields": [
+      {
+        "name": "skin",
+        "type": "Rgb",
+        "offset": 0,
+        "size": 3
+      },
+      {
+        "name": "skinShade",
+        "type": "Rgb",
+        "offset": 3,
+        "size": 3
+      },
+      {
+        "name": "hair",
+        "type": "Rgb",
+        "offset": 6,
+        "size": 3
+      },
+      {
+        "name": "hairShade",
+        "type": "Rgb",
+        "offset": 9,
+        "size": 3
+      },
+      {
+        "name": "eyes",
+        "type": "Rgb",
+        "offset": 12,
+        "size": 3
+      },
+      {
+        "name": "cloth",
+        "type": "Rgb",
+        "offset": 15,
+        "size": 3
+      },
+      {
+        "name": "clothShade",
+        "type": "Rgb",
+        "offset": 18,
+        "size": 3
+      },
+      {
+        "name": "trim",
+        "type": "Rgb",
+        "offset": 21,
+        "size": 3
+      },
+      {
+        "name": "hairStyle",
+        "type": "u8",
+        "offset": 24,
+        "size": 1
+      },
+      {
+        "name": "headwear",
+        "type": "u8",
+        "offset": 25,
+        "size": 1
+      },
+      {
+        "name": "nose",
+        "type": "u8",
+        "offset": 26,
+        "size": 1
+      },
+      {
+        "name": "whiskers",
+        "type": "u8",
+        "offset": 27,
+        "size": 1
+      },
+      {
+        "name": "eyeStyle",
+        "type": "u8",
+        "offset": 28,
+        "size": 1
+      },
+      {
+        "name": "faceWidth",
+        "type": "f32",
+        "offset": 32,
+        "size": 4
+      },
+      {
+        "name": "jaw",
+        "type": "f32",
+        "offset": 36,
+        "size": 4
+      },
+      {
+        "name": "eyeSize",
+        "type": "f32",
+        "offset": 40,
+        "size": 4
+      },
+      {
+        "name": "eyeGap",
+        "type": "f32",
+        "offset": 44,
+        "size": 4
+      },
+      {
+        "name": "browWeight",
+        "type": "f32",
+        "offset": 48,
+        "size": 4
+      },
+      {
+        "name": "mouthWidth",
+        "type": "f32",
+        "offset": 52,
+        "size": 4
+      },
+      {
+        "name": "jawWidth",
+        "type": "f32",
+        "offset": 56,
+        "size": 4
+      },
+      {
+        "name": "chinLength",
+        "type": "f32",
+        "offset": 60,
+        "size": 4
+      },
+      {
+        "name": "bodyHeight",
+        "type": "f32",
+        "offset": 64,
+        "size": 4
+      },
+      {
+        "name": "bodyWidth",
+        "type": "f32",
+        "offset": 68,
+        "size": 4
+      },
+      {
+        "name": "freckles",
+        "type": "bool",
+        "offset": 72,
+        "size": 1
+      },
+      {
+        "name": "scar",
+        "type": "bool",
+        "offset": 73,
+        "size": 1
+      },
+      {
+        "name": "earring",
+        "type": "bool",
+        "offset": 74,
+        "size": 1
+      },
+      {
+        "name": "old",
+        "type": "bool",
+        "offset": 75,
+        "size": 1
+      },
+      {
+        "name": "eyepatch",
+        "type": "bool",
+        "offset": 76,
+        "size": 1
+      },
+      {
+        "name": "warpaint",
+        "type": "bool",
+        "offset": 77,
+        "size": 1
+      },
+      {
+        "name": "tippedHair",
+        "type": "bool",
+        "offset": 78,
+        "size": 1
+      },
+      {
+        "name": "comely",
+        "type": "bool",
+        "offset": 79,
+        "size": 1
+      },
+      {
+        "name": "pointedEars",
+        "type": "bool",
+        "offset": 80,
+        "size": 1
+      },
+      {
+        "name": "slitPupils",
+        "type": "bool",
+        "offset": 81,
+        "size": 1
+      },
+      {
+        "name": "seed",
+        "type": "u32",
+        "offset": 84,
+        "size": 4
+      },
+      {
+        "name": "faceShape",
+        "type": "u8",
+        "offset": 88,
+        "size": 1
+      },
+      {
+        "name": "mouthStyle",
+        "type": "u8",
+        "offset": 89,
+        "size": 1
+      },
+      {
+        "name": "fringeStyle",
+        "type": "u8",
+        "offset": 90,
+        "size": 1
+      },
+      {
+        "name": "hairFinish",
+        "type": "u8",
+        "offset": 91,
+        "size": 1
+      },
+      {
+        "name": "hairEnd",
+        "type": "Rgb",
+        "offset": 92,
+        "size": 3
+      },
+      {
+        "name": "irisSize",
+        "type": "f32",
+        "offset": 96,
+        "size": 4
+      },
+      {
+        "name": "eyeTilt",
+        "type": "f32",
+        "offset": 100,
+        "size": 4
+      },
+      {
+        "name": "cheekFullness",
+        "type": "f32",
+        "offset": 104,
+        "size": 4
+      },
+      {
+        "name": "lipFullness",
+        "type": "f32",
+        "offset": 108,
+        "size": 4
+      },
+      {
+        "name": "eyeWidth",
+        "type": "f32",
+        "offset": 112,
+        "size": 4
+      },
+      {
+        "name": "eyeHeight",
+        "type": "f32",
+        "offset": 116,
+        "size": 4
+      },
+      {
+        "name": "eyeLevel",
+        "type": "f32",
+        "offset": 120,
+        "size": 4
+      },
+      {
+        "name": "lidDrop",
+        "type": "f32",
+        "offset": 124,
+        "size": 4
+      },
+      {
+        "name": "noseScale",
+        "type": "f32",
+        "offset": 128,
+        "size": 4
+      },
+      {
+        "name": "earScale",
+        "type": "f32",
+        "offset": 132,
+        "size": 4
+      },
+      {
+        "name": "equipmentScale",
+        "type": "f32",
+        "offset": 136,
+        "size": 4
+      },
+      {
+        "name": "bodyType",
+        "type": "u8",
+        "offset": 140,
+        "size": 1
+      },
+      {
+        "name": "faceAsset",
+        "type": "u8",
+        "offset": 141,
+        "size": 1
+      },
+      {
+        "name": "hairAsset",
+        "type": "u8",
+        "offset": 142,
+        "size": 1
+      },
+      {
+        "name": "eyeReference",
+        "type": "u8",
+        "offset": 143,
+        "size": 1
+      },
+      {
+        "name": "outfitAsset",
+        "type": "u8",
+        "offset": 144,
+        "size": 1
+      },
+      {
+        "name": "earAsset",
+        "type": "u8",
+        "offset": 145,
+        "size": 1
+      },
+      {
+        "name": "scalpAsset",
+        "type": "u8",
+        "offset": 146,
+        "size": 1
+      },
+      {
+        "name": "scalpWidth",
+        "type": "f32",
+        "offset": 148,
+        "size": 4
+      },
+      {
+        "name": "scalpHeight",
+        "type": "f32",
+        "offset": 152,
+        "size": 4
+      },
+      {
+        "name": "foreheadShift",
+        "type": "f32",
+        "offset": 156,
+        "size": 4
+      },
+      {
+        "name": "templeWidth",
+        "type": "f32",
+        "offset": 160,
+        "size": 4
+      },
+      {
+        "name": "hairCap",
+        "type": "u8",
+        "offset": 164,
+        "size": 1
+      },
+      {
+        "name": "hairFringe",
+        "type": "u8",
+        "offset": 165,
+        "size": 1
+      },
+      {
+        "name": "hairBack",
+        "type": "u8",
+        "offset": 166,
+        "size": 1
+      },
+      {
+        "name": "hairTied",
+        "type": "u8",
+        "offset": 167,
+        "size": 1
+      },
+      {
+        "name": "hairLength",
+        "type": "f32",
+        "offset": 168,
+        "size": 4
+      },
+      {
+        "name": "sideLockGap",
+        "type": "f32",
+        "offset": 172,
+        "size": 4
+      },
+      {
+        "name": "earTilt",
+        "type": "f32",
+        "offset": 176,
+        "size": 4
+      },
+      {
+        "name": "earHeight",
+        "type": "f32",
+        "offset": 180,
+        "size": 4
+      },
+      {
+        "name": "faceBlend",
+        "type": "f32",
+        "offset": 184,
+        "size": 4
+      },
+      {
+        "name": "eyeOpenness",
+        "type": "f32",
+        "offset": 188,
+        "size": 4
+      },
+      {
+        "name": "eyeRoundness",
+        "type": "f32",
+        "offset": 192,
+        "size": 4
+      },
+      {
+        "name": "eyeStroke",
+        "type": "f32",
+        "offset": 196,
+        "size": 4
+      },
+      {
+        "name": "mouthCurve",
+        "type": "f32",
+        "offset": 200,
+        "size": 4
+      },
+      {
+        "name": "scalpTarget",
+        "type": "u8",
+        "offset": 204,
+        "size": 1
+      },
+      {
+        "name": "jawTarget",
+        "type": "u8",
+        "offset": 205,
+        "size": 1
+      },
+      {
+        "name": "scalpBlend",
+        "type": "f32",
+        "offset": 208,
+        "size": 4
+      },
+      {
+        "name": "jawBlend",
+        "type": "f32",
+        "offset": 212,
+        "size": 4
+      },
+      {
+        "name": "portraitEyeKind",
+        "type": "u8",
+        "offset": 216,
+        "size": 1
+      },
+      {
+        "name": "portraitEyeForm",
+        "type": "u8",
+        "offset": 217,
+        "size": 1
+      },
+      {
+        "name": "eyeOutline",
+        "type": "bool",
+        "offset": 218,
+        "size": 1
+      },
+      {
+        "name": "upperLid",
+        "type": "bool",
+        "offset": 219,
+        "size": 1
+      },
+      {
+        "name": "browVisible",
+        "type": "bool",
+        "offset": 220,
+        "size": 1
+      },
+      {
+        "name": "browReference",
+        "type": "u8",
+        "offset": 221,
+        "size": 1
+      },
+      {
+        "name": "pupilHeight",
+        "type": "f32",
+        "offset": 224,
+        "size": 4
+      },
+      {
+        "name": "pupilY",
+        "type": "f32",
+        "offset": 228,
+        "size": 4
+      },
+      {
+        "name": "browWidth",
+        "type": "f32",
+        "offset": 232,
+        "size": 4
+      },
+      {
+        "name": "browSpacing",
+        "type": "f32",
+        "offset": 236,
+        "size": 4
+      },
+      {
+        "name": "browHeight",
+        "type": "f32",
+        "offset": 240,
+        "size": 4
+      },
+      {
+        "name": "browTilt",
+        "type": "f32",
+        "offset": 244,
+        "size": 4
+      },
+      {
+        "name": "browCurve",
+        "type": "f32",
+        "offset": 248,
+        "size": 4
+      }
+    ]
+  }
+}

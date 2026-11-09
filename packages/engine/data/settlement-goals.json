@@ -1,0 +1,198 @@
+[
+  {
+    "title": "Found a camp",
+    "description": "Mark a camp near a discovered dungeon. Settlers gather and deliver its 12 wood.",
+    "kind": "Building",
+    "building": "Camp",
+    "residents": 0
+  },
+  {
+    "title": "Lay a road",
+    "description": "Draw and complete a road connected to the camp.",
+    "kind": "Road",
+    "building": "Count",
+    "residents": 0
+  },
+  {
+    "title": "Build a lumberyard",
+    "description": "Establish a timber supply near trees.",
+    "kind": "Building",
+    "building": "Lumberyard",
+    "residents": 0
+  },
+  {
+    "title": "Build a farmhouse",
+    "description": "Prepare a food supply for the settlement.",
+    "kind": "Building",
+    "building": "Farm",
+    "residents": 0
+  },
+  {
+    "title": "Plant a field",
+    "description": "Draw a field near the farmhouse.",
+    "kind": "Field",
+    "building": "Count",
+    "residents": 0
+  },
+  {
+    "title": "Build a well",
+    "description": "Give your residents drinking water.",
+    "kind": "Building",
+    "building": "Well",
+    "residents": 0
+  },
+  {
+    "title": "Build a tent",
+    "description": "Provide housing for newcomers.",
+    "kind": "Building",
+    "building": "Tent",
+    "residents": 0
+  },
+  {
+    "title": "Build a hostel",
+    "description": "Welcome travellers who may settle here.",
+    "kind": "Building",
+    "building": "Hostel",
+    "residents": 0
+  },
+  {
+    "title": "Reach 4 residents",
+    "description": "Keep homes and food available for settlers.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 4
+  },
+  {
+    "title": "Build a quarry",
+    "description": "Establish a supply of stone.",
+    "kind": "Building",
+    "building": "Quarry",
+    "residents": 0
+  },
+  {
+    "title": "Build a storehouse",
+    "description": "Increase room for delivered resources.",
+    "kind": "Building",
+    "building": "Storehouse",
+    "residents": 0
+  },
+  {
+    "title": "Build a tavern",
+    "description": "Give residents somewhere to relax.",
+    "kind": "Building",
+    "building": "Tavern",
+    "residents": 0
+  },
+  {
+    "title": "Reach 6 residents",
+    "description": "Expand housing and supplies for growth.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 6
+  },
+  {
+    "title": "Build a market",
+    "description": "Let trade support the settlement.",
+    "kind": "Building",
+    "building": "MarketStalls",
+    "residents": 0
+  },
+  {
+    "title": "Build a guild",
+    "description": "Welcome adventurers to a guild.",
+    "kind": "Building",
+    "building": "Guild",
+    "residents": 0
+  },
+  {
+    "title": "Reach 10 residents",
+    "description": "Support a larger working population.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 10
+  },
+  {
+    "title": "Build a weaponsmith",
+    "description": "Equip your fighters.",
+    "kind": "Building",
+    "building": "Weaponsmith",
+    "residents": 0
+  },
+  {
+    "title": "Reach 12 residents",
+    "description": "Expand the settlement.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 12
+  },
+  {
+    "title": "Build an armorer",
+    "description": "Protect your fighters.",
+    "kind": "Building",
+    "building": "Armorer",
+    "residents": 0
+  },
+  {
+    "title": "Reach 16 residents",
+    "description": "Make room for skilled residents.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 16
+  },
+  {
+    "title": "Build a mage tower",
+    "description": "Develop a source of mana.",
+    "kind": "Building",
+    "building": "MageTower",
+    "residents": 0
+  },
+  {
+    "title": "Reach 18 residents",
+    "description": "Keep a growing town supplied.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 18
+  },
+  {
+    "title": "Build an apothecary",
+    "description": "Provide treatment for injured residents.",
+    "kind": "Building",
+    "building": "Apothecary",
+    "residents": 0
+  },
+  {
+    "title": "Reach 26 residents",
+    "description": "Grow a thriving settlement.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 26
+  },
+  {
+    "title": "Build a shrine",
+    "description": "Support the settlement's faith.",
+    "kind": "Building",
+    "building": "Shrine",
+    "residents": 0
+  },
+  {
+    "title": "Build a chapel",
+    "description": "Give residents a place to pray.",
+    "kind": "Building",
+    "building": "Chapel",
+    "residents": 0
+  },
+  {
+    "title": "Reach 30 residents",
+    "description": "Maintain homes, food and water for everyone.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 30
+  },
+  {
+    "title": "Build a portal",
+    "description": "Connect the settlement to distant lands.",
+    "kind": "Building",
+    "building": "Portal",
+    "residents": 0
+  }
+]

@@ -1,0 +1,18 @@
+import { TownState } from './town-state';
+import { Road } from './road-network';
+import { Building } from './town-models';
+import { isSeat } from './building-catalog';
+import { Point, distance, closestOnSegment } from './geometry';
+import { f32 as f } from './numeric';
+export interface RoadConstructionTown extends TownState { camp(id?: number): Building | null; settlementAt(at: Point): number; roadReady(id: number): boolean; roadWorkTarget(id: number): number; }
+export function connectRoad(this: RoadConstructionTown, road: Road): boolean {
+  if (!this.camp() || road.line.length < 2) return false;
+  const owned = road.village >= 0, fire = this.camp(this.settlementAt(road.line[0]))!; let best = Infinity, walked = 0; const total = road.length();
+  for (let i = 0; i < road.line.length; ++i) { if (i) walked = f(walked + distance(road.line[i - 1], road.line[i])); for (const seat of this.placed) if (isSeat(seat.kind)) { const home = distance(road.line[i], seat.center); if (home <= f(1.31) && home < best) { best = home; road.constructionStart = f(walked / total); road.parent = -1; if (!owned) road.village = seat.id; } } }
+  if (Number.isFinite(best)) return true; walked = 0;
+  for (let i = 0; i < road.line.length; ++i) { if (i) walked = f(walked + distance(road.line[i - 1], road.line[i])); const point = road.line[i]; for (const parent of this.network.roads()) { if (parent.id === road.id) continue; let depth = 0, ancestor: Road | null = parent; while (ancestor && ancestor.parent >= 0 && ancestor.id !== road.id && depth <= this.network.roads().length) { ancestor = this.network.road(ancestor.parent); ++depth; } if (!ancestor || ancestor.id === road.id || depth > this.network.roads().length) continue; let along = 0; const parentLength = parent.length(); for (let j = 1; j < parent.line.length; ++j) { const on = closestOnSegment(point, parent.line[j - 1], parent.line[j]), gap = distance(point, on), at = f(f(along + distance(parent.line[j - 1], on)) / parentLength), reached = this.roadReady(parent.id) && at >= f(parent.laidBegin() - f(.0001)) && at <= f(parent.laidEnd() + f(.0001)), score = f(f(f((reached ? 0 : 1000) + depth * 10) + gap) + f(distance(on, fire.center) * f(.0001))); if (gap <= TownState.joinReach && score < best) { best = score; road.constructionStart = f(walked / total); road.parent = parent.id; road.parentAt = at; if (!owned) road.village = parent.village; } along = f(along + distance(parent.line[j - 1], parent.line[j])); } } }
+  return Number.isFinite(best);
+}
+export function roadReady(this: RoadConstructionTown, id: number): boolean { let road = this.network.road(id); for (let depth = 0; road && depth <= this.network.roads().length; ++depth) { if (road.parent < 0) return this.placed.some(seat => isSeat(seat.kind) && seat.built() && distance(road!.along(road!.constructionStart), seat.center) <= f(1.31)); const parent = this.network.road(road.parent); if (!parent || parent.wear >= 1 || road.parentAt < f(parent.laidBegin() - f(.0001)) || road.parentAt > f(parent.laidEnd() + f(.0001)) || distance(road.along(road.constructionStart), parent.along(road.parentAt)) > TownState.joinReach) return false; road = parent; } return false; }
+export function roadWorkTarget(this: RoadConstructionTown, id: number): number { let road = this.network.road(id); for (let depth = 0; road && depth <= this.network.roads().length; ++depth) { if (this.roadReady(road.id)) return road.id; road = this.network.road(road.parent); } return -1; }
+export function roadWorkPosition(this: RoadConstructionTown, id: number): Point | null { return this.network.road(this.roadWorkTarget(id))?.workPoint() ?? null; }

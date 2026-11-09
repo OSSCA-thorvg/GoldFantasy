@@ -1,0 +1,155 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "torch",
+  "name": "Torch",
+  "footprint": 0.25,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.119,
+            0.119,
+            0.131,
+            0.131
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            75,
+            46,
+            28
+          ],
+          "wallShade": [
+            75,
+            46,
+            28
+          ],
+          "roofLit": [
+            75,
+            46,
+            28
+          ],
+          "roofShade": [
+            75,
+            46,
+            28
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.115,
+            0.115,
+            0.135,
+            0.135
+          ],
+          "wall": 1.2,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            44,
+            40,
+            36
+          ],
+          "wallShade": [
+            44,
+            40,
+            36
+          ],
+          "roofLit": [
+            44,
+            40,
+            36
+          ],
+          "roofShade": [
+            44,
+            40,
+            36
+          ],
+          "base": 17.5,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.1175,
+            0.1175,
+            0.1325,
+            0.1325
+          ],
+          "wall": 3,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            246,
+            161,
+            55
+          ],
+          "wallShade": [
+            246,
+            161,
+            55
+          ],
+          "roofLit": [
+            246,
+            161,
+            55
+          ],
+          "roofShade": [
+            246,
+            161,
+            55
+          ],
+          "base": 18.7,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

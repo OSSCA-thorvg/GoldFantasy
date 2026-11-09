@@ -1,0 +1,296 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "shrine",
+  "name": "Shrine",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.119999997,
+            0.119999997,
+            0.879999995,
+            0.879999995
+          ],
+          "wall": 5,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            68,
+            66,
+            76
+          ],
+          "wallShade": [
+            44,
+            42,
+            50
+          ],
+          "roofLit": [
+            68,
+            66,
+            76
+          ],
+          "roofShade": [
+            44,
+            42,
+            50
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.400000006,
+            0.400000006,
+            0.600000024,
+            0.600000024
+          ],
+          "wall": 34,
+          "roof": 12,
+          "shape": "pyramid",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 5,
+          "delay": 4,
+          "windows": 1,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            120,
+            230,
+            210
+          ],
+          "ornament": "crystal",
+          "accent": [
+            120,
+            236,
+            220
+          ]
+        },
+        {
+          "bounds": [
+            0.140000001,
+            0.140000001,
+            0.25999999,
+            0.25999999
+          ],
+          "wall": 15,
+          "roof": 4,
+          "shape": "pyramid",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 5,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.74000001,
+            0.140000001,
+            0.860000014,
+            0.25999999
+          ],
+          "wall": 15,
+          "roof": 4,
+          "shape": "pyramid",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 5,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.140000001,
+            0.74000001,
+            0.25999999,
+            0.860000014
+          ],
+          "wall": 15,
+          "roof": 4,
+          "shape": "pyramid",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 5,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.74000001,
+            0.74000001,
+            0.860000014,
+            0.860000014
+          ],
+          "wall": 15,
+          "roof": 4,
+          "shape": "pyramid",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 5,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

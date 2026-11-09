@@ -1,0 +1,61 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "camp",
+  "name": "Camp",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.219999999,
+            0.140000001,
+            0.779999971,
+            0.620000005
+          ],
+          "wall": 4,
+          "roof": 22,
+          "shape": "gable-y",
+          "wallLit": [
+            124,
+            96,
+            62
+          ],
+          "wallShade": [
+            82,
+            62,
+            44
+          ],
+          "roofLit": [
+            124,
+            96,
+            62
+          ],
+          "roofShade": [
+            82,
+            62,
+            44
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

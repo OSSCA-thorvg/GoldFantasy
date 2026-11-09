@@ -1,0 +1,1166 @@
+{
+  "decoder": "Original native stb_vorbis",
+  "packedSha256": "5102e33f0394d09fe7c4736edf71e8bcdff47885ca7d3a0c287f9b3dc4b47631",
+  "sources": [
+    {
+      "path": "sfx/block_01.ogg",
+      "sha256": "502f5661ce3320c94018e0f5d3edd40579ba9613448bfdc6f7c786b1bb9af7ee"
+    },
+    {
+      "path": "sfx/chest_01.ogg",
+      "sha256": "e172866e9c3d240890a3a22fcb16cf4abfc9778b5c66b95105743b979dfba9c9"
+    },
+    {
+      "path": "sfx/chest_02.ogg",
+      "sha256": "59f65b8374630875b3cc03c15420f75abfee0f659f097659624b2cac5078f471"
+    },
+    {
+      "path": "sfx/chop_01.ogg",
+      "sha256": "0d6a11c6293c33208e12867fbbb21555e207f67ecca10c97dbf4b1c0d6978c70"
+    },
+    {
+      "path": "sfx/clash_01.ogg",
+      "sha256": "9cb1e357992da3053960062d60ab18f4f0c5eb01ad8729299cff6accc467d6db"
+    },
+    {
+      "path": "sfx/coins_01.ogg",
+      "sha256": "90debd2dae530c22925782d6a64187740e22b0eb296421a165c3176e5bef4227"
+    },
+    {
+      "path": "sfx/coins_02.ogg",
+      "sha256": "71c4a01ec71c695be69de64867b1aa8948221c413a5742bf2bd880d6616ea2bd"
+    },
+    {
+      "path": "sfx/coins_03.ogg",
+      "sha256": "c8b6dda630e8ed4323bbb323fae67bfc59afc78e1d3f85cf6dd8f9d29baf424f"
+    },
+    {
+      "path": "sfx/collapse_01.ogg",
+      "sha256": "b5f4b9821ee67a37e797b021b213e48a30d041d816b3d71e99e77b202e396eea"
+    },
+    {
+      "path": "sfx/hammer_01.ogg",
+      "sha256": "40c90ddee51dee95b9156700e7d988dc296dd317a9532b1aaf1e3e74510cd9b9"
+    },
+    {
+      "path": "sfx/horn_01.ogg",
+      "sha256": "8ee91e1853e9c8e1f428c5eb271de834d2c6fd99f2f45cd1ebe18e3b6a714dd3"
+    },
+    {
+      "path": "sfx/rune_wake_01.ogg",
+      "sha256": "f7caa00629b1518f35a606a566105807d7179ca560f47df831032a235f23b5cc"
+    },
+    {
+      "path": "sfx/stone_door_01.ogg",
+      "sha256": "b66cf9865389aac73724ae391892ed29a1dac1114aabf37540f57f1e73f03f0f"
+    },
+    {
+      "path": "sfx/swing_01.ogg",
+      "sha256": "021e07ad5c50b4f066323398080c9ea06080b174b00fb46ab2deea6a17b7e1ec"
+    },
+    {
+      "path": "sfx/torch_01.ogg",
+      "sha256": "0e9000b6737a096a9ead8073cf2c32f16d9e79b7ce1c4f51f4881874bc4b33b0"
+    },
+    {
+      "path": "sfx/tree_fall_01.ogg",
+      "sha256": "efe57e03f50f3c938f7795106a3ee1867b1db8cdf1b4151627952242368feff7"
+    },
+    {
+      "path": "ui/cancel_01.ogg",
+      "sha256": "2bbfd483caa4a626573edf41c7ad44a26e9f26abb67d7afa842dcf68cde2885a"
+    },
+    {
+      "path": "ui/click_01.ogg",
+      "sha256": "77cb0daef565145d06f118a631c57b26d2d6be1da39eb3803489c05fdb9f217a"
+    },
+    {
+      "path": "ui/complete_01.ogg",
+      "sha256": "421ac02208b0098ef219f2969f513352ff8054e4aa70216ba8ae351f448352ca"
+    },
+    {
+      "path": "ui/confirm_01.ogg",
+      "sha256": "6e6d5bb95e090edcc41883ff78ad7f64108253c71eb5a11557487bce75019d4f"
+    },
+    {
+      "path": "ui/error_01.ogg",
+      "sha256": "1a75adadd7497cf93d8e39f2b5bd0d24ceb671adc6a9be50b9bfb8fd3ed164cd"
+    },
+    {
+      "path": "ui/growth_01.ogg",
+      "sha256": "9738105a0cbb6eb91ecf98e9b58884055638a2f7cc570e975388039cf515555b"
+    },
+    {
+      "path": "ui/notify_01.ogg",
+      "sha256": "5ccbdf363324f2ac59a5a5ce20acb87d616db4b28aae711dc145bf41b18e7476"
+    },
+    {
+      "path": "ui/rune_01.ogg",
+      "sha256": "999d9c9bc0721867dad397fdee40e917769bf3045df2f6e26015ffc93fd9e463"
+    },
+    {
+      "path": "voice/berserker/ack_01.ogg",
+      "sha256": "964052e5a7a08e4fcc6831554f8c8c4a64ba7608924bad8381edbf331ff38e83"
+    },
+    {
+      "path": "voice/berserker/ack_02.ogg",
+      "sha256": "73cf699c21d121b52cda423fe476957202547d6108d096a2c4c34bb673c7d85a"
+    },
+    {
+      "path": "voice/berserker/ack_03.ogg",
+      "sha256": "bbd35aace93fd83cda8377661089d79ee7802a70b3faa107ca94105a17dad9ac"
+    },
+    {
+      "path": "voice/berserker/ack_04.ogg",
+      "sha256": "3c68a1d0b08d4d4c50164ad84e27c5fd51534e13d69fc3f6953a348dd748468c"
+    },
+    {
+      "path": "voice/berserker/alarm_01.ogg",
+      "sha256": "42624a37853fd01a88f1c7a9394cdcf26e7eb86c20b83347c5b72e1b6f37ba67"
+    },
+    {
+      "path": "voice/berserker/alarm_02.ogg",
+      "sha256": "f0f84d98128f3d9903c0c6b4b332419881b1af03ebe374011ae1ef3956b9a86f"
+    },
+    {
+      "path": "voice/berserker/alarm_03.ogg",
+      "sha256": "d0a3dae8cfe551dabea193a69411575e379a2c1368cbfe30b3016adc373aa80a"
+    },
+    {
+      "path": "voice/berserker/attack_01.ogg",
+      "sha256": "18255e39fb4818b825b65385a6787b31df670b36693329a3bbe4f8411d34ad8a"
+    },
+    {
+      "path": "voice/berserker/attack_02.ogg",
+      "sha256": "d7d1c97124f636aa3ce610b5c2142476ff7da155e78eeb2c5b5e40401301950d"
+    },
+    {
+      "path": "voice/berserker/attack_03.ogg",
+      "sha256": "fac6a8684d6466a702191d36de14b00ca4e9ce2c3c97e2b6075a612b54bf9c77"
+    },
+    {
+      "path": "voice/berserker/attack_04.ogg",
+      "sha256": "6e8673b7e00b376b479f9e4a95c7c164a0d56efe7a350cfc32efa6eeed86f14d"
+    },
+    {
+      "path": "voice/berserker/complain_01.ogg",
+      "sha256": "e29ddd1349e29d009704fc5b7059cd9dd4154cc989bc30bd54955096f2d57b91"
+    },
+    {
+      "path": "voice/berserker/complain_02.ogg",
+      "sha256": "cea565223d30f7644672f171b8692e43c0ab6576db3b33c6027fc9afe6d2e638"
+    },
+    {
+      "path": "voice/berserker/complain_03.ogg",
+      "sha256": "0945d91953584776a619f0702c760b95e0f891c513705e35ffe7f8f551199cbf"
+    },
+    {
+      "path": "voice/berserker/death_01.ogg",
+      "sha256": "10d1ef747b399da95effdca15c30d168e0cc4c12b32024d827632a9c37aca1de"
+    },
+    {
+      "path": "voice/berserker/death_02.ogg",
+      "sha256": "9ba5d2d98cb8a5f8b2a94695ecf8acf51a92980a5f11c3469684e21ee9419127"
+    },
+    {
+      "path": "voice/berserker/death_03.ogg",
+      "sha256": "5a04bf5d7c12934dfc7b4fb44a8adf8cedd67345c80348332a02e3a960a4c781"
+    },
+    {
+      "path": "voice/berserker/happy_01.ogg",
+      "sha256": "d93f15e2ebe165deeac6c2ebc739f93247cb4e9ecd4367542c3e6aa268e31eb8"
+    },
+    {
+      "path": "voice/berserker/happy_02.ogg",
+      "sha256": "eb1187a9022fb9f0207f92102c3ebed5661e2d34f3a28868104965a2e4024fb7"
+    },
+    {
+      "path": "voice/berserker/happy_03.ogg",
+      "sha256": "cb33fc372b06d1ddc2d493964e94518750e22c0e03d57dd145e7761f92157252"
+    },
+    {
+      "path": "voice/berserker/hum_01.ogg",
+      "sha256": "f2a4233def484b8d6b93e5a0cfc97cef875b166d266fcecc7efc4a09e0e19eca"
+    },
+    {
+      "path": "voice/berserker/hum_02.ogg",
+      "sha256": "e196e4efa76500033446ad589e607b53921256269f38adb055d7ee024933dd2e"
+    },
+    {
+      "path": "voice/berserker/hum_03.ogg",
+      "sha256": "218bb92910757582756f7d6a2476f92ad1dfb4f2f84fe66698b0b7dd394ff6c5"
+    },
+    {
+      "path": "voice/berserker/hurt_01.ogg",
+      "sha256": "ccddaf407666af34877898ca78761a84e243f7354d701e0028a73fbc5a6bab52"
+    },
+    {
+      "path": "voice/berserker/hurt_02.ogg",
+      "sha256": "54a5cfe35db423d6635820dab78b90047443ba9f89de57c4fe977932643318b4"
+    },
+    {
+      "path": "voice/berserker/hurt_03.ogg",
+      "sha256": "3c8365a4018cbd0d5d906602fa67a8f180fcbb048773d1488ad8fabd5d92c6cd"
+    },
+    {
+      "path": "voice/berserker/hurt_04.ogg",
+      "sha256": "d8f6722f0acfbd20d0aac30c52ea7c7b1fbc8013d0424625dce2da09d6e261c4"
+    },
+    {
+      "path": "voice/berserker/mumble_01.ogg",
+      "sha256": "aff4a941635ca522e8bd7887b535e8da1c4f435d70c4e242b81cbb31b33d1317"
+    },
+    {
+      "path": "voice/berserker/mumble_02.ogg",
+      "sha256": "6ad09b70199f33ead3a23570b59deabc92a5caf5913d93bd784a33b467c2595d"
+    },
+    {
+      "path": "voice/berserker/mumble_03.ogg",
+      "sha256": "b36bc735d426ddd451a31020dd4a07c03d3a19574cd1978b87a995c3e5512ed5"
+    },
+    {
+      "path": "voice/berserker/select_01.ogg",
+      "sha256": "006e6ce2e768bd9dfc8f78b8bb42901f4fc111073113f01fb5cb8db726c2b3ca"
+    },
+    {
+      "path": "voice/berserker/select_02.ogg",
+      "sha256": "831ba333f62119a176581590659e370ec8436ac775b88ef674e32755b0df56d6"
+    },
+    {
+      "path": "voice/berserker/select_03.ogg",
+      "sha256": "52e3ed678f1ae07b72f32326534d620f4e12f3770cd3ff54f952f125335a4aab"
+    },
+    {
+      "path": "voice/berserker/sigh_01.ogg",
+      "sha256": "0a3e158ee2594dde3278135fd314b2d68c8fa292b250939c15d5d6428cf4bfa3"
+    },
+    {
+      "path": "voice/berserker/sigh_02.ogg",
+      "sha256": "f6080a3165af16e979c15af818fcb64de756850d3fd4368c4250c5eb8bb34ed1"
+    },
+    {
+      "path": "voice/berserker/sigh_03.ogg",
+      "sha256": "cba36df479b644a8a0606da9fa5035d95b4521d6cb94efc65acd006b3fd03276"
+    },
+    {
+      "path": "voice/berserker/sleep_01.ogg",
+      "sha256": "3f0fd9515723a8815ac0d630581c666ffd683047a31c3560fb63c476ce9df456"
+    },
+    {
+      "path": "voice/berserker/sleep_02.ogg",
+      "sha256": "bbd44071636fd913aaf7b5859c4dca6c31626c5da4821d0aedc8cef56b6ebbc8"
+    },
+    {
+      "path": "voice/berserker/sleep_03.ogg",
+      "sha256": "6d1bb57ff5d454163f92bd0bb368a4d660ffc0371e3e8472fa02f63a47b912c7"
+    },
+    {
+      "path": "voice/berserker/thanks_01.ogg",
+      "sha256": "5a46215d4870982b1372c4fd568226d018d80b715910d23d88d4796bcbb3b2d6"
+    },
+    {
+      "path": "voice/berserker/thanks_02.ogg",
+      "sha256": "d9100e948e821f952f9ee1614d5865432b0ba6546c9ee03aa9d96b7d7b9bc283"
+    },
+    {
+      "path": "voice/berserker/thanks_03.ogg",
+      "sha256": "0b9f401803931c8bf205daded978b99e6a320f8951544de89756af65c1fc5668"
+    },
+    {
+      "path": "voice/berserker/work_01.ogg",
+      "sha256": "73cd467577cd89a875d437d78cd01df72a44f98f9fc884826105e09d6735d990"
+    },
+    {
+      "path": "voice/berserker/work_02.ogg",
+      "sha256": "56fcd5f51efee8139d37813098404da79085aea8d41560bbd14bd23d938c566c"
+    },
+    {
+      "path": "voice/berserker/work_03.ogg",
+      "sha256": "87bd1bb78e60dc207768dc9d30b489bda8e20b4550f7e074b532e1e92ba53a46"
+    },
+    {
+      "path": "voice/berserker/work_04.ogg",
+      "sha256": "f3bfaaa0305cb89426f7b0d9ad34cdf91898e7d13d7555ed90775c5c6cd2e229"
+    },
+    {
+      "path": "voice/berserker/yawn_01.ogg",
+      "sha256": "c99c265b497eb59f4b772a2e5b57d861df2ffec8358502a6dd43aa08122292f3"
+    },
+    {
+      "path": "voice/berserker/yawn_02.ogg",
+      "sha256": "9c90cc2088d8618ff9c7729dab00316725f178082f33904e5a57d450f958ab63"
+    },
+    {
+      "path": "voice/berserker/yawn_03.ogg",
+      "sha256": "9a5878d22187914295586b499eff2f71ede0de741d4a27c6469c6b3e8075d246"
+    },
+    {
+      "path": "voice/huntress/ack_01.ogg",
+      "sha256": "f5f8cf14fa8a53ec26c3e2c6fb1b224ae52d87f6a03dbd74aa9b1e97fad3f472"
+    },
+    {
+      "path": "voice/huntress/ack_02.ogg",
+      "sha256": "3a0469ec67539baea6e64579d8fda3889bcab95fcf0e2e6fd3fd0bd6d6266e09"
+    },
+    {
+      "path": "voice/huntress/ack_03.ogg",
+      "sha256": "bda98e55c02ed9ae2cdba47b9256f7467e398cacceba4655e1d1557d97688820"
+    },
+    {
+      "path": "voice/huntress/ack_04.ogg",
+      "sha256": "eae69a2fd2d5e20535743eb9f58de2396f375b3094c636bf8b64bbc8ff226efb"
+    },
+    {
+      "path": "voice/huntress/alarm_01.ogg",
+      "sha256": "e7db62756712e72ed545afcf54378df5444ac728cc76ba0af267239c70ebc058"
+    },
+    {
+      "path": "voice/huntress/alarm_02.ogg",
+      "sha256": "1919346b6943f84cd19889523038bef80786bf16c5e1c8c03145e978f7fcd08b"
+    },
+    {
+      "path": "voice/huntress/alarm_03.ogg",
+      "sha256": "415ce79174bbb53b6d1c90403b2441e7e5327685539a26c415d8a60fbce87a51"
+    },
+    {
+      "path": "voice/huntress/attack_01.ogg",
+      "sha256": "66de077cf2342eef00d088a8aa6c56d88d5bf7009da649a5c51934fc20938682"
+    },
+    {
+      "path": "voice/huntress/attack_02.ogg",
+      "sha256": "d17868c0e049b38151502f13cc8a90e399c541ec7f6107ea72c2733b23d65f11"
+    },
+    {
+      "path": "voice/huntress/attack_03.ogg",
+      "sha256": "6ab571679914f7f6d266eaa2db9562399c791ee3572ec94e0054aed72d221b76"
+    },
+    {
+      "path": "voice/huntress/attack_04.ogg",
+      "sha256": "23f4865b97ac3b0eab1746b4fc1f69dfd07fc380fbcc5f2c80d4c4ea3a2f2c38"
+    },
+    {
+      "path": "voice/huntress/complain_01.ogg",
+      "sha256": "ab1f22ff209e76afbfb6389f835b8500a4ac33aee0b2ba96f8beecfe1f26ba10"
+    },
+    {
+      "path": "voice/huntress/complain_02.ogg",
+      "sha256": "f0ede8ec1b022393d4eb519166bf98c368ccc8a9a637b2bc5d36e6e8514624b2"
+    },
+    {
+      "path": "voice/huntress/complain_03.ogg",
+      "sha256": "f5e5e557d811c1395f57767e4e4cd22babdb946173097bf8ac5c2b9534f32682"
+    },
+    {
+      "path": "voice/huntress/death_01.ogg",
+      "sha256": "18e32671765705ff20cf40155818058577e92afac9fbe69a4a1591a7c91c6bbd"
+    },
+    {
+      "path": "voice/huntress/death_02.ogg",
+      "sha256": "1f53ac863d2ef7d6274f93c817de99cd04f28d2f5aa3dfbf4aca9d8c73e1267a"
+    },
+    {
+      "path": "voice/huntress/death_03.ogg",
+      "sha256": "56d8e23fb2e4ccd4c1d9bb34f89861741504544e4a83203b56139c8cf3ec90bc"
+    },
+    {
+      "path": "voice/huntress/happy_01.ogg",
+      "sha256": "b7941295c0571e3c090754b8e83204527910b60eba57d906c4f7ad9e969b473f"
+    },
+    {
+      "path": "voice/huntress/happy_02.ogg",
+      "sha256": "09fc6e2c553ee058d5a412ef1328aea5f6e0d61bb4256240540ab02bb7e2e0fb"
+    },
+    {
+      "path": "voice/huntress/happy_03.ogg",
+      "sha256": "c94f8f8850cf1c63fa06caa4129d48bde7830d425f997fa6c99a481ba166a473"
+    },
+    {
+      "path": "voice/huntress/hum_01.ogg",
+      "sha256": "db754dd32fcf6a85af724ea881aa1d31def8a166a12624539b5d4c8532be5b5d"
+    },
+    {
+      "path": "voice/huntress/hum_02.ogg",
+      "sha256": "80d40a59b1b12e6218ed9f44c44970c448e1e2af2285fbfa9508e3afd7e6cc19"
+    },
+    {
+      "path": "voice/huntress/hum_03.ogg",
+      "sha256": "e7fe2bad1c8d21ff743fdc98cc3e16ee81d1cd4835a8c03da86df7972f0f86a6"
+    },
+    {
+      "path": "voice/huntress/hurt_01.ogg",
+      "sha256": "e91748444292018b102fc20e5cab3553d5d95c7f79c3394e8e57e93d5d0b0e28"
+    },
+    {
+      "path": "voice/huntress/hurt_02.ogg",
+      "sha256": "fde40ef2e6be6f86a6a250c98c0c7f58db527e5c7740021761341ab615e96706"
+    },
+    {
+      "path": "voice/huntress/hurt_03.ogg",
+      "sha256": "3815472f598d9d50d05fe05e81c7242968e7c57a8707e5c39ff56b73ade3eeec"
+    },
+    {
+      "path": "voice/huntress/hurt_04.ogg",
+      "sha256": "0ce3a2e3b8aaed37b93ba65c62b3448cd5f6b8687a8ab84bdbecefbc77e16675"
+    },
+    {
+      "path": "voice/huntress/mumble_01.ogg",
+      "sha256": "ff909b2a5313a9af4836f290af4108eca47c8519a8d7f412562b68d5c02a3f9b"
+    },
+    {
+      "path": "voice/huntress/mumble_02.ogg",
+      "sha256": "09acebfc9d18c19bec51c9dd4f0fc9d45436af48935eb813e5b5d1a36fdd59c3"
+    },
+    {
+      "path": "voice/huntress/mumble_03.ogg",
+      "sha256": "5aa85c46ee8efaca2b532bf4f6f308f60e3547a14b77d2a4075c5dc9673f566c"
+    },
+    {
+      "path": "voice/huntress/select_01.ogg",
+      "sha256": "3ff7e87f7a00120f3954ffaeb6c66ac867765e1ea48f56036703e9b7ea68fa02"
+    },
+    {
+      "path": "voice/huntress/select_02.ogg",
+      "sha256": "11a46742e627a60490536ffa29f8440e0861a25703555dcbff8bc9bed81979f0"
+    },
+    {
+      "path": "voice/huntress/select_03.ogg",
+      "sha256": "61def24d4874d6e89c71e716916a7038ca6c50568062f7914320e0a06aa3fe96"
+    },
+    {
+      "path": "voice/huntress/sigh_01.ogg",
+      "sha256": "31241bbc98b2612ee2dc64a2aabe779f0e3f3ead1215ec9775bed5acdff650b5"
+    },
+    {
+      "path": "voice/huntress/sigh_02.ogg",
+      "sha256": "623534c56d875e79193ac2369162984a146d1a7b682d8cf6b7573eb83775d588"
+    },
+    {
+      "path": "voice/huntress/sigh_03.ogg",
+      "sha256": "59ae5e1740b2e513271700d4941f5085eb1786ffc2807b1b550c757027524ad5"
+    },
+    {
+      "path": "voice/huntress/sleep_01.ogg",
+      "sha256": "6a0759e0a37ed60b3b91f117bedf090963e6009b4711c167ac51736b10e27d10"
+    },
+    {
+      "path": "voice/huntress/sleep_02.ogg",
+      "sha256": "ff2034df6ef0c85576cc0cb76e74925fd4bdecb94e847c370731febe9cbcdc6a"
+    },
+    {
+      "path": "voice/huntress/sleep_03.ogg",
+      "sha256": "80bf5d18d5d214f71e2aef92f2ffc1a363035a0319536f8ea06dab7c2271da94"
+    },
+    {
+      "path": "voice/huntress/thanks_01.ogg",
+      "sha256": "2823d729574c64b9bb6abb0376735b95cbaef396c8260c1c4ce391f14d5889a7"
+    },
+    {
+      "path": "voice/huntress/thanks_02.ogg",
+      "sha256": "9997eb11ce59ed89bf554c72b40b207d81328841139c8d79ebe5bad5208f82de"
+    },
+    {
+      "path": "voice/huntress/work_01.ogg",
+      "sha256": "a1a9f65621a786ecb039bdd8581844a8946b353709e8b9685265c850c9f14c0f"
+    },
+    {
+      "path": "voice/huntress/work_02.ogg",
+      "sha256": "19b6a5b99d27feab4bf47295a59d67e0c8ad5b0c74981fc32aeef86a13fdff28"
+    },
+    {
+      "path": "voice/huntress/work_03.ogg",
+      "sha256": "16336c4dd5176e3a4c56b28063c313a7d5532c5a528e31e5fa0ce6960b6b9e87"
+    },
+    {
+      "path": "voice/huntress/work_04.ogg",
+      "sha256": "fcf879d312dde6ae169a4536a04c8db737db153832bce50b2734d1ee56928dc7"
+    },
+    {
+      "path": "voice/huntress/yawn_01.ogg",
+      "sha256": "81f16208494f0101569e70005d2e5345b80930eb7b75b122de034ac76bad5149"
+    },
+    {
+      "path": "voice/huntress/yawn_02.ogg",
+      "sha256": "c8f01dc880abef1c508ff8027a25c7cd9b0877f5e29a3fa23dfa539ddfbd02d6"
+    },
+    {
+      "path": "voice/huntress/yawn_03.ogg",
+      "sha256": "0927fea2bfeb9cceaf179c445c902a5e411c8d1cc09275d4c9013f06066104db"
+    },
+    {
+      "path": "voice/maiden/ack_01.ogg",
+      "sha256": "1a162d245a39e2263ce9cdbd86ed012fff4675f505f89b2b98749c0fef68df20"
+    },
+    {
+      "path": "voice/maiden/ack_02.ogg",
+      "sha256": "5f206311e0d22c30cd5eafe81f58b4c9f8a7a11ecc180711edb1b162b2483f7a"
+    },
+    {
+      "path": "voice/maiden/ack_03.ogg",
+      "sha256": "f663d8ee7e26b7c1a729eb885c0bfaa9ab4d711f97e6a5bf4737feaf4a4cf44d"
+    },
+    {
+      "path": "voice/maiden/ack_04.ogg",
+      "sha256": "770d71036b85f499c4a6295a9f8dcd9eaf265ca69af4a3206e714cd3a75e48b9"
+    },
+    {
+      "path": "voice/maiden/alarm_01.ogg",
+      "sha256": "804827076771d62e8eb88a24a5ba32f8d08310e20fb421cefe4107e6c679faac"
+    },
+    {
+      "path": "voice/maiden/alarm_02.ogg",
+      "sha256": "b59d14bfce740d5ca58407dd7666b1a28d2bc0c25bdd4c5644d004aa0a78b265"
+    },
+    {
+      "path": "voice/maiden/alarm_03.ogg",
+      "sha256": "2e24bfb84b5078472feb4b9abb4847fd8578ccc1ba40525b56a6c9f7a023342d"
+    },
+    {
+      "path": "voice/maiden/attack_01.ogg",
+      "sha256": "6a922e9f1dc0eb33a78d9e68e80070c2c39f0d6a60e96ff417da57e9c52290ae"
+    },
+    {
+      "path": "voice/maiden/attack_02.ogg",
+      "sha256": "694538325751d39ff6834926364556cf1a8d7f9a903d7a047b9d496f4742bf9f"
+    },
+    {
+      "path": "voice/maiden/attack_03.ogg",
+      "sha256": "e22663a2345dce231bea5528bb41de3775743fb1bb65387d43164d1d29805470"
+    },
+    {
+      "path": "voice/maiden/attack_04.ogg",
+      "sha256": "f450697b5c0a0347517dd6388c7f6a21079b6a50dee3688532cdad864fc16f6c"
+    },
+    {
+      "path": "voice/maiden/complain_01.ogg",
+      "sha256": "cfae0bcd876e5fc4c15e4f15b9baf7ff28acf0bf31ea034493916ce36ac4664d"
+    },
+    {
+      "path": "voice/maiden/complain_02.ogg",
+      "sha256": "2a5c9fe91fa088540a1b87ab450b6bfc7f377223148712a03e43117cd841ab6b"
+    },
+    {
+      "path": "voice/maiden/complain_03.ogg",
+      "sha256": "db8e6246d72e69dc683c3def2bd6c1a32b8c42ed59263bcaa114d3665e2d695d"
+    },
+    {
+      "path": "voice/maiden/death_01.ogg",
+      "sha256": "bac76bbfaa057c03d1b4b3f3db194c97e894f9aea3a749f6ce0e309c96c8e629"
+    },
+    {
+      "path": "voice/maiden/death_02.ogg",
+      "sha256": "645c3af90d3817031a1f4e8e3dc49b6925ec119e1bff773ff83a13447a313925"
+    },
+    {
+      "path": "voice/maiden/death_03.ogg",
+      "sha256": "76c3bd363cd2c4b625eb1f75675e1ee88d2ed91a711794acb075e45df298f910"
+    },
+    {
+      "path": "voice/maiden/happy_01.ogg",
+      "sha256": "126aa7d42fecb4a7a9d433ef4b09747d8d6defd914f3fd9d8731aaba08321b98"
+    },
+    {
+      "path": "voice/maiden/happy_02.ogg",
+      "sha256": "b2c4030f160c8ee0a415bc7ca9e1acfe403be543fe302bbfc8af5025228fca3a"
+    },
+    {
+      "path": "voice/maiden/happy_03.ogg",
+      "sha256": "9f837c762deb28a4394436c08a4affcc0cc39bfdba6e170f48cb5484085b1efa"
+    },
+    {
+      "path": "voice/maiden/hum_01.ogg",
+      "sha256": "48430e7c02b4f31bb85c0bf210b91ac98a6be9a469de764d4dfd79f21da7b027"
+    },
+    {
+      "path": "voice/maiden/hum_02.ogg",
+      "sha256": "f4a4924cb50dd8e4e9b01eb1c4df590c167cd5c92f8af9c6f5f6336200372f26"
+    },
+    {
+      "path": "voice/maiden/hum_03.ogg",
+      "sha256": "1e0a5c9cc8da5835694c52460bc55fdae5040ca4d9aa1e15c77233832a745ad1"
+    },
+    {
+      "path": "voice/maiden/hurt_01.ogg",
+      "sha256": "dfce26477e21a47cccdc9b9a7fc1cc727335062e8b3d7cc274918d5cee0f278d"
+    },
+    {
+      "path": "voice/maiden/hurt_02.ogg",
+      "sha256": "4af67d266c102f579f984ebe551135f2bf55f7baddba2a53c07977570a929559"
+    },
+    {
+      "path": "voice/maiden/hurt_03.ogg",
+      "sha256": "ceaee5af94740e039f102b6644a0cf2b096c401f28b32521209894e8ae0325ed"
+    },
+    {
+      "path": "voice/maiden/hurt_04.ogg",
+      "sha256": "209f1ec226f14bea84f9119c5d96745f93bacb5bd5751a33812d5e08fd3554ab"
+    },
+    {
+      "path": "voice/maiden/mumble_01.ogg",
+      "sha256": "1f28dfc94389964fa03af17181a33cf60eb4263e1b37ec4fe01fcd853d3a1010"
+    },
+    {
+      "path": "voice/maiden/mumble_02.ogg",
+      "sha256": "459734b71a047e501929f9f71adf26a2f38b32e568b7dd8f441f627f6308ff7c"
+    },
+    {
+      "path": "voice/maiden/mumble_03.ogg",
+      "sha256": "b2398e207696bb2691563140fdd84a6cf7de1753f886338137cd8776e9e6afa1"
+    },
+    {
+      "path": "voice/maiden/select_01.ogg",
+      "sha256": "0a8609e10a4ae37f3f76ea8ee569e5a1d51897dadf1cac566e6525c504b0b2fa"
+    },
+    {
+      "path": "voice/maiden/select_02.ogg",
+      "sha256": "ed2042e0f21caae815d35ec3c6123196e5952462c23f61a66845063729f4a134"
+    },
+    {
+      "path": "voice/maiden/select_03.ogg",
+      "sha256": "5a86251352392891f2a2e871f21525d2298467e90b136d24760ec78b9d7b3988"
+    },
+    {
+      "path": "voice/maiden/sigh_01.ogg",
+      "sha256": "abf097831eb4483ac80b073dfa517337e9b46d5eb654814decd4e41f81027c29"
+    },
+    {
+      "path": "voice/maiden/sigh_02.ogg",
+      "sha256": "ed2a017fa4577b3c83c6502eb656e5ed076282cd94848b435932ced075dd3337"
+    },
+    {
+      "path": "voice/maiden/sigh_03.ogg",
+      "sha256": "996459aeb073a909ff55c3049fa6c34dfd2289bd7bcd3ae708a4c8ba53b582df"
+    },
+    {
+      "path": "voice/maiden/sleep_01.ogg",
+      "sha256": "95c87b45485ee2a781ca43ae371ecd037dbc250ccff39dee607b3733ee6fdc3a"
+    },
+    {
+      "path": "voice/maiden/sleep_02.ogg",
+      "sha256": "2c6b02bc5631d4f05e8fc14ebb64bb694a9a8d0a03386255331c645051b114dc"
+    },
+    {
+      "path": "voice/maiden/sleep_03.ogg",
+      "sha256": "3ce8eaebb2883ff5168229c57a1531301f09252835b1f5ba6108115f9263b218"
+    },
+    {
+      "path": "voice/maiden/thanks_01.ogg",
+      "sha256": "4e1eefc3c845a20a890270cdf98d48bc8903353f6ea9c590d1c4553cff4eddd5"
+    },
+    {
+      "path": "voice/maiden/thanks_02.ogg",
+      "sha256": "af7cce84bee9304595d1888f0e0e995d9bdd868ef16e9abaa0c17c5ce9d14fee"
+    },
+    {
+      "path": "voice/maiden/thanks_03.ogg",
+      "sha256": "d2cfbac9c531d2cea28b4689c9622b178dbb61cc0691b8104aa83331386bdcb6"
+    },
+    {
+      "path": "voice/maiden/work_01.ogg",
+      "sha256": "0fcdd7a9a0d0a3a53c1312d523f40c5f80e28fbf4ef87765c8039ed57419d579"
+    },
+    {
+      "path": "voice/maiden/work_02.ogg",
+      "sha256": "4a346dd666a30377bc2e76aeb3805db52b3fee804fb8829b0ac0e8f74138aec7"
+    },
+    {
+      "path": "voice/maiden/work_03.ogg",
+      "sha256": "23e8b835577ddd1007d575b88616b88380a7031796528c8a85bd35860fb204cf"
+    },
+    {
+      "path": "voice/maiden/work_04.ogg",
+      "sha256": "6c0d24b40ebb763d8c599d851f007d53ff726c7039a21cf99bcc1bb2824c515a"
+    },
+    {
+      "path": "voice/maiden/yawn_01.ogg",
+      "sha256": "6c8de6a408d2e73a1138c1854f2269f30834e99a053da4323c819c866a584b7b"
+    },
+    {
+      "path": "voice/maiden/yawn_02.ogg",
+      "sha256": "114ad7258d0b48744409ee7f15399c89868c7306419c41cec0b4154e95b7a13e"
+    },
+    {
+      "path": "voice/maiden/yawn_03.ogg",
+      "sha256": "7f01f9953fc24c033ed8c3c2054bfae99aaeb0577af3c99fc480d86b0c4b65ea"
+    },
+    {
+      "path": "voice/veteran/ack_01.ogg",
+      "sha256": "440fe29cb1eb5c60470bab4bc37f4845a3b21d5be7db895f0e0aa6cbc8fe7f12"
+    },
+    {
+      "path": "voice/veteran/ack_02.ogg",
+      "sha256": "da8266794be322488fdc1833e1224bea7cda917f3db7c1d4fc1331efe1e46dfd"
+    },
+    {
+      "path": "voice/veteran/ack_03.ogg",
+      "sha256": "e28edb32b4d8f28551840c41a01bcb5dda3a526c9c4d31128dc5c0ba1067e390"
+    },
+    {
+      "path": "voice/veteran/ack_04.ogg",
+      "sha256": "0cb8a3bf8b8859683331a45ff1e32640c802c017598ae99404f064ba41aa9366"
+    },
+    {
+      "path": "voice/veteran/alarm_01.ogg",
+      "sha256": "03af7dc1e69fdf267421fd7f2bb73a41becd654d5646eda319d7b07c14783501"
+    },
+    {
+      "path": "voice/veteran/alarm_02.ogg",
+      "sha256": "1fca707ec7c6afdbf532f6557872b8957c165a6e0f3a747804b477b1c4f495fd"
+    },
+    {
+      "path": "voice/veteran/alarm_03.ogg",
+      "sha256": "49f715b535f7f4690632975309f052ce68fa4a019679e9c49e91a8f7f5a9efff"
+    },
+    {
+      "path": "voice/veteran/attack_01.ogg",
+      "sha256": "3b17eb012dc53030f6f16879edfe173c32901d86bb830533ed00028ee5d48b00"
+    },
+    {
+      "path": "voice/veteran/attack_02.ogg",
+      "sha256": "1e5bc3627e52178dd7908fd398281b7ece2f31d344813cd1bda59dadf84718c4"
+    },
+    {
+      "path": "voice/veteran/attack_03.ogg",
+      "sha256": "cbca89795adeaccb8d0febeb10746a99a32e2510be3220a9b15256862b392c05"
+    },
+    {
+      "path": "voice/veteran/attack_04.ogg",
+      "sha256": "d172d56fe0fad142132463ab3f097c0478d0f5a2aad5d9b7d63353e8a98fef7a"
+    },
+    {
+      "path": "voice/veteran/complain_01.ogg",
+      "sha256": "e25de28d9a64fc02c35235528f03c7af45afbd2711426df5c104f9130b6362df"
+    },
+    {
+      "path": "voice/veteran/complain_02.ogg",
+      "sha256": "0f03b123489e2b62a8c7a000665063a5f55197a1c986bc3a8c18b498f1038f8a"
+    },
+    {
+      "path": "voice/veteran/complain_03.ogg",
+      "sha256": "39dcf94e7e68e2431f7949f418f835a22c4663d19af7e17a528ec6af51aab46b"
+    },
+    {
+      "path": "voice/veteran/death_01.ogg",
+      "sha256": "a09bff14ec88bdee478a2ec37e2aaff4587203e582120d256d2ee4a9af825a50"
+    },
+    {
+      "path": "voice/veteran/death_02.ogg",
+      "sha256": "eda305a34db5d42b264d6407c45fbc197db2ddd748dfcd416617bf2f0d080442"
+    },
+    {
+      "path": "voice/veteran/death_03.ogg",
+      "sha256": "445c85c116726b3d375606e4464105e5f7b2dedc4c2d3e4cdfbf450d40b89bb0"
+    },
+    {
+      "path": "voice/veteran/happy_01.ogg",
+      "sha256": "24fd359d886b885e8db3a443cb22f46af3cf071135f580276e7356947d721c04"
+    },
+    {
+      "path": "voice/veteran/happy_02.ogg",
+      "sha256": "c783ec347377b851ec44b7650ad4b37947f5f66b20ed0c702b3656fed871098a"
+    },
+    {
+      "path": "voice/veteran/happy_03.ogg",
+      "sha256": "c6d696bc5ab338e40b6e2b171fd10fdd83a148c7516cfcdf88b166b093d45a6a"
+    },
+    {
+      "path": "voice/veteran/hum_01.ogg",
+      "sha256": "f2eea739b6ebb1ebc3c66dbd216ad6c8097a15fb59983262efdefa4a3b9c6fe4"
+    },
+    {
+      "path": "voice/veteran/hum_02.ogg",
+      "sha256": "2501919feb9ee6cf798f599b5469f27d242dcb463d0a684956f8806f20b909c8"
+    },
+    {
+      "path": "voice/veteran/hum_03.ogg",
+      "sha256": "55d044e960c986626f73b88820bb7696823ae44cd715b2a3c11083ef2a3bd47e"
+    },
+    {
+      "path": "voice/veteran/hurt_01.ogg",
+      "sha256": "d72193e5c443d07316260613e9aaec8dbc10c1e31ab22e5edf205f908d397021"
+    },
+    {
+      "path": "voice/veteran/hurt_02.ogg",
+      "sha256": "624c5208bf8e7f1aded421573ee61622451ee3fa80c919c9c92c31085e1cbfee"
+    },
+    {
+      "path": "voice/veteran/hurt_03.ogg",
+      "sha256": "e7fd4d25b662e01c33f497f1ceb8caddff3363151db433952b024bba669e410a"
+    },
+    {
+      "path": "voice/veteran/hurt_04.ogg",
+      "sha256": "259c97816441c1eb84266be0dfadd0c7ed76123f4f65a36bcca4a1b5659b2c6e"
+    },
+    {
+      "path": "voice/veteran/mumble_01.ogg",
+      "sha256": "719c73f461d323bbb21c55f4c17a15d3146106d59c6a38e9218651cf23c01d1b"
+    },
+    {
+      "path": "voice/veteran/mumble_02.ogg",
+      "sha256": "1034c738b02479c5be2afad49e53f3e1b02321389c4c5580a11244e5e1b0089e"
+    },
+    {
+      "path": "voice/veteran/mumble_03.ogg",
+      "sha256": "d6c1ff81bf44a35b21cd76ce258832611504dc7342bb3289ead43eea9bd5e04f"
+    },
+    {
+      "path": "voice/veteran/select_01.ogg",
+      "sha256": "91258af912d3091b6920b1497c1bb2c1159f9146914ec9b4fe6b7c85fd59d5fd"
+    },
+    {
+      "path": "voice/veteran/select_02.ogg",
+      "sha256": "39e749e9eb93e685b35d735db1272de0a0e7df3fd76341786ca0387a93ec4b15"
+    },
+    {
+      "path": "voice/veteran/select_03.ogg",
+      "sha256": "2c0e9f8c00933868dbd1d0d4ba75f941b1fe03b1f0c5bc1fc369c650e2bb7d0c"
+    },
+    {
+      "path": "voice/veteran/sigh_01.ogg",
+      "sha256": "4d9b87dbbc981da9d015520aa387b61743536870d7ef6f0c6ba86baca2934db6"
+    },
+    {
+      "path": "voice/veteran/sigh_02.ogg",
+      "sha256": "b0c840bbb5687c1dded3c6ff2396558bbfe78c566cdf2df1f6d6a98ef8856cef"
+    },
+    {
+      "path": "voice/veteran/sigh_03.ogg",
+      "sha256": "4c76a958eb264d03a7ee3fce5bb5749291df21326fb4256f53e94076640c6ab2"
+    },
+    {
+      "path": "voice/veteran/sleep_01.ogg",
+      "sha256": "6ab9ca9fa4ffc47f59c98274ec33b300177b05fc4d5d6ad5ceccc7c607d2bea7"
+    },
+    {
+      "path": "voice/veteran/sleep_02.ogg",
+      "sha256": "47321182ebc7dcc56135bd400414b7f89095ba6f62e0b49adf8b99bd4828b5b0"
+    },
+    {
+      "path": "voice/veteran/sleep_03.ogg",
+      "sha256": "dfe41de59c223f5258e9a23f61eb504e0e28ef17585ea68491ee863499e46a8a"
+    },
+    {
+      "path": "voice/veteran/thanks_01.ogg",
+      "sha256": "788b04f255ce662a557ef9f7633b89d452717ac5f0f33f0a3c617b1ac1190260"
+    },
+    {
+      "path": "voice/veteran/thanks_02.ogg",
+      "sha256": "7a28bf79a266a888c5b8fb04ee11843e03cfb571ad30036da4fc9b3684ab2a76"
+    },
+    {
+      "path": "voice/veteran/thanks_03.ogg",
+      "sha256": "dc2c25193362edc7003aaec875e84d436ad40344ec75d36c601619293f5d2c57"
+    },
+    {
+      "path": "voice/veteran/work_01.ogg",
+      "sha256": "0bdbe3cc566deca6e2bb45153a7484a83f5937801264bcceb57e9cdcea98f203"
+    },
+    {
+      "path": "voice/veteran/work_02.ogg",
+      "sha256": "0c8384b8512d52a8173ab3e24ace2ebcb8e296e33e455c90caea68564a55607c"
+    },
+    {
+      "path": "voice/veteran/work_03.ogg",
+      "sha256": "7bc44e8ad08f1cb6bc64d6cc2e961e783f27d48e178d74196856139198421a05"
+    },
+    {
+      "path": "voice/veteran/work_04.ogg",
+      "sha256": "5c10c30f578e55f5ef28b2163d9578472d18117b63455ecc291edf9c36791b17"
+    },
+    {
+      "path": "voice/veteran/yawn_01.ogg",
+      "sha256": "46859360372803ed7623866078fe5760162b911f3e89503f5e7b58ffbda292d6"
+    },
+    {
+      "path": "voice/veteran/yawn_02.ogg",
+      "sha256": "c59de60a23c48b9389ff7e0edf5a131a013f441b2b2441db325223997cc46db5"
+    },
+    {
+      "path": "voice/veteran/yawn_03.ogg",
+      "sha256": "8c876fddc784a3e04b02b145311e20544e6bffc6bfbabfd5672ddc6312c43d2e"
+    },
+    {
+      "path": "voice/young/ack_01.ogg",
+      "sha256": "2355f84a9930c7d3acd1e6c0dcefd04a0253a238db8a1fb4d787f6b830bf2e36"
+    },
+    {
+      "path": "voice/young/ack_02.ogg",
+      "sha256": "49f7ec4c8e8741f04db99cd0772ab0bbcf4d31add688a223335627f83679556b"
+    },
+    {
+      "path": "voice/young/ack_03.ogg",
+      "sha256": "9a69ad5ebd5563e78e51ee91885993edf4504730bacf1bd6f9d55d801c8985b0"
+    },
+    {
+      "path": "voice/young/ack_04.ogg",
+      "sha256": "dae2e5a6a0f1696ac687d9b722ddbceb951612b254a6a048da10e8adca1cb8ee"
+    },
+    {
+      "path": "voice/young/alarm_01.ogg",
+      "sha256": "36f3fa91527cd82aed8a2faf00643ce2c6d632f08aaa187ea074cd1eeb8a060b"
+    },
+    {
+      "path": "voice/young/alarm_02.ogg",
+      "sha256": "a627e178e060b43805ea7131b8a676e350a9147c3445ebe4aef11faddf656d33"
+    },
+    {
+      "path": "voice/young/alarm_03.ogg",
+      "sha256": "fa1db559f42640da55bc7ff366da443fa1f93e566ab753a39d78c281d8d64899"
+    },
+    {
+      "path": "voice/young/attack_01.ogg",
+      "sha256": "bfef2e0899d3b10c9a72982f9115831113d0b502daf981accc7d5ba8728371b1"
+    },
+    {
+      "path": "voice/young/attack_02.ogg",
+      "sha256": "04cf6016c77b9c470eae62cd6d99bfb2a3a6d56fa782bf283eea2dbc9c497c29"
+    },
+    {
+      "path": "voice/young/attack_03.ogg",
+      "sha256": "acfe3cf9cdf88611c40f8c2c2fb9a74ffe1e1e0f8658b6dd81cba2f04e823d7b"
+    },
+    {
+      "path": "voice/young/attack_04.ogg",
+      "sha256": "8fcf02acf44f067406fd6f2c60f728c426ff917c5aec75174f8fdb3c5ff11152"
+    },
+    {
+      "path": "voice/young/complain_01.ogg",
+      "sha256": "6c606a01e7e296c02eaee061cb0aae7193d3697c6309d2acc8938c13ee3249b6"
+    },
+    {
+      "path": "voice/young/complain_02.ogg",
+      "sha256": "58ea483a0d7d14c7b8dde4fefb6c910e30d524cd486f06f5220031c598bcbdd6"
+    },
+    {
+      "path": "voice/young/complain_03.ogg",
+      "sha256": "753e75b2d6b7d92bcd52d2d3922ad0a42e49d32df594cea3463b07c9801cfd30"
+    },
+    {
+      "path": "voice/young/death_01.ogg",
+      "sha256": "f70488b5aa6440d9724f382394e3c6f0c5fdbf8b8bf2d174882b74ca3ea7e56c"
+    },
+    {
+      "path": "voice/young/death_02.ogg",
+      "sha256": "5085da432ed3fb123e619c2a3c533a0014c75e59c10171d2bb1f9f438b8a4fdd"
+    },
+    {
+      "path": "voice/young/death_03.ogg",
+      "sha256": "7dc4529b451ed49c8a6a51e59e34168312d6c44b62f73b7ed0d00db863f62fd2"
+    },
+    {
+      "path": "voice/young/happy_01.ogg",
+      "sha256": "3790d97808878a0ae4d8e616fa0a73a7b233c9acb5622c71a082c0e097d38ae6"
+    },
+    {
+      "path": "voice/young/happy_02.ogg",
+      "sha256": "180ee5aeac547813cdcbab414abc9117bc1a7033a97f2af391433c59cf282bf3"
+    },
+    {
+      "path": "voice/young/happy_03.ogg",
+      "sha256": "a9d8f561800e07d7d459585407ce40b7645afd4be425b64539251bdaa48efc5a"
+    },
+    {
+      "path": "voice/young/hum_01.ogg",
+      "sha256": "971e42d5d33e2ec429b6d08c592074a06b89b3438b9a57ed58689fc81db4a460"
+    },
+    {
+      "path": "voice/young/hum_02.ogg",
+      "sha256": "d0e7682633d1feebd3a9f622c7c8f553e928cfb8f51b030d1965528ac62eb3e1"
+    },
+    {
+      "path": "voice/young/hum_03.ogg",
+      "sha256": "7e7021e212a0922753ff2c43bc7b4047acd66043ffdf0c8e91f72ed32ddb6acd"
+    },
+    {
+      "path": "voice/young/hurt_01.ogg",
+      "sha256": "506a5fa3c9dc545a89f3e2ef47f8827cee8507813227771d62b648a32f151ef1"
+    },
+    {
+      "path": "voice/young/hurt_02.ogg",
+      "sha256": "cccb4d06695afdce47ddd93b5de3fb3ee33a5daaaf07920059b2273bf86cbccd"
+    },
+    {
+      "path": "voice/young/hurt_03.ogg",
+      "sha256": "9abee3005c8156350196ad00ac9bcc8e3914dcd36aa91cf5661dcd3cdb787a1d"
+    },
+    {
+      "path": "voice/young/hurt_04.ogg",
+      "sha256": "0d02652838676f507debce524c4af35b9b4b913dec396a9f2e414c9c3cdbd6e0"
+    },
+    {
+      "path": "voice/young/mumble_01.ogg",
+      "sha256": "a59bdb2330e867fd55fa331d57195f8a3970f53894bb8b5cc6b3f2480fae46e4"
+    },
+    {
+      "path": "voice/young/mumble_02.ogg",
+      "sha256": "311d238bcfb43b5c9d11fd9d0cb0d6677da458516bdba61bb0044bb4367c2afe"
+    },
+    {
+      "path": "voice/young/mumble_03.ogg",
+      "sha256": "ff36ac3e0b4706cf98b0d4fe2ca99e4866e1610683db41211945184904d04f38"
+    },
+    {
+      "path": "voice/young/select_01.ogg",
+      "sha256": "85dd63e475a9bf29951bc921f1d8fb354d274200aa8e094d47ec694f63b72752"
+    },
+    {
+      "path": "voice/young/select_02.ogg",
+      "sha256": "78b8b172092cbbc94fa38ad59a5c998d8199a32eaf15190ff525a0ffde93398c"
+    },
+    {
+      "path": "voice/young/select_03.ogg",
+      "sha256": "3ac619322a895ec37d60feab29bf7f270ac59f6d88fbbdddcc7fde86023d1019"
+    },
+    {
+      "path": "voice/young/sigh_01.ogg",
+      "sha256": "107685446c5a8d85493c6a7c3e6b4ce847547e21ccfcbc020b899e496749e8a2"
+    },
+    {
+      "path": "voice/young/sigh_02.ogg",
+      "sha256": "8667dc6145447294dbe6b1b2096cca24dd7004eaa89a6eeaa8f82d5fc1f84c6b"
+    },
+    {
+      "path": "voice/young/sigh_03.ogg",
+      "sha256": "22045e9bd36dc32412800d02ec5a4cffc63dc0969bcceb72fb0f8bcb3065cd2d"
+    },
+    {
+      "path": "voice/young/sleep_01.ogg",
+      "sha256": "906bc91f258d465d003372e88143981deebc7ea4a3aedaed209c248b471feb14"
+    },
+    {
+      "path": "voice/young/sleep_02.ogg",
+      "sha256": "add82380de17163d7d41f07a443d150ec7f65dd3ff107bc07e8d05715afba7f8"
+    },
+    {
+      "path": "voice/young/sleep_03.ogg",
+      "sha256": "0e939e10e18cc4cc69a8236f596a2352af3b9ba75a4a2bf496299e588a51bbf8"
+    },
+    {
+      "path": "voice/young/thanks_01.ogg",
+      "sha256": "6191026b9a7f9e087d5f62035e7e3768c144a76a57329b88543ec069453ffe43"
+    },
+    {
+      "path": "voice/young/thanks_02.ogg",
+      "sha256": "731621f2c72ddb4faf70cc2433ceb257aea70526c48a0b7131d71da7fb3c6c72"
+    },
+    {
+      "path": "voice/young/thanks_03.ogg",
+      "sha256": "be1cc1fb0c1759fab92aa4cf48ea611005b36746ea2ad25bb5d9ac69da0dfbe5"
+    },
+    {
+      "path": "voice/young/work_01.ogg",
+      "sha256": "75c1860a5891cfedcbfa4021c454166ff256716a1a63489ab2a23be0dff4480f"
+    },
+    {
+      "path": "voice/young/work_02.ogg",
+      "sha256": "435e02c0ffbd65992fe13630d832df4f0c88b2bce618cf6c677928a04338cf17"
+    },
+    {
+      "path": "voice/young/work_03.ogg",
+      "sha256": "4702e12be66448681b7568f868d16277c6c54a291f2295220ec953100161ad25"
+    },
+    {
+      "path": "voice/young/work_04.ogg",
+      "sha256": "441566e7d6cce032e422733c841cbdd38a1213a2056648686d2648aefe9293a5"
+    },
+    {
+      "path": "voice/young/yawn_01.ogg",
+      "sha256": "a4d49e8d4d86896833668887fbad081fab9cbf1e5d19fb638a7297f2b95503d6"
+    },
+    {
+      "path": "voice/young/yawn_02.ogg",
+      "sha256": "d2d91e68953dea09d6eb7692c099bdb47254a681025cebbe704a8c8c5c10b974"
+    },
+    {
+      "path": "voice/young/yawn_03.ogg",
+      "sha256": "585d0dfa2aa3bd9ed0dbc5d4e99206da2bcbc37377de48eb11e496053224da15"
+    },
+    {
+      "path": "weather/clap_01.ogg",
+      "sha256": "e2ea7205508c1d931bcb31e04e112520a9b9fdc03c5e5813d504b54f4137e3a8"
+    },
+    {
+      "path": "weather/clap_02.ogg",
+      "sha256": "6a86c7a960d2ec0e8c670c4124007df71e65632708a893df9ed6b43391802b14"
+    },
+    {
+      "path": "weather/clap_03.ogg",
+      "sha256": "d8d7b6e60c8bad5fb514248af94c7d798100b2ec02238f45bc4e403c626a38bc"
+    },
+    {
+      "path": "weather/crack_01.ogg",
+      "sha256": "28bfcf325251cac8161eef5c1ffa6b14f8dac49805eef120da5afdcf46ea5c8b"
+    },
+    {
+      "path": "weather/crack_02.ogg",
+      "sha256": "4509b664942906c27613c614572b15179362701054c36fe40b6b23771e0d34d5"
+    },
+    {
+      "path": "weather/crack_03.ogg",
+      "sha256": "1961066256226703d8c8a62ad93cef76a610664cc1b01e430e79b6fd5b51e410"
+    },
+    {
+      "path": "weather/rumble_01.ogg",
+      "sha256": "04432a9f426a367650c76cb49f67efbbd7bf097c79fbd6de22787bff3b744996"
+    },
+    {
+      "path": "weather/rumble_02.ogg",
+      "sha256": "013c449dc9a04c1a4cd1fe8c03e186e17f698236f41f0197c53fe3e2a08bba3a"
+    },
+    {
+      "path": "weather/rumble_03.ogg",
+      "sha256": "c3929ecb345d82b8b9831c9d421bdd9dd969b4adbeac71e6be4a2e8bef8b861e"
+    },
+    {
+      "path": "weather/strike_01.ogg",
+      "sha256": "33e4fff9447f31d90b8d62cee23615f4471fca8aa4ef8b499b5ab94ce4d40ac6"
+    },
+    {
+      "path": "weather/strike_02.ogg",
+      "sha256": "12f03566f433aad978d06a88882048547f01c3b31e2770dd5430a762c5dcd13f"
+    },
+    {
+      "path": "weather/strike_03.ogg",
+      "sha256": "076d23c0764bdee971df7b2e25fbe308146a5013afd297adab7b9c80258ec74d"
+    },
+    {
+      "path": "wildlife/cat_01.ogg",
+      "sha256": "18bb9ac9c25490a169dc63ceacd5468bcc7372e8cd92fa40a71b4b3fb8ae0a33"
+    },
+    {
+      "path": "wildlife/chicken_01.ogg",
+      "sha256": "60b2f45452542601f52392d27758839daa0f58cf4676297ca57a1b037b31e4d8"
+    },
+    {
+      "path": "wildlife/chicken_02.ogg",
+      "sha256": "fcd290d8da0db0a07294c599ec3fc2dc77fb6d286ca7209a2f0cb18a82e52998"
+    },
+    {
+      "path": "wildlife/cow_01.ogg",
+      "sha256": "9de5e023f72856838f9fd4e2dfe1b8bcd23a7332603c22ae564bf1b3c17c1074"
+    },
+    {
+      "path": "wildlife/dog_01.ogg",
+      "sha256": "f1dc60baf6279abe1cffc728ea79a7c9a6b103f87486b15825bda09a0c2059d9"
+    },
+    {
+      "path": "wildlife/pig_01.ogg",
+      "sha256": "3529ea654405fd6d908d35f78ca70f5189461840d4ff302eaf720a6db2e95ff6"
+    },
+    {
+      "path": "wildlife/raven_01.ogg",
+      "sha256": "a7adfdd4673bdb8f9e846193ea168a2937a4717174e4186daa3698da02985f7b"
+    },
+    {
+      "path": "wildlife/raven_02.ogg",
+      "sha256": "1111dd9405e63388f283854b74f688a16db345b06007f8a71ffefdfe02335b9a"
+    },
+    {
+      "path": "wildlife/wolf_01.ogg",
+      "sha256": "d605bd88c5ccded7c9b057fbf52d80da936867b7503575bb2f71632dfa5afc0b"
+    },
+    {
+      "path": "wildlife/wolf_02.ogg",
+      "sha256": "65ab89ce2b9ff0f4e1e4c35697b5552b861dc843fd047e9214b3d755d137a62a"
+    }
+  ]
+}

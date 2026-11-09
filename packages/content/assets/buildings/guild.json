@@ -1,0 +1,176 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "guild",
+  "name": "Adventurers' guild",
+  "footprint": 2,
+  "variants": [
+    {
+      "patches": [
+        {
+          "bounds": [
+            0.100000001,
+            1.39999998,
+            1.20000005,
+            1.95000005
+          ],
+          "color": [
+            64,
+            60,
+            58
+          ],
+          "furrows": 0,
+          "furrow": [
+            0,
+            0,
+            0
+          ],
+          "delay": 2
+        }
+      ],
+      "blocks": [
+        {
+          "bounds": [
+            0.200000003,
+            0.25,
+            1.79999995,
+            1.35000002
+          ],
+          "wall": 26,
+          "roof": 20,
+          "shape": "gable-x",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            60,
+            68,
+            82
+          ],
+          "roofShade": [
+            38,
+            44,
+            56
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 3,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.300000012,
+            1.5,
+            0.899999976,
+            1.75
+          ],
+          "wall": 7,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 12,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            1.25,
+            1.25,
+            1.85000002,
+            1.85000002
+          ],
+          "wall": 52,
+          "roof": 26,
+          "shape": "pyramid",
+          "wallLit": [
+            68,
+            66,
+            76
+          ],
+          "wallShade": [
+            44,
+            42,
+            50
+          ],
+          "roofLit": [
+            54,
+            60,
+            84
+          ],
+          "roofShade": [
+            34,
+            38,
+            56
+          ],
+          "base": 0,
+          "delay": 8,
+          "windows": 1,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "banner",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

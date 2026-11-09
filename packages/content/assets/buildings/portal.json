@@ -1,0 +1,202 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "portal",
+  "name": "Portal",
+  "footprint": 2,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.0799999982,
+            0.0799999982,
+            0.920000017,
+            0.920000017
+          ],
+          "wall": 4,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            68,
+            66,
+            76
+          ],
+          "wallShade": [
+            44,
+            42,
+            50
+          ],
+          "roofLit": [
+            68,
+            66,
+            76
+          ],
+          "roofShade": [
+            44,
+            42,
+            50
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.219999999,
+            0.400000006,
+            0.340000004,
+            0.600000024
+          ],
+          "wall": 40,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 4,
+          "delay": 4,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.660000026,
+            0.400000006,
+            0.780000031,
+            0.600000024
+          ],
+          "wall": 40,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            84,
+            94
+          ],
+          "roofShade": [
+            56,
+            54,
+            64
+          ],
+          "base": 4,
+          "delay": 4,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.180000007,
+            0.379999995,
+            0.819999993,
+            0.620000005
+          ],
+          "wall": 8,
+          "roof": 3,
+          "shape": "gable-x",
+          "wallLit": [
+            86,
+            84,
+            94
+          ],
+          "wallShade": [
+            56,
+            54,
+            64
+          ],
+          "roofLit": [
+            86,
+            58,
+            124
+          ],
+          "roofShade": [
+            56,
+            38,
+            84
+          ],
+          "base": 44,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "crystal",
+          "accent": [
+            120,
+            236,
+            220
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+# Dependencies and generated static-site output
+/node_modules/
+/dist/
+/public/vendor/
+
+# Local migration, research, verification, and capture material
+/docs/
+/migration/
+/tests/
+/artifacts/
+/playwright-report/
+/test-results/
+/vitest.config.ts
+
+# Only these scripts are required by npm ci and the production build
+/scripts/*
+!/scripts/prepare-assets.mjs
+!/scripts/prepare-audio-worklet.mjs
+!/scripts/verify-audio-assets.mjs
+
+# Local workspace and authoring configuration
+/.vscode/
+/AGENTS.md
+/.prettierrc.json
+/.prettierignore
+/packages/**/README.md
+/packages/**/SCRIPT.md
+*.local
+.env
+.env.*
+.DS_Store
+*.log
+
+# Superseded assets kept only in local archives
+/packages/content/assets/characters/modular-heads.json
+/public/assets/Geist.woff2
+/public/assets/Geist-LICENSE.txt
+/public/assets/audio/captions.tsv

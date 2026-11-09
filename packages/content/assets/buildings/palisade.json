@@ -1,0 +1,531 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "palisade",
+  "name": "Palisade fort",
+  "footprint": 3,
+  "variants": [
+    {
+      "patches": [
+        {
+          "bounds": [
+            0.449999988,
+            0.449999988,
+            2.54999995,
+            2.54999995
+          ],
+          "color": [
+            60,
+            54,
+            44
+          ],
+          "furrows": 0,
+          "furrow": [
+            0,
+            0,
+            0
+          ],
+          "delay": 0
+        }
+      ],
+      "blocks": [
+        {
+          "bounds": [
+            0.550000012,
+            0.100000001,
+            2.45000005,
+            0.400000006
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.100000001,
+            0.550000012,
+            0.400000006,
+            2.45000005
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            1.12,
+            1.12,
+            1.88,
+            1.88
+          ],
+          "wall": 40,
+          "roof": 16,
+          "shape": "pyramid",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 8,
+          "windows": 1,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "banner",
+          "accent": [
+            52,
+            74,
+            150
+          ]
+        },
+        {
+          "bounds": [
+            2.5999999,
+            0.550000012,
+            2.9000001,
+            2.45000005
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 6,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.550000012,
+            2.5999999,
+            2.45000005,
+            2.9000001
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 6,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    },
+    {
+      "patches": [
+        {
+          "bounds": [
+            0.449999988,
+            0.449999988,
+            2.54999995,
+            2.54999995
+          ],
+          "color": [
+            60,
+            54,
+            44
+          ],
+          "furrows": 0,
+          "furrow": [
+            0,
+            0,
+            0
+          ],
+          "delay": 0
+        }
+      ],
+      "blocks": [
+        {
+          "bounds": [
+            0.550000012,
+            0.100000001,
+            2.45000005,
+            0.400000006
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.100000001,
+            0.550000012,
+            0.400000006,
+            2.45000005
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            1.12,
+            1.12,
+            1.88,
+            1.88
+          ],
+          "wall": 40,
+          "roof": 16,
+          "shape": "pyramid",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 8,
+          "windows": 1,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "banner",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            2.5999999,
+            0.550000012,
+            2.9000001,
+            2.45000005
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 6,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.550000012,
+            2.5999999,
+            2.45000005,
+            2.9000001
+          ],
+          "wall": 18,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            96,
+            72,
+            50
+          ],
+          "roofShade": [
+            64,
+            48,
+            36
+          ],
+          "base": 0,
+          "delay": 6,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}

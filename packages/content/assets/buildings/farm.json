@@ -1,0 +1,155 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "farm",
+  "name": "Farmhouse",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [],
+      "blocks": [
+        {
+          "bounds": [
+            0.100000001,
+            0.119999997,
+            0.839999974,
+            0.74000001
+          ],
+          "wall": 17,
+          "roof": 15,
+          "shape": "gable-x",
+          "wallLit": [
+            96,
+            72,
+            50
+          ],
+          "wallShade": [
+            64,
+            48,
+            36
+          ],
+          "roofLit": [
+            92,
+            80,
+            54
+          ],
+          "roofShade": [
+            60,
+            52,
+            38
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.5,
+            0.75999999,
+            0.720000029,
+            0.920000017
+          ],
+          "wall": 6,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            176,
+            150,
+            80
+          ],
+          "wallShade": [
+            124,
+            104,
+            56
+          ],
+          "roofLit": [
+            176,
+            150,
+            80
+          ],
+          "roofShade": [
+            124,
+            104,
+            56
+          ],
+          "base": 0,
+          "delay": 12,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        },
+        {
+          "bounds": [
+            0.74000001,
+            0.779999971,
+            0.899999976,
+            0.920000017
+          ],
+          "wall": 5,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            176,
+            150,
+            80
+          ],
+          "wallShade": [
+            124,
+            104,
+            56
+          ],
+          "roofLit": [
+            176,
+            150,
+            80
+          ],
+          "roofShade": [
+            124,
+            104,
+            56
+          ],
+          "base": 0,
+          "delay": 14,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            232,
+            162,
+            72
+          ],
+          "ornament": "none",
+          "accent": [
+            156,
+            40,
+            46
+          ]
+        }
+      ]
+    }
+  ]
+}
