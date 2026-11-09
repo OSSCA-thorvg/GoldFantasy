@@ -301,12 +301,19 @@ function personFields(a: SaveArchive, v: Person): void {
     past: string,
   });
   if (a.formatVersion >= 3) a.fields(v, { level: i32, experience: i32 });
+  // Original v8 values 0/1 remain unchanged; bit 2 adds health recovery.
+  // Earlier v8 readers reject health bits rather than silently losing that state.
   if (a.formatVersion >= 8) {
     if (a.reading) {
-      const flag = u8.read(a);
-      if (flag > 1) throw new Error('Invalid rest recovery flag');
-      v.recoveringRest = flag !== 0;
-    } else boolean.write(a, v.recoveringRest);
+      const flags = u8.read(a);
+      if (flags > 3) throw new Error('Invalid recovery flags');
+      v.recoveringRest = (flags & 1) !== 0;
+      v.recoveringHealth = (flags & 2) !== 0;
+    } else {
+      if (typeof v.recoveringRest !== 'boolean' || typeof v.recoveringHealth !== 'boolean')
+        throw new Error('Invalid recovery flags');
+      u8.write(a, (v.recoveringRest ? 1 : 0) | (v.recoveringHealth ? 2 : 0));
+    }
   }
   if (
     a.reading &&
@@ -518,7 +525,7 @@ function townFields(a: SaveArchive, v: SaveTown): void {
 export function encodeTown(town: SaveTown): string {
   const a = new SaveArchive();
   // Keep historical v7 bytes unchanged when no new recovery state is needed.
-  a.formatVersion = town.folk.some((p) => p.recoveringRest) ? 8 : 7;
+  a.formatVersion = town.folk.some((p) => p.recoveringRest || p.recoveringHealth) ? 8 : 7;
   a.fields(
     {
       version: a.formatVersion,

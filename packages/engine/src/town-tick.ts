@@ -471,6 +471,7 @@ export function tick(this: TickTown, dt: number): void {
           break;
         if (
           p.rest >= f(0.95) &&
+          (!p.recoveringHealth || p.health >= 1) &&
           p.task !== Activity.Sleeping &&
           (!p.autoMode || this.climate().night <= f(0.5))
         ) {

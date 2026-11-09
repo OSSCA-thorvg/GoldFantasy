@@ -29,7 +29,7 @@ export function orderAutomatic(this: SchedulerTown, ids: number[]): void {
     )
       continue;
     p.ordered = p.approachingOrder = false;
-    p.recoveringRest = false;
+    p.recoveringRest = p.recoveringHealth = false;
     p.task = Activity.Idle;
     p.taskSite = -1;
     p.supplyTarget = -1;
@@ -53,6 +53,7 @@ export function scheduleAutomatic(this: SchedulerTown, p: Person): boolean {
     p.activity === Activity.Leaving
   )
     return false;
+  if (p.health >= 1) p.recoveringHealth = false;
   if (p.rest >= f(0.95)) p.recoveringRest = false;
   else if (p.activity === Activity.Sleeping && p.autoMode) p.recoveringRest = true;
   // Care interrupts an assignment, rather than replacing it. The assignment and its
@@ -67,7 +68,7 @@ export function scheduleAutomatic(this: SchedulerTown, p: Person): boolean {
   const enterCare = (b: Building, activity: Activity): boolean => {
     if (p.activity === activity && p.target === b.id) return true;
     if (!this.walkTo(p, b.door())) return false;
-    if (activity === Activity.Sleeping) p.recoveringRest = true;
+    if (activity === Activity.Sleeping && p.rest < f(0.95)) p.recoveringRest = true;
     p.activity = activity;
     p.target = b.id;
     p.tree = -1;
@@ -93,6 +94,7 @@ export function scheduleAutomatic(this: SchedulerTown, p: Person): boolean {
   let committed =
     p.ordered ||
     p.recoveringRest ||
+    p.recoveringHealth ||
     p.carrying > 0 ||
     [
       Activity.Eating,
@@ -121,7 +123,8 @@ export function scheduleAutomatic(this: SchedulerTown, p: Person): boolean {
   // Match the existing severe-injury walking-speed threshold for interrupting
   // committed work. Minor cold damage must not send a worker back every two seconds.
   const treatmentThreshold = committed ? f(0.4) : f(0.999);
-  if ((!p.ordered || p.autoMode) && p.health < treatmentThreshold) {
+  if ((!p.ordered || p.autoMode) && (p.health < treatmentThreshold || p.recoveringHealth)) {
+    if (p.health < f(0.4)) p.recoveringHealth = true;
     const clinic = this.nearest(
       p.position,
       (b) => b.kind === Structure.Apothecary && b.built() && b.workers > 0,
@@ -135,13 +138,20 @@ export function scheduleAutomatic(this: SchedulerTown, p: Person): boolean {
   }
   if (p.activity === Activity.Sleeping && !p.ordered) {
     const home = this.building(p.target);
-    if (p.rest < f(0.95) && (p.target < 0 || (home?.built() && home.id === p.home))) return true;
+    if (
+      (p.rest < f(0.95) || (p.recoveringHealth && p.health < 1)) &&
+      (p.target < 0 || (home?.built() && home.id === p.home))
+    )
+      return true;
     finishCare();
   }
-  if (p.autoMode && (p.rest < f(0.2) || (p.recoveringRest && p.rest < f(0.95)))) {
+  if (
+    p.autoMode &&
+    (p.rest < f(0.2) || (p.recoveringRest && p.rest < f(0.95)) || (p.recoveringHealth && p.health < 1))
+  ) {
     const home = this.building(p.home);
     if (home?.built() && enterCare(home, Activity.Sleeping)) return true;
-    p.recoveringRest = true;
+    if (p.rest < f(0.95)) p.recoveringRest = true;
     p.activity = Activity.Sleeping;
     p.target = -1;
     p.tree = -1;
