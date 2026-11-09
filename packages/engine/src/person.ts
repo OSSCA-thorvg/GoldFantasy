@@ -47,5 +47,5 @@ export class Person {
 }
 export const adventurer = (p: Person): boolean => p.calling === Calling.Warrior || p.calling === Calling.Ranger || p.calling === Calling.Mage || p.calling === Calling.Cleric;
 export interface AnimalCall { serial: bigint; kind: AnimalKind; position: Point; at: number; }
-export enum TreeWorkKind { Chop, Fall, Mine, Shatter, Regrow, Produced }
+export enum TreeWorkKind { Chop, Fall, Mine, Shatter, Regrow, Produced, Hammer }
 export interface TreeWorkEvent { serial: bigint; kind: TreeWorkKind; person: number; cell: number; index: number; worker: Point; at: number; }

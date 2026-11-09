@@ -6,3 +6,4 @@ export * from './spoken-voice';
 export * from './person-speech';
 export * from './music-score';
 export * from './sound-board';
+export { treeFallClipImpactSeconds } from './sound-catalog';

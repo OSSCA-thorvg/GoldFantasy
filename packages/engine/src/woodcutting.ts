@@ -1,9 +1,10 @@
-// Exact constants and axe animation from native woodcutting.h.
+// Harvest duration and yield retain the game rules; contacts share the visible work rhythm.
 import { f32 as f, clamp } from './numeric';
-export const cutSeconds = 6,
-  swingSeconds = 0.7,
-  impactSeconds = 0.52,
-  fallSeconds = 0.8,
+import { harvestTiming, treeFallTiming } from './work-timing';
+export const cutSeconds = harvestTiming.duration,
+  swingSeconds = harvestTiming.period,
+  impactSeconds = harvestTiming.impact,
+  fallSeconds = treeFallTiming.duration,
   searchRadius = 5,
   logsPerTree = 3;
 export function axeAngle(elapsed: number): number {

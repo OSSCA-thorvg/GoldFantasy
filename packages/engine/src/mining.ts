@@ -3,7 +3,8 @@ import { point, type Point } from './geometry';
 import { hash01, f32 as f } from './numeric';
 import { Terrain } from './world-types';
 import type { WorldMap } from './world-map';
-export const workSeconds = 6,
+import { harvestTiming } from './work-timing';
+export const workSeconds = harvestTiming.duration,
   collectSeconds = 0.65,
   stonePerRock = 3;
 export const position = (x: number, y: number): Point => point(f(x + f(0.5)), f(y + f(0.55)));

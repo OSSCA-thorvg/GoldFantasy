@@ -20,12 +20,14 @@ import {
   animateProcessingWork,
 } from '../../packages/native-renderer/src/work-motion';
 import { moveAgents } from '../../packages/native-renderer/src/world-people';
-import { Person, Role, Race, Calling, Activity } from '../../packages/engine/src/person';
+import { animateAction, workPose } from '../../packages/native-renderer/src/action-motion';
+import { Person, Role, Race, Calling, Activity, TreeWorkKind } from '../../packages/engine/src/person';
 import { Structure, Product, structureSpec } from '../../packages/engine/src/building-catalog';
 import { Tool, toolStructure } from '../../packages/engine/src/game-tools';
 import { Building } from '../../packages/engine/src/town-models';
 import { point } from '../../packages/engine/src/geometry';
 import { Traffic } from '../../packages/engine/src/traffic';
+import { harvestTiming, hammerTiming, workElapsed } from '../../packages/engine/src/work-timing';
 import type { Town } from '../../packages/engine/src/town';
 class Pixels {
   constructor(
@@ -297,3 +299,188 @@ it('keeps raw and refined cargo visually distinct and clears loads after deliver
     view.dispose();
   }
 });
+
+for (const activity of [Activity.Felling, Activity.Mining, Activity.Building, Activity.Roadwork])
+  it(`keeps ${Activity[activity]} grounded while the tool remains animated`, () => {
+    const view = surface(960, 160),
+      states: WorldRendererState[] = [],
+      harvest = activity === Activity.Felling || activity === Activity.Mining,
+      timing = harvest ? harvestTiming : hammerTiming,
+      period = timing.period,
+      phases = [
+        0,
+        0.24,
+        (timing.impact / period) * 0.7,
+        (timing.impact / period) * 0.84,
+        timing.impact / period,
+        0.9,
+      ],
+      bodies: number[][] = [],
+      feet: number[][] = [],
+      wrists: number[] = [];
+    try {
+      for (const [col, phase] of phases.entries()) {
+        const state = new WorldRendererState(tvg);
+        states.push(state);
+        state.rows = Array.from({ length: 64 }, () => new SceneNode());
+        state.currentVisibility.sample = () => 255;
+        const p = new Person(7, 'Worker', Role.Resident, Calling.Settler, Race.Human, 499096, point(10, 10));
+        p.activity = activity;
+        p.tree = 11 + 10 * 32;
+        p.until = 6;
+        const time = phase * period + (harvest ? 0 : period * 3 - workElapsed(0, p.id));
+        const town = {
+          people: () => [p],
+          buildings: () => [],
+          building: () => null,
+          monsters: () => [],
+          wildlife: () => [],
+          hits: () => [],
+          clock: () => time,
+          map: () => ({
+            giant: () => null,
+            volcano: () => null,
+            width: () => 32,
+            seed: () => 5,
+            inside: () => true,
+            at: () => ({ trees: 1 }),
+          }),
+        } as unknown as Town;
+        moveAgents(state, town, new Traffic(5), time, []);
+        const figure = state.figures.get(p.id)!,
+          parts = figure.parts;
+        bodies.push([...parts.body!.matrix]);
+        feet.push(parts.feet.flatMap((foot) => [foot!.matrix[2], foot!.matrix[5]]));
+        wrists.push(parts.arms[1].hand!.matrix[0]);
+        figure.paint.transform([4, 0, 60 + col * 160, 0, 4, 135, 0, 0, 1]);
+        view.root.add(figure.paint);
+      }
+      view.draw();
+      view.capture(`restrained-${Activity[activity].toLowerCase()}`);
+      expect(
+        Math.max(...bodies.map((matrix) => Math.abs(matrix[5]))),
+        'work must not jump above the grounded shadow',
+      ).toBe(0);
+      for (const matrix of bodies) {
+        expect(matrix[4], 'work torso compression stays below five percent').toBeGreaterThanOrEqual(0.95);
+        expect(Math.abs(matrix[2]), 'work must not lunge away from its work spot').toBeLessThanOrEqual(0.4);
+      }
+      for (const foot of feet) expect(foot).toEqual(feet[0]);
+      expect(bodies[4][4], 'the actual renderer reaches contact at the shared impact time').toBeCloseTo(
+        0.965,
+        6,
+      );
+      expect(bodies[4][2]).toBeCloseTo(0.3, 6);
+      expect(Math.max(...wrists) - Math.min(...wrists)).toBeGreaterThan(0.05);
+    } finally {
+      for (const state of states) state.adapter.dispose();
+      view.dispose();
+    }
+  });
+
+it('places the compact work strike at the supplied impact without changing combat lift', () => {
+  for (const { period, impact } of [harvestTiming, hammerTiming]) {
+    const contact = workPose(impact, period, impact);
+    expect(contact.direction).toBeGreaterThan(workPose(impact - 0.02, period, impact).direction);
+    expect(contact.direction).toBeGreaterThan(workPose(impact + 0.02, period, impact).direction);
+    const poses = Array.from({ length: 121 }, (_, i) => workPose((i * period) / 120, period, impact));
+    expect(
+      Math.max(...poses.map((p) => p.direction)) - Math.min(...poses.map((p) => p.direction)),
+    ).toBeLessThan(1.2);
+    expect(poses.every((p) => p.lift === 0 && p.crouch <= 0.04 && Math.abs(p.forward) <= 0.3)).toBe(true);
+  }
+  const person = new Person(0, 'Fighter', Role.Resident, Calling.Warrior, Race.Human, 499096, point()),
+    parts = new PersonParts();
+  personSprite(person, parts);
+  animateAction(parts, 'sword', 0.5, 1);
+  expect(parts.body!.matrix[5]).toBe(-2.5);
+  expect(parts.feet[1]!.matrix[5]).toBeCloseTo(-0.35, 6);
+});
+
+for (const stone of [false, true])
+  it(`retains the final ${stone ? 'pick' : 'axe'} contact briefly after harvesting becomes collecting`, () => {
+    const view = surface(160, 160),
+      state = new WorldRendererState(tvg),
+      traffic = new Traffic(5);
+    state.rows = Array.from({ length: 64 }, () => new SceneNode());
+    state.currentVisibility.sample = () => 255;
+    const p = new Person(7, 'Worker', Role.Resident, Calling.Settler, Race.Human, 499096, point(10, 10));
+    p.activity = stone ? Activity.Mining : Activity.Felling;
+    p.tree = 9 + 10 * 32;
+    p.until = 6;
+    let time = 5.9;
+    const events = [
+      {
+        serial: 1n,
+        kind: stone ? TreeWorkKind.Mine : TreeWorkKind.Chop,
+        person: p.id,
+        cell: p.tree,
+        index: 0,
+        worker: { ...p.position },
+        at: 6,
+      },
+      {
+        serial: 2n,
+        kind: stone ? TreeWorkKind.Shatter : TreeWorkKind.Fall,
+        person: p.id,
+        cell: p.tree,
+        index: 0,
+        worker: { ...p.position },
+        at: 6,
+      },
+    ];
+    const town = {
+      people: () => [p],
+      buildings: () => [],
+      building: () => null,
+      monsters: () => [],
+      wildlife: () => [],
+      hits: () => [],
+      treeEvents: () => events,
+      clock: () => time,
+      map: () => ({
+        giant: () => null,
+        volcano: () => null,
+        width: () => 32,
+        seed: () => 5,
+        inside: () => true,
+        at: () => ({ trees: 1 }),
+      }),
+    } as unknown as Town;
+    try {
+      moveAgents(state, town, traffic, time, []);
+      const figure = state.figures.get(p.id)!,
+        parts = figure.parts,
+        tool = stone ? 'pickaxe' : 'axe';
+      expect(figure.facing).toBe(-1);
+      p.activity = Activity.Collecting;
+      p.tree = -1;
+      p.carriedProduct = stone ? Product.Stone : Product.Wood;
+      // Collection owns a different deadline; the final work pose must use the real hit.
+      p.until = 999;
+      time = 6.02;
+      moveAgents(state, town, traffic, time, []);
+      figure.paint.transform([-4, 0, 100, 0, 4, 135, 0, 0, 1]);
+      view.root.add(figure.paint);
+      view.draw();
+      view.capture(`final-${tool}-contact`);
+      expect(parts[tool]!.alpha).toBe(255);
+      expect(figure.facing).toBe(-1);
+      expect(parts.body!.matrix[5]).toBe(0);
+      expect(parts.body!.matrix[4]).toBeCloseTo(
+        1 - workPose(harvestTiming.impact + 0.02, harvestTiming.period, harvestTiming.impact).crouch,
+        6,
+      );
+      for (const foot of parts.feet) expect(foot!.matrix[5]).toBe(0);
+      time = 6.2;
+      moveAgents(state, town, traffic, time, []);
+      figure.paint.transform([-4, 0, 100, 0, 4, 135, 0, 0, 1]);
+      view.draw();
+      view.capture(`final-${tool}-collect`);
+      expect(parts.axe!.alpha).toBe(0);
+      expect(parts.pickaxe!.alpha).toBe(0);
+    } finally {
+      state.adapter.dispose();
+      view.dispose();
+    }
+  });

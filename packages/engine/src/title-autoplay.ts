@@ -2,6 +2,7 @@ import { nativeSort } from './native-sort';
 import { nativeRandomRadial } from './native-random-order';
 // Translated from src/game/title_autoplay.cpp; invoked only on disposable title worlds.
 import { TownState } from './town-state';
+import { titleAutoplayRate } from './work-timing';
 import { Building, type Check, type Forecast, type Placement } from './town-models';
 import { Resources, Product, Structure, structureSpec, isLodging } from './building-catalog';
 import { Activity, Role, Calling, type Person } from './person';
@@ -147,7 +148,7 @@ export function startTitleAutoplay(this: TitleTown, seed: number): void {
 export function advanceTitleAutoplay(this: TitleTown, seconds: number): void {
   if (!this.titleAutoplay || !Number.isFinite(seconds) || seconds <= 0) return;
   this.maintainTitleBuilder();
-  seconds = Math.min(seconds, 0.25) * 4;
+  seconds = Math.min(seconds, 0.25) * titleAutoplayRate;
   this.titlePlanTimer -= seconds;
   this.titleWeatherTimer -= seconds;
   if (this.titleWeatherTimer <= 0) {

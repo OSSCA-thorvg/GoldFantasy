@@ -79,6 +79,7 @@ function interval(cue: Cue): number {
       return 0.25;
     case Cue.Chop:
     case Cue.Mine:
+    case Cue.Hammer:
       return 0.12;
     case Cue.TreeFall:
       return 0.4;

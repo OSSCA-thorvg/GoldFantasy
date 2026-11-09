@@ -3,7 +3,6 @@ import type { GameInputApp } from './game-input';
 import { point, add, scale, distance, unproject, type Point } from '../../../../packages/engine/src/geometry';
 import { clamp, f32 as f } from '../../../../packages/engine/src/numeric';
 import { Weather } from '../../../../packages/engine/src/climate';
-import { Activity } from '../../../../packages/engine/src/person';
 import { Season } from '../../../../packages/engine/src/town-models';
 import { Structure } from '../../../../packages/engine/src/building-catalog';
 import { isWater } from '../../../../packages/engine/src/world-types';
@@ -37,24 +36,8 @@ export function ambience(this: GameAmbienceApp): Ambience {
   mix.birds = f(f(f(1 - sky.night) * (wet ? f(0.1) : 1)) * (sky.temperature > 3 ? 1 : f(0.2)));
   const middle = unproject(this.camera.x, this.camera.y),
     earshot = f(14 / Math.max(this.camera.zoom, f(0.3)));
-  let hammers = 0,
-    hammerX = 0;
-  for (const person of this.town.people()) {
-    const hammering = person.activity === Activity.Building || person.activity === Activity.Roadwork;
-    if (
-      !hammering ||
-      person.moving() ||
-      person.crossingDoorway() ||
-      person.inside ||
-      !this.renderer.visible(person.position)
-    )
-      continue;
-    const weight = f(f(0.6) * f(Math.exp(f(-distance(person.position, middle) / earshot))));
-    hammers = f(hammers + weight);
-    hammerX = f(hammerX + f(this.spatial(Cue.Place, person.position).pan * weight));
-  }
-  mix.hammering = f(Math.min(1, f(hammers / 3)) * effectVolume(this.camera.zoom));
-  mix.hammerPan = hammers > 0 ? f(hammerX / hammers) : 0;
+  // Work hits are discrete simulation events, synchronized with each visible
+  // tool contact. Random ambient hammering would play between those contacts.
   const steps = 10;
   let heard = 0,
     shore = 0,

@@ -34,6 +34,7 @@ export enum Cue {
   Wolf,
   Dog,
   Cat,
+  Hammer,
   Count,
 }
 export enum SpeechChannel {

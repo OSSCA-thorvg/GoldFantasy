@@ -590,6 +590,7 @@ export function encodeTown(town: SaveTown): string {
         (p.carrying > 0 && (p.carriedProduct === Product.Planks || p.carriedProduct === Product.CutStone)),
     ) ||
     town.beasts.some((m) => m.strength !== 1) ||
+    town.timberEvents.some(event => event.kind >= TreeWorkKind.Regrow) ||
     town.placed.some(
       (b) =>
         b.kind >= Structure.Sawmill ||

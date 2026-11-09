@@ -5,7 +5,7 @@ import { Clip, MusicStream, SoundLibrary, sounds, onsets } from './sound-library
 import { voiceSample } from './spoken-voice';
 import { EffectManager } from './effect-manager';
 import { Score } from './music-score';
-import { animalCallWindows, cueClips } from './sound-catalog';
+import { animalCallWindows, workClipWindows, cueClips } from './sound-catalog';
 import { ambient, voice, clipEnd, effectDuration, type Voice, type Stereo } from './sound-synthesis';
 export enum Playback {
   Playing,
@@ -34,6 +34,8 @@ function makeVoice(sound: Sound, age = 0, token = 0n): Voice {
     right: f(Math.sin(angle)),
     clip: new Clip(),
     rate: 1,
+    woodLow: 0,
+    woodSoft: 0,
   };
 }
 export class SoundBoard {
@@ -120,9 +122,7 @@ export class SoundBoard {
     const age =
         sound.cue === Cue.Speech
           ? f(sound.offset - sound.delay)
-          : picked.clip.frames
-            ? -Math.max(0, sound.delay)
-            : 0,
+          : f(Math.max(0, sound.offset) - Math.max(0, sound.delay)),
       v = makeVoice(sound, age, token);
     v.clip = picked.clip;
     v.rate = picked.rate;
@@ -139,29 +139,32 @@ export class SoundBoard {
         return (this.picking >>> 8) / 16777216;
       },
       group = groups[Math.min(groups.length - 1, Math.trunc(f(next() * groups.length)))],
-      calls = animalCallWindows[sound.cue],
+      calls = animalCallWindows[sound.cue] ?? workClipWindows[sound.cue],
       takes = calls?.length ?? this.library.count(group);
     if (!takes) return { clip: new Clip(), rate: 1 };
     const key = sound.cue % this.lastTake.length;
     let take = Math.trunc(f(next() * takes)) % takes;
     if (takes > 1 && take === this.lastTake[key]) take = (take + 1) % takes;
     this.lastTake[key] = take;
-    const spread = f(interfaceCue(sound.cue) ? 0.02 : 0.05),
+    const spread = f(sound.cue === Cue.TreeFall ? 0 : interfaceCue(sound.cue) ? 0.02 : 0.05),
       speed = f(
         f(1 + f(f(f(next() * 2) - 1) * spread)) *
-          (Number.isFinite(sound.pitch) && sound.pitch > 0 ? sound.pitch : 1),
-      );
+          (Number.isFinite(sound.pitch) && sound.pitch > 0 ? sound.pitch : 1) *
+          (sound.cue === Cue.Chop ? 0.72 : 1),
+      ),
+      playable = (clip: Clip): Clip =>
+        !clip.pcm && [Cue.Chop, Cue.TreeFall, Cue.Hammer].includes(sound.cue) ? new Clip() : clip;
     if (calls) {
       const call = calls[take],
         source = this.library.clip(call.source, 0),
         first = Math.min(source.frames, Math.round(call.from * source.rate)),
         last = Math.min(source.frames, Math.round(call.to * source.rate));
       return {
-        clip: new Clip(source.pcm?.subarray(first, last) ?? null, last - first, source.rate),
+        clip: playable(new Clip(source.pcm?.subarray(first, last) ?? null, last - first, source.rate)),
         rate: speed,
       };
     }
-    return { clip: this.library.clip(group, take), rate: speed };
+    return { clip: playable(this.library.clip(group, take)), rate: speed };
   }
   musicPlaying(): boolean {
     return this.musicOn;
@@ -264,7 +267,7 @@ export class SoundBoard {
       };
     let mixedFrames = 0,
       fadedOut = false;
-    for (let first = 0; first < frames;) {
+    for (let first = 0; first < frames; ) {
       let count = Math.min(1024, frames - first);
       if (this.fadeTarget !== Playback.Playing && this.fadeSamples > 0)
         count = Math.min(count, this.fadeSamples - this.fadeAt);

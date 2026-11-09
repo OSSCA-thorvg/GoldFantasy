@@ -3,7 +3,7 @@ import { Town } from '../../engine/src/town';
 import { Traffic, Agent, AgentKind } from '../../engine/src/traffic';
 import { point, sub, add, mul, distance, normalized, project } from '../../engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../engine/src/numeric';
-import { Activity } from '../../engine/src/person';
+import { Activity, TreeWorkKind, type TreeWorkEvent } from '../../engine/src/person';
 import { farmWorkPhase } from '../../engine/src/farm-work';
 import { breedOf } from '../../engine/src/town-monsters';
 import { injuryOf, Injury } from '../../engine/src/person-look';
@@ -13,6 +13,7 @@ import { Weather } from '../../engine/src/climate';
 import { treePosition } from '../../engine/src/world-map';
 import * as mining from '../../engine/src/mining';
 import * as woodcutting from '../../engine/src/woodcutting';
+import { harvestTiming, hammerTiming, workElapsed } from '../../engine/src/work-timing';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
 import { standingRow, registerDepth } from './world-depth';
@@ -24,8 +25,23 @@ import { line, opaque } from './vector-paint';
 import { updateBuildingDamage } from './building-damage';
 import { clearWorkProps, animateFieldWork, animateProcessingWork } from './work-motion';
 import { callingEquipment, combatEquipment, showEquipment, poseBow } from './person-equipment';
-import { animateAction, animateMonsterAttack, strikePhase } from './action-motion';
+import { animateAction, animateWork, animateMonsterAttack, strikePhase } from './action-motion';
 const inSight = (s: WorldRendererState, p: { x: number; y: number }) => s.currentVisibility.sample(p) >= 119;
+function finalHarvestContact(town: Town, person: number): TreeWorkEvent | undefined {
+  const events = town.treeEvents();
+  for (let i = events.length - 1; i >= 0; --i) {
+    const event = events[i],
+      age = town.clock() - event.at;
+    if (
+      event.person === person &&
+      (event.kind === TreeWorkKind.Chop || event.kind === TreeWorkKind.Mine) &&
+      age >= 0 &&
+      age <= 0.12
+    )
+      return event;
+  }
+  return undefined;
+}
 export function moveAgents(
   s: WorldRendererState,
   town: Town,
@@ -120,6 +136,16 @@ export function moveAgents(
     const chopping =
         person.activity === Activity.Felling && !person.moving() && !crossing && person.tree >= 0,
       miningNow = person.activity === Activity.Mining && !person.moving() && !crossing && person.tree >= 0;
+    // The final hit changes the simulation to Collecting immediately. Preserve
+    // its short grounded follow-through from the real event, not the new deadline.
+    const workContact =
+      !s.sceneView &&
+      person.activity === Activity.Collecting &&
+      !person.moving() &&
+      !crossing &&
+      !person.inside
+        ? finalHarvestContact(town, person.id)
+        : undefined;
     if (miningNow)
       ahead = sub(
         mining.position(person.tree % town.map().width(), Math.trunc(person.tree / town.map().width())),
@@ -199,26 +225,27 @@ export function moveAgents(
         workplace.productionProgress > 0 &&
         (workplace.kind === Structure.Sawmill || workplace.kind === Structure.Stoneworks);
     clearWorkProps(figure.parts);
-    const tool = chopping
-      ? 'axe'
-      : miningNow
-        ? 'pickaxe'
-        : hammering
-          ? 'hammer'
-          : farming
-            ? watering
-              ? 'wateringCan'
-              : 'hoe'
-            : processing
-              ? workplace.kind === Structure.Sawmill
-                ? 'saw'
-                : 'hammer'
-              : fighting
-                ? combatEquipment(person, town.building(person.job)?.kind)
-                : callingEquipment(person.calling);
+    const tool =
+      chopping || workContact?.kind === TreeWorkKind.Chop
+        ? 'axe'
+        : miningNow || workContact?.kind === TreeWorkKind.Mine
+          ? 'pickaxe'
+          : hammering
+            ? 'hammer'
+            : farming
+              ? watering
+                ? 'wateringCan'
+                : 'hoe'
+              : processing
+                ? workplace.kind === Structure.Sawmill
+                  ? 'saw'
+                  : 'hammer'
+                : fighting
+                  ? combatEquipment(person, town.building(person.job)?.kind)
+                  : callingEquipment(person.calling);
     showEquipment(figure.parts, tool);
     figure.parts.lute?.opacity(
-      fighting || chopping || miningNow || hammering || farming || processing ? 0 : 255,
+      fighting || chopping || miningNow || workContact || hammering || farming || processing ? 0 : 255,
     );
     if (tool === 'bow') poseBow(figure.parts, 0);
     figure.parts.arrow?.opacity(0);
@@ -230,14 +257,24 @@ export function moveAgents(
           workplace.kind === Structure.Sawmill,
           town.clock() + person.id * 0.31,
         );
-      else if (chopping || miningNow)
-        animateAction(
+      else if (chopping || miningNow || workContact)
+        animateWork(
           figure.parts,
           tool,
-          town.clock() - (person.until - woodcutting.cutSeconds),
-          woodcutting.swingSeconds,
+          workContact
+            ? harvestTiming.impact + town.clock() - workContact.at
+            : town.clock() - (person.until - woodcutting.cutSeconds),
+          harvestTiming.period,
+          harvestTiming.impact,
         );
-      else if (hammering) animateAction(figure.parts, tool, town.clock() + person.id * 0.17, 0.85);
+      else if (hammering)
+        animateWork(
+          figure.parts,
+          tool,
+          workElapsed(town.clock(), person.id),
+          hammerTiming.period,
+          hammerTiming.impact,
+        );
       else if (fighting && !striding && person.ready > town.clock())
         animateAction(figure.parts, tool, town.clock() - person.ready + 1 + strikePhase, 1);
     }

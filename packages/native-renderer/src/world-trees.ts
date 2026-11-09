@@ -3,6 +3,7 @@ import { f32, clamp } from '../../engine/src/numeric';
 import { WorldMap } from '../../engine/src/world-map';
 import { Town } from '../../engine/src/town';
 import { TreeWorkKind } from '../../engine/src/person';
+import { treeFallTiming } from '../../engine/src/work-timing';
 import * as mining from '../../engine/src/mining';
 import type { Climate } from '../../engine/src/climate';
 import { Rect } from '../../native-ui/src/types';
@@ -258,7 +259,7 @@ export function updateGrowth(s: WorldRendererState, town: Town, seconds: number)
 export function updateFelling(s: WorldRendererState, town: Town): void {
   const now = town.clock();
   s.fallingTrees = s.fallingTrees.filter((tree) => {
-    if (now - tree.at < 0.8) return true;
+    if (now - tree.at < treeFallTiming.duration) return true;
     s.rows[tree.row].remove(tree.paint);
     return false;
   });
@@ -266,7 +267,7 @@ export function updateFelling(s: WorldRendererState, town: Town): void {
   for (const event of town.treeEvents()) {
     if (event.serial < s.seenTreeEvent) continue;
     s.seenTreeEvent = event.serial + 1n;
-    if (event.kind !== TreeWorkKind.Fall || now - event.at >= 0.8 || s.fallingTrees.length >= 64) continue;
+    if (event.kind !== TreeWorkKind.Fall || now - event.at >= treeFallTiming.duration || s.fallingTrees.length >= 64) continue;
     const x = event.cell % map.width(),
       y = Math.trunc(f32(event.cell / map.width())),
       tree = treeAt(map, x, y, event.index),
@@ -305,8 +306,9 @@ export function updateFelling(s: WorldRendererState, town: Town): void {
     s.fallingTrees.push({ paint, body, dust, pivot, row, at: event.at, side: pivot.x < worker.x ? -1 : 1 });
   }
   for (const tree of s.fallingTrees) {
-    const t = f32(clamp((now - tree.at) / 0.8, 0, 1)),
-      angle = f32(f32(f32(tree.side * f32(1.46)) * t) * t),
+    const t = f32(clamp((now - tree.at) / treeFallTiming.duration, 0, 1)),
+      contact = f32(clamp((now - tree.at) / treeFallTiming.impact, 0, 1)),
+      angle = f32(f32(f32(tree.side * f32(1.46)) * contact) * contact),
       c = f32(Math.cos(angle)),
       sin = f32(Math.sin(angle)),
       flat = f32(1 - f32(f32(0.65) * t)),

@@ -16,6 +16,7 @@ import { Weather } from './climate';
 import { DungeonKind } from './world-types';
 import { f32 as f, clamp } from './numeric';
 import * as mining from './mining';
+import { hammerTiming, harvestTiming, workElapsed, workImpactBetween } from './work-timing';
 import { animalSpec } from './wildlife';
 import { prepareFarmWork } from './farm-work';
 import { separatePeople, roadWorkSpot, buildingWorkSpot } from './person-navigation';
@@ -53,6 +54,16 @@ export interface TickTown extends PeopleTown {
   credit(gain: Resources, village: number): void;
   think(p: Person): void;
   recount(): void;
+}
+/** Sounds are emitted by productive ticks, never an unrelated ambience timer. */
+function hammerContact(town: TickTown, p: Person, dt: number): void {
+  const contact = workImpactBetween(workElapsed(town.time - dt, p.id), workElapsed(town.time, p.id), hammerTiming);
+  if (contact === null) return;
+  town.timberEvents.push({
+    serial: town.nextTreeEvent++, kind: TreeWorkKind.Hammer, person: p.id,
+    cell: Math.floor(p.position.y) * town.world.width() + Math.floor(p.position.x),
+    index: 0, worker: { ...p.position }, at: contact - workElapsed(0,p.id),
+  });
 }
 export function dangerNear(town: TickTown, p: Person): boolean {
   const notice = p.ordered ? 6 : p.role === Role.Guest ? 8 : town.raiding() ? 10 : 5;
@@ -236,7 +247,7 @@ export function tick(this: TickTown, dt: number): void {
           }
           break;
         }
-        const repairing = place.built();
+        const repairing = place.built(), previousHealth = place.health, previousProgress = place.progress;
         if (repairing) {
           if (prepareBuildingRepair(this as Town, p, place)) break;
           restoreBuildingHealth(place, f(f(2 * f(dt)) / buildWork(place.kind)));
@@ -248,6 +259,7 @@ export function tick(this: TickTown, dt: number): void {
             f(place.progress + f(f(dt) / buildWork(place.kind))),
           );
         }
+        if (place.health > previousHealth || place.progress > previousProgress) hammerContact(this,p,dt);
         if (!repairing && place.built()) {
           this.notify(structureSpec(place.kind).name + ' is finished');
           if (place.kind === Structure.Guild)
@@ -323,6 +335,7 @@ export function tick(this: TickTown, dt: number): void {
           road.wear = Math.max(0, f(road.wear - f(f(f(dt) * f(0.5)) / Math.max(1, road.length()))));
           if (ruined && road.wear < 1) this.roadChanged();
           if (road.wear <= 0) this.notify('A road is mended');
+          hammerContact(this,p,dt);
           break;
         }
         if (this.prepareConstruction(p, Activity.Roadwork, road.id)) break;
@@ -332,6 +345,7 @@ export function tick(this: TickTown, dt: number): void {
           road.materials.limit(),
           f(road[shareKey] + f(f(f(dt) * (paving ? f(0.2) : f(0.32))) / Math.max(1, road.length()))),
         );
+        if (road[shareKey] > before) hammerContact(this,p,dt);
         const turn = f(1 - road.constructionStart);
         if (!paving && before < turn && road[shareKey] >= turn && turn < 1) {
           road[shareKey] = turn;
@@ -386,17 +400,13 @@ export function tick(this: TickTown, dt: number): void {
           break;
         }
         if (place) place.workedSeconds = f(place.workedSeconds + f(dt));
-        const started = p.until - 6,
-          stroke = (at: number): number => Math.floor((at - started - 0.52) / 0.7);
-        if (stroke(this.time) > stroke(this.time - dt))
+        const started = p.until - harvestTiming.duration,
+          contact = workImpactBetween(this.time - dt - started, Math.min(harvestTiming.duration, this.time - started), harvestTiming);
+        if (contact !== null)
           this.timberEvents.push({
-            serial: this.nextTreeEvent++,
-            kind: stone ? TreeWorkKind.Mine : TreeWorkKind.Chop,
-            person: p.id,
-            cell: p.tree,
-            index: stone ? 0 : this.world.at(x, y).trees - 1,
-            worker: { ...p.position },
-            at: started + 0.52 + stroke(this.time) * 0.7,
+            serial: this.nextTreeEvent++, kind: stone ? TreeWorkKind.Mine : TreeWorkKind.Chop,
+            person: p.id, cell: p.tree, index: stone ? 0 : this.world.at(x,y).trees - 1,
+            worker: { ...p.position }, at: started + contact,
           });
         if (this.time < p.until) break;
         if (stone) this.world.at(x, y).quarried = true;
@@ -408,7 +418,7 @@ export function tick(this: TickTown, dt: number): void {
           cell: p.tree,
           index: this.world.at(x, y).trees,
           worker: { ...p.position },
-          at: this.time,
+          at: p.until,
         });
         p.carriedProduct = stone ? Product.Stone : Product.Wood;
         p.carrying += 3;

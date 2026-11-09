@@ -7,12 +7,10 @@ import type { Town } from '../../../../packages/engine/src/town';
 import { Tool, Preview } from '../../../../packages/engine/src/game-tools';
 import { Camera, distance, type Point } from '../../../../packages/engine/src/geometry';
 import { clamp, f32 as f } from '../../../../packages/engine/src/numeric';
-import { TreeWorkKind } from '../../../../packages/engine/src/person';
-import { treePosition } from '../../../../packages/engine/src/world-map';
-import * as mining from '../../../../packages/engine/src/mining';
 import { Cue, Sound, SpeechChannel, noticeCue } from '../../../../packages/native-audio/src/sound-types';
 import { Moment } from '../../../../packages/native-audio/src/music-director';
 import { Rect } from '../../../../packages/native-ui/src';
+import { queueWorkSounds } from './work-audio';
 import {
   type CharacterEditor,
   type BuildingEditor,
@@ -200,39 +198,7 @@ export function render(
       blow.gain = f(blow.gain * f(0.6));
       if (blow.gain > f(0.03) && this.cues.length < 32) this.cues.push(blow);
     }
-    let timberHeard = 0;
-    for (const event of this.town.treeEvents()) {
-      if (event.serial < this.heardTree) continue;
-      this.heardTree = event.serial + 1n;
-      if (this.town.clock() - event.at > 0.25 || timberHeard >= 4) continue;
-      const stone = event.kind === TreeWorkKind.Mine || event.kind === TreeWorkKind.Shatter,
-        x = event.cell % this.town.map().width(),
-        y = Math.trunc(event.cell / this.town.map().width()),
-        at =
-          event.kind === TreeWorkKind.Produced
-            ? event.worker
-            : stone
-              ? mining.position(x, y)
-              : treePosition(this.town.map(), x, y, event.index);
-      if (!this.renderer.visible(at)) continue;
-      const sound = this.spatial(
-        event.kind === TreeWorkKind.Regrow || event.kind === TreeWorkKind.Produced
-          ? Cue.Growth
-          : stone
-            ? Cue.Mine
-            : event.kind === TreeWorkKind.Chop
-              ? Cue.Chop
-              : Cue.TreeFall,
-        at,
-      );
-      sound.gain = f(
-        sound.gain *
-          f(event.kind === TreeWorkKind.Regrow || event.kind === TreeWorkKind.Produced ? 0.22 : 0.4),
-      );
-      sound.speaker = event.person;
-      this.cues.push(sound);
-      ++timberHeard;
-    }
+    queueWorkSounds(this);
     let completed = false;
     for (const item of this.town.buildings()) {
       if (!item.built() || this.finished.includes(item.id)) continue;

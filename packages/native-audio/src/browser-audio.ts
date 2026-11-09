@@ -1,4 +1,5 @@
-const processorUrl = `${import.meta.env?.BASE_URL ?? '/'}vendor/goldfantasy-audio.js`;
+// The mixer changed with work contacts; avoid reusing a cached pre-contact processor.
+const processorUrl = `${import.meta.env?.BASE_URL ?? '/'}vendor/goldfantasy-audio.js?v=work-contacts-1`;
 import { SoundLibrary } from './sound-library';
 import effectEndings from './data/effect-endings.json';
 import { Playback } from './sound-board';

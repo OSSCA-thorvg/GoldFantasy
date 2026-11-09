@@ -2,7 +2,7 @@
 import { f32, clamp } from '../../engine/src/numeric';
 import { Cue, VoiceLine, type Ambience, type Sound } from './sound-types';
 import type { Clip } from './sound-library';
-import { animalCallWindows } from './sound-catalog';
+import { animalCallWindows, treeFallClipImpactSeconds } from './sound-catalog';
 export interface Stereo {
   left: number;
   right: number;
@@ -17,6 +17,8 @@ export interface Voice {
   right: number;
   clip: Clip;
   rate: number;
+  woodLow: number;
+  woodSoft: number;
 }
 export interface SynthesisState {
   clock: number;
@@ -53,9 +55,25 @@ const nativeDouble = <T>(value: T): T => value;
 const fmod = (a: number, b: number): number => a % b;
 const tau = f32(6.2831853);
 export const effectDuration = (cue: Cue): number =>
-  cue === Cue.Chop ? f32(0.18) : cue === Cue.Mine ? f32(0.22) : cue === Cue.TreeFall ? f32(0.85) : f32(1.6);
+  cue === Cue.Chop
+    ? f32(0.28)
+    : cue === Cue.Hammer
+      ? f32(0.34)
+      : cue === Cue.Mine
+        ? f32(0.22)
+        : cue === Cue.TreeFall
+          ? f32(0.85)
+          : f32(1.6);
 export const clipEnd = (cue: Cue, clip: Clip, rate: number): number =>
   Math.min(f32(f32(clip.duration()) / rate), cue === Cue.Chop ? effectDuration(cue) : f32(1e9));
+const woodFilter = 1 - Math.exp((-2 * Math.PI * 1800) / 44100);
+function woodImpact(v: Voice, sample: number): number {
+  // Two gentle low-pass stages keep the trunk's low resonance while softening
+  // the full-scale high-frequency edge in the recorded axe strike.
+  v.woodLow += woodFilter * (sample - v.woodLow);
+  v.woodSoft += woodFilter * (v.woodLow - v.woodSoft);
+  return v.woodSoft;
+}
 export function decay(age: number, length: number): number {
   return age < 0 ? 0 : f32(Math.exp(f32(-age / length)));
 }
@@ -264,6 +282,7 @@ export function ambient(this: SynthesisState, out: Stereo): void {
 }
 export function voice(this: SynthesisState, v: Voice): number {
   let a = v.age;
+  if (a < 0) return 0;
   if (v.clip.frames) {
     if (v.sound.cue != Cue.Speech) {
       // Faded over its last moments, longer where it is cut short, so no clip ends on a click.
@@ -271,6 +290,10 @@ export function voice(this: SynthesisState, v: Voice): number {
         fade = end < f32(f32(v.clip.duration()) / v.rate) ? f32(0.025) : f32(0.006);
       if (animalCallWindows[v.sound.cue])
         return f32(v.clip.at(a, v.rate) * clamp(Math.min(a / 0.008, (end - a) / 0.045), 0, 1));
+      if (v.sound.cue === Cue.Chop)
+        return f32(woodImpact(v, v.clip.at(a, v.rate)) * clamp(Math.min(a / 0.002, (end - a) / 0.035), 0, 1));
+      if (v.sound.cue === Cue.Hammer || v.sound.cue === Cue.TreeFall)
+        return f32(v.clip.at(a, v.rate) * clamp(Math.min(a / 0.002, (end - a) / 0.045), 0, 1));
       return f32(v.clip.at(a, v.rate) * clamp(f32(f32(end - a) / fade), 0, 1));
     }
     if (a < 0 || a >= v.sound.duration) return 0;
@@ -355,10 +378,16 @@ export function voice(this: SynthesisState, v: Voice): number {
       );
     case Cue.Chop:
       return f32(
-        f32(
-          f32(f32(f32(Math.sin(f32(f32(tau * 185) * a))) * decay(a, f32(0.028))) * f32(0.35)) +
-            f32(f32(this.noise() * decay(a, f32(0.009))) * f32(0.22)),
-        ) * clamp(f32(f32(f32(0.18) - a) / f32(0.025)), 0, 1),
+        woodImpact(
+          v,
+          Math.sin(tau * 130 * a) * decay(a, 0.055) * 0.4 + this.noise() * decay(a, 0.006) * 0.1,
+        ) * clamp(Math.min(a / 0.002, (0.28 - a) / 0.035), 0, 1),
+      );
+    case Cue.Hammer:
+      return f32(
+        (Math.sin(tau * 190 * a) * 0.45 + this.noise() * 0.12) *
+          decay(a, 0.035) *
+          clamp(Math.min(a / 0.002, (0.34 - a) / 0.045), 0, 1),
       );
     case Cue.Mine:
       return f32(
@@ -377,7 +406,7 @@ export function voice(this: SynthesisState, v: Voice): number {
       let creak = f32(
         f32(f32(Math.sin(f32(f32(tau * f32(160 - f32(65 * a))) * a))) * decay(a, f32(0.25))) * f32(0.055),
       );
-      let hit = f32(a - f32(0.5));
+      let hit = f32(a - f32(treeFallClipImpactSeconds));
       let thud =
         hit < 0
           ? 0

@@ -116,6 +116,90 @@ export function animateAction(parts: PersonParts, tool: HeldTool, elapsed: numbe
   parts.shadow?.transform([shadow, 0, 0, 0, shadow, 0, 0, 0, 1]);
 }
 
+// Work uses a restrained hand-led motion. Contact is supplied by the same clock
+// as the simulation's impact event; combat retains its separate dynamic poses.
+const workKeys: (ActionPose & { at: number })[] = [
+  { at: 0, upper: -0.88, elbow: -0.25, direction: -0.35, crouch: 0.01, lift: 0, lean: 0.01, forward: 0 },
+  {
+    at: 0.28,
+    upper: -1.05,
+    elbow: -0.3,
+    direction: -0.6,
+    crouch: 0.02,
+    lift: 0,
+    lean: -0.01,
+    forward: -0.12,
+  },
+  {
+    at: 0.52,
+    upper: -1.4,
+    elbow: -0.25,
+    direction: -1.05,
+    crouch: 0.015,
+    lift: 0,
+    lean: -0.015,
+    forward: -0.15,
+  },
+  { at: 0.63, upper: -1.3, elbow: -0.18, direction: -0.8, crouch: 0.02, lift: 0, lean: 0, forward: 0 },
+  { at: 0.75, upper: -0.95, elbow: -0.08, direction: 0.08, crouch: 0.035, lift: 0, lean: 0.03, forward: 0.3 },
+  {
+    at: 0.86,
+    upper: -0.9,
+    elbow: -0.12,
+    direction: -0.02,
+    crouch: 0.025,
+    lift: 0,
+    lean: 0.02,
+    forward: 0.18,
+  },
+  { at: 1, upper: -0.88, elbow: -0.25, direction: -0.35, crouch: 0.01, lift: 0, lean: 0.01, forward: 0 },
+];
+export function workPose(elapsed: number, period: number, impact: number): ActionPose {
+  const phase = (((elapsed % period) + period) % period) / period,
+    contact = impact / period;
+  const at = phase <= contact ? (phase / contact) * 0.75 : 0.75 + ((phase - contact) / (1 - contact)) * 0.25;
+  let next = 1;
+  while (next < workKeys.length - 1 && at > workKeys[next].at) ++next;
+  const from = workKeys[next - 1],
+    to = workKeys[next],
+    t = (at - from.at) / (to.at - from.at),
+    eased = next === 4 ? t * t : smooth(t),
+    blend = (key: keyof ActionPose) => from[key] + (to[key] - from[key]) * eased;
+  return {
+    upper: blend('upper'),
+    elbow: blend('elbow'),
+    direction: blend('direction'),
+    crouch: blend('crouch'),
+    lift: 0,
+    lean: blend('lean'),
+    forward: blend('forward'),
+  };
+}
+export function animateWork(
+  parts: PersonParts,
+  tool: HeldTool,
+  elapsed: number,
+  period: number,
+  impact: number,
+): void {
+  const pose = workPose(elapsed, period, impact),
+    phase = (((elapsed % period) + period) % period) / period,
+    contact = impact / period,
+    nearing = smooth(Math.max(0, 1 - Math.abs(phase - contact) / 0.16)),
+    direction =
+      -0.35 +
+      (pose.direction + 0.35) * (tool === 'hammer' ? 0.7 : 1) +
+      (tool === 'pickaxe' ? 0.3 : tool === 'hammer' ? 0.12 : 0) * nearing,
+    restAngle = Math.atan2(-8, 6);
+  poseArm(parts.arms[1], pose.upper, pose.elbow, direction - restAngle - pose.upper - pose.elbow);
+  poseArm(parts.arms[0], -0.45, -0.4 - pose.crouch * 0.5, 0.1);
+  parts.body?.transform([1, -pose.lean, pose.forward, 0, 1 - pose.crouch, 0, 0, 0, 1]);
+  // Neither foot nor shadow follows the striking arm: repeated work stays planted.
+  parts.feet[0]?.translate(0, 0);
+  parts.feet[1]?.translate(0, 0);
+  parts.shadow?.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+}
+
 const monsterPoses = [
   [0, 2.6, 0.22, 0.08, 0.35],
   [0.12, 1.1, 0.12, 0.16, 0],
