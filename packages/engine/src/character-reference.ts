@@ -1,5 +1,4 @@
-import pool from '../../content/assets/characters/character-pool.json';
-import library from '../../content/assets/characters/character-library.json';
+import references from '../data/character-references.json';
 import { BodyType, FaceShape, PortraitEyeForm, PortraitEyeKind, type Appearance } from './person-appearance';
 import { clamp, f32 as f, hash01 } from './numeric';
 export const referenceHeadCount = 19,
@@ -23,20 +22,22 @@ export enum CharacterAssetGender {
 }
 const hairIndex = (i: number) => clamp(i, 0, hairAssetCount - 1),
   baseIndex = (i: number) => clamp(i, 0, faceBaseCount - 1);
-export const faceBaseName = (i: number): string => pool.faces[baseIndex(i)].name;
-export const headAssetName = (i: number): string => library.heads[clamp(i, 0, referenceHeadCount - 1)].name;
+export const faceBaseName = (i: number): string => references.faces[baseIndex(i)].name;
+export const headAssetName = (i: number): string =>
+  references.heads[clamp(i, 0, referenceHeadCount - 1)].name;
 export const eyeAssetName = (i: number): string =>
   i >= referenceHeadCount ? 'Flat lids / elf' : headAssetName(i);
-export const hairAssetName = (i: number): string => pool.looks[hairIndex(i)].name;
-export const characterAssetGroup = (i: number): CharacterAssetGroup => pool.looks[hairIndex(i)].group;
-export const characterAssetGender = (i: number): CharacterAssetGender => pool.looks[hairIndex(i)].gender;
+export const hairAssetName = (i: number): string => references.looks[hairIndex(i)].name;
+export const characterAssetGroup = (i: number): CharacterAssetGroup => references.looks[hairIndex(i)].group;
+export const characterAssetGender = (i: number): CharacterAssetGender =>
+  references.looks[hairIndex(i)].gender;
 export const characterAssetReady = (i: number): boolean =>
-  i >= 0 && i < hairAssetCount && pool.looks[i].ready;
+  i >= 0 && i < hairAssetCount && references.looks[i].ready;
 export const safeCharacterHairAsset = (i: number): number =>
-  i < 0 || i >= hairAssetCount ? baldHairAsset : pool.looks[i].fallback;
+  i < 0 || i >= hairAssetCount ? baldHairAsset : references.looks[i].fallback;
 export const characterOutfitReady = (i: number): boolean => i >= 0 && i < outfitAssetCount && i !== 10;
 export const safeCharacterOutfitAsset = (i: number): number => (characterOutfitReady(i) ? i : 0);
-export const outfitAssetName = (i: number): string => library.outfits[safeCharacterOutfitAsset(i)].name;
+export const outfitAssetName = (i: number): string => references.outfits[safeCharacterOutfitAsset(i)].name;
 export function setCharacterHeadBase(a: Appearance, i: number): void {
   a.faceAsset = a.scalpAsset = baseIndex(i);
   a.scalpWidth = a.scalpHeight = a.templeWidth = 1;
@@ -52,7 +53,7 @@ export function resolveCharacterAssets(a: Appearance): void {
 export function characterAssetWeight(i: number, gender: BodyType): number {
   if (!characterAssetReady(i)) return 0;
   if (i === baldHairAsset) return f(0.25);
-  const h = pool.looks[hairIndex(i)],
+  const h = references.looks[hairIndex(i)],
     family = [5, f(0.35), 1, f(1.5), 2][h.group];
   return f(family * (h.gender === 2 ? 4 : h.gender === gender ? 8 : 1));
 }
@@ -68,7 +69,7 @@ export function randomCharacterReference(seed: number, gender: BodyType): number
 }
 export function useCharacterReference(a: Appearance, i: number): void {
   i = safeCharacterHairAsset(i);
-  const source = pool.looks[hairIndex(i)];
+  const source = references.looks[hairIndex(i)];
   setCharacterHeadBase(a, source.native_face);
   a.hairAsset = hairIndex(i);
   a.earAsset = source.native_face;

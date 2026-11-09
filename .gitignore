@@ -16,6 +16,7 @@
 /scripts/*
 !/scripts/prepare-assets.mjs
 !/scripts/prepare-audio-worklet.mjs
+!/scripts/prepare-character-references.mjs
 !/scripts/verify-audio-assets.mjs
 
 # Local workspace and authoring configuration
