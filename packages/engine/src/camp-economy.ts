@@ -10,7 +10,7 @@ export class Ledger {
 }
 export class CampEconomy {
   faction = 0;
-  renown = 50;
+  renown = 0;
   today = new Ledger();
   yesterday = new Ledger();
   growingTended = 0;
