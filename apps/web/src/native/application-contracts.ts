@@ -14,7 +14,7 @@ export interface Camera extends Point {
 }
 export type SceneId = 'Title' | 'Game' | 'CharacterStudio' | 'MapEditor';
 export type AppEventType =
-  'PointerDown' | 'PointerUp' | 'PointerMove' | 'Wheel' | 'KeyDown' | 'KeyUp' | 'Text' | 'PointerCancel';
+  'PointerDown' | 'PointerUp' | 'PointerMove' | 'Wheel' | 'KeyDown' | 'KeyUp' | 'Text' | 'PointerCancel' | 'Gesture';
 export interface AppEvent {
   type: AppEventType;
   x: number;
@@ -27,6 +27,8 @@ export interface AppEvent {
   control: boolean;
   alt: boolean;
   meta: boolean;
+  pointerType?: string;
+  gesture?: { dx: number; dy: number; scale: number };
 }
 export interface Property {
   id: string;
@@ -44,6 +46,7 @@ export interface Application {
   /** Native hit geometry is valid only after the host has presented the Canvas. */
   presented?(pixelRatio: number): void;
   invalidatePresentation?(): void;
+  setTouchInput?(enabled: boolean): void;
   event(event: AppEvent): void;
   properties(): Property[];
   property(id: string, value: number): boolean;

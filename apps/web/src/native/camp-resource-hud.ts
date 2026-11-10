@@ -164,7 +164,7 @@ export class CampResourceHud {
             this.pending.push({ camp: receipt.camp, kind, amount: gains[kind] });
         }
       }
-    for (let at = 0; at < this.pending.length;) {
+    for (let at = 0; at < this.pending.length; ) {
       const pending = this.pending[at];
       if (!marker(pending.camp)) {
         this.pending.splice(at, 1);
@@ -254,8 +254,24 @@ export class CampResourceHud {
     const anchor = marker(hovered),
       seat = town.camp(hovered);
     if (!anchor || !seat || viewport.w < 240 || viewport.h < 36 + 36 * Math.ceil(names.length / 3)) return;
-    const stock = town.stock(hovered),
-      capacity = town.capacity(hovered),
+    const w = Math.min(336, viewport.w),
+      row = viewport.h < 220 ? 36 : 46,
+      h = f(36 + f(row * Math.ceil(names.length / 3)));
+    let x = f(anchor.roof.x + 30);
+    if (f(x + w) > f(viewport.x + viewport.w)) x = f(f(anchor.roof.x - w) - 30);
+    x = clamp(x, viewport.x, f(f(viewport.x + viewport.w) - w));
+    const y = clamp(f(anchor.roof.y - 28), viewport.y, f(f(viewport.y + viewport.h) - h)),
+      panel = new Rect(x, y, w, h);
+    this.drawStores(context, theme, town, hovered, panel);
+  }
+
+  /** The same resource artwork serves pointer tooltips and the touch inspector. */
+  drawStores(context: Context, theme: Theme, town: Town, camp: number, panel: Rect): void {
+    const seat = town.camp(camp);
+    if (!seat) return;
+
+    const stock = town.stock(camp),
+      capacity = town.capacity(camp),
       values = [
         stock.gold,
         stock.wood,
@@ -263,9 +279,9 @@ export class CampResourceHud {
         stock.food,
         stock.water,
         stock.mana,
-        town.renown(hovered),
-        town.population(hovered),
-        town.guests(hovered),
+        town.renown(camp),
+        town.population(camp),
+        town.guests(camp),
         stock.planks,
         stock.cutStone,
         stock.bones,
@@ -278,26 +294,20 @@ export class CampResourceHud {
         capacity.water,
         0,
         100,
-        town.housing(hovered),
-        town.guestBeds(hovered),
+        town.housing(camp),
+        town.guestBeds(camp),
         capacity.planks,
         capacity.cutStone,
         capacity.bones,
-      ],
-      w = Math.min(336, viewport.w),
-      row = viewport.h < 220 ? 36 : 46,
-      h = f(36 + f(row * Math.ceil(names.length / 3)));
-    let x = f(anchor.roof.x + 30);
-    if (f(x + w) > f(viewport.x + viewport.w)) x = f(f(anchor.roof.x - w) - 30);
-    x = clamp(x, viewport.x, f(f(viewport.x + viewport.w) - w));
-    const y = clamp(f(anchor.roof.y - 28), viewport.y, f(f(viewport.y + viewport.h) - h)),
-      panel = new Rect(x, y, w, h),
+      ];
+    const { x, y, w, h } = panel,
+      row = f((h - 36) / Math.ceil(names.length / 3)),
       fill = { ...theme.raised, a: 255 };
     context.rect(new Rect(x, y + 3, w, h), rgba(0, 0, 0, 75), theme.radius);
     context.rect(panel, fill, theme.radius, theme.border);
     context.text(
       new Rect(x + 12, y + 5, f(w * f(0.55)), 24),
-      structureSpec(seat.kind).name + ' #' + (hovered + 1),
+      structureSpec(seat.kind).name + ' #' + (camp + 1),
       theme.text,
       13,
       true,

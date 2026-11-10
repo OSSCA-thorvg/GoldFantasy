@@ -16,8 +16,16 @@ import { injuryOf } from '../../../../packages/engine/src/person-look';
 import { hudPaint } from './hud-paint';
 import { actionButton } from './hud-actions';
 import type { GameHudApp } from './game-hud-contract';
+import { touchCommandColumns } from './mobile-layout';
 
 const footerHeight = 42;
+function commandFooter(app: GameHudApp, width: number): number {
+  if (!app.touchMode) return footerHeight;
+  const count = app.shelteredSelection() ? 8 : 7,
+    columns = touchCommandColumns(width - 24, count),
+    rows = Math.ceil(count / columns);
+  return rows * 44 + (rows - 1) * 6 + 10;
+}
 export function residentSelection(this: GameHudApp): boolean {
   return this.chosen.some((id) => canControl(this.town.person(id)));
 }
@@ -36,7 +44,7 @@ export function personPanelBounds(this: GameHudApp, width: number, height: numbe
         ? 116
         : 132
       : 34 + Math.min(3, Math.ceil(Math.min(20, this.chosen.length) / columns)) * 56;
-  const h = Math.min(Math.max(90, height - 96), content + (commands ? footerHeight : 12));
+  const h = Math.min(Math.max(90, height - 96), content + (commands ? commandFooter(this, w) : 12));
   return new Rect((width - w) / 2, height - 12 - h, w, h);
 }
 export function personPanel(this: GameHudApp, panel: Rect): void {
@@ -92,7 +100,9 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
   actionButton(
     c,
     'unit-management',
-    new Rect(panel.x + panel.w - 67, panel.y + 5, 30, 28),
+    this.touchMode
+      ? new Rect(panel.x + panel.w - 56, panel.y + 5, 44, 44)
+      : new Rect(panel.x + panel.w - 67, panel.y + 5, 30, 28),
     'unit',
     'Unit equipment and inventory',
     manage,
@@ -197,7 +207,15 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     }
   }
   if (commands)
-    this.commandCard(new Rect(panel.x + 12, panel.y + panel.h - footerHeight, panel.w - 24, 32), 1);
+    this.commandCard(
+      new Rect(
+        panel.x + 12,
+        panel.y + panel.h - commandFooter(this, panel.w),
+        panel.w - 24,
+        this.touchMode ? 44 : 32,
+      ),
+      1,
+    );
   for (const [id, entry] of this.dockPortraits)
     if (!this.chosen.includes(id)) {
       c.deferRelease(() => entry.paint.dispose());

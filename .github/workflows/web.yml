@@ -35,6 +35,8 @@ jobs:
         run: npm run test:prayer
       - name: Verify visible-object picking and friendly selection across renderers
         run: npm run test:picking
+      - name: Verify touch camera gestures and mobile construction controls
+        run: npm run test:mobile
       - name: Verify splash and priority audio loading
         run: npm run test:loading
       - name: Verify mobile audio before background samples finish

@@ -8,10 +8,16 @@ body {
 }
 /* WebCanvas sets inline pixel sizes, including on DPR changes. The game viewport owns its CSS size. */
 #world {
+  position: fixed;
+  left: env(safe-area-inset-left, 0px);
+  top: env(safe-area-inset-top, 0px);
   display: block;
-  width: 100vw !important;
-  height: 100dvh !important;
+  width: calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) !important;
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   outline: none;
 }
 #startup-error {

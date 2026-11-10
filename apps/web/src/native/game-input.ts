@@ -44,6 +44,7 @@ import { Cue } from '../../../../packages/native-audio/src/sound-types';
 import { Key } from '../../../../packages/native-ui/src';
 import type { AppEvent } from './application-contracts';
 import { targetsInBox, hoveredTarget, cachedWorldHit, refreshHoveredTarget } from './world-targets';
+import { placementMapBounds } from './mobile-layout';
 
 export interface GameInputApp extends GameAppState {
   cue(sound: Cue): void;
@@ -257,11 +258,13 @@ export function finishRoad(this: GameInputApp): void {
   this.selectTool(Tool.Select);
 }
 export function plan(this: GameInputApp): Plan {
+  const touchPlacement = this.touchMode && toolStructure(this.tool) !== undefined && this.touchPlacement;
+  if (touchPlacement) this.cursor = { ...touchPlacement };
   const result = new Plan(),
     preview = result.preview;
   preview.zoom = this.camera.zoom;
   preview.cursor = { ...this.cursor };
-  if (this.hudPointer || this.mouse.x < 0 || this.panFrom || !this.town.map().inside(this.cursor))
+  if ((!touchPlacement && (this.hudPointer || this.mouse.x < 0 || this.panFrom)) || !this.town.map().inside(this.cursor))
     return result;
   const take = (check: Check) => {
     preview.valid = check.ok;
@@ -356,6 +359,14 @@ export function selectTool(this: GameInputApp, value: Tool, useSelection = false
   this.fieldFrom = null;
   this.boxFrom = null;
   this.status = '';
+  this.touchPlacement = null;
+  if (this.touchMode && toolStructure(value) !== undefined) {
+    const area = placementMapBounds(this.viewWidth, this.viewHeight),
+      screen = point(area.x + area.w / 2, area.y + area.h / 2),
+      projected = this.camera.toWorld(screen, this.viewWidth, this.viewHeight);
+    this.touchPlacement = unproject(projected.x, projected.y);
+    this.cursor = { ...this.touchPlacement };
+  }
 }
 export function selectPeople(this: GameInputApp, ids: number[]): void {
   this.selectTool(Tool.Select);
@@ -459,6 +470,7 @@ export function cancelStroke(this: GameInputApp): void {
   this.roadMoved = false;
 }
 export function cancelPointer(this: GameInputApp): void {
+  this.touchGesture = null;
   this.cancelStroke();
   this.fieldFrom = this.boxFrom = this.panFrom = this.pressAt = null;
   this.panMoved = this.hudPointer = this.timeExpanded = false;

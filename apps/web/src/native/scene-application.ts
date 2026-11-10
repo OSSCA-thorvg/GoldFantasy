@@ -47,6 +47,7 @@ export class SceneApplication implements Application {
   private newGame = false;
   private continueGame = false;
   private overlayPointer = false;
+  private touchInput = false;
   private previewFromSave = false;
   private settingsOpen = false;
   private readonly savePath: string;
@@ -82,6 +83,11 @@ export class SceneApplication implements Application {
 
   title(): string {
     return 'Midgard';
+  }
+  setTouchInput(enabled: boolean): void {
+    this.touchInput = enabled;
+    this.gameSession?.setTouchInput?.(enabled);
+    this.editorSession?.setTouchInput?.(enabled);
   }
   scene(): Scene {
     return this.root;
@@ -240,7 +246,7 @@ export class SceneApplication implements Application {
         } else this.requested = 'Title';
       }
       if (this.intro === 'None') {
-        const bounds = new Rect(f(width - 52), 12, 36, 36);
+        const bounds = new Rect(f(width - (this.touchInput ? 56 : 52)), 12, this.touchInput ? 44 : 36, this.touchInput ? 44 : 36);
         const state = button(this.overlay, 'settings', bounds, '', () => this.openSettings());
         this.overlay.icon('settings/gear', bounds.inset(7), 'settings', theme.text, {
           hovered: state.hovered,
@@ -287,6 +293,7 @@ export class SceneApplication implements Application {
     }
     if (event.type === 'PointerCancel') {
       this.overlay.cancelPointer();
+      this.overlayPointer = false;
       this.active()?.event(event);
       return;
     }
@@ -532,6 +539,7 @@ export class SceneApplication implements Application {
     this.current = next;
     const session = this.active();
     if (session) {
+      session.setTouchInput?.(this.touchInput);
       session.command('session.resume');
       this.root.add(session.scene());
     }

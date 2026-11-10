@@ -157,6 +157,13 @@ export class GameApplication implements Application {
   title(): string {
     return 'Midgard';
   }
+  setTouchInput(enabled: boolean): void {
+    if (this.game.touchMode === enabled) return;
+    this.game.touchMode = enabled;
+    this.game.touchGesture = null;
+    this.game.touchPlacement = null;
+    this.dirty = true;
+  }
   scene(): Scene {
     return this.root;
   }
@@ -207,9 +214,11 @@ export class GameApplication implements Application {
     this.lastTime = -1;
   }
   private reset(): void {
+    const touchMode = this.game.touchMode;
     this.root.remove();
     this.game.dispose();
     this.game = this.services.createGame(worldSeed(this.options, this.services));
+    this.game.touchMode = touchMode;
     this.configure();
     this.mount();
   }
@@ -380,6 +389,7 @@ export class GameApplication implements Application {
         }
       }
     }
+    if (!this.authoringTool() && this.game.handleTouchEvent?.(e)) return;
     if (e.type === 'PointerDown') this.game.pointerDown(e.x, e.y, button);
     else if (e.type === 'PointerUp') this.game.pointerUp(e.x, e.y, button);
     else if (e.type === 'PointerMove') this.game.pointerMove(e.x, e.y);

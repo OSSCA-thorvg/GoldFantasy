@@ -2,6 +2,7 @@ import type { Canvas, ThorVGNamespace } from '@thorvg/webcanvas';
 import { Key } from '../../../../packages/native-ui/src';
 import { emptyEvent, type Application, type AppEvent } from './application-contracts';
 import { applicationCursor } from './browser-cursor';
+import { BrowserTouch } from './browser-touch';
 import { invalidateWebCanvasRasterResources } from '../../../../packages/native-renderer/src/webcanvas-adapter';
 
 const keys = new Map<string, Key>([
@@ -47,6 +48,7 @@ export class BrowserHost {
   private width = 0;
   private height = 0;
   private readonly pressed = new Set<string>();
+  private touch: BrowserTouch;
   private readonly started = performance.now();
   constructor(
     private readonly element: HTMLCanvasElement,
@@ -110,11 +112,20 @@ export class BrowserHost {
       },
       { signal },
     );
-    const pointer = (type: AppEvent['type'], e: PointerEvent) => {
+    this.touch = new BrowserTouch(dispatch);
+    this.app.setTouchInput?.(matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
+    const pointer = (type: 'PointerDown' | 'PointerMove' | 'PointerUp' | 'PointerCancel', e: PointerEvent) => {
       const bounds = element.getBoundingClientRect(),
         event = emptyEvent(type);
       event.x = e.clientX - bounds.left;
       event.y = e.clientY - bounds.top;
+      if (e.pointerType === 'touch') {
+        this.app.setTouchInput?.(true);
+        this.touch.event(type, e.pointerId, { x: event.x, y: event.y });
+        return;
+      }
+      if (type === 'PointerDown') this.app.setTouchInput?.(false);
+      event.pointerType = e.pointerType;
       event.button = e.button + 1;
       event.shift = e.shiftKey;
       event.control = e.ctrlKey;
@@ -146,7 +157,7 @@ export class BrowserHost {
     element.addEventListener(
       'pointerleave',
       (e) => {
-        if (e.buttons === 0) {
+        if (e.pointerType !== 'touch' && e.buttons === 0) {
           const event = emptyEvent('PointerMove');
           event.x = event.y = -1;
           dispatch(event);
@@ -274,6 +285,7 @@ export class BrowserHost {
     }
   }
   private releaseInput(): void {
+    this.touch?.cancel();
     for (const text of this.pressed) {
       const event = emptyEvent('KeyUp');
       event.text = text;

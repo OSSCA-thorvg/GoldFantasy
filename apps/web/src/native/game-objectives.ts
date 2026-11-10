@@ -5,7 +5,8 @@ import {
   goalComplete,
   GoalKind,
 } from '../../../../packages/engine/src/settlement-progression';
-import { Tool, toolStructure } from '../../../../packages/engine/src/game-tools';
+import { Tool, Order, toolStructure } from '../../../../packages/engine/src/game-tools';
+import { compactViewport } from './mobile-layout';
 import { project } from '../../../../packages/engine/src/geometry';
 import { f32, clamp } from '../../../../packages/engine/src/numeric';
 import { structureSpec, describe } from '../../../../packages/engine/src/building-catalog';
@@ -17,6 +18,8 @@ import {
 import type { Building } from '../../../../packages/engine/src/town-models';
 import type { GameHudApp } from './game-hud-contract';
 export function objectives(this: GameHudApp, width: number, height: number, top: number): void {
+  const compact = this.touchMode && compactViewport(width, height);
+  if (compact && (this.tool !== Tool.Select || this.pending !== Order.None)) return;
   const goals = settlementGoals();
   let completed = 0,
     current = goals.length;
@@ -36,17 +39,32 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
       : f32(clamp(1 - (now - this.questPulseAt) / 0.45, 0, 1));
   this.questsAnimating = pulse > 0;
   if (this.questsAnimating) c.requestAnimationFrame();
-  const w = Math.min(292, f32(width - 24)),
+  const collapsed = compact ? !this.mobileQuestsExpanded : this.objectivesCollapsed,
+    header = this.touchMode ? 44 : 38,
+    w = Math.min(compact && collapsed ? 164 : 292, f32(width - 24)),
     y = Math.min(top, f32(height - 60)),
     expanded = clamp(f32(f32(this.dockBounds.y - y) - 24), 38, 210),
-    reveal = c.animate('quests/reveal', this.objectivesCollapsed ? 0 : 1, 0.18),
-    h = lerpFloat(38, expanded, reveal),
-    bounds = new Rect(f32(f32(width - 12) - w), y, w, h),
+    reveal = c.animate('quests/reveal', collapsed ? 0 : 1, 0.18),
+    h = lerpFloat(header, Math.max(header, expanded), reveal),
+    bounds = new Rect(compact ? 12 : f32(f32(width - 12) - w), y, w, h),
     left = f32(bounds.x + 14);
   c.control('objectives-panel', bounds, undefined, true, false);
   let border = t.border;
   if (pulse > 0) border = { ...t.accent, a: Math.trunc(f32(180 + f32(75 * pulse))) };
   c.rect(bounds, t.surface, t.radius, border);
+  button(
+    c,
+    'objectives-toggle',
+    this.touchMode
+      ? new Rect(bounds.x, y, w, header)
+      : new Rect(f32(f32(bounds.x + w) - 38), f32(y + 6), 26, 26),
+    this.touchMode ? '' : collapsed ? '+' : '-',
+    () => {
+      if (compact) this.mobileQuestsExpanded = !this.mobileQuestsExpanded;
+      else this.objectivesCollapsed = !this.objectivesCollapsed;
+    },
+    ButtonStyle.Quiet,
+  );
   const ink = t.accent;
   c.paint(JSON.stringify(['Q', bounds.x, y, ink]), () => {
     const shape = new c.tvg.Shape(),
@@ -64,25 +82,22 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
       .fill(0, 0, 0, 0)
       .stroke({ width: f32(1.2), color: [ink.r, ink.g, ink.b, ink.a] });
   });
-  c.text(new Rect(f32(bounds.x + 38), f32(y + 7), f32(w - 148), 24), 'Quests', t.text, 13, true);
   c.text(
-    new Rect(f32(f32(bounds.x + w) - 102), f32(y + 9), 58, 20),
-    completed + ' / ' + goals.length,
-    t.muted,
-    10,
-    false,
-    Align.End,
+    new Rect(f32(bounds.x + 38), f32(y + 7), f32(w - (compact && collapsed ? 50 : 148)), 24),
+    compact && collapsed ? `Quests ${completed}/${goals.length}` : 'Quests',
+    t.text,
+    compact && collapsed ? 11 : 13,
+    true,
   );
-  button(
-    c,
-    'objectives-toggle',
-    new Rect(f32(f32(bounds.x + w) - 38), f32(y + 6), 26, 26),
-    this.objectivesCollapsed ? '+' : '-',
-    () => {
-      this.objectivesCollapsed = !this.objectivesCollapsed;
-    },
-    ButtonStyle.Quiet,
-  );
+  if (!compact || !collapsed)
+    c.text(
+      new Rect(f32(f32(bounds.x + w) - 102), f32(y + 9), 58, 20),
+      completed + ' / ' + goals.length,
+      t.muted,
+      10,
+      false,
+      Align.End,
+    );
   if (h < 76) return;
   c.clip(bounds.inset(6), () => {
     if (current === goals.length) {
@@ -165,7 +180,7 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
     button(
       c,
       'quest-action/' + current,
-      new Rect(left, f32(y + 171), f32(w - 28), 29),
+      new Rect(left, f32(y + (this.touchMode ? 160 : 171)), f32(w - 28), this.touchMode ? 44 : 29),
       action,
       () => {
         if (goal.kind === GoalKind.Building) {

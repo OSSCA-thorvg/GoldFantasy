@@ -27,6 +27,10 @@ export interface GameHudApp extends GameAppState {
   commandCard(area: Rect, scale?: number, global?: boolean, buildMenu?: boolean): void;
   placementPanelBounds(width: number, height: number): Rect;
   placementPanel(panel: Rect): void;
+  confirmTouchPlacement(): void;
+  rotate(radians: number): void;
+  finish(): void;
+  undoPoint(): void;
   residentSelection(): boolean;
   shelteredSelection(): boolean;
   personPanelBounds(width: number, height: number, commands: boolean): Rect;

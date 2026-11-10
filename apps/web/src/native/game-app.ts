@@ -34,6 +34,7 @@ import * as soundscape from './game-soundscape';
 import { refreshHoveredTarget } from './world-targets';
 import { isPlayerResident } from '../../../../packages/engine/src/faction';
 import { openPrayer, closePrayer, handlePrayerEvent } from './game-prayer';
+import * as touch from './game-touch';
 const {
   pointerDown: rawDown,
   pointerUp: rawUp,
@@ -46,6 +47,7 @@ const { SpeakerState, speakerState: unusedSpeakerFactory, ...speechMethods } = s
 const { buildGroups: unusedBuildGroups, ...hudMethods } = hud;
 const methods = {
   openPrayer, closePrayer, handlePrayerEvent,
+  ...touch,
   ...inputMethods,
   ...commands,
   ...ambience,
@@ -93,6 +95,7 @@ export class GameApp extends GameAppState implements GameRuntime {
     this.traffic = source ? copyNative(source.traffic) : new Traffic(town.map().seed());
     this.director = new MusicDirector(services.sounds);
     if (source) {
+      this.touchMode = source.touchMode;
       this.theme = copyNative(source.theme);
       this.camera = copyNative(source.camera);
       this.chosen =

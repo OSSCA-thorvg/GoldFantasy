@@ -63,6 +63,10 @@ export class GameAppState {
   static readonly maxZoom = 6;
   theme = gameTheme();
   camera = new Camera();
+  touchMode = false;
+  touchGesture: { start: Point; last: Point; mode: 'tap' | 'pan' | 'place' | 'draw' | 'ui' } | null = null;
+  touchPlacement: Point | null = null;
+  mobileQuestsExpanded = false;
   tool = Tool.Select;
   mouse = point(-1, -1);
   cursor = point(-1, -1);

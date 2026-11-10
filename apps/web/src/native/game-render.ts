@@ -13,6 +13,7 @@ import { Rect } from '../../../../packages/native-ui/src';
 import { queueWorkSounds } from './work-audio';
 import { objectSelectionOverlay } from './selection-overlay';
 import { renderPrayer } from './game-prayer';
+import { keepTouchPlacementVisible } from './game-touch';
 import {
   type CharacterEditor,
   type BuildingEditor,
@@ -155,8 +156,10 @@ export function render(
     this.last = seconds;
   }
   const editing = this.editor !== null;
+  const resized = width !== this.viewWidth || height !== this.viewHeight;
   this.viewWidth = width;
   this.viewHeight = height;
+  if (resized) keepTouchPlacementVisible.call(this);
   const elapsed = !simulate || this.last < 0 ? 0 : clamp(seconds - this.last, 0, maxDelta);
   this.last = seconds;
   if (!editing && !this.prayer && (this.pan.x !== 0 || this.pan.y !== 0)) {

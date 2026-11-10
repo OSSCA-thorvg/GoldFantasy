@@ -38,6 +38,7 @@ import { civicInspector } from './game-civic-panel';
 import { hudPaint } from './hud-paint';
 import type { CampMarker } from './camp-resource-hud';
 import { actionButton, type HudGlyph } from './hud-actions';
+import { touchPlacementHeight, touchCommandColumns } from './mobile-layout';
 interface ToolInfo {
   label: string;
   key: string;
@@ -158,7 +159,7 @@ export function hud(this: GameHudApp, width: number, height: number): void {
       true,
       Align.Center,
     );
-  if (this.status || this.current.problem)
+  if ((this.status || this.current.problem) && !(this.touchMode && this.toolStructure() !== undefined))
     c.text(
       new Rect(16, f32(this.dockBounds.y - 28), f32(width - 32), 22),
       this.status || this.current.problem,
@@ -169,18 +170,24 @@ export function hud(this: GameHudApp, width: number, height: number): void {
     );
   if (this.pending !== Order.None)
     c.text(
-      new Rect(f32(f32(width / 2) - 200), f32(this.dockBounds.y - 34), 400, 22),
-      this.pending === Order.Move
-        ? 'Move: choose a destination'
-        : this.pending === Order.Work
-          ? 'Work: choose a resource, building or road'
-          : 'Attack: choose an enemy, resource or destination',
+      new Rect(12, f32(this.dockBounds.y - 34), f32(width - 24), 22),
+      this.touchMode
+        ? this.pending === Order.Move
+          ? 'Tap a destination'
+          : this.pending === Order.Work
+            ? 'Tap a resource, building or road'
+            : 'Tap a target or destination'
+        : this.pending === Order.Move
+          ? 'Move: choose a destination'
+          : this.pending === Order.Work
+            ? 'Work: choose a resource, building or road'
+            : 'Attack: choose an enemy, resource or destination',
       t.accent,
       13,
       true,
       Align.Center,
     );
-  if (width > 640 && !this.town.camp() && this.town.map().dungeons().length) {
+  if (!this.touchMode && width > 640 && !this.town.camp() && this.town.map().dungeons().length) {
     const lair = this.town.map().dungeons()[0].origin,
       start = this.town.map().camp(),
       toward = sub(project(f32(lair.x + 1), f32(lair.y + 1)), project(start.x, start.y)),
@@ -210,7 +217,7 @@ export function hud(this: GameHudApp, width: number, height: number): void {
     );
     c.requestFrameAt(this.noticeUntil);
   }
-  this.objectives(width, height, width < 900 ? 104 : 64);
+  this.objectives(width, height, this.touchMode ? (this.timeExpanded ? 116 : 64) : width < 900 ? 104 : 64);
   this.timeControls(width);
   this.campSupplies(width, height);
   this.calendarDetails(width);
@@ -230,6 +237,7 @@ export function campSupplies(this: GameHudApp, width: number, height: number): v
     }
   let hovered = -1;
   if (
+    !this.touchMode &&
     this.tool === Tool.Select &&
     this.pending === Order.None &&
     !this.panFrom &&
@@ -261,6 +269,17 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     t = this.theme,
     building = this.selected >= 0 ? this.town.building(this.selected) : null;
   if (!building && this.selectedDungeon < 0) return 0;
+  if (this.touchMode && building?.built() && isSeat(building.kind)) {
+    if (draw)
+      this.campResources.drawStores(
+        c,
+        t,
+        this.town,
+        building.id,
+        new Rect(panel.x + 8, panel.y + 8, panel.w - 16, 180),
+      );
+    return 196;
+  }
   if (building?.built() && [Structure.Shrine, Structure.Guild, Structure.GuildHall].includes(building.kind))
     return civicInspector.call(this, building, panel, draw);
   let y = 12;
@@ -482,11 +501,19 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
         workers = building.workers,
         hands = this.town.idle() > 0 || this.town.employed() > workers;
       rows.push(() => {
-        c.text(new Rect(left, f32(top + at), 200, 26), `Workers ${workers} / ${spec.jobs}`, t.text, 13);
+        const labelWidth = this.touchMode ? inner - 100 : 200,
+          size = this.touchMode ? 44 : 30,
+          rowHeight = this.touchMode ? 44 : 26;
+        c.text(
+          new Rect(left, f32(top + at), labelWidth, rowHeight),
+          `Workers ${workers} / ${spec.jobs}`,
+          t.text,
+          13,
+        );
         button(
           c,
           'workers-less',
-          new Rect(f32(left + 200), f32(top + at), 30, 26),
+          new Rect(f32(left + (this.touchMode ? inner - 94 : 200)), f32(top + at), size, rowHeight),
           '-',
           () => {
             if (isPlayerBuilding(this.town.building(id))) this.town.setWorkers(id, f32(workers - 1));
@@ -497,7 +524,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
         button(
           c,
           'workers-more',
-          new Rect(f32(left + 234), f32(top + at), 30, 26),
+          new Rect(f32(left + (this.touchMode ? inner - 44 : 234)), f32(top + at), size, rowHeight),
           '+',
           () => {
             if (isPlayerBuilding(this.town.building(id))) this.town.setWorkers(id, f32(workers + 1));
@@ -506,7 +533,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
           isPlayerBuilding(building) && workers < spec.jobs && hands,
         );
       });
-      y = f32(y + 32);
+      y = f32(y + (this.touchMode ? 50 : 32));
       const output = this.town.dailyOutput(building);
       if (building.kind === Structure.Farm)
         textRow(
@@ -615,7 +642,10 @@ export function buildMenuBounds(this: GameHudApp, width: number, height: number,
     w = Math.min(available, Math.max(244, f32(f32(f32(columns * cell) + f32(f32(columns - 1) * 6)) + 24))),
     rows = Math.trunc(f32(f32(f32(count + columns) - 1) / columns)),
     h = f32(
-      f32(f32(48 + f32(rows * (page === 0 ? 32 : 64))) + f32(f32(rows - 1) * 6)) + (page === 0 ? 6 : 30),
+      f32(
+        f32((this.touchMode ? 60 : 48) + f32(rows * (page === 0 ? (this.touchMode ? 44 : 32) : 64))) +
+          f32(f32(rows - 1) * 6),
+      ) + (page === 0 ? 6 : 30),
     );
   return new Rect(f32(f32(width - w) / 2), f32(f32(height - 56) - h), w, h);
 }
@@ -677,8 +707,15 @@ export function commandCard(
     const leave = this.shelteredSelection(),
       count = leave ? 8 : 7,
       gap = f32(6 * scale),
-      w = f32(f32(area.w - f32(f32(count - 1) * gap)) / count),
-      cell = (i: number) => new Rect(f32(area.x + f32(i * f32(w + gap))), area.y, w, area.h);
+      columns = this.touchMode ? touchCommandColumns(area.w, count) : count,
+      w = f32(f32(area.w - f32(f32(columns - 1) * gap)) / columns),
+      cell = (i: number) =>
+        new Rect(
+          f32(area.x + f32((i % columns) * f32(w + gap))),
+          area.y + Math.floor(i / columns) * (44 + gap),
+          w,
+          this.touchMode ? 44 : area.h,
+        );
     drawButton('card-build', cell(0), 'Build', () => this.openUnitBuild());
     drawButton(
       'card-move',
@@ -730,7 +767,7 @@ export function commandCard(
   actionButton(
     c,
     `${global ? 'global/' : 'unit/'}card-back`,
-    new Rect(f32(area.x + 10), f32(area.y + 5), 34, 32),
+    new Rect(f32(area.x + 10), f32(area.y + 5), this.touchMode ? 44 : 34, this.touchMode ? 44 : 32),
     'back',
     'Back',
     () => {
@@ -757,11 +794,11 @@ export function commandCard(
     preferred = page === 0 ? 78 : 86,
     columns = Math.max(1, Math.min(count, Math.trunc(f32(f32(area.w - 18) / f32(preferred + 6))))),
     w = f32(f32(f32(area.w - 24) - f32(f32(columns - 1) * 6)) / columns),
-    h = page === 0 ? 32 : 64,
+    h = page === 0 ? (this.touchMode ? 44 : 32) : 64,
     cell = (i: number) =>
       new Rect(
         f32(f32(area.x + 12) + f32((i % columns) * f32(w + 6))),
-        f32(f32(area.y + 40) + f32(Math.trunc(f32(i / columns)) * f32(h + 6))),
+        f32(f32(area.y + (this.touchMode ? 54 : 40)) + f32(Math.trunc(f32(i / columns)) * f32(h + 6))),
         w,
         h,
       );
@@ -833,12 +870,83 @@ export function commandCard(
   );
 }
 export function placementPanelBounds(this: GameHudApp, width: number, height: number): Rect {
-  const w = Math.min(460, f32(width - 24));
-  return new Rect(f32(f32(width - w) / 2), f32(height - 82), w, 70);
+  const w = Math.min(this.touchMode ? 520 : 460, f32(width - 24)),
+    h = this.touchMode ? touchPlacementHeight : 70;
+  return new Rect(f32(f32(width - w) / 2), f32(height - 12 - h), w, h);
 }
 export function placementPanel(this: GameHudApp, panel: Rect): void {
   const c = this.context,
     t = this.theme;
+  if (this.touchMode) {
+    const kind = this.toolStructure(),
+      detail =
+        kind !== undefined
+          ? this.current.problem || `${describe(structureSpec(kind).cost)} · Tap or drag to position`
+          : this.tool === Tool.Road || this.tool === Tool.Field
+            ? 'Draw with one finger · Move or zoom with two'
+            : 'Tap a target · Drag to move the map',
+      y = panel.y + 56;
+    c.text(new Rect(panel.x + 12, panel.y + 8, panel.w - 24, 22), tools[this.tool].label, t.text, 14, true);
+    c.text(
+      new Rect(panel.x + 12, panel.y + 32, panel.w - 24, 18),
+      c.elideText(detail, panel.w - 24, 11),
+      this.current.problem ? t.danger : t.muted,
+      11,
+    );
+    actionButton(c, 'placement-build', new Rect(panel.x + 10, y, 44, 44), 'build', 'Buildings', () => {
+      this.globalCard = 0;
+      this.card = -1;
+      this.drawerPinned = true;
+      this.drawerSuppressed = false;
+    });
+    if (kind !== undefined) {
+      actionButton(c, 'placement-rotate', new Rect(panel.x + 62, y, 44, 44), 'rotate', 'Rotate', () =>
+        this.rotate(Math.PI / 12),
+      );
+      button(
+        c,
+        'placement-confirm',
+        new Rect(panel.x + 116, y, panel.w - 180, 44),
+        'Place',
+        () => this.confirmTouchPlacement(),
+        ButtonStyle.Primary,
+        !!this.touchPlacement && this.current.preview.valid,
+      );
+    } else if (this.tool === Tool.Field && this.outline.length) {
+      actionButton(c, 'placement-undo', new Rect(panel.x + 62, y, 44, 44), 'back', 'Undo point', () =>
+        this.undoPoint(),
+      );
+      button(
+        c,
+        'placement-confirm',
+        new Rect(panel.x + 116, y, panel.w - 180, 44),
+        'Plant',
+        () => this.finish(),
+        ButtonStyle.Primary,
+        this.outline.length >= 3 && this.current.preview.valid,
+      );
+    } else
+      c.text(
+        new Rect(panel.x + 60, y, panel.w - 124, 44),
+        'Two fingers to move / zoom',
+        t.muted,
+        11,
+        false,
+        Align.Center,
+      );
+    actionButton(
+      c,
+      'placement-cancel',
+      new Rect(panel.x + panel.w - 54, y, 44, 44),
+      'close',
+      'Cancel placement',
+      () => this.selectTool(Tool.Select),
+      false,
+      true,
+      false,
+    );
+    return;
+  }
   c.text(
     new Rect(f32(panel.x + 12), f32(panel.y + 9), f32(panel.w - 172), 22),
     tools[this.tool].label,

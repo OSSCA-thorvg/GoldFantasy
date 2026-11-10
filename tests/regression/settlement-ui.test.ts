@@ -2,7 +2,9 @@ import { beforeAll, afterAll, expect, it, vi } from 'vitest';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import ThorVG, { type ThorVGNamespace } from '@thorvg/webcanvas';
 import { parseFontMetrics } from '../../packages/native-ui/src/fonts';
-import { Context, Rect, Key } from '../../packages/native-ui/src';
+import { Context, Rect, Key, Cursor } from '../../packages/native-ui/src';
+import { handleTouchEvent } from '../../apps/web/src/native/game-touch';
+import { emptyEvent } from '../../apps/web/src/native/application-contracts';
 import { civicInspector } from '../../apps/web/src/native/game-civic-panel';
 import { closePrayer, renderPrayer } from '../../apps/web/src/native/game-prayer';
 import { Structure, Resources } from '../../packages/engine/src/building-catalog';
@@ -19,9 +21,17 @@ import {
   taskbar,
 } from '../../apps/web/src/native/game-context-dock';
 import { rosterPanel, rosterBounds } from '../../apps/web/src/native/game-roster';
-import { commandCard, inspector, buildMenuBounds, buildGroups } from '../../apps/web/src/native/game-hud';
+import {
+  commandCard,
+  inspector,
+  buildMenuBounds,
+  buildGroups,
+  placementPanel,
+  placementPanelBounds,
+} from '../../apps/web/src/native/game-hud';
+import { objectives } from '../../apps/web/src/native/game-objectives';
 import * as input from '../../apps/web/src/native/game-input';
-import { PointerButton } from '../../packages/engine/src/game-tools';
+import { PointerButton, Tool, Order } from '../../packages/engine/src/game-tools';
 import { actionButton } from '../../apps/web/src/native/hud-actions';
 import {
   worldNameplateBounds,
@@ -121,11 +131,185 @@ function fixture(width = 880, height = 600) {
     dispose() {
       canvas.remove();
       context.dispose();
+      app.campResources.dispose();
       for (const entry of app.dockPortraits.values()) entry.paint.dispose();
       canvas.destroy();
     },
   };
 }
+it.each([
+  [360, 740],
+  [390, 844],
+  [844, 390],
+])('keeps mobile placement and unit actions tappable at %ix%i', (width, height) => {
+  const ui = fixture(width, height);
+  try {
+    ui.app.touchMode = true;
+    ui.app.viewWidth = width;
+    ui.app.viewHeight = height;
+    ui.app.tool = Tool.Camp;
+    ui.app.toolStructure = () => Structure.Camp;
+    ui.app.touchPlacement = point(16, 16);
+    ui.app.current.preview.valid = true;
+    ui.app.confirmTouchPlacement = vi.fn();
+    ui.app.rotate = vi.fn();
+    const bounds = placementPanelBounds.call(ui.app, width, height);
+    ui.draw(() => placementPanel.call(ui.app, bounds));
+    const controls = ui.controls.mock.calls.filter(([id]) => id.startsWith('placement-'));
+    expect(controls.map(([id]) => id)).toContain('placement-confirm');
+    for (const [, r] of controls) {
+      expect(r.w).toBeGreaterThanOrEqual(44);
+      expect(r.h).toBeGreaterThanOrEqual(44);
+      expect(r.x).toBeGreaterThanOrEqual(0);
+      expect(r.y).toBeGreaterThanOrEqual(0);
+      expect(r.x + r.w).toBeLessThanOrEqual(width);
+      expect(r.y + r.h).toBeLessThanOrEqual(height);
+    }
+    const confirm = controls.find(([id]) => id === 'placement-confirm')![1];
+    ui.context.pointerDown(confirm.x + 10, confirm.y + 10);
+    ui.context.pointerUp(confirm.x + 10, confirm.y + 10);
+    expect(ui.app.confirmTouchPlacement).toHaveBeenCalledOnce();
+    ui.app.chosen = [ui.town.folk[0].id];
+    ui.app.commandCard = commandCard.bind(ui.app);
+    const selected = personPanelBounds.call(ui.app, width, height, true);
+    ui.draw(() => personPanel.call(ui.app, selected));
+    expect(selected.y + selected.h).toBe(height - 12);
+    const actions = ui.controls.mock.calls.filter(([id]) => id.startsWith('unit/card-'));
+    expect(actions).toHaveLength(7);
+    for (const [, r] of actions) {
+      expect(r.w).toBeGreaterThanOrEqual(44);
+      expect(r.h).toBeGreaterThanOrEqual(44);
+      expect(r.y).toBeGreaterThanOrEqual(selected.y + 100);
+      expect(r.y + r.h).toBeLessThanOrEqual(selected.y + selected.h);
+    }
+  } finally {
+    ui.dispose();
+  }
+});
+it('shows village supplies in the bottom Camp inspector without requiring hover on touch', () => {
+  const ui = fixture(390, 844);
+  try {
+    const camp = new Building(20, Structure.Camp, point(16, 16), 0, 0);
+    camp.progress = 1;
+    ui.town.placed = [camp];
+    ui.app.selected = camp.id;
+    ui.app.touchMode = true;
+    const height = inspector.call(ui.app, new Rect(0, 0, 366, 0), false);
+    expect(height).toBe(196);
+    const panel = new Rect(12, 844 - 12 - height, 366, height);
+    ui.draw(() => inspector.call(ui.app, panel));
+    const words = ui.labels.mock.calls.map(([, text]) => text);
+    expect(words).toEqual(
+      expect.arrayContaining(['Village stores', 'Gold', 'Wood', 'Food', 'Water', 'Bones', 'Residents']),
+    );
+    for (const [r] of ui.labels.mock.calls) {
+      expect(r.y).toBeGreaterThanOrEqual(panel.y);
+      expect(r.y + r.h).toBeLessThanOrEqual(panel.y + panel.h);
+    }
+  } finally {
+    ui.dispose();
+  }
+});
+it('provides a touch-sized Cancel action while a world order is armed', () => {
+  const ui = fixture(390, 844);
+  try {
+    ui.app.touchMode = true;
+    ui.app.pending = Order.Move;
+    ui.app.reducedMotion = () => true;
+    ui.app.animatingUi = () => false;
+    ui.app.buildMenuBounds = buildMenuBounds.bind(ui.app);
+    ui.app.renderDockContent = renderDockContent.bind(ui.app);
+    ui.draw(() => {
+      updateContextDock.call(ui.app, 390, 844);
+      taskbar.call(ui.app, 390, 844);
+    });
+    const cancel = ui.controls.mock.calls.find(([id]) => id === 'command-cancel')![1];
+    expect(cancel.w).toBe(44);
+    expect(cancel.h).toBe(44);
+    expect(ui.context.controlAt(cancel.x + 12, cancel.y + 12)).toBe(true);
+    ui.context.pointerDown(cancel.x + 12, cancel.y + 12);
+    ui.context.pointerUp(cancel.x + 12, cancel.y + 12);
+    expect(ui.app.pending).toBe(Order.None);
+  } finally {
+    ui.dispose();
+  }
+});
+it('keeps mobile workplace staffing controls inside the inspector', () => {
+  const ui = fixture(390, 844);
+  try {
+    const camp = new Building(0, Structure.Camp, point(16, 16), 0, 0),
+      yard = new Building(20, Structure.Lumberyard, point(18, 16), 0, 0);
+    camp.progress = yard.progress = 1;
+    ui.town.placed = [camp, yard];
+    ui.app.touchMode = true;
+    ui.app.selected = yard.id;
+    const panel = new Rect(12, 500, 366, 332);
+    ui.draw(() => inspector.call(ui.app, panel));
+    for (const id of ['workers-less', 'workers-more']) {
+      const r = ui.controls.mock.calls.find(([key]) => key === id)![1];
+      expect(r.w).toBeGreaterThanOrEqual(44);
+      expect(r.h).toBeGreaterThanOrEqual(44);
+      expect(r.x).toBeGreaterThanOrEqual(panel.x);
+      expect(r.x + r.w).toBeLessThanOrEqual(panel.x + panel.w);
+    }
+  } finally {
+    ui.dispose();
+  }
+});
+it.each([
+  [Cursor.Default, ''],
+  [Cursor.Text, 'tap'],
+])('clears touch button focus while retaining text input focus (%s)', (cursor, expected) => {
+  const ui = fixture(390, 844);
+  try {
+    const app = Object.assign(ui.app, {
+      pointerMove: (x: number, y: number) => ui.context.pointerMove(x, y),
+      pointerUp: (x: number, y: number) => ui.context.pointerUp(x, y),
+    });
+    ui.draw(() =>
+      ui.context.control(
+        'tap',
+        new Rect(100, 100, 44, 44),
+        () => {},
+        true,
+        true,
+        false,
+        false,
+        cursor as Cursor,
+      ),
+    );
+    ui.context.pointerDown(110, 110);
+    app.touchGesture = { start: point(110, 110), last: point(110, 110), mode: 'ui' };
+    handleTouchEvent.call(app as any, { ...emptyEvent('PointerUp'), x: 110, y: 110, pointerType: 'touch' });
+    expect(ui.context.focused()).toBe(expected);
+  } finally {
+    ui.dispose();
+  }
+});
+it('keeps mobile quests collapsed and removes their hit shield during placement or commands', () => {
+  const ui = fixture(390, 844);
+  try {
+    ui.app.touchMode = true;
+    ui.app.reducedMotion = () => true;
+    ui.app.dockBounds = new Rect(12, 650, 366, 182);
+    ui.draw(() => objectives.call(ui.app, 390, 844, 64));
+    const panel = ui.controls.mock.calls.find(([id]) => id === 'objectives-panel')![1];
+    const toggle = ui.controls.mock.calls.find(([id]) => id === 'objectives-toggle')![1];
+    expect(panel.h).toBe(44);
+    expect(panel.w).toBeLessThan(200);
+    expect(toggle.h).toBe(44);
+    expect(ui.labels.mock.calls.some(([, text]) => text.startsWith('Quests '))).toBe(true);
+    ui.app.tool = Tool.Camp;
+    ui.draw(() => objectives.call(ui.app, 390, 844, 64));
+    expect(ui.controls.mock.calls.some(([id]) => id === 'objectives-panel')).toBe(false);
+    ui.app.tool = Tool.Select;
+    ui.app.pending = Order.Move;
+    ui.draw(() => objectives.call(ui.app, 390, 844, 64));
+    expect(ui.controls.mock.calls.some(([id]) => id === 'objectives-panel')).toBe(false);
+  } finally {
+    ui.dispose();
+  }
+});
 it('lists actual lodging visitors without fabricated recruitment offers or a Hire action', () => {
   const ui = fixture();
   try {

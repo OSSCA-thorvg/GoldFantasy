@@ -1,10 +1,11 @@
-import { Rect, setTransform } from '../../../../packages/native-ui/src';
+import { Rect, Align, setTransform } from '../../../../packages/native-ui/src';
 import { Tool, Order } from '../../../../packages/engine/src/game-tools';
 import { f32 as f, clamp } from '../../../../packages/engine/src/numeric';
 import { DockView } from './game-app-state';
 import { reducedMotionPreferred } from './game-theme';
 import type { GameHudApp } from './game-hud-contract';
 import { actionButton } from './hud-actions';
+import { isSeat } from '../../../../packages/engine/src/building-catalog';
 const copy = (r: Rect) => new Rect(r.x, r.y, r.w, r.h);
 const padded = (r: Rect, amount: number) =>
   r.w <= 0 || r.h <= 0
@@ -72,16 +73,24 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
   )
     next = DockView.Resource;
   else if (this.tool !== Tool.Select) next = DockView.Placement;
-  else if (eligible && !this.drawerSuppressed && (atHandle || (this.dockView === DockView.Menu && inMenu)))
+  else if (
+    eligible &&
+    (this.touchMode || (!this.drawerSuppressed && (atHandle || (this.dockView === DockView.Menu && inMenu))))
+  )
     next = DockView.Menu;
   if (this.pending !== Order.None) next = DockView.Handle;
   else if (this.tool !== Tool.Select && next !== DockView.Build && next !== DockView.Roster)
     next = DockView.Placement;
   let target = new Rect(f((width - 128) / 2), height - 28, 128, 16),
     key = String(next);
+  if (this.touchMode && this.pending !== Order.None) {
+    target.w = 236;
+    target.h = 60;
+    key += ':' + this.pending;
+  }
   if (next === DockView.Menu) {
     target.w = 236;
-    target.h = 52;
+    target.h = this.touchMode ? 76 : 52;
   }
   if (next === DockView.Build) {
     const shared = !this.chosen.length;
@@ -92,7 +101,9 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
     target = this.personPanelBounds(width, height, this.residentSelection());
     for (const id of this.chosen) key += ':' + id;
   } else if (next === DockView.Inspector) {
-    target.w = Math.min(620, f(width - 24));
+    const building = this.town.building(this.selected),
+      stores = this.touchMode && building?.built() && isSeat(building.kind);
+    target.w = Math.min(stores ? 420 : 620, f(width - 24));
     target.h = Math.min(this.inspector(new Rect(0, 0, target.w, 0), false), Math.max(120, f(height - 180)));
     key += ':' + this.selected + ':' + this.selectedDungeon + ':' + this.residentPage;
   } else if (next === DockView.Resource) {
@@ -157,27 +168,63 @@ export function renderDockContent(this: GameHudApp, panel: Rect): void {
     t = this.theme;
   switch (this.dockView) {
     case DockView.Handle:
+      if (this.touchMode && this.pending !== Order.None) {
+        const label =
+          this.pending === Order.Move ? 'Move' : this.pending === Order.Attack ? 'Attack' : 'Work';
+        c.text(new Rect(panel.x + 16, panel.y + 8, panel.w - 80, 44), label, t.accent, 14, true);
+        actionButton(
+          c,
+          'command-cancel',
+          new Rect(panel.x + panel.w - 54, panel.y + 8, 44, 44),
+          'close',
+          'Cancel order',
+          () => {
+            this.pending = Order.None;
+          },
+          false,
+          true,
+          false,
+        );
+      }
       break;
     case DockView.Menu:
-      actionButton(c, 'build-handle', new Rect(panel.x + 12, panel.y + 7, 100, 38), 'build', 'Build', () => {
-        this.selectTool(Tool.Select, true);
-        this.selected =
-          this.selectedDungeon =
-          this.selectedTree =
-          this.selectedTreeInstance =
-          this.selectedRock =
-          this.selectedAnimal =
-            -1;
-        this.selectedObjects = [];
-        this.card = this.chosen.length ? 0 : -1;
-        this.globalCard = this.chosen.length ? -1 : 0;
-        this.drawerPinned = true;
-        this.drawerSuppressed = false;
-      });
-      actionButton(c, 'unit-roster', new Rect(panel.x + 124, panel.y + 7, 100, 38), 'unit', 'Units', () => {
-        this.selectTool(Tool.Select, true);
-        this.rosterOpen = true;
-      });
+      actionButton(
+        c,
+        'build-handle',
+        new Rect(panel.x + 12, panel.y + 7, 100, this.touchMode ? 44 : 38),
+        'build',
+        'Build',
+        () => {
+          this.selectTool(Tool.Select, true);
+          this.selected =
+            this.selectedDungeon =
+            this.selectedTree =
+            this.selectedTreeInstance =
+            this.selectedRock =
+            this.selectedAnimal =
+              -1;
+          this.selectedObjects = [];
+          this.card = this.chosen.length ? 0 : -1;
+          this.globalCard = this.chosen.length ? -1 : 0;
+          this.drawerPinned = true;
+          this.drawerSuppressed = false;
+        },
+      );
+      actionButton(
+        c,
+        'unit-roster',
+        new Rect(panel.x + 124, panel.y + 7, 100, this.touchMode ? 44 : 38),
+        'unit',
+        'Units',
+        () => {
+          this.selectTool(Tool.Select, true);
+          this.rosterOpen = true;
+        },
+      );
+      if (this.touchMode) {
+        c.text(new Rect(panel.x + 12, panel.y + 51, 100, 18), 'Build', t.text, 10, false, Align.Center);
+        c.text(new Rect(panel.x + 124, panel.y + 51, 100, 18), 'Units', t.text, 10, false, Align.Center);
+      }
       break;
     case DockView.Build:
       this.commandCard(panel, 1, !this.chosen.length, true);
@@ -244,7 +291,7 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
   // previous-frame snapshot for the same transition instead of retaining a borrowed wrapper.
   this.dockContent?.dispose();
   this.dockContent = layer?.duplicate() ?? null;
-  if (this.dockView === DockView.Handle) {
+  if (this.dockView === DockView.Handle && !(this.touchMode && this.pending !== Order.None)) {
     const r = this.dockBounds;
     c.rect(new Rect(r.x + r.w * 0.25, r.y + r.h / 2 - 1, r.w * 0.5, 2), this.theme.accent, 1);
     c.control(

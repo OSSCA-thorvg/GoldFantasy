@@ -151,14 +151,15 @@ export function skyMural(this: GameHudApp, width: number): void {
   else if (this.timeExpanded) this.timeReveal = Math.min(target, f(this.timeReveal + f(dt / revealDuration)));
   else this.timeReveal = Math.max(target, f(this.timeReveal - f(dt / revealDuration)));
   const opened = unfold(this.timeReveal);
-  this.timeToggleBounds = new Rect(width - 96, 12, 36, 36);
+  this.timeToggleBounds = new Rect(width - (this.touchMode ? 108 : 96), 12, this.touchMode ? 44 : 36, this.touchMode ? 44 : 36);
   const below = width < 900,
-    right = below ? width - 16 : this.timeToggleBounds.x - 8;
+    right = below ? width - 16 : this.timeToggleBounds.x - 8,
+    controlsWidth = this.touchMode ? 6 * 46 + 8 : panelWidth;
   this.timePanelBounds = new Rect(
-    f(right - f(panelWidth * opened)),
-    below ? 56 : 12,
-    f(panelWidth * opened),
-    36,
+    f(right - f(controlsWidth * opened)),
+    below ? (this.touchMode ? 62 : 56) : 12,
+    f(controlsWidth * opened),
+    this.touchMode ? 52 : 36,
   );
   const leftEdge = 16,
     rightEdge = below ? this.timeToggleBounds.x - 12 : this.timePanelBounds.x - 12,
@@ -240,7 +241,7 @@ export function skyMural(this: GameHudApp, width: number): void {
   if (Math.abs(f(this.timeReveal - target)) > f(0.001)) c.requestAnimationFrame();
 }
 export function calendarDetails(this: GameHudApp, width: number): void {
-  if (!this.skyHovered) return;
+  if (!this.skyHovered || this.touchMode) return;
   const c = this.context,
     t = this.theme,
     date = this.town.calendar(),
@@ -286,11 +287,13 @@ export function calendarDetails(this: GameHudApp, width: number): void {
 }
 export function timeControls(this: GameHudApp, width: number): void {
   const c = this.context,
-    t = this.theme;
+    t = this.theme,
+    step = this.touchMode ? 46 : controlStep,
+    fullWidth = this.touchMode ? 6 * step + 8 : panelWidth;
   if (this.timeReveal > 0) {
     const below = width < 900,
       right = below ? width - 16 : this.timeToggleBounds.x - 8,
-      full = new Rect(right - panelWidth, below ? 56 : 12, panelWidth, 36);
+      full = new Rect(right - fullWidth, below ? 62 : 12, fullWidth, this.touchMode ? 52 : 36);
     c.clip(this.timePanelBounds, () => {
       c.control('time-controls-panel', this.timePanelBounds, undefined, true, false);
       c.rect(full, t.surface, t.radius, t.border);
@@ -299,7 +302,7 @@ export function timeControls(this: GameHudApp, width: number): void {
         button(
           c,
           'speed-' + labels[i],
-          new Rect(full.x + 6 + i * controlStep, full.y + 4, controlStep - 4, 28),
+          new Rect(full.x + 4 + i * step, full.y + 4, this.touchMode ? 44 : controlStep - 4, this.touchMode ? 44 : 28),
           labels[i],
           () => {
             if (i) this.setSpeed(i);
@@ -354,7 +357,7 @@ export function timeControls(this: GameHudApp, width: number): void {
     y = this.timeToggleBounds.y + 18;
   c.line(x + (this.timeExpanded ? 0 : 3), y - 3, x + (this.timeExpanded ? 3 : 0), y, ink, 1.2);
   c.line(x + (this.timeExpanded ? 3 : 0), y, x + (this.timeExpanded ? 0 : 3), y + 3, ink, 1.2);
-  if (toggle.hovered && !this.timeExpanded) {
+  if (toggle.hovered && !this.timeExpanded && !this.touchMode) {
     const hint = new Rect(this.timeToggleBounds.x - 58, 56, 94, 26);
     c.rect(hint, t.raised, t.radius, t.border);
     c.text(hint, 'Time controls', t.text, 10, false, Align.Center);

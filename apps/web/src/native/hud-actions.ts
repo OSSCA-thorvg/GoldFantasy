@@ -12,6 +12,7 @@ export type HudGlyph =
   | 'craft'
   | 'back'
   | 'next'
+  | 'rotate'
   | 'roads'
   | 'housing'
   | 'materials'
@@ -107,7 +108,14 @@ export function actionButton(
     y = r.y + r.h / 2;
   const line = (a: number, b: number, d: number, e: number, w = 1.7) =>
     c.line(x + a, y + b, x + d, y + e, color, w);
-  if (glyph === 'close') {
+  if (glyph === 'rotate') {
+    const ink = [color.r, color.g, color.b, color.a] as [number, number, number, number];
+    c.paint(JSON.stringify(['rotate-action', r, ink]), () => new c.tvg.Shape()
+      .moveTo(x + 7, y - 3).cubicTo(x + 3, y - 12, x - 10, y - 7, x - 8, y + 2)
+      .cubicTo(x - 6, y + 10, x + 6, y + 10, x + 8, y + 3)
+      .moveTo(x + 7, y - 9).lineTo(x + 7, y - 3).lineTo(x + 1, y - 3)
+      .fill(0, 0, 0, 0).stroke({ width: 1.7, color: ink }));
+  } else if (glyph === 'close') {
     line(-5, -5, 5, 5);
     line(5, -5, -5, 5);
   } else if (glyph === 'stop') c.rect(new Rect(x - 5, y - 5, 10, 10), color, 1);

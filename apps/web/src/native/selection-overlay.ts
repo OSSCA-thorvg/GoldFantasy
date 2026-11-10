@@ -14,7 +14,7 @@ export function objectSelectionOverlay(app: GameCommandApp): void {
   const selected = selectionReferences(app);
   const refs = selected.length
     ? selected
-    : app.tool === Tool.Select && !app.boxFrom && !app.panFrom
+    : !app.touchMode && app.tool === Tool.Select && !app.boxFrom && !app.panFrom
       ? [hoveredTarget(app)].filter((ref): ref is WorldObjectRef => !!ref)
       : [];
   const hover = selected.length === 0,
