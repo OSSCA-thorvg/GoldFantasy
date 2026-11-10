@@ -4,6 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
+import { BrowserCaseLifetime } from './browser-case-lifetime.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const output = process.env.GOLDFANTASY_TEST_OUTPUT ?? resolve(root, 'artifacts/regression/picking');
@@ -15,7 +16,7 @@ const combinations = [
   ['gl', 2],
 ].filter(([backend, dpr]) => !only || only === `${backend}-${dpr}`);
 const report = { cases: [], errors: [], passed: false };
-let browser, server, deadline, page;
+let browser, server, page;
 const interrupt = () => {
   process.exitCode = 130;
   void browser?.close().catch(() => {});
@@ -49,7 +50,6 @@ try {
     headless: true,
     args: ['--mute-audio', '--autoplay-policy=user-gesture-required'],
   });
-  deadline = setTimeout(() => void browser.close().catch(() => {}), 240000);
   for (const [backend, dpr] of combinations) {
     const name = `${backend}-${dpr}`;
     const context = await browser.newContext({
@@ -65,6 +65,8 @@ try {
     const started = Date.now();
     const row = { name, checks: [], passed: false };
     report.cases.push(row);
+    const lifetime = new BrowserCaseLifetime(name, context);
+    let primaryError;
     try {
       await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/picking-host`);
       await page.evaluate(async (backend) => {
@@ -122,7 +124,7 @@ try {
           document
             .querySelector('#world')
             .addEventListener(type, (event) => probe.events.push({ type, trusted: event.isTrusted }));
-        probe.frame = (count = 2) => {
+        probe.frame = (count = 1) => {
           for (let i = 0; i < count; ++i) {
             probe.draws = [];
             runtime.app.dirty = true;
@@ -237,11 +239,11 @@ try {
               return original(...args);
             };
           }
-          probe.frame(3);
+          probe.frame(1);
           if (kind === 'building') {
             const visual = game.renderer.visuals.get(data.building);
             probe.frames += Math.ceil((visual.layout.frames / visual.layout.frameRate) * 60) + 1;
-            probe.frame(2);
+            probe.frame(1);
             if (visual.frame < visual.layout.frames) throw Error('Building rise animation is not complete');
           }
           probe.data = data;
@@ -307,9 +309,10 @@ try {
           }
           throw Error(`No visible painted point for ${JSON.stringify(ref)} in ${JSON.stringify(g)}`);
         };
-        probe.frame();
+        // The first fixture performs the first presentation; the discarded
+        // default 176-tile world does not need its own warm-up frames.
       }, backend);
-      const frame = (n = 2) => page.evaluate((n) => picking.frame(n), n);
+      const frame = (n = 1) => page.evaluate((n) => picking.frame(n), n);
       const reset = (kind) => page.evaluate((kind) => picking.reset(kind), kind);
       const hover = async (at) => {
         await page.mouse.move(at.x, at.y);
@@ -331,6 +334,7 @@ try {
         }, id);
         return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
       };
+      const persons = await reset('people');
       row.surface = await page.evaluate(() => ({
         renderer: picking.runtime.host.canvas.renderer,
         dpr: picking.runtime.host.canvas.dpr,
@@ -341,7 +345,6 @@ try {
       assert.equal(row.surface.dpr, Math.min(dpr, 1.75));
       assert.equal(row.surface.width, row.surface.logicalWidth * row.surface.dpr);
 
-      const persons = await reset('people');
       const frontPoint = await find(
         { kind: 'person', id: persons.front },
         { kind: 'person', id: persons.back },
@@ -476,7 +479,7 @@ try {
       row.checks.push('post-present picking follows trusted camera pan and zoom');
 
       await page.setViewportSize({ width: 390, height: 844 });
-      await frame(3);
+      await frame(1);
       const bottom = await page.evaluate(() => ({
         bounds: picking.game.dockBounds,
         inventory: picking.game.context.controls.filter((c) => c.id.startsWith('inventory-slot-')).length,
@@ -505,14 +508,20 @@ try {
       }
       await page.screenshot({ path: `${output}/${name}-bottom-tooltip.png` });
       await click(management);
-      await frame(15);
+      await frame(1);
       const center = await page.evaluate(() => ({
         open: picking.game.rosterOpen,
+        reducedMotion: picking.game.reducedMotion(),
+        dockStarted: picking.game.dockStarted,
         bounds: picking.game.dockBounds,
         inventory: picking.game.context.controls.filter((c) => c.id.startsWith('inventory-slot-')).length,
         chosen: picking.game.chosen,
       }));
       assert.equal(center.open, true);
+      // Reduced motion settles this layout immediately, rather than after an
+      // arbitrary number of full-resolution raster frames.
+      assert.equal(center.reducedMotion, true);
+      assert.equal(center.dockStarted, -1);
       assert.equal(center.inventory, 16);
       assert.deepEqual(center.chosen, [10]);
       assert(Math.abs(center.bounds.y + center.bounds.h / 2 - 844 / 2) < 2);
@@ -525,7 +534,9 @@ try {
       row.passed = true;
       console.log(`${name}: ${row.checks.length} browser picking checks passed`);
     } catch (error) {
-      row.failure = error.stack ?? String(error);
+      primaryError = lifetime.failure(error);
+      row.failure = primaryError.stack ?? String(primaryError);
+      console.error(row.failure);
       row.diagnostics = await page
         .evaluate(() => ({
           lastFind: picking.lastFind,
@@ -537,16 +548,18 @@ try {
         }))
         .catch(() => null);
       await page.screenshot({ path: `${output}/${name}-failure.png` }).catch(() => {});
-      throw error;
+      console.error(
+        JSON.stringify({ case: name, completedChecks: row.checks, diagnostics: row.diagnostics }),
+      );
+      throw primaryError;
     } finally {
       row.durationSeconds = (Date.now() - started) / 1000;
-      await context.close();
+      await lifetime.finish(primaryError);
     }
   }
   assert.deepEqual(report.errors, []);
   report.passed = true;
 } finally {
-  clearTimeout(deadline);
   process.off('SIGINT', interrupt);
   process.off('SIGTERM', interrupt);
   await browser?.close();
