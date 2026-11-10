@@ -196,7 +196,6 @@ export class WorldRendererState {
   printsAt = -1;
   firePosition = point();
   visuals = new Map<number, Visual>();
-  sprites = new Map<number, Sprite>();
   figures = new Map<number, Figure>();
   beasts = new Map<number, Sprite>();
   climateKey = -1;

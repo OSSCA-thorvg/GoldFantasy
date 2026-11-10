@@ -174,7 +174,6 @@ export function render(
   if (simulate) {
     this.town.advance(editing ? 0 : elapsed * this.gameSpeed());
     if (!editing) this.dispatchWork();
-    this.traffic.update(this.town, editing ? 0 : elapsed * this.gameSpeed());
   }
   this.chosen = this.chosen.filter((id) => !!this.town.person(id));
   for (const id of this.speakers.keys()) if (!this.town.person(id)) this.speakers.delete(id);

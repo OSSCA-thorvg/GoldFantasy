@@ -1,6 +1,6 @@
 // World agents, articulated action poses, combat feedback and footprints.
 import { Town } from '../../engine/src/town';
-import { Traffic, Agent, AgentKind } from '../../engine/src/traffic';
+import { Agent, AgentKind, type Traffic } from '../../engine/src/traffic';
 import {
   point,
   sub,
@@ -17,7 +17,6 @@ import { farmWorkPhase } from '../../engine/src/farm-work';
 import { breedOf } from '../../engine/src/town-monsters';
 import { injuryOf, Injury } from '../../engine/src/person-look';
 import { Product, Structure, structureSpec } from '../../engine/src/building-catalog';
-import { DungeonKind } from '../../engine/src/world-types';
 import { Weather } from '../../engine/src/climate';
 import { treePosition } from '../../engine/src/world-map';
 import * as mining from '../../engine/src/mining';
@@ -27,7 +26,7 @@ import { workItem, equippedItem, type WorkKind } from '../../engine/src/equipmen
 import { ceremonySeconds } from '../../engine/src/town-devotion';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { registerPick } from './world-pick-registry';
-import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
+import { WorldRendererState } from './world-renderer-state';
 import { standingRow, registerDepth } from './world-depth';
 import { agentSprite, personSprite, PersonParts, stridePose, monsterParts } from './world-sprites';
 import { animalSprite } from './wildlife-sprites';
@@ -55,42 +54,15 @@ function finalHarvestContact(town: Town, person: number): TreeWorkEvent | undefi
   }
   return undefined;
 }
+// Keep the legacy traffic argument for reference callers; only real simulated actors are drawn.
 export function moveAgents(
   s: WorldRendererState,
   town: Town,
-  traffic: Traffic,
+  _traffic: Traffic,
   seconds: number,
   selected: readonly number[],
 ): void {
-  for (const sprite of s.sprites.values()) sprite.seen = false;
   const count = s.rows.length;
-  for (const agent of traffic.agents()) {
-    let sprite = s.sprites.get(agent.id);
-    if (!sprite) {
-      sprite = { paint: agentSprite(agent, DungeonKind.Cave), row: -1, seen: false };
-      s.sprites.set(agent.id, sprite);
-    }
-    sprite.seen = true;
-    registerDepth(sprite.paint, agent.position(), `traveller:${agent.id}`);
-    const at = agent.position(),
-      row = standingRow(town, at, count);
-    if (row !== sprite.row) {
-      if (sprite.row >= 0) s.rows[sprite.row].remove(sprite.paint);
-      s.rows[row].add(sprite.paint);
-      sprite.row = row;
-    }
-    const screen = project(at.x, at.y),
-      heading = agent.heading(),
-      facing = f(heading.x - heading.y) < 0 ? -1 : 1,
-      bob = f(-Math.abs(f(Math.sin(f(f(f(seconds) * 7) + agent.id)))) * f(1.2));
-    sprite.paint.transform([facing, 0, screen.x, 0, 1, f(screen.y + bob), 0, 0, 1]);
-    sprite.paint.opacity(town.map().revealed(at) && inSight(s, at) ? 255 : 0);
-  }
-  for (const [id, sprite] of s.sprites) {
-    if (sprite.seen) continue;
-    if (sprite.row >= 0) s.rows[sprite.row].remove(sprite.paint);
-    s.sprites.delete(id);
-  }
   const strikes = new Map<number, ReturnType<Town['hits']>[number]>();
   for (const hit of town.hits()) {
     const attacker = hit.attacker ?? (!hit.onPerson ? hit.person : -1);

@@ -99,7 +99,6 @@ export class WorldRenderer extends WorldRendererState {
     this.groundWidth = this.groundHeight = 0;
     this.ornaments.remove();
     this.ornamentLook = -1n;
-    for (const sprite of this.sprites.values()) sprite.row = -1;
     for (const figure of this.figures.values()) {
       figure.row = -1;
       figure.last = point(-1, -1);
@@ -321,7 +320,7 @@ export class WorldRenderer extends WorldRendererState {
     this.adapter.collect([
       this.root,
       ...[...this.visuals.values()].map((v) => v.picture),
-      ...[...this.sprites.values(), ...this.figures.values(), ...this.beasts.values()].map((v) => v.paint),
+      ...[...this.figures.values(), ...this.beasts.values()].map((v) => v.paint),
       ...[this.ymirPaint.paint, this.volcanoPaint.paint].filter((p) => p !== undefined),
     ]);
   }

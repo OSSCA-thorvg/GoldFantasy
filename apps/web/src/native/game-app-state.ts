@@ -25,7 +25,6 @@ export interface WorldRenderer {
   selectionGeometry(ref: WorldObjectRef): SelectionGeometry | null;
   presented(pixelRatio: number): void;
   invalidatePresentation(): void;
-  // Traffic is supplied by the native application render loop.
   visible(at: Point): boolean;
   buildingDrawnAt(town: Town, projected: Point): number;
   buildingRoof(building: Building): Point | null | undefined;
