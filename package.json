@@ -17,6 +17,7 @@
     "test:roads": "node tests/regression/road-quadrants.browser.mjs",
     "test:loading": "node tests/regression/loading.browser.mjs",
     "test:audio": "node tests/regression/audio-priority.browser.mjs",
+    "test:weather-audio": "node tests/regression/weather-speech.browser.mjs",
     "postinstall": "node scripts/prepare-assets.mjs",
     "predev": "node scripts/prepare-assets.mjs",
     "prebuild": "node scripts/prepare-assets.mjs",

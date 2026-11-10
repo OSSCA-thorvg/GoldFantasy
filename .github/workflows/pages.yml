@@ -52,6 +52,8 @@ jobs:
         run: npm run test:loading
       - name: Verify mobile audio before background samples finish
         run: npm run test:audio
+      - name: Verify recorded weather speech and mobile playback
+        run: npm run test:weather-audio
       - name: Verify work contacts against decoded audio and rendered poses
         run: npm run test:work
       - name: Build for the Pages URL
