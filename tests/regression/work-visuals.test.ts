@@ -92,6 +92,11 @@ function surface(width: number, height: number) {
     },
   };
 }
+function equipTool(person: Person, item: string, slot: 'tool1' | 'tool2' = 'tool1'): void {
+  const index = slot === 'tool1' ? 0 : 1;
+  person.inventory[index] = { item, quantity: 1 };
+  person.equipment[slot] = index + 1;
+}
 const flatten = (p: PaintNode): PaintNode[] => [
   p,
   ...(p instanceof SceneNode ? p.children.flatMap(flatten) : []),
@@ -191,6 +196,8 @@ it('shows work equipment only while actually outdoors at the field or productive
   s.currentVisibility.sample = () => 255;
   const p = new Person(0, 'Worker', Role.Resident, Calling.Settler, Race.Human, 499096, point(6, 6)),
     b = new Building(1, Structure.Farm, point(5, 5), 0, 0);
+  equipTool(p, 'hoe');
+  equipTool(p, 'watering-can', 'tool2');
   p.target = p.job = b.id;
   p.activity = Activity.Working;
   p.workField = 0;
@@ -222,6 +229,7 @@ it('shows work equipment only while actually outdoors at the field or productive
     expect(parts.wateringCan!.alpha).toBe(0);
     expect(parts.waterDrops!.alpha).toBe(0);
     p.path = [];
+    equipTool(p, 'saw');
     b.kind = Structure.Sawmill;
     b.productionProgress = 1;
     moveAgents(s, town, traffic, time, []);
@@ -231,6 +239,7 @@ it('shows work equipment only while actually outdoors at the field or productive
     moveAgents(s, town, traffic, time, []);
     expect(parts.saw!.alpha).toBe(0);
     expect(parts.sawLog!.alpha).toBe(0);
+    equipTool(p, 'hammer');
     b.kind = Structure.Stoneworks;
     b.productionProgress = 1;
     moveAgents(s, town, traffic, time, []);
@@ -325,6 +334,10 @@ for (const activity of [Activity.Felling, Activity.Mining, Activity.Building, Ac
         state.rows = Array.from({ length: 64 }, () => new SceneNode());
         state.currentVisibility.sample = () => 255;
         const p = new Person(7, 'Worker', Role.Resident, Calling.Settler, Race.Human, 499096, point(10, 10));
+        equipTool(
+          p,
+          activity === Activity.Felling ? 'axe' : activity === Activity.Mining ? 'pickaxe' : 'hammer',
+        );
         p.activity = activity;
         p.tree = 11 + 10 * 32;
         p.until = 6;
@@ -405,6 +418,7 @@ for (const stone of [false, true])
     state.rows = Array.from({ length: 64 }, () => new SceneNode());
     state.currentVisibility.sample = () => 255;
     const p = new Person(7, 'Worker', Role.Resident, Calling.Settler, Race.Human, 499096, point(10, 10));
+    equipTool(p, stone ? 'pickaxe' : 'axe');
     p.activity = stone ? Activity.Mining : Activity.Felling;
     p.tree = 9 + 10 * 32;
     p.until = 6;

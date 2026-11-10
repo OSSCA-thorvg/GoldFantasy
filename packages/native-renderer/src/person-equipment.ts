@@ -1,5 +1,6 @@
-import { Activity, Calling, type Person } from '../../engine/src/person';
+import { Calling, type Person } from '../../engine/src/person';
 import { Structure } from '../../engine/src/building-catalog';
+import { combatItem } from '../../engine/src/equipment';
 import { add, point } from '../../engine/src/geometry';
 import { SceneNode, ShapeNode } from './paint';
 import { poly, oval, stroke } from './sprite-primitives';
@@ -35,15 +36,9 @@ export function callingEquipment(calling: Calling): HeldTool | null {
   }
 }
 
-/** Keep combat equipment tied to the worker's occupation, including interrupted work. */
-export function combatEquipment(person: Person, workplace: Structure | undefined): HeldTool {
-  const profession = callingEquipment(person.calling);
-  if (profession) return profession;
-  if (person.calling === Calling.Bard) return 'staff';
-  if (workplace === Structure.Lumberyard || person.task === Activity.Felling) return 'axe';
-  if (workplace === Structure.Quarry || person.task === Activity.Mining) return 'pickaxe';
-  if (person.task === Activity.Building || person.task === Activity.Roadwork) return 'hammer';
-  return 'sword';
+/** Work and combat display the item actually equipped in the resident's inventory. */
+export function combatEquipment(person: Person, _workplace?: Structure): HeldTool | null {
+  return combatItem(person)?.visual ?? null;
 }
 
 /** Every tool is authored around its grip and belongs to the hand, never to the world. */
@@ -59,9 +54,29 @@ export function createEquipment(parts: PersonParts, calling: Calling): void {
     parts[tool] = paint;
   };
   const axe = new SceneNode();
-  axe.add(stroke(p(-0.7, 1), p(6, -8), 1.4, wood));
-  axe.add(poly([p(4.8, -9), p(9.5, -7), p(10, -3.7), p(5.8, -6)], steel));
-  axe.add(stroke(p(9.5, -7), p(10, -3.7), 0.5, bright));
+  const along = (shaft: number, across: number) => p(shaft * 0.6 + across * 0.8, shaft * -0.8 + across * 0.6);
+  axe.add(stroke(along(-1, 0), along(9.5, 0), 1.35, wood));
+  // The blade flares across the shaft, with a lower beard and a curved cutting
+  // edge. Its neck remains visibly fitted around the wooden handle.
+  const blade = new ShapeNode(),
+    edge = new ShapeNode();
+  const a = along(8, -0.65),
+    b = along(9.8, -0.65),
+    c = along(10.4, 3.5),
+    d = along(7, 5.2);
+  blade.moveTo(a.x, a.y).lineTo(b.x, b.y).lineTo(c.x, c.y);
+  const e0 = along(10, 4.4),
+    e1 = along(8.8, 5.1);
+  blade.cubicTo(e0.x, e0.y, e1.x, e1.y, d.x, d.y);
+  for (const q of [along(6.1, 2.8), along(7.6, 2.65), along(8.2, 0.6)]) blade.lineTo(q.x, q.y);
+  blade.close().fill(...steel);
+  edge
+    .moveTo(c.x, c.y)
+    .cubicTo(e0.x, e0.y, e1.x, e1.y, d.x, d.y)
+    .strokeWidth(0.55)
+    .strokeFill(...bright);
+  axe.add(blade).add(edge);
+  axe.add(stroke(along(8.1, -0.5), along(9.4, -0.5), 0.7, [91, 96, 106]));
   attach('axe', axe);
 
   const pick = new SceneNode();
@@ -71,9 +86,10 @@ export function createEquipment(parts: PersonParts, calling: Calling): void {
   attach('pickaxe', pick);
 
   const hammer = new SceneNode();
-  hammer.add(stroke(p(-0.7, 1), p(5.3, -7.8), 1.4, wood));
-  hammer.add(poly([p(3.1, -10), p(8.5, -6.4), p(10, -8.6), p(4.6, -12.2)], [120, 120, 130]));
-  hammer.add(stroke(p(4.6, -12.2), p(10, -8.6), 0.6, bright));
+  hammer.add(stroke(along(-0.8, 0), along(6.2, 0), 1.4, wood));
+  hammer.add(poly([along(5.8, -2.6), along(5.8, 2.8), along(8, 2.8), along(8, -2.6)], [120, 120, 130]));
+  hammer.add(poly([along(5.8, 2), along(5.8, 2.8), along(8, 2.8), along(8, 2)], [86, 89, 101]));
+  hammer.add(stroke(along(8, -2.6), along(8, 2.8), 0.55, bright));
   attach('hammer', hammer);
 
   const sword = new SceneNode();
@@ -157,7 +173,7 @@ export function createEquipment(parts: PersonParts, calling: Calling): void {
   parts.arms[0].hand!.add(chisel);
   parts.chisel = chisel;
   poseBow(parts, 0);
-  showEquipment(parts, callingEquipment(calling));
+  showEquipment(parts, null);
 }
 
 export function showEquipment(parts: PersonParts, tool: HeldTool | null): void {

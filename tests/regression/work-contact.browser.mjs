@@ -60,6 +60,7 @@ try {
       audio,
       { default: endings },
       timing,
+      equipment,
     ] = await Promise.all([
       import('/apps/web/src/native/startup-canvas.ts'),
       import('/packages/native-ui/src/index.ts'),
@@ -77,6 +78,7 @@ try {
       import('/packages/native-audio/src/sound-types.ts'),
       import('/packages/native-audio/src/data/effect-endings.json'),
       import('/packages/engine/src/work-timing.ts'),
+      import('/packages/engine/src/equipment.ts'),
     ]);
     const tvg = await initializeWebCanvas('sw'),
       element = document.createElement('canvas');
@@ -107,6 +109,7 @@ try {
       ...geometry,
       ...audio,
       ...timing,
+      ...equipment,
     };
   });
   for (const title of [false, true])
@@ -129,6 +132,8 @@ try {
             Camera,
             Cue,
             treeFallTiming,
+            addInventory,
+            workItem,
           } = probe;
           const { Person, Role, Calling, Race, TreeWorkKind } = people,
             town = new Town(5, 32, false),
@@ -150,6 +155,13 @@ try {
           p.food = p.rest = p.health = p.hydration = 1;
           town.folk.push(p);
           town.nextPerson = 1;
+          // This probe checks decoded tool contacts against the corresponding
+          // tool poses. The game starts barehanded; its fixture must own and
+          // equip a real item instead of relying on an implicit starter tool.
+          const tool = mode === 'chop' ? 'axe' : 'hammer',
+            work = mode === 'chop' ? 'woodcutting' : 'construction';
+          if (!addInventory(p, tool) || !town.equipItem(p.id, 1, 'tool1') || workItem(p, work)?.id !== tool)
+            throw Error(`Could not equip the fixture's ${tool}`);
           town.titleAutoplay = title;
           town.titlePlanTimer = 1000;
           town.titleWeatherTimer = 1000;
@@ -246,6 +258,7 @@ try {
             cues,
             liveAudioContexts,
             activity: p.activity,
+            equippedTool: workItem(p, work)?.id,
           };
           if (mode === 'chop') {
             if (!fallEvent)
@@ -287,6 +300,7 @@ try {
         { title, mode },
       );
       report.cases.push(row);
+      assert.equal(row.equippedTool, mode === 'chop' ? 'axe' : 'hammer');
       await page.screenshot({ path: `${output}/${title ? 'title4x' : 'normal'}-${mode}.png` });
       if (mode === 'chop') {
         assert.equal(row.fallCues, 1);

@@ -1,7 +1,16 @@
 // World agents, articulated action poses, combat feedback and footprints.
 import { Town } from '../../engine/src/town';
 import { Traffic, Agent, AgentKind } from '../../engine/src/traffic';
-import { point, sub, add, mul, distance, normalized, project } from '../../engine/src/geometry';
+import {
+  point,
+  sub,
+  add,
+  mul,
+  distance,
+  normalized,
+  project,
+  tileHalfWidth,
+} from '../../engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../engine/src/numeric';
 import { Activity, TreeWorkKind, type TreeWorkEvent } from '../../engine/src/person';
 import { farmWorkPhase } from '../../engine/src/farm-work';
@@ -13,7 +22,9 @@ import { Weather } from '../../engine/src/climate';
 import { treePosition } from '../../engine/src/world-map';
 import * as mining from '../../engine/src/mining';
 import * as woodcutting from '../../engine/src/woodcutting';
-import { harvestTiming, hammerTiming, workElapsed } from '../../engine/src/work-timing';
+import { harvestTiming, harvestDuration, hammerTiming, workElapsed } from '../../engine/src/work-timing';
+import { workItem, equippedItem, type WorkKind } from '../../engine/src/equipment';
+import { ceremonySeconds } from '../../engine/src/town-devotion';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { SelectionMarker, selectionFrame } from './selection-marker';
 import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
@@ -32,8 +43,9 @@ import { canIdleGesture, idleGesture, animateGesture, IdleGesture } from './idle
 import { line, opaque } from './vector-paint';
 import { updateBuildingDamage } from './building-damage';
 import { clearWorkProps, animateFieldWork, animateProcessingWork } from './work-motion';
-import { callingEquipment, combatEquipment, showEquipment, poseBow } from './person-equipment';
+import { combatEquipment, showEquipment, poseBow } from './person-equipment';
 import { animateAction, animateWork, animateMonsterAttack, strikePhase } from './action-motion';
+import { animatePrayer, updateDevotionEffects } from './devotion-effects';
 const inSight = (s: WorldRendererState, p: { x: number; y: number }) => s.currentVisibility.sample(p) >= 119;
 function finalHarvestContact(town: Town, person: number): TreeWorkEvent | undefined {
   const events = town.treeEvents();
@@ -88,7 +100,10 @@ export function moveAgents(
     s.sprites.delete(id);
   }
   const strikes = new Map<number, ReturnType<Town['hits']>[number]>();
-  for (const hit of town.hits()) if (!hit.onPerson && hit.person >= 0) strikes.set(hit.person, hit);
+  for (const hit of town.hits()) {
+    const attacker = hit.attacker ?? (!hit.onPerson ? hit.person : -1);
+    if (attacker >= 0) strikes.set(attacker, hit);
+  }
   for (const figure of s.figures.values()) figure.seen = false;
   for (const person of town.people()) {
     let figure = s.figures.get(person.id);
@@ -134,14 +149,16 @@ export function moveAgents(
     const screen = project(person.position.x, person.position.y),
       strike = strikes.get(person.id),
       followingThrough = !!strike && town.clock() - strike.at < 0.25,
-      fighting = person.activity === Activity.Fighting || followingThrough,
-      combatTravel = fighting && figure.last.x >= 0 && distance(figure.last, person.position) > 0.0001;
+      fighting = person.activity === Activity.Fighting || followingThrough;
 
     let ahead = point();
     if (crossing)
       ahead = person.inside ? sub(person.threshold, person.entrance) : sub(person.entrance, person.threshold);
     else if (person.moving()) ahead = sub(person.path[0], person.position);
     else if (figure.last.x >= 0) ahead = sub(person.position, figure.last);
+    const prayerSite = person.activity === Activity.Praying ? town.building(person.target) : null,
+      praying = prayerSite?.kind === Structure.Shrine && !person.moving() && !crossing && !person.inside;
+    if (praying) ahead = sub(prayerSite.center, person.position);
     const chopping =
         person.activity === Activity.Felling && !person.moving() && !crossing && person.tree >= 0,
       miningNow = person.activity === Activity.Mining && !person.moving() && !crossing && person.tree >= 0;
@@ -166,7 +183,7 @@ export function moveAgents(
       if (town.map().inside(x, y) && town.map().at(x, y).trees)
         ahead = sub(treePosition(town.map(), x, y, town.map().at(x, y).trees - 1), person.position);
     }
-    if (fighting && !combatTravel && !person.moving()) {
+    if (fighting && !person.moving()) {
       const foe =
         person.foe >= 0
           ? town.creatureTarget(person.foe)
@@ -176,11 +193,14 @@ export function moveAgents(
       if (foe) ahead = sub(foe.position, person.position);
       else if (strike) ahead = sub(strike.to, person.position);
     }
-    if (Math.abs(f(ahead.x - ahead.y)) > f(0.0001)) figure.facing = f(ahead.x - ahead.y) < 0 ? -1 : 1;
+    // In-range spacing is not walking. Keep the strike facing its target, and
+    // avoid mirroring for subpixel corrections around the target's centerline.
+    const facingThreshold = fighting && !person.moving() ? 2 / tileHalfWidth : 0.0001;
+    if (Math.abs(f(ahead.x - ahead.y)) > facingThreshold) figure.facing = f(ahead.x - ahead.y) < 0 ? -1 : 1;
     if (figure.last.x >= 0)
       figure.stride = f(figure.stride + f(Math.min(1, distance(figure.last, person.position)) * f(5.5)));
     figure.last = { ...person.position };
-    const striding = !s.sceneView && (person.moving() || crossing || combatTravel),
+    const striding = !s.sceneView && (person.moving() || crossing),
       bob = striding ? f(-Math.abs(f(Math.sin(figure.stride))) * f(1.1)) : 0,
       collecting =
         !s.sceneView && person.activity === Activity.Collecting
@@ -259,33 +279,48 @@ export function moveAgents(
         workplace.productionProgress > 0 &&
         (workplace.kind === Structure.Sawmill || workplace.kind === Structure.Stoneworks);
     clearWorkProps(figure.parts);
-    const tool =
+    const workKind: WorkKind | undefined =
       chopping || workContact?.kind === TreeWorkKind.Chop
-        ? 'axe'
+        ? 'woodcutting'
         : miningNow || workContact?.kind === TreeWorkKind.Mine
-          ? 'pickaxe'
+          ? 'mining'
           : hammering
-            ? 'hammer'
+            ? 'construction'
             : farming
               ? watering
-                ? 'wateringCan'
-                : 'hoe'
+                ? 'watering'
+                : 'farming'
               : processing
                 ? workplace.kind === Structure.Sawmill
-                  ? 'saw'
-                  : 'hammer'
-                : fighting
-                  ? combatEquipment(person, town.building(person.job)?.kind)
-                  : callingEquipment(person.calling);
+                  ? 'sawing'
+                  : 'crafting'
+                : undefined;
+    const tool = praying
+      ? null
+      : fighting
+        ? combatEquipment(person)
+        : workKind
+          ? (workItem(person, workKind)?.visual ?? null)
+          : (equippedItem(person, 'weapon')?.visual ?? null);
     showEquipment(figure.parts, tool);
     figure.parts.lute?.opacity(
-      fighting || chopping || miningNow || workContact || hammering || farming || processing ? 0 : 255,
+      fighting || chopping || miningNow || workContact || hammering || farming || processing || praying
+        ? 0
+        : 255,
     );
     if (tool === 'bow') poseBow(figure.parts, 0);
     figure.parts.arrow?.opacity(0);
-    if (!s.sceneView && tool) {
-      if (farming) animateFieldWork(figure.parts, watering, town.clock() + person.id * 0.31);
-      else if (processing)
+    if (!s.sceneView) {
+      if (fighting && !striding && person.ready > town.clock())
+        animateAction(figure.parts, tool, town.clock() - person.ready + 1 + strikePhase, 1);
+      else if (praying)
+        animatePrayer(
+          figure.parts,
+          Math.max(0, ceremonySeconds - (person.until - town.clock())),
+          ceremonySeconds,
+        );
+      else if (farming && tool) animateFieldWork(figure.parts, watering, town.clock() + person.id * 0.31);
+      else if (processing && tool)
         animateProcessingWork(
           figure.parts,
           workplace.kind === Structure.Sawmill,
@@ -297,11 +332,11 @@ export function moveAgents(
           tool,
           workContact
             ? harvestTiming.impact + town.clock() - workContact.at
-            : town.clock() - (person.until - woodcutting.cutSeconds),
+            : town.clock() - (person.until - harvestDuration(person, miningNow)),
           harvestTiming.period,
           harvestTiming.impact,
         );
-      else if (hammering)
+      else if (hammering || farming || processing)
         animateWork(
           figure.parts,
           tool,
@@ -309,8 +344,6 @@ export function moveAgents(
           hammerTiming.period,
           hammerTiming.impact,
         );
-      else if (fighting && !striding && person.ready > town.clock())
-        animateAction(figure.parts, tool, town.clock() - person.ready + 1 + strikePhase, 1);
     }
     const job =
         person.activity === Activity.Hauling && person.carrying === 0 ? town.building(person.job) : null,
@@ -398,6 +431,7 @@ export function moveAgents(
     if (sprite.row >= 0) s.rows[sprite.row].remove(sprite.paint);
     s.beasts.delete(id);
   }
+  if (!s.sceneView) updateDevotionEffects(s, town);
 }
 export function markDamage(s: WorldRendererState, town: Town): void {
   updateBuildingDamage(s, town);
@@ -458,7 +492,6 @@ export function sparkle(s: WorldRendererState, town: Town, seconds: number): voi
     number.size = 11;
     number.text = '-' + hit.damage;
     number.color = [...tint, 255];
-    number.outline(2, 20, 14, 10);
     number.translate(f(to.x + 4), f(to.y - 14));
     s.combat.add(number);
     s.sparks.push({

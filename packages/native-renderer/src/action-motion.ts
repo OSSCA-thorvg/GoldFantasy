@@ -1,4 +1,4 @@
-import { poseArm } from './idle-gesture';
+import { poseArm, reachArm } from './idle-gesture';
 import { poseBow, type HeldTool } from './person-equipment';
 import type { PersonParts, MonsterParts } from './world-sprites';
 
@@ -72,8 +72,29 @@ export function actionPose(elapsed: number, period: number): ActionPose {
   };
 }
 
-export function animateAction(parts: PersonParts, tool: HeldTool, elapsed: number, period: number): void {
+export function animateAction(
+  parts: PersonParts,
+  tool: HeldTool | null,
+  elapsed: number,
+  period: number,
+): void {
   const phase = (((elapsed % period) + period) % period) / period;
+  if (!tool) {
+    const punch = Math.max(0, 1 - Math.abs(phase - strikePhase) / 0.16);
+    reachArm(
+      parts.arms[1],
+      { x: 3.6 + punch * 3.5, y: parts.arms[1].shoulder.y + 1.3 - punch * 0.5 },
+      1,
+      1,
+      0,
+      0,
+    );
+    reachArm(parts.arms[0], { x: -1.2, y: parts.arms[0].shoulder.y + 2.2 }, -1, 1, 0, 0);
+    parts.body?.transform([1, -0.055 * punch, 0.65 * punch, 0, 0.98 - 0.035 * punch, 0, 0, 0, 1]);
+    parts.feet[0]?.translate(-0.35, 0);
+    parts.feet[1]?.translate(0.35, 0);
+    return;
+  }
   if (tool === 'bow') {
     const draw =
       phase < strikePhase
@@ -177,7 +198,7 @@ export function workPose(elapsed: number, period: number, impact: number): Actio
 }
 export function animateWork(
   parts: PersonParts,
-  tool: HeldTool,
+  tool: HeldTool | null,
   elapsed: number,
   period: number,
   impact: number,
@@ -191,8 +212,13 @@ export function animateWork(
       (pose.direction + 0.35) * (tool === 'hammer' ? 0.7 : 1) +
       (tool === 'pickaxe' ? 0.3 : tool === 'hammer' ? 0.12 : 0) * nearing,
     restAngle = Math.atan2(-8, 6);
-  poseArm(parts.arms[1], pose.upper, pose.elbow, direction - restAngle - pose.upper - pose.elbow);
-  poseArm(parts.arms[0], -0.45, -0.4 - pose.crouch * 0.5, 0.1);
+  if (!tool) {
+    // Empty hands pull, press or clear material close to the body. They never
+    // mimic holding an invisible full-length tool.
+    reachArm(parts.arms[1], { x: 4 + nearing * 2, y: -4.5 + nearing * 1.8 }, 1, 1, 0, 0);
+    reachArm(parts.arms[0], { x: 2.2 + nearing * 1.5, y: -4 + nearing * 1.8 }, -1, 1, 0, 0);
+  } else poseArm(parts.arms[1], pose.upper, pose.elbow, direction - restAngle - pose.upper - pose.elbow);
+  if (tool) poseArm(parts.arms[0], -0.45, -0.4 - pose.crouch * 0.5, 0.1);
   parts.body?.transform([1, -pose.lean, pose.forward, 0, 1 - pose.crouch, 0, 0, 0, 1]);
   // Neither foot nor shadow follows the striking arm: repeated work stays planted.
   parts.feet[0]?.translate(0, 0);

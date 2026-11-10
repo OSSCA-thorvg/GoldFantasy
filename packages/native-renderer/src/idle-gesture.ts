@@ -91,6 +91,8 @@ function reach(rig: ArmRig, hand: Point, bend: number, weight: number, wrist: nu
     elbowTurn = shortAngle(f32(f32(angle(sub(target, elbow)) - angle(lower)) - shoulderTurn));
   poseArm(rig, f32(shoulderTurn * weight), f32(elbowTurn * weight), f32(wrist * weight), f32(lift * weight));
 }
+// Shared two-link inverse kinematics for authored, grounded hand poses.
+export { reach as reachArm };
 export const gestureName = (kind: IdleGesture): string =>
   [
     'Wave',

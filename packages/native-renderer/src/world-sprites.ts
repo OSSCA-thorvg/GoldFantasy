@@ -12,6 +12,8 @@ import { poly, oval, stroke, opaque, scale, fill, glow } from './sprite-primitiv
 import { ArmRig, connectArm, poseArm } from './idle-gesture';
 import { stoneGiantSprite } from './stone-giant';
 import { createEquipment } from './person-equipment';
+import { equippedItem } from '../../engine/src/equipment';
+import { wearableBack, wearableBody, wearableHead } from './person-wearables';
 import { createWorkProps } from './work-motion';
 import { characterFigure } from './character-assets';
 import { Mood } from './person-portrait';
@@ -975,10 +977,11 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
         [104, 76, 50],
       ),
     );
+  wearableBack(sprite, person, height, broad);
   personFigure(sprite, look, color(look.cloth), height, broad, parts);
   if (injuryOf(person) == Injury.Bandaged) bandagedWrist(parts.arms[person.look % 2]);
-  parts.arms[0].free = person.calling != Calling.Warrior && person.calling != Calling.Cleric;
-  parts.arms[1].free = person.calling == Calling.Settler || person.calling == Calling.Cleric;
+  parts.arms[0].free = equippedItem(person, 'offhand')?.id !== 'shield';
+  parts.arms[1].free = true;
   switch (person.calling) {
     case Calling.Settler:
       break;
@@ -996,18 +999,6 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
           opaque(color(look.cloth)),
         ),
       ); // Tabard.
-      sprite.add(
-        poly(
-          [
-            [-f32(6.5), -4],
-            [-2, -4],
-            [-2, -11],
-            [-f32(6.5), -11],
-          ],
-          opaque(color(look.cloth)),
-        ),
-      ); // Shield in the house colours.
-      sprite.add(stroke([-f32(4.25), -f32(4.6)], [-f32(4.25), -f32(10.4)], f32(0.7), [212, 172, 82]));
       break;
     case Calling.Ranger:
     case Calling.Mage:
@@ -1025,26 +1016,28 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
         ),
       );
       break;
-    case Calling.Bard: {
-      const lute = new SceneNode();
-      sprite.add(lute);
-      parts.lute = lute;
-      // A lute held by its pear-shaped bowl, the pegbox bent back at the top of the neck.
-      let spruce: Rgb = [186, 124, 66],
-        walnut: Rgb = [104, 68, 40];
-      lute.add(stroke([f32(5.7), -f32(6.6)], [6, -f32(14.2)], f32(1.1), opaque(walnut)));
-      lute.add(stroke([6, -f32(14.2)], [f32(7.4), -f32(15.4)], f32(1.2), opaque(scale(walnut, f32(0.8)))));
-      lute.add(oval([f32(5.8), -f32(3.4)], f32(2.5), f32(2.6), opaque(spruce)));
-      lute.add(oval([f32(5.7), -f32(5.5)], f32(1.7), f32(1.6), opaque(spruce)));
-      lute.add(oval([f32(6.6), -f32(3.3)], f32(1.5), f32(2.2), opaque(scale(spruce, f32(0.8)))));
-      lute.add(oval([f32(5.5), -f32(4.5)], f32(0.7), f32(0.7), opaque(scale(walnut, f32(0.6)))));
-      lute.add(
-        stroke([f32(5.75), -f32(2.4)], [f32(5.98), -f32(13.9)], f32(0.25), opaque([232, 220, 188], 200)),
-      );
+    case Calling.Bard:
       break;
-    }
   }
+  // Equipment appears only when a real inventory item occupies the slot.
+  if (equippedItem(person, 'offhand')?.id === 'shield') {
+    sprite.add(
+      poly(
+        [
+          [-f32(6.5), -4],
+          [-2, -4],
+          [-2, -11],
+          [-f32(6.5), -11],
+        ],
+        opaque(color(look.cloth)),
+      ),
+    ); // Shield in the house colours.
+    sprite.add(stroke([-f32(4.25), -f32(4.6)], [-f32(4.25), -f32(10.4)], f32(0.7), [212, 172, 82]));
+  }
+
+  wearableBody(sprite, person, parts, height, broad);
   streetHead(sprite, look, hair, head);
+  wearableHead(sprite, person, head);
   for (const arm of parts.arms) sprite.add(arm.forearm!);
   createEquipment(parts, person.calling);
   createWorkProps(root, parts);
