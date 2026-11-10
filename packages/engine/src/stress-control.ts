@@ -4,6 +4,7 @@ import { f32 } from './numeric';
 import { distance } from './geometry';
 import { defect } from './neutral-settlements';
 import { TownState } from './town-state';
+import { hasUnfinishedRoadwork } from './automatic-work';
 
 export const stressPolicy = {
   breakdown: 0.85,
@@ -16,6 +17,9 @@ export const stressPolicy = {
 export function updateStress(this: Town, p: Person, dt: number): boolean {
   if (p.faction !== 0 || p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition)
     return false;
+  // Finish accepted road work before starting a breakdown. Stress still grows
+  // normally and is reconsidered on completion; combat can still interrupt now.
+  if (!p.stressRecovery && hasUnfinishedRoadwork(this, p)) return false;
   if (!p.stressRecovery && p.stress >= f32(stressPolicy.breakdown)) {
     const elapsed = this.time - p.lastBreakdownAt;
     if (

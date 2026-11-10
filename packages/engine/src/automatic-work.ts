@@ -7,6 +7,13 @@ const blockedRetrySeconds = 30;
 const assignments = new WeakMap<Person, string>();
 const blocked = new WeakMap<Person, Map<string, number>>();
 const key = (work: Activity, id: number) => `${work}:${id}`;
+/** The requested road owns its clearing, supply and prerequisite-road work. */
+export function hasUnfinishedRoadwork(town: Town, person: Person): boolean {
+    if (person.task !== Activity.Roadwork) return false;
+    const road = town.roads().road(person.taskSite);
+    return !!road && road.faction === person.faction &&
+        (road.built < 1 || road.paving >= 0 || road.wear > 0);
+}
 export function clearAutomaticConstruction(person: Person): void { assignments.delete(person); }
 export function registerAutomaticConstruction(town: Town, person: Person, work: Activity, id: number): void {
     if (person.task === work && person.taskSite === id)
@@ -21,14 +28,24 @@ export function automaticConstructionAllowed(town: Town, person: Person, work: A
     const at = work === Activity.Roadwork ? town.roadWorkPosition(id) : town.building(id)!.door();
     return !!at && distance(person.position, at) <= automaticConstructionRadius;
 }
-/** Failed supply searches yield, while a valid gather/deliver/build transaction stays committed. */
+/** Road supply failures retry the same transaction; impossible building jobs yield. */
 export function deferAutomaticConstruction(town: Town, person: Person): boolean {
     if (person.task !== Activity.Building && person.task !== Activity.Roadwork)
         return false;
+    if (hasUnfinishedRoadwork(town, person)) {
+        // Missing stock or a temporarily blocked delivery route must not cancel
+        // an accepted road. Retain its target, cargo and player-order policy;
+        // WaitingMaterials retries the supply search without a new assignment.
+        person.activity = Activity.WaitingMaterials;
+        person.path = [];
+        person.tree = -1;
+        person.until = town.time + 3;
+        return true;
+    }
     const taskKey = assignments.get(person) ?? key(person.task, person.taskSite);
     // This is called only after every usable source, gather target and processor
-    // has failed. Even an explicit order must not hold a resident forever when
-    // the transaction cannot advance; a later direct click can retry immediately.
+    // has failed. A building job yields when its transaction cannot advance;
+    // a later direct click can retry immediately.
     let retries = blocked.get(person);
     if (!retries) {
         retries = new Map();

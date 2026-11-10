@@ -123,7 +123,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
     if (!resourceAmount(materials.required, p.carriedProduct) && this.haulCargo(p)) return true;
     if (go(Activity.DeliveringMaterials, id, at)) return true;
     // A changed obstacle can invalidate the delivery leg after collection.
-    // Retain the cargo, release the impossible job, and let Auto store it.
+    // Retain the cargo. Roads retry this leg; impossible building jobs yield.
     if (deferAutomaticConstruction(this, p)) return true;
     p.activity = Activity.WaitingMaterials;
     p.path = [];

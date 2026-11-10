@@ -5,7 +5,7 @@ import { Building } from './town-models';
 import { Structure } from './building-catalog';
 import { add, distance, normalized, point, rotated, scale, sub } from './geometry';
 import { f32 as f } from './numeric';
-import { automaticConstructionAllowed, registerAutomaticConstruction } from './automatic-work';
+import { automaticConstructionAllowed, hasUnfinishedRoadwork, registerAutomaticConstruction } from './automatic-work';
 
 export function orderAutomatic(this: Town, ids: number[]): void {
   for (const p of this.folk) {
@@ -23,13 +23,22 @@ export function orderAutomatic(this: Town, ids: number[]): void {
 
 // Resident policy has one entry point. An active enemy interrupts everything;
 // direct targets otherwise run to completion. Auto keeps a construction/supply
-// chain intact, and selects roads before buildings. Needs suspend that chain,
-// rather than erasing the assignment. Explicit Stop/Auto OFF is the sole idle hold.
+// chain intact, and selects roads before buildings. Once road work is accepted,
+// ordinary needs wait for completion; only combat or a new player order interrupts.
+// Explicit Stop/Auto OFF is the sole idle hold.
 export function scheduleAutomatic(this: Town, p: Person): boolean {
   if (p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || p.activity === Activity.Leaving) return false;
   if (p.faction !== this.controlFaction) return false;
   if (p.stressRecovery) return true;
   if (p.activity === Activity.Fighting) return true;
+  if (hasUnfinishedRoadwork(this, p)) {
+    // Keep the requested road through clearing, fetching and delivery, including
+    // a connected prerequisite road. Also recover old saves suspended in care.
+    if ([Activity.Idle, Activity.Holding, Activity.Sleeping, Activity.Eating,
+      Activity.Drinking, Activity.Treating].includes(p.activity) ||
+      (p.activity === Activity.WaitingMaterials && this.time >= p.until)) this.resumeOrder(p);
+    return true;
+  }
   if (p.ordered || p.approachingOrder) return true;
   if (!p.autoMode) return false;
   const night = this.climate().night > f(.5);
@@ -72,11 +81,8 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
     p.activity = Activity.Idle; p.until = this.time;
   }
 
-  const roadTask = p.task === Activity.Roadwork ? this.network.road(p.taskSite) : null,
-    buildingTask = p.task === Activity.Building ? this.building(p.taskSite) : null,
-    unfinished = (roadTask && (roadTask.built < 1 || roadTask.paving >= 0 || roadTask.wear > 0)) ||
-      (buildingTask && (!buildingTask.built() || buildingTask.health < 1));
-  if (unfinished) {
+  const buildingTask = p.task === Activity.Building ? this.building(p.taskSite) : null;
+  if (buildingTask && (!buildingTask.built() || buildingTask.health < 1)) {
     if ([Activity.Idle, Activity.Holding].includes(p.activity) || (p.activity === Activity.WaitingMaterials && this.time >= p.until)) this.resumeOrder(p);
     // An unavailable supply chain keeps its target, but does not forbid eating
     // or drinking while waiting. Successful delivery resumes this same site.

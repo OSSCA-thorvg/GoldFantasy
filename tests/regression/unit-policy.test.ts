@@ -322,12 +322,13 @@ describe('resident automatic policy', () => {
     issueOrder.call(app,Order.Work);expect(p.task).toBe(Activity.Moving);town.advance(.1);expect(animal.health).toBe(3);
     issueOrder.call(app,Order.Move);expect(p.task).toBe(Activity.Moving);
   });
-  it('briefly drinks during critical health recovery, preserving the suspended task', () => {
+  it('briefly drinks during critical health recovery, preserving a suspended building task', () => {
     const town=fixture(),p=town.people()[0],well=new Building(1,Structure.Well,point(34,34),0,0);well.village=0;town.placed.push(well);
-    const r=road(town);p.task=Activity.Roadwork;p.taskSite=r.id;p.health=.3;p.hydration=.05;p.recoveringHealth=true;
-    town.scheduleAutomatic(p);expect(p.activity).toBe(Activity.Drinking);expect(p.taskSite).toBe(r.id);
+    const site=new Building(2,Structure.Tent,point(36,34),0,0);site.village=0;site.progress=0;town.placed.push(site);
+    p.task=Activity.Building;p.taskSite=site.id;p.health=.3;p.hydration=.05;p.recoveringHealth=true;
+    town.scheduleAutomatic(p);expect(p.activity).toBe(Activity.Drinking);expect(p.taskSite).toBe(site.id);
     for(let i=0;i<160&&p.hydration<.9;++i)town.advance(.1);
-    expect(p.hydration).toBeGreaterThan(.9);step(town,8);expect(p.activity).toBe(Activity.Sleeping);expect(p.target).toBe(p.home);expect(p.recoveringHealth).toBe(true);expect(p.taskSite).toBe(r.id);
+    expect(p.hydration).toBeGreaterThan(.9);step(town,8);expect(p.activity).toBe(Activity.Sleeping);expect(p.target).toBe(p.home);expect(p.recoveringHealth).toBe(true);expect(p.taskSite).toBe(site.id);
   });
   it('lets legacy guests drink at an existing Well without placing buildings themselves', () => {
     const town=fixture(),p=town.people()[0];p.role=Role.Guest;p.hydration=.2;
