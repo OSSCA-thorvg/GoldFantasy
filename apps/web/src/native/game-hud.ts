@@ -281,7 +281,25 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     for (const line of wrap(c, spec.description, inner, 12)) textRow(line, t.muted, 12);
     y = f32(y + 4);
     if (building.built() && [Structure.Weaponsmith, Structure.Armorer].includes(building.kind)) {
-      const at = y;
+      const at = y,
+        crafter = () => {
+          const village = this.town.settlementOf(building);
+          return this.town
+            .people()
+            .filter(
+              (p) =>
+                village >= 0 &&
+                canControl(p) &&
+                p.faction === building.faction &&
+                this.town.settlementOf(p) === village,
+            )
+            .sort(
+              (a, b) =>
+                Number(this.chosen.includes(b.id)) - Number(this.chosen.includes(a.id)) ||
+                distance(a.position, building.center) - distance(b.position, building.center) ||
+                a.id - b.id,
+            )[0];
+        };
       rows.push(() =>
         actionButton(
           c,
@@ -290,20 +308,16 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
           'craft',
           'Choose a resident and craft equipment',
           () => {
-            const p = this.town
-              .people()
-              .filter(canControl)
-              .sort(
-                (a, b) => distance(a.position, building.center) - distance(b.position, building.center),
-              )[0];
+            const p = crafter();
             if (p) {
               this.selectPeople([p.id]);
               this.equipmentTab = 'craft';
               this.craftPage = 0;
+              this.craftWorkshopFilter = building.kind;
             }
           },
           false,
-          isPlayerBuilding(building),
+          isPlayerBuilding(building) && !!crafter(),
         ),
       );
       y += 34;

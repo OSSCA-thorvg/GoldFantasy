@@ -31,6 +31,8 @@ interface Badge {
   condition: Condition;
   box: Rect;
 }
+const commandFooterHeight = 42;
+const commandButtonHeight = 32;
 function badges(context: Context, conditions: readonly Condition[], width: number): Badge[] {
   const result: Badge[] = [];
   let x = 0,
@@ -82,13 +84,13 @@ export function personPanelBounds(this: GameHudApp, width: number, height: numbe
             60,
         ),
     );
-  h = f32(h + (commands ? 44 : 12));
   const scale = Math.min(1, f32(Math.max(1, f32(width - 24)) / w));
+  const screenHeight = f32(f32(h * scale) + (commands ? commandFooterHeight : f32(12 * scale)));
   return new Rect(
     f32(f32(width - f32(w * scale)) / 2),
-    f32(f32(height - 12) - f32(h * scale)),
+    f32(f32(height - 12) - screenHeight),
     f32(w * scale),
-    f32(h * scale),
+    screenHeight,
   );
 }
 export function personPanel(this: GameHudApp, panel: Rect): void {
@@ -257,7 +259,12 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     equipmentPanel(
       this,
       p,
-      new Rect(panel.x + 12, panel.y + 164 * scale, panel.w - 24, panel.h - 216 * scale),
+      new Rect(
+        panel.x + 12,
+        panel.y + 164 * scale,
+        panel.w - 24,
+        panel.h - 164 * scale - commandFooterHeight - 10,
+      ),
     );
   } else {
     text(
@@ -299,9 +306,9 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     this.commandCard(
       new Rect(
         f32(panel.x + f32(12 * scale)),
-        f32(f32(panel.y + panel.h) - f32(42 * scale)),
+        f32(f32(panel.y + panel.h) - commandFooterHeight),
         f32(panel.w - f32(24 * scale)),
-        f32(30 * scale),
+        commandButtonHeight,
       ),
       scale,
     );

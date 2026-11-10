@@ -371,6 +371,9 @@ export function selectPeople(this: GameInputApp, ids: number[]): void {
   this.selectTool(Tool.Select);
   this.chosen = [...ids];
   this.selectedObjects = [];
+  this.inventorySelected = -1;
+  this.craftWorkshopFilter = null;
+  this.craftPage = 0;
   this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
 }
 export function selectBuilding(this: GameInputApp, id: number): void {

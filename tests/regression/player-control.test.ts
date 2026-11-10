@@ -95,8 +95,12 @@ describe('player command ownership boundary', () => {
   it('preserves individual inspection of guests, neutral people and overwhelmed residents', () => {
     const { app } = fixture();
     for (const id of [1, 2, 3]) {
+      app.inventorySelected = 1;
+      app.craftWorkshopFilter = Structure.Armorer;
       selectPeople.call(app, [id]);
       expect(app.chosen).toEqual([id]);
+      expect(app.inventorySelected).toBe(-1);
+      expect(app.craftWorkshopFilter).toBeNull();
       expect(residentSelection.call(app as unknown as GameHudApp)).toBe(false);
     }
   });

@@ -13,6 +13,7 @@ import { GameAppState, DockView } from '../../apps/web/src/native/game-app-state
 import { addInventory } from '../../packages/engine/src/equipment';
 import { updateContextDock, renderDockContent } from '../../apps/web/src/native/game-context-dock';
 import { rosterPanel, rosterBounds } from '../../apps/web/src/native/game-roster';
+import { commandCard, inspector } from '../../apps/web/src/native/game-hud';
 import {
   personPanel,
   personPanelBounds,
@@ -50,10 +51,10 @@ afterAll(() => {
   tvg.term();
   vi.unstubAllGlobals();
 });
-function fixture() {
-  const canvas = new tvg.Canvas(new MemoryCanvas(880, 600) as any, {
-    width: 880,
-    height: 600,
+function fixture(width = 880, height = 600) {
+  const canvas = new tvg.Canvas(new MemoryCanvas(width, height) as any, {
+    width,
+    height,
     enableDevicePixelRatio: false,
   });
   for (const font of ['DejaVuSans', 'DejaVuSans-Bold'])
@@ -84,7 +85,7 @@ function fixture() {
     draw(fn: () => void) {
       controls.mockClear();
       labels.mockClear();
-      context.begin(app.theme, new Rect(0, 0, 880, 600), 1);
+      context.begin(app.theme, new Rect(0, 0, width, height), 1);
       fn();
       context.end();
       canvas.update().render();
@@ -345,6 +346,102 @@ it('keeps a fixed-size object panel on screen when only viewport height changes'
     ui.draw(() => updateContextDock.call(app, 880, 500));
     expect(app.dockTarget.y).toBe(340);
     expect(app.dockBounds.y).toBe(340);
+  } finally {
+    ui.dispose();
+  }
+});
+
+it.each([
+  [1, false],
+  [1, true],
+  [2, false],
+  [2, true],
+] as const)(
+  'keeps touch commands at full height for %s selected residents, sheltered=%s',
+  (count, sheltered) => {
+    const ui = fixture(390, 844);
+    try {
+      ui.app.chosen = ui.town.folk.slice(0, count).map((p) => p.id);
+      ui.town.folk[0].inside = sheltered;
+      ui.app.commandCard = commandCard.bind(ui.app);
+      const panel = personPanelBounds.call(ui.app, 390, 844, true);
+      ui.draw(() => personPanel.call(ui.app, panel));
+      const commands = ui.controls.mock.calls.filter(([id]) => id.startsWith('unit/card-'));
+      expect(commands).toHaveLength(sheltered ? 8 : 7);
+      for (const [id, bounds] of commands) {
+        expect(bounds.h, id).toBeGreaterThanOrEqual(28);
+        expect(bounds.y, id).toBeGreaterThanOrEqual(panel.y + panel.h - 42 - 0.001);
+        expect(bounds.y + bounds.h, id).toBeLessThanOrEqual(panel.y + panel.h);
+        expect(bounds.x, id).toBeGreaterThanOrEqual(panel.x);
+        expect(bounds.x + bounds.w, id).toBeLessThanOrEqual(panel.x + panel.w + 0.001);
+      }
+      const content = ui.controls.mock.calls.filter(
+        ([id]) =>
+          id.startsWith('pick-person-') ||
+          id.startsWith('inventory-slot-') ||
+          id.startsWith('equipment-slot-'),
+      );
+      for (const [id, bounds] of content)
+        expect(bounds.y + bounds.h, id).toBeLessThanOrEqual(commands[0][1].y);
+    } finally {
+      ui.dispose();
+    }
+  },
+);
+
+it.each([
+  [Structure.Weaponsmith, 'none'],
+  [Structure.Weaponsmith, 'foreign'],
+  [Structure.Weaponsmith, 'local'],
+  [Structure.Armorer, 'none'],
+  [Structure.Armorer, 'foreign'],
+  [Structure.Armorer, 'local'],
+] as const)('chooses a workshop %s resident from its own camp with %s selection', (kind, selected) => {
+  const ui = fixture();
+  try {
+    const first = new Building(0, Structure.Camp, point(5, 5), 0, 0),
+      second = new Building(10, Structure.Camp, point(24, 24), 0, 0),
+      smith = new Building(11, kind, point(20, 20), 0, 0),
+      [foreign, local] = ui.town.folk,
+      preferred = new Person(
+        20,
+        'Selected craftsperson',
+        Role.Resident,
+        Calling.Settler,
+        Race.Human,
+        9,
+        point(28, 27),
+      );
+    first.village = 0;
+    second.village = smith.village = 10;
+    foreign.home = foreign.village = 0;
+    foreign.position = smith.door();
+    local.home = local.village = preferred.home = preferred.village = 10;
+    local.position = point(24, 24);
+    ui.town.placed = [first, second, smith];
+    ui.town.folk.push(preferred);
+    ui.town.migrateSettlements();
+    ui.town.stock(10).add(new Resources(50, 50, 50, 50));
+    expect(ui.town.settlementOf(foreign)).toBe(0);
+    expect(ui.town.settlementOf(local)).toBe(10);
+    expect(ui.town.settlementOf(smith)).toBe(10);
+    ui.app.selected = smith.id;
+    ui.app.chosen = selected === 'none' ? [] : [selected === 'local' ? preferred.id : foreign.id];
+    ui.draw(() => inspector.call(ui.app, new Rect(100, 100, 620, 420), true));
+    const action = ui.controls.mock.calls.find(([id]) => id === 'workshop-craft')!;
+    expect(action[3]).toBe(true);
+    ui.context.pointerDown(action[1].x + 10, action[1].y + 10);
+    ui.context.pointerUp(action[1].x + 10, action[1].y + 10);
+    const expected = selected === 'local' ? preferred : local;
+    expect(ui.app.selectPeople).toHaveBeenCalledWith([expected.id]);
+    expect(ui.app.equipmentTab).toBe('craft');
+    expect(ui.app.craftWorkshopFilter).toBe(kind);
+    expect(ui.town.craftReason(expected.id, smith.id, kind === Structure.Weaponsmith ? 'axe' : 'cap')).toBe(
+      '',
+    );
+    local.faction = preferred.faction = 1;
+    ui.draw(() => inspector.call(ui.app, new Rect(100, 100, 620, 420), true));
+    expect(ui.controls.mock.calls.find(([id]) => id === 'workshop-craft')![3]).toBe(false);
   } finally {
     ui.dispose();
   }

@@ -12,7 +12,7 @@ import { SceneNode, ShapeNode } from '../../../../packages/native-renderer/src/p
 import { fill, opaque } from '../../../../packages/native-renderer/src/vector-paint';
 import { hudPaint } from './hud-paint';
 import type { GameHudApp } from './game-hud-contract';
-import { worldTarget } from './world-targets';
+import { worldTarget, landmarkDescription } from './world-targets';
 import type { GameCommandApp } from './game-commands';
 import { actionButton } from './hud-actions';
 function fitted(context: Context, model: Paint, frame: Rect): Paint {
@@ -65,6 +65,7 @@ export function worldObjectPanel(this: GameHudApp, panel: Rect): void {
         ? `Built ${Math.round(r.built * 100)}% · Length ${r.length().toFixed(1)} · Wear ${Math.round(r.wear * 100)}%`
         : '';
     }
+    if (target.kind === 'landmark') detail = landmarkDescription(target.id);
     if (target.kind === 'field') {
       const f = this.town.field(target.id);
       detail = f ? `Farmland · ${f.acres()} acres` : '';

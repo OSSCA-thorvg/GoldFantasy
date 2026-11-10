@@ -1,7 +1,7 @@
 import type { Paint, Scene } from '@thorvg/webcanvas';
 import { Town } from '../../../../packages/engine/src/town';
 import { Camera, point, type Outline, type Point } from '../../../../packages/engine/src/geometry';
-import { Resources } from '../../../../packages/engine/src/building-catalog';
+import { Resources, type Structure } from '../../../../packages/engine/src/building-catalog';
 import { Activity, Calling } from '../../../../packages/engine/src/person';
 import { Tool, Order, Preview } from '../../../../packages/engine/src/game-tools';
 import { Context, Rect } from '../../../../packages/native-ui/src';
@@ -72,6 +72,7 @@ export class GameAppState {
   equipmentTab: 'profile' | 'equipment' | 'craft' = 'equipment';
   inventorySelected = -1;
   craftPage = 0;
+  craftWorkshopFilter: Structure | null = null;
   speed = 1;
   paused = false;
   card = -1;

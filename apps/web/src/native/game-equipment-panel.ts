@@ -132,13 +132,18 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
       label,
       () => {
         app.equipmentTab = tab;
+        app.craftWorkshopFilter = null;
         app.inventorySelected = -1;
       },
       app.equipmentTab === tab,
     ),
   );
   if (app.equipmentTab === 'craft') {
-    const items = itemCatalog.filter((item) => item.workshop !== null),
+    const items = itemCatalog.filter(
+        (item) =>
+          item.workshop !== null &&
+          (app.craftWorkshopFilter === null || item.workshop === app.craftWorkshopFilter),
+      ),
       rows = Math.max(2, Math.floor((panel.h - 66) / 35)),
       pages = Math.ceil(items.length / rows);
     app.craftPage = Math.max(0, Math.min(pages - 1, app.craftPage));
