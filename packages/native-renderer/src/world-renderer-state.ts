@@ -19,7 +19,6 @@ import {
 } from './paint';
 import { SUN_PASSES, blendLayer } from './vector-paint';
 import { WebCanvasAdapter } from './webcanvas-adapter';
-import { SelectionMarker } from './selection-marker';
 import { Flicker } from './light-flicker';
 import type { RiseAnimation } from './building-animation';
 import { PersonParts, type TextBounds } from './world-sprites';
@@ -124,7 +123,6 @@ export class WorldRendererState {
   effects = new SceneNode();
   overlay = new SceneNode();
   selection = new SceneNode();
-  selectionMarkers = new Map<number, SelectionMarker>();
   background = new ShapeNode();
   vignette = new SceneNode();
   darkness = new SceneNode();
@@ -224,7 +222,7 @@ export class WorldRendererState {
   seenTreeEvent = 0n;
   constructor(readonly tvg: ThorVGNamespace) {
     this.adapter = new WebCanvasAdapter(tvg);
-    this.root.add(this.background).add(this.world).add(this.overcast).add(this.vignette).add(this.selection);
+    this.root.add(this.background).add(this.world).add(this.overcast).add(this.vignette);
     for (const layer of [
       this.ground,
       this.farmland,
@@ -232,6 +230,7 @@ export class WorldRendererState {
       this.roads,
       this.prints,
       this.lights,
+      this.selection,
       this.objects,
       this.effects,
       this.sunlight,

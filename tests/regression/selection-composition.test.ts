@@ -6,12 +6,13 @@ import { GameAppState, Plan } from '../../apps/web/src/native/game-app-state';
 import { render, type GameRenderApp } from '../../apps/web/src/native/game-render';
 import { commandOverlay } from '../../apps/web/src/native/game-commands';
 import { toScreen } from '../../apps/web/src/native/game-input';
-import { selectionTargets } from '../../apps/web/src/native/selection-targets';
-import { selectionFrame } from '../../packages/native-renderer/src/selection-marker';
 import { AnimalKind } from '../../packages/engine/src/person';
 import { Camera, point, project } from '../../packages/engine/src/geometry';
 import { parseFontMetrics, type NativeFontMetrics } from '../../packages/native-ui/src/fonts';
-import { paintSelection, objectSelectionOverlay } from '../../apps/web/src/native/selection-overlay';
+import { objectSelectionOverlay } from '../../apps/web/src/native/selection-overlay';
+import { WorldRenderer } from '../../packages/native-renderer/src/world-renderer';
+import { ShapeNode } from '../../packages/native-renderer/src/paint';
+import type { GroundSelectionMarker } from '../../packages/native-renderer/src/world-picking-types';
 
 class Pixels {
   constructor(
@@ -62,13 +63,12 @@ it('road feedback follows an L course and never draws its bounding rectangle or 
     height = 200,
     target = new MemoryCanvas(width, height),
     canvas = new tvg.Canvas(target as any, { width, height, enableDevicePixelRatio: false });
-  const context = nativeContext(),
+  const world = groundWorld(width, height),
     background = new tvg.Shape().appendRect(0, 0, width, height).fill(36, 52, 41);
-  canvas.add(background).add(context.scene());
+  canvas.add(background).add(world.scene());
   try {
-    context.begin(Theme.dark(), new Rect(0, 0, width, height), 0);
     paintSelection(
-      context,
+      world,
       'road:8',
       {
         foot: point(30, 140),
@@ -82,7 +82,6 @@ it('road feedback follows an L course and never draws its bounding rectangle or 
       },
       'road',
     );
-    context.end();
     canvas.update().render();
     const changed = (x: number, y: number) => {
       const i = (y * width + x) * 4;
@@ -95,7 +94,7 @@ it('road feedback follows an L course and never draws its bounding rectangle or 
     expect(changed(100, 80), 'empty interior stays unpainted').toBe(false);
   } finally {
     canvas.remove();
-    context.dispose();
+    world.dispose();
     background.dispose();
     canvas.destroy();
   }
@@ -106,13 +105,12 @@ it('unit feedback is a foot ellipse rather than an artwork box', () => {
     height = 200,
     target = new MemoryCanvas(width, height),
     canvas = new tvg.Canvas(target as any, { width, height, enableDevicePixelRatio: false });
-  const context = nativeContext(),
+  const world = groundWorld(width, height),
     background = new tvg.Shape().appendRect(0, 0, width, height).fill(36, 52, 41);
-  canvas.add(background).add(context.scene());
+  canvas.add(background).add(world.scene());
   try {
-    context.begin(Theme.dark(), new Rect(0, 0, width, height), 0);
     paintSelection(
-      context,
+      world,
       'person:1',
       {
         foot: point(120, 150),
@@ -123,7 +121,6 @@ it('unit feedback is a foot ellipse rather than an artwork box', () => {
       },
       'person',
     );
-    context.end();
     canvas.update().render();
     const at = (x: number, y: number) =>
       Array.from(target.pixels.slice((y * width + x) * 4, (y * width + x) * 4 + 3));
@@ -132,7 +129,7 @@ it('unit feedback is a foot ellipse rather than an artwork box', () => {
     expect(at(160, 50)).toEqual([36, 52, 41]);
   } finally {
     canvas.remove();
-    context.dispose();
+    world.dispose();
     background.dispose();
     canvas.destroy();
   }
@@ -143,13 +140,12 @@ it('building feedback uses a ground ellipse instead of a footprint box', () => {
     height = 200,
     target = new MemoryCanvas(width, height),
     canvas = new tvg.Canvas(target as any, { width, height, enableDevicePixelRatio: false });
-  const context = nativeContext(),
+  const world = groundWorld(width, height),
     background = new tvg.Shape().appendRect(0, 0, width, height).fill(36, 52, 41);
-  canvas.add(background).add(context.scene());
+  canvas.add(background).add(world.scene());
   try {
-    context.begin(Theme.dark(), new Rect(0, 0, width, height), 0);
     paintSelection(
-      context,
+      world,
       'building:1',
       {
         foot: point(120, 150),
@@ -160,7 +156,6 @@ it('building feedback uses a ground ellipse instead of a footprint box', () => {
       },
       'building',
     );
-    context.end();
     canvas.update().render();
     const at = (x: number, y: number) =>
       Array.from(target.pixels.slice((y * width + x) * 4, (y * width + x) * 4 + 3));
@@ -169,7 +164,7 @@ it('building feedback uses a ground ellipse instead of a footprint box', () => {
     expect(at(80, 50), 'no artwork-box corner').toEqual([36, 52, 41]);
   } finally {
     canvas.remove();
-    context.dispose();
+    world.dispose();
     background.dispose();
     canvas.destroy();
   }
@@ -181,6 +176,7 @@ it('shows selected feedback without a second hover label and reads cached hover 
     target = new MemoryCanvas(width, height),
     canvas = new tvg.Canvas(target as any, { width, height, enableDevicePixelRatio: false });
   const context = nativeContext(),
+    world = groundWorld(width, height),
     background = new tvg.Shape().appendRect(0, 0, width, height).fill(36, 52, 41);
   const geometry = (x: number) => ({
     foot: point(x, 150),
@@ -197,7 +193,11 @@ it('shows selected feedback without a second hover label and reads cached hover 
   const town = { person: (id: number) => people.find((p) => p.id === id), map: () => ({}) };
   const app = new GameAppState(
     town as any,
-    { selectionGeometry: (ref: any) => geometry(ref.id === 1 ? 60 : 220), pick } as any,
+    {
+      selectionGeometry: (ref: any) => geometry(ref.id === 1 ? 60 : 220),
+      setGroundSelection: (markers: readonly GroundSelectionMarker[]) => world.setGroundSelection(markers),
+      pick,
+    } as any,
     context,
   ) as any;
   app.chosen = [1];
@@ -208,7 +208,7 @@ it('shows selected feedback without a second hover label and reads cached hover 
     screen: { ...app.mouse },
     hit: { kind: 'person', id: 2, key: 'person:2', drawRank: 2, frameId: 1, geometry: geometry(220) },
   };
-  canvas.add(background).add(context.scene());
+  canvas.add(background).add(world.scene()).add(context.scene());
   const draw = () => {
     context.begin(Theme.dark(), new Rect(0, 0, width, height), 0);
     objectSelectionOverlay(app);
@@ -229,6 +229,7 @@ it('shows selected feedback without a second hover label and reads cached hover 
   } finally {
     canvas.remove();
     context.dispose();
+    world.dispose();
     background.dispose();
     canvas.destroy();
   }
@@ -244,13 +245,14 @@ function nativeContext(): Context {
   return new Context(tvg, metrics);
 }
 
-it('composes object selection above world art but beneath HUD panels through the game render loop', () => {
+it('composes ground selection before world objects and keeps labels beneath HUD panels', () => {
   const width = 320,
     height = 240,
     target = new MemoryCanvas(width, height),
     canvas = new tvg.Canvas(target as any, { width, height, enableDevicePixelRatio: false }),
     context = nativeContext(),
-    world = new tvg.Shape().appendRect(0, 0, width, height).fill(36, 52, 41),
+    world = groundWorld(width, height),
+    body = new ShapeNode().appendRect(170, 102, 20, 30).fill(90, 40, 36),
     animal = { id: 4, animal: AnimalKind.Pig, health: 3, position: point(10, 10) },
     map = { width: () => 40, height: () => 40, revealed: () => true, dungeons: () => [] },
     town = {
@@ -262,6 +264,7 @@ it('composes object selection above world art but beneath HUD panels through the
     renderer = {
       visible: () => true,
       update: () => {},
+      setGroundSelection: (markers: readonly GroundSelectionMarker[]) => world.setGroundSelection(markers),
       selectionGeometry: () => ({
         foot: point(160, 120),
         bounds: { x: 140, y: 76, w: 40, h: 48 },
@@ -271,6 +274,7 @@ it('composes object selection above world art but beneath HUD panels through the
       }),
     },
     app = new GameAppState(town as any, renderer as any, context) as GameRenderApp;
+  world.background.appendRect(0, 0, width, height).fill(36, 52, 41);
   const center = project(10, 10);
   app.camera = new Camera(center.x, center.y);
   app.viewWidth = width;
@@ -288,35 +292,28 @@ it('composes object selection above world art but beneath HUD panels through the
   app.targetingCursor = () => false;
   app.commandOverlay = () => commandOverlay.call(app);
   app.toScreen = (at) => toScreen.call(app, at);
-  const frame = selectionFrame(selectionTargets(app)[0].bounds),
-    panel = new Rect(frame.x - 10, frame.y - 10, frame.w + 20, frame.h / 2 + 10);
+  const panel = new Rect(135, 124, 35, 14);
   app.hud = () => context.rect(panel, rgba(50, 80, 120));
-  canvas.add(world).add(context.scene());
+  // A native world object is after the ground marker, before the HUD.
+  world.objects.add(body);
+  canvas.add(world.scene()).add(context.scene());
   const draw = () => {
     render.call(app, width, height, 0, false);
     canvas.update().render();
     return target.pixels.slice();
   };
+  const rgb = (pixels: Uint8ClampedArray, x: number, y: number) =>
+    Array.from(pixels.slice((y * width + x) * 4, (y * width + x) * 4 + 3));
   try {
     app.selectedAnimal = -1;
     const plain = draw();
     app.selectedAnimal = animal.id;
     const marked = draw();
-    let visible = 0,
-      overHud = 0;
-    for (let y = 0; y < height; y++)
-      for (let x = 0; x < width; x++) {
-        const i = (y * width + x) * 4;
-        if (plain[i] === marked[i] && plain[i + 1] === marked[i + 1] && plain[i + 2] === marked[i + 2])
-          continue;
-        if (x > panel.x + 1 && x < panel.x + panel.w - 1 && y > panel.y + 1 && y < panel.y + panel.h - 1)
-          overHud++;
-        else visible++;
-      }
-    expect(visible, 'selection corners remain visible over opaque world art').toBeGreaterThan(40);
-    expect(overHud, 'world selection must not paint over menus').toBe(0);
+    expect(rgb(marked, 144, 120), 'uncovered ground still shows the ring').not.toEqual(rgb(plain, 144, 120));
+    expect(rgb(marked, 176, 120), 'world artwork covers the ring').toEqual([90, 40, 36]);
+    expect(rgb(marked, 160, 126), 'HUD panels cover ground feedback').toEqual([50, 80, 120]);
     app.selectedAnimal = -1;
-    expect(draw(), 'deselection removes all target feedback').toEqual(plain);
+    expect(draw(), 'deselection removes target feedback').toEqual(plain);
   } finally {
     canvas.remove();
     context.dispose();
@@ -324,3 +321,19 @@ it('composes object selection above world art but beneath HUD panels through the
     canvas.destroy();
   }
 });
+
+function groundWorld(width: number, height: number): WorldRenderer {
+  const world = new WorldRenderer(tvg);
+  world.viewWidth = width;
+  world.viewHeight = height;
+  world.view = new Camera(width / 2, height / 2, 1);
+  return world;
+}
+function paintSelection(
+  world: WorldRenderer,
+  key: string,
+  geometry: GroundSelectionMarker['geometry'],
+  kind: GroundSelectionMarker['kind'],
+): void {
+  world.setGroundSelection([{ key, kind, geometry, hover: false }]);
+}

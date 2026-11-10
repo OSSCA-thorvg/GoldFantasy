@@ -102,7 +102,8 @@ try {
         );
         const game = runtime.app.game;
         const { point, project, Camera } = geometry;
-        const text = game.context.text.bind(game.context);
+        const text = game.context.text.bind(game.context),
+          paint = game.context.paint.bind(game.context);
         const probe = (window.picking = {
           runtime,
           game,
@@ -110,6 +111,7 @@ try {
           draws: [],
           events: [],
           calls: [],
+          hudGroundPaints: [],
           ...people,
           ...geometry,
           ...world,
@@ -120,6 +122,10 @@ try {
           probe.draws.push({ bounds: args[0], text: args[1] });
           return text(...args);
         };
+        game.context.paint = (key, make) => {
+          if (key.startsWith('["selection-ground",')) probe.hudGroundPaints.push(key);
+          return paint(key, make);
+        };
         for (const type of ['pointerdown', 'pointerup', 'pointermove'])
           document
             .querySelector('#world')
@@ -127,6 +133,7 @@ try {
         probe.frame = (count = 1) => {
           for (let i = 0; i < count; ++i) {
             probe.draws = [];
+            probe.hudGroundPaints = [];
             runtime.app.dirty = true;
             runtime.host.render(++probe.frames / 60);
           }
@@ -257,6 +264,177 @@ try {
           treeInstance: game.selectedTreeInstance,
           objects: game.selectedObjects,
         });
+        probe.ringState = () => {
+          const renderer = game.renderer,
+            ellipses = renderer.selection.children.flatMap((marker) =>
+              marker.children.flatMap((shape) => shape.commands.filter((command) => command[0] === 'E')),
+            ),
+            a = renderer.world.matrix,
+            b = renderer.selection.matrix;
+          return {
+            selected: [...game.chosen],
+            geometry: renderer.selectionGeometry({ kind: 'person', id: game.chosen[0] }),
+            ellipses,
+            markerCount: renderer.selection.children.length,
+            groundIndex: renderer.world.children.indexOf(renderer.selection),
+            objectsIndex: renderer.world.children.indexOf(renderer.objects),
+            rootOverlay: renderer.root.children.includes(renderer.selection),
+            hudGroundPaints: [...probe.hudGroundPaints],
+            composed: [
+              a[0] * b[0] + a[1] * b[3],
+              a[0] * b[1] + a[1] * b[4],
+              a[0] * b[2] + a[1] * b[5] + a[2],
+              a[3] * b[0] + a[4] * b[3],
+              a[3] * b[1] + a[4] * b[4],
+              a[3] * b[2] + a[4] * b[5] + a[5],
+            ],
+          };
+        };
+        probe.ringPixels = () => {
+          const renderer = game.renderer,
+            element = document.querySelector('#world'),
+            ratio = runtime.host.canvas.dpr,
+            state = probe.ringState(),
+            ellipse = state.ellipses[0];
+          if (!ellipse) throw Error('Selected resident has no native ground ellipse');
+          const [, cx, cy, rx, ry] = ellipse,
+            left = Math.max(0, Math.floor((cx - rx - 4) * ratio)),
+            top = Math.max(0, Math.floor((cy - ry - 4) * ratio)),
+            width = Math.min(element.width - left, Math.ceil((rx * 2 + 8) * ratio)),
+            height = Math.min(element.height - top, Math.ceil((ry * 2 + 8) * ratio)),
+            sample = new OffscreenCanvas(width, height),
+            pixels = sample.getContext('2d', { willReadFrequently: true }),
+            ringAlpha = renderer.selection.alpha,
+            objectsAlpha = renderer.objects.alpha;
+          // Diagnostic rasters reuse the same prepared world, pose and clock.
+          // They never change simulation state, parents or native ownership.
+          const capture = () => {
+            renderer.scene();
+            runtime.host.canvas.update().render();
+            pixels.clearRect(0, 0, width, height);
+            pixels.drawImage(element, left, top, width, height, 0, 0, width, height);
+            return pixels.getImageData(0, 0, width, height).data;
+          };
+          const raster = (ring, objects) => {
+            renderer.selection.opacity(ring);
+            renderer.objects.opacity(objects);
+            return capture();
+          };
+          const delta = (a, b, i) =>
+            Math.max(Math.abs(a[i] - b[i]), Math.abs(a[i + 1] - b[i + 1]), Math.abs(a[i + 2] - b[i + 2]));
+          let selected, plain, ringOnly, groundOnly;
+          try {
+            selected = raster(ringAlpha, objectsAlpha);
+            plain = raster(0, objectsAlpha);
+            ringOnly = raster(ringAlpha, 0);
+            groundOnly = raster(0, 0);
+          } finally {
+            renderer.selection.opacity(ringAlpha);
+            renderer.objects.opacity(objectsAlpha);
+            renderer.scene();
+            runtime.host.canvas.update().render();
+          }
+          const own = game.chosen[0],
+            other = game.town.people().find((person) => person.id !== own)?.id;
+          if (other === undefined) throw Error('Occlusion fixture needs an overlapping actor');
+          // Intersections include antialiased boundary pixels. Only the actual
+          // actor-only raster can identify pixels that are completely opaque.
+          const savedAlphas = new Map(
+            [...renderer.root.children, ...renderer.world.children, ...renderer.objects.children].map(
+              (node) => [node, node.alpha],
+            ),
+          );
+          const only = (children, visible) => {
+            for (const child of children) child.opacity(child === visible ? savedAlphas.get(child) : 0);
+          };
+          let ownBody, otherBody;
+          try {
+            only(renderer.root.children, renderer.world);
+            only(renderer.world.children, renderer.objects);
+            const actor = (id) => {
+              const figure = renderer.figures.get(id)?.paint;
+              if (!figure || !renderer.objects.children.includes(figure))
+                throw Error(`Actor ${id} has no painted figure`);
+              only(renderer.objects.children, figure);
+              return capture();
+            };
+            ownBody = actor(own);
+            otherBody = actor(other);
+          } finally {
+            for (const [node, alpha] of savedAlphas) node.opacity(alpha);
+            renderer.scene();
+            runtime.host.canvas.update().render();
+          }
+          const metrics = {
+            own,
+            other,
+            visible: 0,
+            ownCovered: 0,
+            otherCovered: 0,
+            ownLeaks: 0,
+            otherLeaks: 0,
+            ringPixels: 0,
+            ownTransparent: 0,
+            otherTransparent: 0,
+            geometricFalsePositives: [],
+          };
+          const bodyAt = (x, y, id) =>
+            renderer
+              .querySelection({
+                x: x / ratio,
+                y: y / ratio,
+                w: 1 / ratio,
+                h: 1 / ratio,
+              })
+              .some((hit) => hit.kind === 'person' && hit.id === id);
+          for (let y = 0; y < height; ++y)
+            for (let x = 0; x < width; ++x) {
+              const index = (y * width + x) * 4;
+              const ownAlpha = ownBody[index + 3],
+                otherAlpha = otherBody[index + 3];
+              if (!ownAlpha) metrics.ownTransparent++;
+              if (!otherAlpha) metrics.otherTransparent++;
+              if (delta(ringOnly, groundOnly, index) < 8) continue;
+              metrics.ringPixels++;
+              const changed = delta(selected, plain, index),
+                px = left + x,
+                py = top + y;
+              const oldGeometricCoverage = (id) =>
+                id !== undefined &&
+                [
+                  [0, 0],
+                  [-1, 0],
+                  [1, 0],
+                  [0, -1],
+                  [0, 1],
+                ].every(([dx, dy]) => bodyAt(px + dx, py + dy, id));
+              if (ownAlpha === 255) {
+                metrics.ownCovered++;
+                if (changed > 1) metrics.ownLeaks++;
+              }
+              if (otherAlpha === 255) {
+                metrics.otherCovered++;
+                if (changed > 1) metrics.otherLeaks++;
+              }
+              if (ownAlpha === 0 && otherAlpha === 0 && changed >= 8) metrics.visible++;
+              if (changed > 1 && metrics.geometricFalsePositives.length < 8)
+                for (const [id, alpha] of [
+                  [own, ownAlpha],
+                  [other, otherAlpha],
+                ])
+                  if (alpha < 255 && oldGeometricCoverage(id))
+                    metrics.geometricFalsePositives.push({
+                      actor: id,
+                      alpha,
+                      physical: { x: px, y: py },
+                      logical: { x: px / ratio, y: py / ratio },
+                      delta: changed,
+                      selected: Array.from(selected.slice(index, index + 4)),
+                      plain: Array.from(plain.slice(index, index + 4)),
+                    });
+            }
+          return metrics;
+        };
         probe.find = (ref, behind) => {
           const g = game.renderer.selectionGeometry(ref);
           if (!g) throw Error(`Missing presented geometry ${JSON.stringify(ref)}`);
@@ -334,6 +512,40 @@ try {
         }, id);
         return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
       };
+      const checkRing = async (person) => {
+        const state = await page.evaluate(() => picking.ringState());
+        assert.deepEqual(state.selected, [person]);
+        assert(state.geometry, 'The selected actor must have current presented geometry');
+        assert(
+          state.groundIndex >= 0 && state.groundIndex < state.objectsIndex,
+          'Native selection must be in the world before all actor artwork',
+        );
+        assert.equal(state.rootOverlay, false, 'No second selection scene may cover world artwork');
+        assert.equal(state.markerCount, 1, 'Relocation must reuse one ground marker without a stale ring');
+        assert.equal(state.ellipses.length, 2, 'One marker owns its under-stroke and colored edge');
+        assert.deepEqual(
+          state.hudGroundPaints,
+          [],
+          'The HUD must paint names, never a duplicate ground ring',
+        );
+        for (const ellipse of state.ellipses) {
+          assert(
+            Math.abs(ellipse[1] - state.geometry.foot.x) < 0.002,
+            'Ring X must use this frame actor foot',
+          );
+          assert(
+            Math.abs(ellipse[2] - state.geometry.foot.y) < 0.002,
+            'Ring Y must use this frame actor foot',
+          );
+        }
+        for (const [i, expected] of [1, 0, 0, 0, 1, 0].entries())
+          assert(
+            Math.abs(state.composed[i] - expected) < 0.002,
+            'Ground layer must cancel camera transform exactly once',
+          );
+        (row.rings ??= []).push({ person, foot: state.geometry.foot, ellipse: state.ellipses[0] });
+        return state.geometry.foot;
+      };
       const persons = await reset('people');
       row.surface = await page.evaluate(() => ({
         renderer: picking.runtime.host.canvas.renderer,
@@ -352,11 +564,36 @@ try {
       assert.equal((await hover(frontPoint))?.id, persons.front);
       assert.deepEqual((await click(frontPoint)).people, [persons.front]);
       row.checks.push('front painted resident wins hover and click');
+      const originalRingFoot = await checkRing(persons.front);
+      row.ringPixels = await page.evaluate(() => picking.ringPixels());
+      await page.screenshot({ path: `${output}/${name}-ring-occlusion.png` });
+      assert(
+        row.ringPixels.ownTransparent > 0 && row.ringPixels.otherTransparent > 0,
+        'Actor-only alpha oracles must preserve transparent empty pixels',
+      );
+      assert(row.ringPixels.ringPixels > 8, 'Actual native ground ring must rasterize');
+      assert(row.ringPixels.visible > 8, 'Ground ring must remain visible outside actor artwork');
+      assert(row.ringPixels.ownCovered > 0, 'The ring must cross opaque pixels of its own actor');
+      assert(row.ringPixels.otherCovered > 0, 'The overlapping actor must cover part of the ring');
+      assert.equal(row.ringPixels.ownLeaks, 0, 'Selection must never paint over its own opaque actor');
+      assert.equal(
+        row.ringPixels.otherLeaks,
+        0,
+        'Selection must never paint over an overlapping opaque actor',
+      );
+      row.checks.push(
+        'native ground ring is visible outside artwork but occluded by its own and overlapping actors',
+      );
       await page.evaluate(() => {
         const p = picking.game.town.person(picking.data.front);
         p.position = picking.point(20, 12);
         picking.frame();
       });
+      const relocatedRingFoot = await checkRing(persons.front);
+      assert(
+        Math.hypot(relocatedRingFoot.x - originalRingFoot.x, relocatedRingFoot.y - originalRingFoot.y) > 20,
+        'Selected actor relocation must move the ground ring in the same presentation',
+      );
       assert.equal((await hover(frontPoint))?.id, persons.back);
       assert.deepEqual((await click(frontPoint)).people, [persons.back]);
       row.checks.push('moving front resident exposes the rear silhouette');
@@ -467,16 +704,21 @@ try {
         'Camera changes must invalidate old native hit geometry until the next presentation',
       );
       await frame();
+      await checkRing(10);
       const panned = await page.evaluate(() => ({ x: picking.game.camera.x, y: picking.game.camera.y }));
       assert.notDeepEqual(panned, { x: before.x, y: before.y });
       await page.mouse.wheel(0, -100);
       await frame();
+      await checkRing(10);
       assert.notEqual(await page.evaluate(() => picking.game.camera.zoom), before.zoom);
       const movedPoint = await find({ kind: 'person', id: 10 });
       assert.notDeepEqual(movedPoint, personPoint);
       assert.equal((await hover(movedPoint))?.id, 10);
       assert.deepEqual((await click(movedPoint)).people, [10]);
       row.checks.push('post-present picking follows trusted camera pan and zoom');
+      row.checks.push(
+        'one native ground ring tracks the current actor foot through movement, pan and zoom without a HUD duplicate',
+      );
 
       await page.setViewportSize({ width: 390, height: 844 });
       await frame(1);

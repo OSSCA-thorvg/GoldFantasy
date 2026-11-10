@@ -15,6 +15,7 @@ import type {
   WorldHit,
   SelectionGeometry,
   PickBounds,
+  GroundSelectionMarker,
 } from '../../../../packages/native-renderer/src/world-picking-types';
 export { gameTheme } from './game-theme';
 
@@ -23,6 +24,7 @@ export interface WorldRenderer {
   pick(screen: Point): WorldHit | null;
   querySelection(screen: PickBounds): readonly WorldHit[];
   selectionGeometry(ref: WorldObjectRef): SelectionGeometry | null;
+  setGroundSelection(markers: readonly GroundSelectionMarker[]): void;
   presented(pixelRatio: number): void;
   invalidatePresentation(): void;
   visible(at: Point): boolean;

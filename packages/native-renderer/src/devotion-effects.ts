@@ -107,7 +107,6 @@ export function updateDevotionEffects(s: WorldRendererState, town: Town): void {
       const reveal = smooth(age / 0.7),
         base = figure.parts.body?.matrix;
       figure.paint.opacity(Math.round(figure.paint.alpha * reveal));
-      s.selectionMarkers.get(item.person)?.opacity(figure.paint.alpha);
       if (base)
         figure.parts.body!.transform([
           base[0] * (0.95 + 0.05 * reveal),

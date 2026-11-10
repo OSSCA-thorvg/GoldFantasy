@@ -11,6 +11,8 @@ import {
   type SelectionGeometry,
   type WorldHit,
   type WorldObjectRef,
+  type GroundSelectionMarker,
+  type ResolvedGroundSelectionMarker,
 } from './world-picking-types';
 
 interface Candidate {
@@ -177,6 +179,67 @@ export class WorldPicker {
       return best?.geometry ?? null;
     }
     return null;
+  }
+  /** Ground feedback uses this frame's model metadata, never stale prepared native bounds. */
+  groundSelection(
+    markers: readonly GroundSelectionMarker[],
+    town: Town | null,
+  ): ResolvedGroundSelectionMarker[] {
+    if (!markers.length) return [];
+    const s = this.state,
+      requested = new Map(markers.map((marker) => [marker.key, marker])),
+      current = new Map<string, ResolvedGroundSelectionMarker>(),
+      seen = new Set<string>(),
+      screen = (p: Point) => s.view.toScreen(project(p.x, p.y), s.viewWidth, s.viewHeight);
+    for (const layer of [s.farmland, s.ornaments, s.objects])
+      for (const paint of layer.children) {
+        const source = pickSource(paint);
+        if (!source?.ref) continue;
+        const ref = source.ref,
+          marker =
+            requested.get(worldObjectKey(ref)) ??
+            (ref.kind === 'tree' ? requested.get(`tree:${ref.id}`) : undefined);
+        if (!marker) continue;
+        seen.add(marker.key);
+        if (
+          !paint.alpha ||
+          !source.body.some((body) => body.alpha > 0) ||
+          (town && !this.eligible(town, source, paint.alpha))
+        )
+          continue;
+        current.set(marker.key, {
+          ...marker,
+          geometry: {
+            foot: screen(source.foot),
+            opacity: paint.alpha,
+            groundOutline: source.groundOutline?.map(screen),
+            ellipse: source.ellipse
+              ? { rx: source.ellipse.rx * s.view.zoom, ry: source.ellipse.ry * s.view.zoom }
+              : undefined,
+          },
+        });
+      }
+    if (town && markers.some((marker) => marker.kind === 'road')) {
+      for (const span of this.roadSpans(town)) {
+        const key = `road:${span.id}`,
+          marker = requested.get(key);
+        if (!marker) continue;
+        let resolved = current.get(key);
+        if (!resolved) {
+          resolved = {
+            ...marker,
+            geometry: { foot: screen(span.line[Math.floor(span.line.length / 2)]), paths: [], opacity: 255 },
+          };
+          current.set(key, resolved);
+        }
+        resolved.geometry.paths!.push(span.line.map(screen));
+      }
+    }
+    return markers.flatMap(
+      (marker) =>
+        current.get(marker.key) ??
+        (!town && !seen.has(marker.key) && marker.geometry ? { ...marker, geometry: marker.geometry } : []),
+    );
   }
   pick(screen: Point): WorldHit | null {
     if (!this.ready) return null;

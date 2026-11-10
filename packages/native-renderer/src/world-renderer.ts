@@ -10,7 +10,14 @@ import type { Strike } from '../../engine/src/thunderstorm';
 import type { TileRegion } from './render-types';
 import { WorldRendererState } from './world-renderer-state';
 import { WorldPicker } from './world-picking';
-import type { PickBounds, SelectionGeometry, WorldHit, WorldObjectRef } from './world-picking-types';
+import type {
+  PickBounds,
+  SelectionGeometry,
+  WorldHit,
+  WorldObjectRef,
+  GroundSelectionMarker,
+} from './world-picking-types';
+import { GroundSelection } from './ground-selection';
 import { buildingCatalogGeneration } from './building-assets';
 import { resize, fitToView, paintMapName, buildPreview, updateGroundChunks } from './world-ground';
 import { paintGround, tintGround, paintFields } from './terrain-painter';
@@ -46,6 +53,7 @@ const intersects = (a: TileRegion, b: TileRegion) =>
 
 export class WorldRenderer extends WorldRendererState {
   private readonly picker = new WorldPicker(this);
+  private readonly groundSelection = new GroundSelection(this);
   private pickedTown: Town | null = null;
   pick(screen: Point): WorldHit | null {
     return this.picker.pick(screen);
@@ -55,6 +63,11 @@ export class WorldRenderer extends WorldRendererState {
   }
   selectionGeometry(ref: WorldObjectRef): SelectionGeometry | null {
     return this.picker.selectionGeometry(ref);
+  }
+  setGroundSelection(markers: readonly GroundSelectionMarker[]): void {
+    const retired = this.groundSelection.set(this.picker.groundSelection(markers, this.pickedTown));
+    this.adapter.sync(this.selection);
+    if (retired) this.collectPaints();
   }
   presented(dpr: number): void {
     if (this.pickedTown) this.picker.presented(this.pickedTown, dpr);
@@ -121,8 +134,7 @@ export class WorldRenderer extends WorldRendererState {
     this.currentVisibility = new VisibilityMap();
     this.visibilityPixels = new Uint32Array();
     this.vision = [];
-    this.selection.remove();
-    this.selectionMarkers.clear();
+    this.groundSelection.clear();
     this.combat.remove();
     this.damageBack = this.damageLeft = null;
     this.sparks = [];
@@ -316,6 +328,9 @@ export class WorldRenderer extends WorldRendererState {
     }
     sortWorldObjects(this);
     this.adapter.sync(this.root);
+    this.collectPaints();
+  }
+  private collectPaints(): void {
     // Native caches hold independent references even while their rows are culled.
     this.adapter.collect([
       this.root,

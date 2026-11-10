@@ -25,6 +25,19 @@ export interface SelectionGeometry {
   paths?: Point[][];
   ellipse?: { rx: number; ry: number };
 }
+export interface GroundSelectionMarker {
+  key: string;
+  kind: WorldObjectKind;
+  geometry?: SelectionGeometry;
+  hover: boolean;
+}
+export type GroundSelectionGeometry = Pick<
+  SelectionGeometry,
+  'foot' | 'opacity' | 'groundOutline' | 'path' | 'paths' | 'ellipse'
+>;
+export interface ResolvedGroundSelectionMarker extends Omit<GroundSelectionMarker, 'geometry'> {
+  geometry: GroundSelectionGeometry;
+}
 export interface WorldHit extends WorldObjectRef {
   key: string;
   drawRank: number;

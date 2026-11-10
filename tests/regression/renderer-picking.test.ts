@@ -361,6 +361,44 @@ it('uses the actual bent road stroke and does not select its empty enclosing rec
     v.dispose();
   }
 });
+it('reprojects current road feedback without joining its hidden spans or requiring a new presented frame', () => {
+  const v = fixture();
+  try {
+    const road = new Road();
+    Object.assign(road, { id: 1, line: [point(2, 2), point(8, 2)], built: 1, paved: true });
+    v.roads.push(road);
+    v.town.map().revealed = (p) => p.x < 4 || p.x > 6;
+    const previousView = new Camera(100, 100, 1);
+    v.s.view = previousView;
+    v.draw();
+    const geometry = v.picker.selectionGeometry({ kind: 'road', id: 1 })!;
+    expect(geometry.paths).toHaveLength(2);
+    v.s.view = new Camera(120, 140, 2);
+    const markers = v.picker.groundSelection(
+      [{ key: 'road:1', kind: 'road', hover: false, geometry }],
+      v.town,
+    );
+    expect(markers).toHaveLength(1);
+    const current = markers[0].geometry.paths!;
+    expect(current).toHaveLength(2);
+    for (let i = 0; i < current.length; i++)
+      for (let n = 0; n < current[i].length; n++) {
+        const world = previousView.toWorld(geometry.paths![i][n], 320, 240),
+          expected = v.s.view.toScreen(world, 320, 240),
+          tile = unproject(world.x, world.y);
+        expect(current[i][n].x).toBeCloseTo(expected.x, 3);
+        expect(current[i][n].y).toBeCloseTo(expected.y, 3);
+        expect(tile.x < 4 || tile.x > 6).toBe(true);
+      }
+    expect(v.picker.selectionGeometry({ kind: 'road', id: 1 })).toBe(geometry);
+    v.picker.invalidate();
+    const restored = v.picker.groundSelection([{ key: 'road:1', kind: 'road', hover: false }], v.town);
+    expect(restored[0].geometry.paths).toEqual(current);
+    expect(v.picker.selectionGeometry({ kind: 'road', id: 1 })).toBeNull();
+  } finally {
+    v.dispose();
+  }
+});
 it('publishes frame snapshots only after rendering and clears native/index references on invalidation', () => {
   const v = fixture();
   try {

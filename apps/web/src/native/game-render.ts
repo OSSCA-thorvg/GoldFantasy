@@ -232,6 +232,7 @@ export function render(
   if (simulate || this.town.isTitleAutoplay()) this.updateSpeech(seconds);
   this.context.begin(this.theme, new Rect(0, 0, width, height), uiSeconds >= 0 ? uiSeconds : seconds);
   if (!editing) objectSelectionOverlay(this);
+  else this.renderer.setGroundSelection([]);
   if (
     !editing &&
     this.tool === Tool.Select &&
