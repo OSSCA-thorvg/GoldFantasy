@@ -251,6 +251,8 @@ export function planTitleWork(this: TitleTown): void {
             p.task !== Activity.Roadwork,
         );
         if (!donor || !this.assignJob([donor.id], b.id)) break;
+        // This is an autonomous staffing choice, not a player-pinned work order.
+        donor.ordered = false;
       }
     }
   }

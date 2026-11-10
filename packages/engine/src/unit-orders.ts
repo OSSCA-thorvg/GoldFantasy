@@ -245,6 +245,8 @@ export function assignJob(this: OrderTown, ids: number[], id: number): boolean {
     if (p.job !== id && place.workers >= structureSpec(place.kind).jobs) break;
     p.job = id;
     this.setOrder(p, Activity.Working, id);
+    // Explicit work also enables the resident's critical-care checks after Stop.
+    p.autoMode = true;
     p.path = [];
     p.activity = Activity.Idle;
     p.until = this.time;

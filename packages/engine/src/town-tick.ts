@@ -463,7 +463,6 @@ export function tick(this: TickTown, dt: number): void {
       case Activity.Working:
         if (place?.kind === Structure.Farm && prepareFarmWork(this as Town, p, place)) {
           if (!p.moving() && distance(p.position,p.goal) <= .04) {
-            if (p.task === Activity.Working) { p.ordered = false; p.autoMode = true; }
             place.workedSeconds = f(place.workedSeconds + f(dt * workEfficiency(p, farmWorkPhase(p, this.time) === 1 ? 'watering' : 'farming')));
           }
           break;
@@ -476,7 +475,6 @@ export function tick(this: TickTown, dt: number): void {
           break;
         }
         if (place) {
-          if (p.task === Activity.Working) { p.ordered = false; p.autoMode = true; }
           place.workedSeconds = f(place.workedSeconds + f(dt));
           const recipe = processingRecipe(place.kind);
           if (recipe && p.rest >= f(2 / 3) && resourceAmount(this.stock(this.settlementOf(place)),recipe.input) < 2 &&

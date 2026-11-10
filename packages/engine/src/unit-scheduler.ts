@@ -39,9 +39,12 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
       (p.activity === Activity.WaitingMaterials && this.time >= p.until)) this.resumeOrder(p);
     return true;
   }
-  if (p.ordered || p.approachingOrder) return true;
-  if (!p.autoMode) return false;
-  const night = this.climate().night > f(.5);
+  const directWork = p.ordered && p.task === Activity.Working;
+  if ((p.ordered && !directWork) || p.approachingOrder) return true;
+  if (!p.autoMode && !directWork) return false;
+  // A player-selected workplace is an ongoing order, not just a trip to its
+  // door. Night is a routine Auto preference; critical care still takes priority.
+  const night = !directWork && this.climate().night > f(.5);
   if (p.health >= 1) p.recoveringHealth = false;
   if (p.rest >= f(.95)) p.recoveringRest = false;
   const care = (place: Building | null, activity: Activity): boolean => {
@@ -62,7 +65,7 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
   if (p.food < f(.25) && (p.food < f(.05) || p.recoveringHealth || p.recoveringRest || p.activity === Activity.Sleeping) && (this.eat(p) || this.huntFood(p))) return true;
   // Dehydration must not keep a wounded sleeper trapped in slow recovery.
   // A short visit to an existing Well preserves both recovery flags and work.
-  if (p.hydration < f(.1) && (p.recoveringHealth || p.recoveringRest || p.health < f(.4)) &&
+  if (p.hydration < f(.1) && (directWork || p.recoveringHealth || p.recoveringRest || p.health < f(.4)) &&
       this.placed.some(b => b.built() && b.kind === Structure.Well && this.settlementOf(b) === this.settlementOf(p)) &&
       this.drink(p)) return true;
   if (p.health < f(.4)) p.recoveringHealth = true;
@@ -79,6 +82,15 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
   }
   if (p.activity === Activity.Sleeping) {
     p.activity = Activity.Idle; p.until = this.time;
+  }
+
+  if (directWork) {
+    const job = this.building(p.taskSite);
+    // Keep gathering inputs, output delivery and temporary care in the same
+    // workplace transaction. Completion of care resumes it, even after dark.
+    if (!job?.built() || p.job !== job.id || [Activity.Idle, Activity.Holding].includes(p.activity))
+      this.resumeOrder(p);
+    return true;
   }
 
   const buildingTask = p.task === Activity.Building ? this.building(p.taskSite) : null;

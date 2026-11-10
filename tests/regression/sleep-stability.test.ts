@@ -255,7 +255,7 @@ describe('sleep state stability', () => {
     ++town.changes;
     expect(town.assignJob([p.id], workshop.id)).toBe(true);
     trace(town, 10);
-    expect(p.ordered).toBe(false);
+    expect(p.ordered).toBe(true);
     p.rest = 0.1;
     const states = trace(town, 125);
     expect(
@@ -267,6 +267,7 @@ describe('sleep state stability', () => {
     expect(p.activity, states.join('\n')).toBe(Activity.Working);
     expect(p.job).toBe(workshop.id);
     expect(p.taskSite).toBe(workshop.id);
+    expect(p.ordered).toBe(true);
   });
 
   it('resumes the same direct rest after an enemy interruption without restarting the doorway loop', () => {
@@ -334,6 +335,8 @@ describe('sleep state stability', () => {
     town.placed.push(workshop);
     ++town.changes;
     expect(town.assignJob([p.id], workshop.id)).toBe(true);
+    // This case exercises autonomous employment, not a standing player order.
+    town.orderAutomatic([p.id]);
     const states = trace(town, 900),
       sleeping = states.filter((s) => s.includes('Sleeping:'));
     expect(

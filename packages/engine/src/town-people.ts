@@ -302,9 +302,8 @@ export function arrive(this: PeopleTown, p: Person): void {
       p.activity = Activity.Idle;
       break;
     case Activity.Working:
-      // Assigning a workplace completes upon arrival. The job remains assigned,
-      // while Auto can handle its meals, sleep, threats and higher-priority roads.
-      if (p.task === Activity.Working) { p.ordered = false; p.autoMode = true; }
+      // Arrival starts the requested work; it does not complete the player's
+      // order. The scheduler preserves it through work, supplies and recovery.
       if (place?.kind === Structure.Farm) prepareFarmWork(this as Town,p,place);
       if (!place) p.activity = Activity.Idle;
       break;
