@@ -4,6 +4,7 @@ import { lerpFloat } from './numeric';
 const f = Math.fround;
 import {
   Align,
+  Cursor,
   ButtonStyle,
   EventType,
   Icon,
@@ -238,6 +239,10 @@ export function textField(
           input.edit(event.key);
       },
       enabled,
+      true,
+      false,
+      false,
+      Cursor.Text,
     ),
     t = context.theme();
   context.rect(

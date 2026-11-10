@@ -18,6 +18,10 @@ import {
 import { controllableIds, selectionControlReason } from './game-control';
 import { Cue } from '../../../../packages/native-audio/src/sound-types';
 import { Rect } from '../../../../packages/native-ui/src';
+import {
+  automaticConstructionAllowed,
+  registerAutomaticConstruction,
+} from '../../../../packages/engine/src/automatic-work';
 export interface GameCommandApp extends GameInputApp {
   editor?: unknown;
   atlas?: unknown;
@@ -234,7 +238,13 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
     return;
   }
   this.status = '';
-  const personTarget = order === Order.Attack ? this.personAt(this.mouse) : -1;
+  const personTarget = this.personAt(this.mouse);
+  if (order === Order.Work && personTarget >= 0) {
+    const target = this.town.person(personTarget);
+    if (target) this.town.orderMove(ids, target.position);
+    this.cue(Cue.Order);
+    return;
+  }
   const animal = this.animalAtScreen(this.mouse);
   const monster = animal >= 0 ? animal : this.town.monsterAt(this.cursor, f(1.2)),
     tree = this.treeAtScreen(this.mouse),
@@ -250,7 +260,8 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
     for (const person of ids) {
       const unit = [person];
       let accepted = false;
-      if (monster >= 0) accepted = this.town.orderAttack(unit, monster);
+      if (monster >= 0 && (animal < 0 || order === Order.Attack || this.town.creature(monster)?.angry))
+        accepted = this.town.orderAttack(unit, monster);
       else if (tree >= 0) accepted = this.town.orderChop(unit, tree);
       else if (rock >= 0) accepted = this.town.orderMine(unit, rock);
       else if (place && !isPlayerBuilding(place)) this.status = buildingControlReason(place);
@@ -319,6 +330,11 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
       for (const p of this.town.people()) {
         const stopped = this.stoppedWork.get(p.id);
         if (!canControl(p) || p.ordered || (stopped !== undefined && stopped >= work.serial)) continue;
+        if (
+          (work.activity === Activity.Building || work.activity === Activity.Roadwork) &&
+          !automaticConstructionAllowed(this.town, p, work.activity, work.target)
+        )
+          continue;
         // A newly queued site must not abandon an unfinished construction job.
         // Explicit commands to selected residents still replace their orders.
         const building = p.task === Activity.Building ? this.town.building(p.taskSite) : null;
@@ -358,7 +374,12 @@ export function dispatchWork(this: GameCommandApp, force = false): void {
             : work.activity === Activity.Mining
               ? this.town.orderMine([worker], work.target)
               : this.town.orderChop([worker], work.target);
-      if (started) break;
+      if (started) {
+        const p = this.town.person(worker);
+        if (p && (work.activity === Activity.Building || work.activity === Activity.Roadwork))
+          registerAutomaticConstruction(this.town, p, work.activity, work.target);
+        break;
+      }
     }
     ++index;
   }

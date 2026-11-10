@@ -12,6 +12,9 @@ import { SceneNode, ShapeNode } from '../../../../packages/native-renderer/src/p
 import { fill, opaque } from '../../../../packages/native-renderer/src/vector-paint';
 import { hudPaint } from './hud-paint';
 import type { GameHudApp } from './game-hud-contract';
+import { worldTarget } from './world-targets';
+import type { GameCommandApp } from './game-commands';
+import { actionButton } from './hud-actions';
 function fitted(context: Context, model: Paint, frame: Rect): Paint {
   const holder = new context.tvg.Scene(),
     bounds = model.bounds();
@@ -30,6 +33,80 @@ function fitted(context: Context, model: Paint, frame: Rect): Paint {
   return holder;
 }
 export function worldObjectPanel(this: GameHudApp, panel: Rect): void {
+  if (this.selectedObjects?.length) {
+    const targets = this.selectedObjects
+      .map((ref) => worldTarget(this as unknown as GameCommandApp, ref))
+      .filter((t) => t !== null);
+    if (!targets.length) {
+      this.selectedObjects = [];
+      return;
+    }
+    this.objectPage = Math.max(0, Math.min(targets.length - 1, this.objectPage));
+    const target = targets[this.objectPage],
+      c = this.context,
+      t = this.theme;
+    c.text(new Rect(panel.x + 16, panel.y + 12, panel.w - 70, 26), target.name, t.text, 17, true);
+    c.text(
+      new Rect(panel.x + 16, panel.y + 42, panel.w - 32, 22),
+      `${target.kind} · ${this.objectPage + 1} / ${targets.length} selected objects`,
+      t.accent,
+      11,
+    );
+    let detail = '';
+    if (target.kind === 'animal' || target.kind === 'monster') {
+      const p = this.town.creature(target.id);
+      detail = p
+        ? `Health ${Math.max(0, p.health).toFixed(1)} · ${target.kind === 'monster' || p.angry ? 'Hostile' : 'Neutral'} · Strength ${p.strength.toFixed(1)}`
+        : '';
+    }
+    if (target.kind === 'road') {
+      const r = this.town.roads().road(target.id);
+      detail = r
+        ? `Built ${Math.round(r.built * 100)}% · Length ${r.length().toFixed(1)} · Wear ${Math.round(r.wear * 100)}%`
+        : '';
+    }
+    if (target.kind === 'field') {
+      const f = this.town.field(target.id);
+      detail = f ? `Farmland · ${f.acres()} acres` : '';
+    }
+    if (target.kind === 'tree')
+      detail = 'A wood resource. Right-click to gather; inspect any selected object below.';
+    if (target.kind === 'rock') detail = 'A stone resource. Right-click to mine.';
+    if (target.kind === 'building')
+      detail = 'Open the building inspector for construction, residents and services.';
+    c.text(
+      new Rect(panel.x + 16, panel.y + 70, panel.w - 32, 22),
+      c.elideText(detail, panel.w - 32, 11),
+      t.muted,
+      11,
+    );
+    const y = panel.y + panel.h - 38;
+    actionButton(
+      c,
+      'objects-prev',
+      new Rect(panel.x + 14, y, 30, 28),
+      'back',
+      'Previous object',
+      () => --this.objectPage,
+      false,
+      this.objectPage > 0,
+    );
+    actionButton(
+      c,
+      'objects-next',
+      new Rect(panel.x + 50, y, 30, 28),
+      'next',
+      'Next object',
+      () => ++this.objectPage,
+      false,
+      this.objectPage < targets.length - 1,
+    );
+    if (target.kind === 'building')
+      actionButton(c, 'objects-inspect', new Rect(panel.x + 96, y, 70, 28), 'build', 'Inspect building', () =>
+        this.selectBuilding(target.id),
+      );
+    return;
+  }
   const map = this.town.map(),
     animal = this.selectedAnimal >= 0 ? this.town.creature(this.selectedAnimal) : null,
     stone = this.selectedRock >= 0,

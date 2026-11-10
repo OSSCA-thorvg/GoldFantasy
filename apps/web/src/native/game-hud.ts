@@ -37,6 +37,7 @@ import { canControl, isPlayerBuilding } from '../../../../packages/engine/src/fa
 import { civicInspector } from './game-civic-panel';
 import { hudPaint } from './hud-paint';
 import type { CampMarker } from './camp-resource-hud';
+import { actionButton, type HudGlyph } from './hud-actions';
 interface ToolInfo {
   label: string;
   key: string;
@@ -138,7 +139,12 @@ export function hud(this: GameHudApp, width: number, height: number): void {
   this.skyMural(width);
   if (this.town.raiding())
     c.text(
-      new Rect(this.skyBounds.x, f32(f32(this.skyBounds.y + this.skyBounds.h) + 8), this.skyBounds.w, 20),
+      new Rect(
+        (width - Math.min(320, width - 24)) / 2,
+        f32(f32(this.skyBounds.y + this.skyBounds.h) + 8),
+        Math.min(320, width - 24),
+        20,
+      ),
       'Raid! Defend the settlement',
       t.danger,
       12,
@@ -274,6 +280,34 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
       );
     for (const line of wrap(c, spec.description, inner, 12)) textRow(line, t.muted, 12);
     y = f32(y + 4);
+    if (building.built() && [Structure.Weaponsmith, Structure.Armorer].includes(building.kind)) {
+      const at = y;
+      rows.push(() =>
+        actionButton(
+          c,
+          'workshop-craft',
+          new Rect(left, top + at, 54, 28),
+          'craft',
+          'Choose a resident and craft equipment',
+          () => {
+            const p = this.town
+              .people()
+              .filter(canControl)
+              .sort(
+                (a, b) => distance(a.position, building.center) - distance(b.position, building.center),
+              )[0];
+            if (p) {
+              this.selectPeople([p.id]);
+              this.equipmentTab = 'craft';
+              this.craftPage = 0;
+            }
+          },
+          false,
+          isPlayerBuilding(building),
+        ),
+      );
+      y += 34;
+    }
     if (!building.built()) {
       textRow(`Under construction: ${Math.trunc(f32(building.progress * 100))}%`, t.accent, 13, true);
       textRow('On site: ' + describe(building.materials.delivered), t.text, 12);
@@ -578,7 +612,30 @@ export function commandCard(
       activate: () => void,
       style = ButtonStyle.Default,
       enabled = true,
-    ) =>
+    ) => {
+      if (!buildMenu) {
+        const glyphs: Record<string, HudGlyph> = {
+          'card-build': 'build',
+          'card-move': 'move',
+          'card-attack': 'attack',
+          'card-work': 'work',
+          'card-stop': 'stop',
+          'card-clear': 'close',
+          'card-select': 'unit',
+          'card-leave': 'back',
+        };
+        actionButton(
+          c,
+          `${global ? 'global/' : 'unit/'}${id}`,
+          bounds,
+          glyphs[id] ?? 'unit',
+          label,
+          activate,
+          style === ButtonStyle.Primary,
+          enabled,
+        );
+        return;
+      }
       button(
         c,
         `${global ? 'global/' : 'unit/'}${id}`,
@@ -591,6 +648,7 @@ export function commandCard(
         false,
         appearance,
       );
+    };
   if (!buildMenu) {
     const leave = this.shelteredSelection(),
       count = leave ? 8 : 7,

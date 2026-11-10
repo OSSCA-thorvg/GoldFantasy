@@ -10,6 +10,7 @@ import type { Strike } from '../../../../packages/engine/src/thunderstorm';
 import type { Building } from '../../../../packages/engine/src/town-models';
 import { CampResourceHud } from './camp-resource-hud';
 import { gameTheme } from './game-theme';
+import type { WorldObjectRef } from './world-targets';
 export { gameTheme } from './game-theme';
 
 export interface WorldRenderer {
@@ -32,6 +33,7 @@ export enum DockView {
   Resource,
   Placement,
   Roster,
+  Menu,
 }
 export class Plan {
   preview = new Preview();
@@ -65,6 +67,11 @@ export class GameAppState {
   boxFrom: Point | null = null;
   fieldFrom: Point | null = null;
   chosen: number[] = [];
+  selectedObjects: WorldObjectRef[] = [];
+  objectPage = 0;
+  equipmentTab: 'profile' | 'equipment' | 'craft' = 'equipment';
+  inventorySelected = -1;
+  craftPage = 0;
   speed = 1;
   paused = false;
   card = -1;

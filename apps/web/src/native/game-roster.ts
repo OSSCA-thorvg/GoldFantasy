@@ -23,7 +23,7 @@ import type { GameHudApp } from './game-hud-contract';
 export function rosterBounds(this: GameHudApp, width: number, height: number): Rect {
   const w = Math.min(880, width - 24),
     h = Math.max(1, Math.min(height - 68, 408, Math.max(270, height - 154)));
-  return new Rect((width - w) / 2, height - h - 56, w, h);
+  return new Rect((width - w) / 2, Math.max(64, (height - h) / 2), w, h);
 }
 export function rosterPanel(this: GameHudApp, panel: Rect): void {
   const c = this.context,

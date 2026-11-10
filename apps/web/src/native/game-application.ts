@@ -332,6 +332,21 @@ export class GameApplication implements Application {
       this.command('edit.building');
       return;
     }
+    if (
+      e.type === 'KeyDown' &&
+      !e.control &&
+      !e.meta &&
+      !e.alt &&
+      !this.scriptContext.textFocused() &&
+      !this.game.buildings &&
+      !this.game.atlas &&
+      !this.game.editor &&
+      this.game.selectedPeople().length &&
+      (e.text.toLowerCase() === 'a' || e.text.toLowerCase() === 'm')
+    ) {
+      this.game.prepare(e.text.toLowerCase() === 'a' ? Order.Attack : Order.Move);
+      return;
+    }
     if (this.script.ready() && !this.game.buildings) {
       if (e.type === 'PointerMove') {
         this.scriptContext.pointerMove(e.x, e.y);
@@ -422,7 +437,6 @@ export class GameApplication implements Application {
       )
         this.game.prepare(Order.Work);
       else if (e.text === 's') this.game.stopSelected();
-      else if (e.text === 't') this.game.toggleAuto();
       else if (e.text === 'b' && this.game.selectedPeople().length) this.game.openUnitBuild();
       else {
         const tool = shortcuts.get(e.text);

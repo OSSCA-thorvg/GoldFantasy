@@ -4,6 +4,7 @@ import { f32 as f, clamp } from '../../../../packages/engine/src/numeric';
 import { DockView } from './game-app-state';
 import { reducedMotionPreferred } from './game-theme';
 import type { GameHudApp } from './game-hud-contract';
+import { actionButton } from './hud-actions';
 const copy = (r: Rect) => new Rect(r.x, r.y, r.w, r.h);
 const padded = (r: Rect, amount: number) =>
   r.w <= 0 || r.h <= 0
@@ -35,10 +36,10 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
       this.dockBounds.w = Math.min(lerp(this.dockFrom.w, this.dockTarget.w, t), Math.max(1, f(width - 24)));
       this.dockBounds.h = lerp(this.dockFrom.h, this.dockTarget.h, t);
       this.dockBounds.x = f(f(width - this.dockBounds.w) / 2);
-      this.dockBounds.y = f(f(height - (this.dockView === DockView.Handle ? 12 : 56)) - this.dockBounds.h);
+      this.dockBounds.y = lerp(this.dockFrom.y, this.dockTarget.y, t);
     };
   if (this.dockKey) advance();
-  const handle = new Rect(f(f(width - 236) / 2), height - 48, 116, 36),
+  const handle = new Rect(f((width - 128) / 2), height - 40, 128, 28),
     atHandle = handle.contains(this.mouse.x, this.mouse.y);
   if (!atHandle) this.drawerSuppressed = false;
   const eligible =
@@ -57,29 +58,31 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
     this.drawerPinned = false;
     this.drawerBridge = new Rect();
   }
-  const vacant =
-      !this.chosen.length &&
-      this.selected < 0 &&
-      this.selectedDungeon < 0 &&
-      this.selectedTree < 0 &&
-      this.selectedRock < 0 &&
-      this.selectedAnimal < 0,
-    global =
-      vacant &&
-      eligible &&
-      !this.drawerSuppressed &&
-      (this.drawerPinned || atHandle || (this.globalCard >= 0 && inMenu));
-  if (global && this.globalCard < 0) this.globalCard = 0;
+  const global = eligible && this.globalCard >= 0;
   let next = DockView.Handle;
   if (eligible && this.rosterOpen) next = DockView.Roster;
   else if (eligible && ((this.chosen.length > 0 && this.card >= 0) || global)) next = DockView.Build;
   else if (this.chosen.length) next = DockView.Unit;
   else if (this.selected >= 0 || this.selectedDungeon >= 0) next = DockView.Inspector;
-  else if (this.selectedTree >= 0 || this.selectedRock >= 0 || this.selectedAnimal >= 0)
+  else if (
+    this.selectedTree >= 0 ||
+    this.selectedRock >= 0 ||
+    this.selectedAnimal >= 0 ||
+    this.selectedObjects.length
+  )
     next = DockView.Resource;
   else if (this.tool !== Tool.Select) next = DockView.Placement;
-  let target = new Rect(f(f(width - 236) / 2), height - 48, 236, 36),
+  else if (eligible && !this.drawerSuppressed && (atHandle || (this.dockView === DockView.Menu && inMenu)))
+    next = DockView.Menu;
+  if (this.pending !== Order.None) next = DockView.Handle;
+  else if (this.tool !== Tool.Select && next !== DockView.Build && next !== DockView.Roster)
+    next = DockView.Placement;
+  let target = new Rect(f((width - 128) / 2), height - 28, 128, 16),
     key = String(next);
+  if (next === DockView.Menu) {
+    target.w = 236;
+    target.h = 52;
+  }
   if (next === DockView.Build) {
     const shared = !this.chosen.length;
     target = this.buildMenuBounds(width, height, shared);
@@ -104,8 +107,17 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
     key += ':' + this.rosterTab;
   }
   target.x = f(f(width - target.w) / 2);
-  target.y = f(f(height - (next === DockView.Handle ? 12 : 56)) - target.h);
-  if (key !== this.dockKey || target.w !== this.dockTarget.w || target.h !== this.dockTarget.h) {
+  target.y =
+    next === DockView.Unit || next === DockView.Roster
+      ? Math.max(72, f((height - target.h) / 2))
+      : f(height - 12 - target.h);
+  if (
+    key !== this.dockKey ||
+    target.w !== this.dockTarget.w ||
+    target.h !== this.dockTarget.h ||
+    target.x !== this.dockTarget.x ||
+    target.y !== this.dockTarget.y
+  ) {
     if (this.dockKey) {
       if (this.dockGhost) {
         const old = this.dockGhost;
@@ -148,6 +160,26 @@ export function renderDockContent(this: GameHudApp, panel: Rect): void {
     t = this.theme;
   switch (this.dockView) {
     case DockView.Handle:
+      break;
+    case DockView.Menu:
+      actionButton(c, 'build-handle', new Rect(panel.x + 12, panel.y + 7, 100, 38), 'build', 'Build', () => {
+        this.selectTool(Tool.Select, true);
+        this.selected =
+          this.selectedDungeon =
+          this.selectedTree =
+          this.selectedRock =
+          this.selectedAnimal =
+            -1;
+        this.selectedObjects = [];
+        this.card = this.chosen.length ? 0 : -1;
+        this.globalCard = this.chosen.length ? -1 : 0;
+        this.drawerPinned = true;
+        this.drawerSuppressed = false;
+      });
+      actionButton(c, 'unit-roster', new Rect(panel.x + 124, panel.y + 7, 100, 38), 'unit', 'Units', () => {
+        this.selectTool(Tool.Select, true);
+        this.rosterOpen = true;
+      });
       break;
     case DockView.Build:
       this.commandCard(panel, 1, !this.chosen.length, true);
@@ -206,9 +238,7 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
     if (reveal > f(0.01) || this.dockProgress === 1) {
       const body = copy(this.dockTarget);
       body.x = f(f(width - body.w) / 2);
-      body.y = f(
-        f(f(height - (this.dockView === DockView.Handle ? 12 : 56)) - body.h) + f(8 * f(1 - reveal)),
-      );
+      body.y = f(this.dockTarget.y + f(8 * f(1 - reveal)));
       c.layer(this.dockBounds.inset(1), () => this.renderDockContent(body), Math.trunc(f(255 * reveal)));
     }
   });
@@ -216,33 +246,40 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
   // previous-frame snapshot for the same transition instead of retaining a borrowed wrapper.
   this.dockContent?.dispose();
   this.dockContent = layer?.duplicate() ?? null;
-  const nav = new Rect(f((width - 236) / 2), height - 48, 236, 36);
-  c.rect(nav, this.theme.surface, 3, this.theme.border);
-  button(
-    c,
-    'build-handle',
-    new Rect(nav.x + 3, nav.y + 3, 112, 30),
-    'Build',
-    () => {
-      this.selectTool(Tool.Select, true);
-      this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
-      this.card = this.chosen.length ? 0 : -1;
-      this.globalCard = this.chosen.length ? -1 : 0;
-      this.drawerPinned = true;
-      this.drawerSuppressed = false;
-    },
-    this.dockView === DockView.Build ? ButtonStyle.Primary : ButtonStyle.Quiet,
-  );
-  button(
-    c,
-    'unit-roster',
-    new Rect(nav.x + 121, nav.y + 3, 112, 30),
-    'Unit',
-    () => {
-      const open = !this.rosterOpen;
-      this.selectTool(Tool.Select, true);
-      this.rosterOpen = open;
-    },
-    this.dockView === DockView.Roster ? ButtonStyle.Primary : ButtonStyle.Quiet,
-  );
+  if (this.dockView === DockView.Handle) {
+    const r = this.dockBounds;
+    c.rect(new Rect(r.x + r.w * 0.25, r.y + r.h / 2 - 1, r.w * 0.5, 2), this.theme.accent, 1);
+    c.control(
+      'dock-handle',
+      r,
+      () => {
+        this.drawerSuppressed = false;
+      },
+      true,
+      false,
+    );
+  } else if (this.dockView !== DockView.Menu && this.dockView !== DockView.Roster) {
+    actionButton(
+      c,
+      'dock-close',
+      new Rect(this.dockBounds.x + this.dockBounds.w - 30, this.dockBounds.y + 3, 26, 24),
+      'close',
+      'Close panel',
+      () => {
+        this.rosterOpen = false;
+        this.chosen = [];
+        this.selectedObjects = [];
+        this.selected =
+          this.selectedDungeon =
+          this.selectedTree =
+          this.selectedRock =
+          this.selectedAnimal =
+            -1;
+        this.tool = Tool.Select;
+        this.card = this.globalCard = -1;
+        this.drawerPinned = false;
+        this.drawerSuppressed = true;
+      },
+    );
+  }
 }

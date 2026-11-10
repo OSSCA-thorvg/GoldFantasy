@@ -261,6 +261,10 @@ export class Context {
   focused(): string {
     return this.focusId;
   }
+  textFocused(): boolean {
+    const control = this.find(this.focusId);
+    return !!control?.enabled && control.cursor === Cursor.Text;
+  }
   cursor(): Cursor {
     const pressed = this.find(this.pressedId);
     if (pressed?.enabled && pressed.cursor !== Cursor.Default) return pressed.cursor;

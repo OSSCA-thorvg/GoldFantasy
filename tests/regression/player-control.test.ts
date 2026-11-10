@@ -132,7 +132,7 @@ it('does not pick a neutral resident through player fog', () => {
   expect(personAt.call(app, point(50, 41))).toBe(people[2].id);
 });
 
-it('marquee selects player residents for inspection, including recovery, but excludes visitors and neutrals', () => {
+it('marquee inspects every visible person while later commands filter control ownership', () => {
   const { app, people } = fixture();
   app.town.people = () => people;
   app.boxFrom = point(0, 0);
@@ -140,9 +140,11 @@ it('marquee selects player residents for inspection, including recovery, but exc
     app.mouse = point(x, y);
   };
   app.toScreen = () => point(50, 50);
+  app.camera = { zoom: 1 } as any;
+  app.renderer = { visible: () => true } as any;
   app.context = { controlAt: () => false } as any;
   pointerUp.call(app, 100, 100, PointerButton.Primary);
-  expect(app.chosen).toEqual([0, 1]);
+  expect(app.chosen).toEqual([0, 1, 2, 3]);
 });
 it('retires queued work on orphaned neutral roads without relying on a surviving Camp', () => {
   const { app, town, people } = fixture();

@@ -9,7 +9,9 @@ import { Building } from '../../packages/engine/src/town-models';
 import { Town } from '../../packages/engine/src/town';
 import { Activity, Calling, Role, Person, Race } from '../../packages/engine/src/person';
 import { point } from '../../packages/engine/src/geometry';
-import { GameAppState } from '../../apps/web/src/native/game-app-state';
+import { GameAppState, DockView } from '../../apps/web/src/native/game-app-state';
+import { addInventory } from '../../packages/engine/src/equipment';
+import { updateContextDock, renderDockContent } from '../../apps/web/src/native/game-context-dock';
 import { rosterPanel, rosterBounds } from '../../apps/web/src/native/game-roster';
 import {
   personPanel,
@@ -178,7 +180,7 @@ it('uses real altar eligibility and pending arrival state, and sends the selecte
     ui.town.folk[0].task = Activity.Idle;
     altar.devotionDueDay = 2;
     draw();
-    expect(ui.labels.mock.calls.some((call) => call[1] === 'Resident expected on day 3')).toBe(true);
+    expect(ui.labels.mock.calls.some((call) => call[1] === 'Awaiting a safe arrival at the gate')).toBe(true);
     expect(ui.controls.mock.calls.find((call) => call[0] === 'altar-pray')![3]).toBe(false);
   } finally {
     ui.dispose();
@@ -200,7 +202,9 @@ it('previews class stats without mutating the resident and disables a second pro
     draw();
     expect(ui.app.inspectorCalling).toBe(Calling.Ranger);
     expect(resident.calling).toBe(Calling.Settler);
-    expect(ui.labels.mock.calls.some((call) => String(call[1]).includes('Reach 3.0'))).toBe(true);
+    // A class preview does not conjure a bow or add weapon damage.
+    expect(ui.labels.mock.calls.some((call) => String(call[1]).includes('Reach 0.9'))).toBe(true);
+    expect(ui.town.power(resident)).toBe(1);
     const action = ui.controls.mock.calls.find((call) => call[0] === 'guild-train')!;
     expect(action[3]).toBe(true);
     ui.context.pointerDown(action[1].x + 10, action[1].y + 10);
@@ -232,3 +236,116 @@ function civicTown(town: Town) {
   town.stock(0).add(new Resources(100, 100, 100, 100));
   return { camp, altar, guild };
 }
+
+it('equips the selected real inventory stack through the centered gear grid without creating items', () => {
+  const ui = fixture();
+  try {
+    const p = ui.town.folk[0];
+    ui.app.chosen = [p.id];
+    expect(p.inventory.every((item) => item === null)).toBe(true);
+    expect(p.equipment.tool1).toBe(-1);
+    addInventory(p, 'axe');
+    const draw = () =>
+      ui.draw(() => personPanel.call(ui.app, personPanelBounds.call(ui.app, 880, 600, true)));
+    draw();
+    expect(ui.controls.mock.calls.some((call) => call[0] === 'unit-auto')).toBe(false);
+    expect(ui.controls.mock.calls.filter((call) => call[0].startsWith('inventory-slot-'))).toHaveLength(16);
+    const click = (id: string) => {
+      const r = ui.controls.mock.calls.find((call) => call[0] === id)![1];
+      ui.context.pointerDown(r.x + r.w / 2, r.y + r.h / 2);
+      ui.context.pointerUp(r.x + r.w / 2, r.y + r.h / 2);
+    };
+    click('inventory-slot-1');
+    draw();
+    click('equipment-slot-tool1');
+    expect(p.equipment.tool1).toBe(1);
+    expect(p.inventory.filter(Boolean)).toHaveLength(1);
+    expect(p.inventory[0]).toEqual({ item: 'axe', quantity: 1 });
+    ui.app.inventorySelected = -1;
+    draw();
+    click('equipment-slot-tool1');
+    expect(p.equipment.tool1).toBe(-1);
+    expect(p.inventory[0]?.item).toBe('axe');
+  } finally {
+    ui.dispose();
+  }
+});
+
+it('morphs a single handle into Build and Unit and centers the unit window from the first frame', () => {
+  const ui = fixture();
+  try {
+    const app = ui.app;
+    app.reducedMotion = () => true;
+    app.animatingUi = () => false;
+    app.buildMenuBounds = () => new Rect(100, 200, 600, 250);
+    app.rosterBounds = rosterBounds.bind(app);
+    app.personPanelBounds = personPanelBounds.bind(app);
+    app.selectTool = vi.fn();
+    app.viewHeight = 600;
+    app.viewWidth = 880;
+    app.mouse = point(-1, -1);
+    ui.draw(() => updateContextDock.call(app, 880, 600));
+    expect(app.dockView).toBe(DockView.Handle);
+    app.mouse = point(440, 579);
+    ui.draw(() => {
+      updateContextDock.call(app, 880, 600);
+      renderDockContent.call(app, app.dockTarget);
+    });
+    expect(app.dockView).toBe(DockView.Menu);
+    expect(ui.controls.mock.calls.map((call) => call[0])).toEqual(
+      expect.arrayContaining(['build-handle', 'unit-roster']),
+    );
+    const r = ui.controls.mock.calls.find((call) => call[0] === 'unit-roster')![1];
+    ui.context.pointerDown(r.x + 10, r.y + 10);
+    ui.context.pointerUp(r.x + 10, r.y + 10);
+    ui.draw(() => updateContextDock.call(app, 880, 600));
+    expect(app.dockView).toBe(DockView.Roster);
+    expect(app.dockTarget.y + app.dockTarget.h / 2).toBe(300);
+  } finally {
+    ui.dispose();
+  }
+});
+
+it.each([
+  [844, 390],
+  [800, 500],
+  [390, 844],
+  [1280, 800],
+])('fits every bag and gear control inside the unit panel at %sx%s', (width, height) => {
+  const ui = fixture();
+  try {
+    ui.app.chosen = [ui.town.folk[0].id];
+    const panel = personPanelBounds.call(ui.app, width, height, true);
+    ui.draw(() => personPanel.call(ui.app, panel));
+    const grid = ui.controls.mock.calls.filter(
+      (call) => call[0].startsWith('inventory-slot-') || call[0].startsWith('equipment-slot-'),
+    );
+    expect(grid).toHaveLength(25);
+    for (const [id, r] of grid) {
+      expect(r.x, id).toBeGreaterThanOrEqual(panel.x);
+      expect(r.x + r.w, id).toBeLessThanOrEqual(panel.x + panel.w);
+      expect(r.y, id).toBeGreaterThanOrEqual(panel.y);
+      expect(r.y + r.h, id).toBeLessThanOrEqual(panel.y + panel.h - 36);
+    }
+  } finally {
+    ui.dispose();
+  }
+});
+
+it('keeps a fixed-size object panel on screen when only viewport height changes', () => {
+  const ui = fixture();
+  try {
+    const app = ui.app;
+    app.reducedMotion = () => true;
+    app.animatingUi = () => false;
+    app.buildMenuBounds = () => new Rect();
+    app.selectedTree = 1;
+    ui.draw(() => updateContextDock.call(app, 880, 800));
+    expect(app.dockTarget.y).toBe(640);
+    ui.draw(() => updateContextDock.call(app, 880, 500));
+    expect(app.dockTarget.y).toBe(340);
+    expect(app.dockBounds.y).toBe(340);
+  } finally {
+    ui.dispose();
+  }
+});

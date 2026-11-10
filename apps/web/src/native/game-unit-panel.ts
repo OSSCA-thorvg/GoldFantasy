@@ -25,6 +25,8 @@ import { f32, clamp } from '../../../../packages/engine/src/numeric';
 import { canControl, controlReason } from '../../../../packages/engine/src/faction';
 import { hudPaint } from './hud-paint';
 import type { GameHudApp } from './game-hud-contract';
+import { equipmentPanel } from './game-equipment-panel';
+import { actionButton } from './hud-actions';
 interface Badge {
   condition: Condition;
   box: Rect;
@@ -54,6 +56,11 @@ export function shelteredSelection(this: GameHudApp): boolean {
   });
 }
 export function personPanelBounds(this: GameHudApp, width: number, height: number, commands: boolean): Rect {
+  if (this.chosen.length === 1) {
+    const w = Math.min(720, width - 24),
+      h = Math.max(170, Math.min(width < 540 ? 440 : 540, height - 84));
+    return new Rect((width - w) / 2, Math.max(64, (height - h) / 2), w, h);
+  }
   const count = commands ? (this.shelteredSelection() ? 8 : 7) : 0,
     w = Math.max(
       this.chosen.length === 1 ? 600 : 360,
@@ -107,9 +114,9 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     text = (r: Rect, value: string, color: Color, size = 12, bold = false) =>
       c.text(
         box(r),
-        c.elideText(value, f32(r.w * scale), f32(size * scale), bold),
+        c.elideText(value, f32(r.w * scale), Math.max(9, f32(size * scale)), bold),
         color,
-        f32(size * scale),
+        Math.max(9, f32(size * scale)),
         bold,
       ),
     portrait = (p: Person, frame: Rect) => {
@@ -152,7 +159,25 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
         e33: 1,
       });
     };
-  if (this.chosen.length === 1) {
+  if (this.chosen.length === 1 && (panel.h < 440 || panel.w < 520)) {
+    const p = this.town.person(this.chosen[0]);
+    if (!p) return;
+    portrait(p, new Rect(panel.x + 12, panel.y + 8, 38, 38));
+    c.text(
+      new Rect(panel.x + 60, panel.y + 6, panel.w - 110, 22),
+      `${p.name} · Lv ${p.level}`,
+      t.text,
+      14,
+      true,
+    );
+    c.text(
+      new Rect(panel.x + 60, panel.y + 28, panel.w - 76, 18),
+      `Health ${Math.round(p.health * 100)}% · Food ${Math.round(p.food * 100)}% · Water ${Math.round(p.hydration * 100)}% · Rest ${Math.round(p.rest * 100)}%`,
+      t.muted,
+      10,
+    );
+    equipmentPanel(this, p, new Rect(panel.x + 12, panel.y + 54, panel.w - 24, panel.h - 100));
+  } else if (this.chosen.length === 1) {
     const p = this.town.person(this.chosen[0]);
     if (!p) return;
     portrait(p, box(new Rect(12, 12, 80, 84)));
@@ -217,7 +242,7 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     if (fraction > 0)
       c.rect(box(new Rect(132, 118, f32(f32(logicalWidth - 144) * fraction), 6)), t.accent, f32(3 * scale));
     const tags = badges(c, this.town.conditions(p), f32(logicalWidth - 24));
-    for (const tag of tags) {
+    for (const tag of tags.filter((tag) => tag.box.y === 0)) {
       const r = new Rect(f32(tag.box.x + 12), f32(tag.box.y + 136), tag.box.w, tag.box.h);
       let color = positiveCondition(tag.condition) ? t.success : t.accent;
       if (
@@ -229,8 +254,11 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
       c.rect(box(r), t.raised, f32(3 * scale));
       text(new Rect(f32(r.x + 6), r.y, f32(r.w - 12), r.h), conditionName(tag.condition), color, 11);
     }
-    const after = tags.length ? f32(158 + tags[f32(tags.length - 1)].box.y) : 136;
-    if (p.past) text(new Rect(12, after, f32(logicalWidth - 24), 18), p.past, t.muted, 11);
+    equipmentPanel(
+      this,
+      p,
+      new Rect(panel.x + 12, panel.y + 164 * scale, panel.w - 24, panel.h - 216 * scale),
+    );
   } else {
     text(
       new Rect(12, 10, f32(logicalWidth - 144), 22),
@@ -268,21 +296,6 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     }
   }
   if (commands) {
-    const allAuto = this.chosen
-      .filter((id) => canControl(this.town.person(id)))
-      .every((id) => this.town.person(id)?.autoMode);
-    button(
-      c,
-      'unit-auto',
-      box(new Rect(f32(logicalWidth - 112), 10, 100, 24)),
-      allAuto ? 'Auto ON  T' : 'Auto OFF  T',
-      () => this.toggleAuto(),
-      allAuto ? ButtonStyle.Primary : ButtonStyle.Default,
-      true,
-      Icon.None,
-      false,
-      { fontSize: f32(11 * scale) },
-    );
     this.commandCard(
       new Rect(
         f32(panel.x + f32(12 * scale)),
@@ -293,6 +306,17 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
       scale,
     );
   }
+  if (this.selectedObjects.length)
+    actionButton(
+      c,
+      'inspect-marquee-objects',
+      new Rect(panel.x + panel.w - 72, panel.y + 5, 30, 26),
+      'bag',
+      `Inspect ${this.selectedObjects.length} objects`,
+      () => {
+        this.chosen = [];
+      },
+    );
   for (const [id, entry] of this.dockPortraits)
     if (!this.chosen.includes(id)) {
       c.deferRelease(() => entry.paint.dispose());

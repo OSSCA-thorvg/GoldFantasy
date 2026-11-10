@@ -10,6 +10,7 @@ import { selectionTargets } from '../../apps/web/src/native/selection-targets';
 import { selectionFrame } from '../../packages/native-renderer/src/selection-marker';
 import { AnimalKind } from '../../packages/engine/src/person';
 import { Camera, point, project } from '../../packages/engine/src/geometry';
+import { parseFontMetrics, type NativeFontMetrics } from '../../packages/native-ui/src/fonts';
 
 class Pixels {
   constructor(
@@ -36,6 +37,7 @@ class MemoryCanvas {
   }
 }
 let tvg: ThorVGNamespace;
+let metrics: NativeFontMetrics;
 beforeAll(async () => {
   vi.stubGlobal('OffscreenCanvas', MemoryCanvas);
   vi.stubGlobal('ImageData', Pixels);
@@ -44,6 +46,14 @@ beforeAll(async () => {
     renderer: 'sw',
     locateFile: () => `data:application/wasm;base64,${wasm.toString('base64')}`,
   });
+  for (const font of ['DejaVuSans', 'DejaVuSans-Bold'])
+    tvg.Font.load(font, new Uint8Array(readFileSync(`public/assets/native-fonts/${font}.ttf`)));
+  metrics = Object.fromEntries(
+    ['DejaVuSans', 'DejaVuSans-Bold'].map((font) => [
+      font,
+      parseFontMetrics(new Uint8Array(readFileSync(`public/assets/native-fonts/${font}.ttf`))),
+    ]),
+  );
 });
 afterAll(() => {
   tvg?.term();
@@ -55,7 +65,7 @@ it('composes object selection above world art but beneath HUD panels through the
     height = 240,
     target = new MemoryCanvas(width, height),
     canvas = new tvg.Canvas(target as any, { width, height, enableDevicePixelRatio: false }),
-    context = new Context(tvg, {}),
+    context = new Context(tvg, metrics),
     world = new tvg.Shape().appendRect(0, 0, width, height).fill(36, 52, 41),
     animal = { id: 4, animal: AnimalKind.Pig, health: 3, position: point(10, 10) },
     map = { width: () => 40, height: () => 40, revealed: () => true, dungeons: () => [] },

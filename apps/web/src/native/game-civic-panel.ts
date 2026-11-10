@@ -35,7 +35,7 @@ export function civicInspector(this: GameHudApp, building: Building, panel: Rect
   line(
     compact ? 30 : 34,
     altar
-      ? 'Pray here. A new resident arrives the following day.'
+      ? 'Pray at the gate. A new resident arrives when the rite is complete.'
       : `Choose one class · ${building.trainingCount} residents trained`,
     t.muted,
     compact ? 10 : 12,
@@ -124,7 +124,7 @@ export function civicInspector(this: GameHudApp, building: Building, panel: Rect
     line(
       compact ? 104 : 140,
       status.pendingBirths
-        ? `Resident expected on day ${status.dueDay + 1}`
+        ? 'Awaiting a safe arrival at the gate'
         : preparing
           ? `${preparing.name}: prayer in progress`
           : 'No resident expected yet',
