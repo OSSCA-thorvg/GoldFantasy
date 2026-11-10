@@ -107,10 +107,7 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
     key += ':' + this.rosterTab;
   }
   target.x = f(f(width - target.w) / 2);
-  target.y =
-    next === DockView.Unit || next === DockView.Roster
-      ? Math.max(72, f((height - target.h) / 2))
-      : f(height - 12 - target.h);
+  target.y = next === DockView.Roster ? f((height - target.h) / 2) : f(height - 12 - target.h);
   if (
     key !== this.dockKey ||
     target.w !== this.dockTarget.w ||

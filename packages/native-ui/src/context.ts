@@ -33,6 +33,8 @@ interface Control {
   captureRelease: boolean;
   cursor: Cursor;
 }
+export type OverlayControl = Readonly<Pick<Control, 'id' | 'bounds' | 'focusable'>>;
+type OverlayDraw = (viewport: Rect, controls: readonly OverlayControl[]) => void;
 interface Drawn {
   key: string;
   paint: Paint;
@@ -99,6 +101,8 @@ export class Context {
   private readonly icons: Icons;
   private iconSequence = 0;
   private deferredReleases: (() => void)[] = [];
+  private overlayDraws: { draw: OverlayDraw; key: string; priority: number }[] = [];
+  private viewportBounds = new Rect();
   fontFor: ((text: string, bold: boolean) => string | undefined) | undefined;
   constructor(
     readonly tvg: WebCanvas,
@@ -139,10 +143,25 @@ export class Context {
     this.iconSequence = 0;
     this.tokens = theme;
     this.clipBounds = viewport;
+    this.viewportBounds = viewport;
+    this.overlayDraws = [];
     this.controls = [];
     this.modalFrame = false;
   }
   end(): void {
+    // Paint overlays only after all clipped panels and their controls exist.
+    // They remain ordinary retained root paints, detached before disposal.
+    const previousTarget = this.target,
+      previousClip = this.clipBounds;
+    this.target = this.rootLayer;
+    this.clipBounds = this.viewportBounds;
+    try {
+      const controls = this.controls.map(({ id, bounds, focusable }) => ({ id, bounds, focusable }));
+      for (const overlay of this.overlayDraws.splice(0)) overlay.draw(this.viewportBounds, controls);
+    } finally {
+      this.target = previousTarget;
+      this.clipBounds = previousClip;
+    }
     this.finishLayer(this.rootLayer);
     for (const release of this.deferredReleases.splice(0)) release();
     this.icons.end();
@@ -201,6 +220,7 @@ export class Context {
     for (const release of this.deferredReleases.splice(0)) release();
     this.icons.destroy();
     this.controls = [];
+    this.overlayDraws = [];
   }
   dispose(): void {
     this.destroy();
@@ -209,6 +229,13 @@ export class Context {
    * WebCanvas wrappers must likewise survive Scene.remove(), even if their owner changes. */
   deferRelease(release: () => void): void {
     this.deferredReleases.push(release);
+  }
+  /** A keyed overlay is drawn once per frame; pointer feedback can outrank focus. */
+  deferOverlay(draw: OverlayDraw, key = '', priority = 0): void {
+    const previous = key ? this.overlayDraws.findIndex((item) => item.key === key) : -1;
+    if (previous < 0) this.overlayDraws.push({ draw, key, priority });
+    else if (priority >= this.overlayDraws[previous].priority)
+      this.overlayDraws[previous] = { draw, key, priority };
   }
   setIcons(assets: readonly IconAsset[]): boolean {
     return this.icons.replace(assets);

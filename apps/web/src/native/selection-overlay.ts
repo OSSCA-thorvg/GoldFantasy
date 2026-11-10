@@ -8,6 +8,7 @@ import type { GameCommandApp } from './game-commands';
 import { selectionTargets } from './selection-targets';
 import { hoveredTarget, worldTarget, targetKey, type WorldObjectRef } from './world-targets';
 import { Tool } from '../../../../packages/engine/src/game-tools';
+import { worldNameplateBounds, paintWorldNameplate } from './world-nameplate';
 
 /** World feedback belongs above object art and below speech, menus and modal UI. */
 export function paintSelection(context: Context, key: string, bounds: SelectionBounds, hover = false): void {
@@ -54,7 +55,8 @@ export function objectSelectionOverlay(app: GameCommandApp): void {
     seen.add(target.key);
     labels.push({ name: target.name, bounds: target.bounds, hover: false });
   }
-  const hover = app.tool === Tool.Select && !app.boxFrom && !app.panFrom ? hoveredTarget(app) : null;
+  const hover =
+    refs.length === 0 && app.tool === Tool.Select && !app.boxFrom && !app.panFrom ? hoveredTarget(app) : null;
   if (hover && !seen.has(targetKey(hover))) {
     const target = worldTarget(app, hover);
     if (target) {
@@ -64,14 +66,11 @@ export function objectSelectionOverlay(app: GameCommandApp): void {
   }
   const occupied: Rect[] = [];
   for (const label of labels) {
-    const width = Math.min(180, app.context.textWidth(label.name, 11, true) + 14),
-      b = label.bounds;
-    const r = new Rect(
-      Math.max(4, Math.min(app.viewWidth - width - 4, b.x + b.w / 2 - width / 2)),
-      Math.max(4, b.y - 28),
-      width,
-      21,
-    );
+    const b = label.bounds,
+      r = worldNameplateBounds(app.context, label.name, b.x + b.w / 2, b.y - 7, 1.25);
+    r.w = Math.min(180, app.viewWidth - 8, r.w);
+    r.x = Math.max(4, Math.min(app.viewWidth - r.w - 4, b.x + b.w / 2 - r.w / 2));
+    r.y = Math.max(4, r.y);
     while (
       occupied.some(
         (other) =>
@@ -81,14 +80,11 @@ export function objectSelectionOverlay(app: GameCommandApp): void {
     )
       r.y -= 23;
     occupied.push(r);
-    app.context.rect(r, rgba(19, 25, 24, 224), 3);
-    app.context.text(
+    paintWorldNameplate(
+      app.context,
+      app.context.elideText(label.name, r.w - 15, 10, true),
       r,
-      label.name,
-      label.hover ? rgba(143, 205, 225) : rgba(240, 210, 120),
-      11,
-      true,
-      Align.Center,
+      label.hover ? rgba(143, 205, 225) : undefined,
     );
   }
 }

@@ -19,17 +19,25 @@ import {
 } from '../../../../packages/engine/src/faction';
 import { hudPaint } from './hud-paint';
 import type { GameHudApp } from './game-hud-contract';
+import { equipmentPanel } from './game-equipment-panel';
 
 export function rosterBounds(this: GameHudApp, width: number, height: number): Rect {
-  const w = Math.min(880, width - 24),
-    h = Math.max(1, Math.min(height - 68, 408, Math.max(270, height - 154)));
-  return new Rect((width - w) / 2, Math.max(64, (height - h) / 2), w, h);
+  const w = Math.min(920, width - 24),
+    h = Math.max(170, Math.min(640, height - 84));
+  return new Rect((width - w) / 2, Math.max(12, (height - h) / 2), w, h);
 }
 export function rosterPanel(this: GameHudApp, panel: Rect): void {
   const c = this.context,
     t = this.theme;
   const short = panel.h < 400;
   const micro = panel.h < 270;
+  const narrow = panel.w < 620;
+  const resetProfile = () => {
+    this.inventorySelected = -1;
+    this.craftPage = 0;
+    this.craftWorkshopFilter = null;
+    this.equipmentTab = 'equipment';
+  };
   const stone = rgba(37, 39, 34),
     ochre = rgba(176, 151, 101),
     ink = rgba(226, 215, 188);
@@ -75,6 +83,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
         this.rosterTab = tab;
         this.rosterPage = 0;
         this.rosterSelected = '';
+        resetProfile();
       },
       this.rosterTab === tab ? ButtonStyle.Primary : ButtonStyle.Quiet,
     );
@@ -88,14 +97,25 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
     )
     .map((person) => ({ key: `${this.rosterTab}:${person.id}`, person }));
   const listX = panel.x + 14,
-    top = panel.y + (short ? 68 : 91),
-    leftW = Math.max(108, Math.min(252, panel.w * 0.36));
-  const rows = Math.max(2, Math.min(4, Math.floor((panel.h - 129) / 66)));
+    top = panel.y + (short ? 64 : 84),
+    leftW = narrow ? panel.w - 28 : Math.max(160, Math.min(232, panel.w * 0.26));
+  const rows = narrow
+    ? Math.max(1, Math.min(4, Math.floor(leftW / 68)))
+    : Math.max(1, Math.min(6, Math.floor((panel.y + panel.h - top - 38) / 66)));
   const pages = Math.max(1, Math.ceil(entries.length / rows));
   this.rosterPage = Math.max(0, Math.min(pages - 1, this.rosterPage));
   if (!entries.some((entry) => entry.key === this.rosterSelected))
     this.rosterSelected = entries[this.rosterPage * rows]?.key ?? '';
+  const usedPortraits = new Set<number>();
+  const releasePortraits = () => {
+    for (const [id, entry] of this.dockPortraits)
+      if (!usedPortraits.has(id)) {
+        c.deferRelease(() => entry.paint.dispose());
+        this.dockPortraits.delete(id);
+      }
+  };
   const portrait = (p: Person, frame: Rect) => {
+    usedPortraits.add(p.id);
     const mood = moodOf(p),
       backdrop = portraitBackdrop(this.town.map(), p.position, this.town.climate());
     const key = JSON.stringify([
@@ -136,7 +156,8 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
   const visible = entries.slice(this.rosterPage * rows, (this.rosterPage + 1) * rows);
   for (let i = 0; i < visible.length; ++i) {
     const entry = visible[i],
-      row = new Rect(listX, top + i * 66, leftW, 60);
+      width = narrow ? (leftW - (rows - 1) * 6) / rows : leftW,
+      row = new Rect(listX + (narrow ? i * (width + 6) : 0), top + (narrow ? 0 : i * 66), width, 60);
     const active = entry.key === this.rosterSelected;
     button(
       c,
@@ -144,10 +165,14 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       row,
       '',
       () => {
+        if (this.rosterSelected !== entry.key) resetProfile();
         this.rosterSelected = entry.key;
       },
       active ? ButtonStyle.Primary : ButtonStyle.Default,
     );
+    const thumb = narrow
+      ? new Rect(row.x + (row.w - 30) / 2, row.y + 3, 30, 36)
+      : new Rect(row.x + 5, row.y + 7, 36, 46);
     // List portraits use separate retained instances from the large profile.
     c.paint(
       JSON.stringify([
@@ -156,8 +181,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
         entry.person.race,
         String(entry.person.lookRevision),
         entry.person.calling,
-        row.x,
-        row.y,
+        thumb,
       ]),
       () => {
         const paint = hudPaint(
@@ -165,15 +189,26 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
           personPortrait(
             entry.person,
             moodOf(entry.person),
-            36,
-            46,
+            thumb.w,
+            thumb.h,
             portraitBackdrop(this.town.map(), entry.person.position, this.town.climate()),
           ),
         );
-        paint.translate(row.x + 5, row.y + 7);
+        paint.translate(thumb.x, thumb.y);
         return paint;
       },
     );
+    if (narrow) {
+      c.text(
+        new Rect(row.x + 3, row.y + 41, row.w - 6, 16),
+        c.elideText(entry.person.name, row.w - 6, 10, true),
+        active ? t.accentText : ink,
+        10,
+        true,
+        Align.Center,
+      );
+      continue;
+    }
     const textX = row.x + 46,
       w = Math.max(10, row.w - 51);
     c.text(
@@ -190,7 +225,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       11,
     );
   }
-  const pagerY = panel.y + panel.h - 33;
+  const pagerY = narrow ? top + 64 : panel.y + panel.h - 34;
   button(
     c,
     'roster-prev',
@@ -199,6 +234,7 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
     () => {
       --this.rosterPage;
       this.rosterSelected = '';
+      resetProfile();
     },
     ButtonStyle.Quiet,
     this.rosterPage > 0,
@@ -219,12 +255,15 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
     () => {
       ++this.rosterPage;
       this.rosterSelected = '';
+      resetProfile();
     },
     ButtonStyle.Quiet,
     this.rosterPage < pages - 1,
   );
-  const detail = new Rect(listX + leftW + 14, top, panel.w - leftW - 42, panel.h - 104);
-  c.line(detail.x - 7, top, detail.x - 7, panel.y + panel.h - 15, rgba(176, 151, 101, 80));
+  const detail = narrow
+    ? new Rect(listX, top + 98, panel.w - 28, panel.y + panel.h - (top + 98) - 12)
+    : new Rect(listX + leftW + 14, top, panel.w - leftW - 42, panel.y + panel.h - top - 12);
+  if (!narrow) c.line(detail.x - 7, top, detail.x - 7, panel.y + panel.h - 15, rgba(176, 151, 101, 80));
   const selected = entries.find((entry) => entry.key === this.rosterSelected);
   if (!selected) {
     c.text(
@@ -235,12 +274,54 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       ochre,
       12,
     );
+    releasePortraits();
+    return;
+  }
+  if (selected.person.role === Role.Resident) {
+    const p = selected.person,
+      header = short ? 18 : 66;
+    const text = (r: Rect, value: string, color: Color = ink, size = 12, bold = false) =>
+      c.text(r, c.elideText(value, r.w, size, bold), color, size, bold);
+    if (short)
+      text(
+        new Rect(detail.x, detail.y, detail.w, 18),
+        `${p.name} · Lv ${p.level} · Health ${Math.round(p.health * 100)}%`,
+        ink,
+        12,
+        true,
+      );
+    else {
+      portrait(p, new Rect(detail.x, detail.y, 40, 46));
+      text(
+        new Rect(detail.x + 50, detail.y, detail.w - 50, 23),
+        `${p.name} · Level ${p.level}`,
+        ink,
+        16,
+        true,
+      );
+      text(
+        new Rect(detail.x + 50, detail.y + 24, detail.w - 50, 20),
+        `${raceName(p.race)} · ${callingName(p.calling)}`,
+        ochre,
+        11,
+      );
+      text(
+        new Rect(detail.x, detail.y + 47, detail.w, 18),
+        controlReason(p) ||
+          `${activityName(p.activity)} · Food ${Math.round(p.food * 100)}% · Water ${Math.round(p.hydration * 100)}% · Rest ${Math.round(p.rest * 100)}%`,
+        canControl(p) ? t.muted : t.danger,
+        10,
+      );
+    }
+    if (this.equipmentTab === 'profile') this.equipmentTab = 'equipment';
+    equipmentPanel(this, p, new Rect(detail.x, detail.y + header, detail.w, detail.h - header));
+    releasePortraits();
     return;
   }
   const p = selected.person,
     compact = detail.w < 300 || short;
   const split = short && detail.w > 400;
-  const meta = split ? new Rect(detail.x + 200, top + 43, detail.w - 200, detail.h) : detail;
+  const meta = split ? new Rect(detail.x + 200, detail.y + 43, detail.w - 200, detail.h) : detail;
   const text = (y: number, label: string, color: Color = ink, size = 12, bold = false) =>
     c.text(
       new Rect(meta.x, y, meta.w, short ? 16 : 22),
@@ -250,21 +331,21 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       bold,
     );
   c.text(
-    new Rect(detail.x, top, detail.w, 23),
+    new Rect(detail.x, detail.y, detail.w, 23),
     c.elideText(p.name, detail.w, compact ? 14 : 19, true),
     ink,
     compact ? 14 : 19,
     true,
   );
   c.text(
-    new Rect(detail.x, top + (short ? 21 : 24), detail.w, 21),
+    new Rect(detail.x, detail.y + (short ? 21 : 24), detail.w, 21),
     `${raceName(p.race)} · ${callingName(p.calling)} · Level ${p.level}`,
     ochre,
     compact ? 10 : 12,
   );
   const frame = new Rect(
     detail.x,
-    top + (short ? 43 : 53),
+    detail.y + (short ? 43 : 53),
     micro ? 32 : short ? 40 : compact ? 64 : 100,
     micro ? 36 : short ? 46 : compact ? 80 : 116,
   );
@@ -283,9 +364,9 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
   stat(2, `Health ${Math.round(p.health * 100)}%`);
   if (!compact) {
     stat(3, `Gear ${p.gear}`);
-    c.text(new Rect(sx, top + 150, sw, 24), c.elideText(p.past, sw, 11), ochre, 11);
+    c.text(new Rect(sx, detail.y + 150, sw, 24), c.elideText(p.past, sw, 11), ochre, 11);
   }
-  const y = split ? top + 43 : top + (micro ? 84 : short ? 92 : compact ? 144 : 182);
+  const y = split ? detail.y + 43 : detail.y + (micro ? 84 : short ? 92 : compact ? 144 : 182);
   const footer = new Rect(meta.x, panel.y + panel.h - 43, meta.w, 29);
   if (p.role === Role.Guest) {
     const lodging = this.town.building(p.bed);
@@ -298,36 +379,10 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
       footer,
       'Inspect guest',
       () => {
-        this.rosterOpen = false;
-        this.selectPeople([p.id]);
-      },
-      ButtonStyle.Primary,
-    );
-  } else {
-    const job = this.town.building(p.job);
-    text(y, job ? structureSpec(job.kind).name : 'Available for settlement work', ochre, 12);
-    text(
-      y + (short ? 17 : 23),
-      controlReason(p) || activityName(p.activity),
-      canControl(p) ? ink : t.danger,
-      11,
-    );
-    text(
-      y + (short ? 34 : 46),
-      `Food ${Math.round(p.food * 100)}% · Water ${Math.round(p.hydration * 100)}% · Rest ${Math.round(p.rest * 100)}%`,
-      t.muted,
-      10,
-    );
-    button(
-      c,
-      'roster-focus',
-      footer,
-      canControl(p) ? 'Select unit' : 'Inspect unit',
-      () => {
-        this.rosterOpen = false;
-        this.selectPeople([p.id]);
+        this.rosterSelected = selected.key;
       },
       ButtonStyle.Primary,
     );
   }
+  releasePortraits();
 }

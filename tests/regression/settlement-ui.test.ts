@@ -1,5 +1,5 @@
 import { beforeAll, afterAll, expect, it, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import ThorVG, { type ThorVGNamespace } from '@thorvg/webcanvas';
 import { parseFontMetrics } from '../../packages/native-ui/src/fonts';
 import { Context, Rect } from '../../packages/native-ui/src';
@@ -14,6 +14,12 @@ import { addInventory } from '../../packages/engine/src/equipment';
 import { updateContextDock, renderDockContent } from '../../apps/web/src/native/game-context-dock';
 import { rosterPanel, rosterBounds } from '../../apps/web/src/native/game-roster';
 import { commandCard, inspector } from '../../apps/web/src/native/game-hud';
+import { actionButton } from '../../apps/web/src/native/hud-actions';
+import {
+  worldNameplateBounds,
+  paintWorldNameplate,
+  worldNameplateStyle,
+} from '../../apps/web/src/native/world-nameplate';
 import {
   personPanel,
   personPanelBounds,
@@ -29,12 +35,18 @@ class Pixels {
   ) {}
 }
 class MemoryCanvas {
+  pixels = new Uint8ClampedArray();
   constructor(
     public width: number,
     public height: number,
   ) {}
   getContext() {
-    return { putImageData() {}, clearRect() {} };
+    return {
+      putImageData: (image: Pixels) => {
+        this.pixels = image.data.slice();
+      },
+      clearRect() {},
+    };
   }
 }
 let tvg: ThorVGNamespace;
@@ -52,7 +64,8 @@ afterAll(() => {
   vi.unstubAllGlobals();
 });
 function fixture(width = 880, height = 600) {
-  const canvas = new tvg.Canvas(new MemoryCanvas(width, height) as any, {
+  const memory = new MemoryCanvas(width, height);
+  const canvas = new tvg.Canvas(memory as any, {
     width,
     height,
     enableDevicePixelRatio: false,
@@ -82,6 +95,13 @@ function fixture(width = 880, height = 600) {
     context,
     controls,
     labels,
+    capture(name: string) {
+      const directory = process.env.GOLDFANTASY_UI_CAPTURE;
+      if (!directory) return;
+      mkdirSync(directory, { recursive: true });
+      writeFileSync(`${directory}/${name}.rgba`, memory.pixels);
+      writeFileSync(`${directory}/${name}.json`, JSON.stringify({ width, height }));
+    },
     draw(fn: () => void) {
       controls.mockClear();
       labels.mockClear();
@@ -137,6 +157,127 @@ it('lists actual lodging visitors without fabricated recruitment offers or a Hir
     ui.dispose();
   }
 });
+
+it('keeps Unit management open while equipping its selected resident without selecting the world', () => {
+  const ui = fixture();
+  try {
+    const p = ui.town.folk[0];
+    addInventory(p, 'axe');
+    ui.app.rosterOpen = true;
+    ui.app.rosterSelected = `units:${p.id}`;
+    ui.app.chosen = [ui.town.folk[1].id];
+    const draw = () => ui.draw(() => rosterPanel.call(ui.app, rosterBounds.call(ui.app, 880, 600)));
+    const click = (id: string) => {
+      const bounds = ui.controls.mock.calls.find(([key]) => key === id)![1];
+      ui.context.pointerDown(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+      ui.context.pointerUp(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+    };
+    draw();
+    expect(ui.controls.mock.calls.filter(([id]) => id.startsWith('inventory-slot-'))).toHaveLength(16);
+    click('inventory-slot-1');
+    draw();
+    click('equipment-slot-tool1');
+    expect(p.equipment.tool1).toBe(1);
+    expect(ui.app.rosterOpen).toBe(true);
+    click(`roster-person-units:${ui.town.folk[1].id}`);
+    expect(ui.app.inventorySelected).toBe(-1);
+    expect(ui.app.equipmentTab).toBe('equipment');
+    expect(ui.app.rosterSelected).toBe(`units:${ui.town.folk[1].id}`);
+    expect(p.equipment.tool1).toBe(1);
+    expect(ui.app.chosen).toEqual([ui.town.folk[1].id]);
+    expect(ui.app.selectPeople).not.toHaveBeenCalled();
+    draw();
+    click('equipment-tab-craft');
+    draw();
+    expect(ui.controls.mock.calls.some(([id]) => id.startsWith('craft-item-'))).toBe(true);
+    expect(ui.app.rosterOpen).toBe(true);
+  } finally {
+    ui.dispose();
+  }
+});
+
+it('draws action tooltips after clipped icons and outside every control', () => {
+  const ui = fixture(390, 844),
+    anchor = new Rect(100, 100, 30, 30),
+    neighbor = new Rect(90, 78, 100, 22);
+  try {
+    ui.context.pointerMove(110, 110);
+    ui.draw(() => {
+      ui.context.layer(new Rect(80, 80, 160, 50), () => {
+        actionButton(ui.context, 'tooltip-anchor', anchor, 'gear', 'Manage equipment', () => {});
+        actionButton(ui.context, 'tooltip-neighbor', neighbor, 'craft', 'Craft equipment', () => {});
+        ui.context.text(new Rect(80, 160, 100, 20), 'Last normal icon', ui.app.theme.text, 10);
+      });
+    });
+    const tip = ui.labels.mock.calls.find(([, text]) => text === 'Manage equipment')![0];
+    expect(ui.labels.mock.calls.at(-1)![1]).toBe('Manage equipment');
+    const clipped = tip.intersect(new Rect(80, 80, 160, 50));
+    expect(clipped.w * clipped.h).toBe(0);
+    for (const [, bounds] of ui.controls.mock.calls) {
+      const overlap = tip.intersect(bounds);
+      expect(overlap.w * overlap.h).toBe(0);
+    }
+    expect(tip.x).toBeGreaterThanOrEqual(0);
+    expect(tip.x + tip.w).toBeLessThanOrEqual(390);
+    expect(tip.y + tip.h).toBeLessThanOrEqual(844);
+    ui.capture('tooltip-390x844');
+    ui.draw(() => {});
+    expect(ui.labels.mock.calls.some(([, text]) => text === 'Manage equipment')).toBe(false);
+  } finally {
+    ui.dispose();
+  }
+});
+
+it('shows one viewport-clamped pointer tooltip instead of a competing focused tooltip', () => {
+  const ui = fixture(390, 844);
+  try {
+    ui.context.focus('focused-action');
+    ui.context.pointerMove(375, 12);
+    ui.draw(() => {
+      actionButton(
+        ui.context,
+        'hovered-action',
+        new Rect(360, 4, 28, 28),
+        'craft',
+        'Hovered crafting action',
+        () => {},
+      );
+      actionButton(
+        ui.context,
+        'focused-action',
+        new Rect(4, 4, 28, 28),
+        'gear',
+        'Focused equipment action',
+        () => {},
+      );
+    });
+    expect(ui.labels.mock.calls.some(([, label]) => label === 'Focused equipment action')).toBe(false);
+    const shown = ui.labels.mock.calls.filter(([, label]) => label === 'Hovered crafting action');
+    expect(shown).toHaveLength(1);
+    const bounds = shown[0][0];
+    expect(bounds.x).toBeGreaterThanOrEqual(4);
+    expect(bounds.y).toBeGreaterThanOrEqual(4);
+    expect(bounds.x + bounds.w).toBeLessThanOrEqual(386);
+    expect(bounds.y + bounds.h).toBeLessThanOrEqual(840);
+  } finally {
+    ui.dispose();
+  }
+});
+
+it('uses the dungeon label plate, bold font and gold ink for world nameplates', () => {
+  const ui = fixture(),
+    rectangles = vi.spyOn(ui.context, 'rect');
+  try {
+    const bounds = worldNameplateBounds(ui.context, 'Ancient hall', 180, 80);
+    ui.draw(() => paintWorldNameplate(ui.context, 'Ancient hall', bounds));
+    expect(bounds.h).toBe(14);
+    expect(bounds.w).toBeCloseTo(ui.context.textWidth('Ancient hall', 8, true) + 12, 4);
+    expect(rectangles).toHaveBeenCalledWith(bounds, worldNameplateStyle.plate);
+    expect(ui.labels.mock.calls[0].slice(1, 5)).toEqual(['Ancient hall', worldNameplateStyle.ink, 8, true]);
+  } finally {
+    ui.dispose();
+  }
+});
 it('keeps overwhelmed player residents in Units while excluding defectors and guests', () => {
   const ui = fixture();
   try {
@@ -148,7 +289,7 @@ it('keeps overwhelmed player residents in Units while excluding defectors and gu
     expect(
       ui.controls.mock.calls.filter((call) => call[0].startsWith('roster-person-')).map((call) => call[0]),
     ).toEqual([`roster-person-units:${player.id}`]);
-    expect(ui.labels.mock.calls.some((call) => call[1] === 'Inspect unit')).toBe(true);
+    expect(ui.labels.mock.calls.some((call) => String(call[1]).includes('Overwhelmed'))).toBe(true);
     ui.app.chosen = [player.id];
     ui.draw(() => personPanel.call(ui.app, personPanelBounds.call(ui.app, 880, 600, false)));
     expect(ui.controls.mock.calls.some((call) => call[0] === 'unit-auto')).toBe(false);
@@ -242,12 +383,12 @@ it('equips the selected real inventory stack through the centered gear grid with
   const ui = fixture();
   try {
     const p = ui.town.folk[0];
-    ui.app.chosen = [p.id];
+    ui.app.rosterOpen = true;
+    ui.app.rosterSelected = `units:${p.id}`;
     expect(p.inventory.every((item) => item === null)).toBe(true);
     expect(p.equipment.tool1).toBe(-1);
     addInventory(p, 'axe');
-    const draw = () =>
-      ui.draw(() => personPanel.call(ui.app, personPanelBounds.call(ui.app, 880, 600, true)));
+    const draw = () => ui.draw(() => rosterPanel.call(ui.app, rosterBounds.call(ui.app, 880, 600)));
     draw();
     expect(ui.controls.mock.calls.some((call) => call[0] === 'unit-auto')).toBe(false);
     expect(ui.controls.mock.calls.filter((call) => call[0].startsWith('inventory-slot-'))).toHaveLength(16);
@@ -312,12 +453,14 @@ it.each([
   [800, 500],
   [390, 844],
   [1280, 800],
-])('fits every bag and gear control inside the unit panel at %sx%s', (width, height) => {
-  const ui = fixture();
+])('fits every bag and gear control inside Unit management at %sx%s', (width, height) => {
+  const ui = fixture(width, height);
   try {
-    ui.app.chosen = [ui.town.folk[0].id];
-    const panel = personPanelBounds.call(ui.app, width, height, true);
-    ui.draw(() => personPanel.call(ui.app, panel));
+    ui.app.rosterOpen = true;
+    ui.app.rosterSelected = `units:${ui.town.folk[0].id}`;
+    const panel = rosterBounds.call(ui.app, width, height);
+    ui.draw(() => rosterPanel.call(ui.app, panel));
+    ui.capture(`roster-${width}x${height}`);
     const grid = ui.controls.mock.calls.filter(
       (call) => call[0].startsWith('inventory-slot-') || call[0].startsWith('equipment-slot-'),
     );
@@ -326,7 +469,7 @@ it.each([
       expect(r.x, id).toBeGreaterThanOrEqual(panel.x);
       expect(r.x + r.w, id).toBeLessThanOrEqual(panel.x + panel.w);
       expect(r.y, id).toBeGreaterThanOrEqual(panel.y);
-      expect(r.y + r.h, id).toBeLessThanOrEqual(panel.y + panel.h - 36);
+      expect(r.y + r.h, id).toBeLessThanOrEqual(panel.y + panel.h - 12);
     }
   } finally {
     ui.dispose();
@@ -366,6 +509,7 @@ it.each([
       ui.app.commandCard = commandCard.bind(ui.app);
       const panel = personPanelBounds.call(ui.app, 390, 844, true);
       ui.draw(() => personPanel.call(ui.app, panel));
+      if (count === 1 && !sheltered) ui.capture('selection-bottom-390x844');
       const commands = ui.controls.mock.calls.filter(([id]) => id.startsWith('unit/card-'));
       expect(commands).toHaveLength(sheltered ? 8 : 7);
       for (const [id, bounds] of commands) {

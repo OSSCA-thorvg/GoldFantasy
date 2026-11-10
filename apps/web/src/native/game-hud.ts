@@ -314,6 +314,9 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
               this.equipmentTab = 'craft';
               this.craftPage = 0;
               this.craftWorkshopFilter = building.kind;
+              this.rosterOpen = true;
+              this.rosterTab = 'units';
+              this.rosterSelected = `units:${p.id}`;
             }
           },
           false,
