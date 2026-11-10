@@ -35,6 +35,8 @@ export enum Cue {
   Dog,
   Cat,
   Hammer,
+  /** Host-only request to warm recorded speech without playing or reserving a channel. */
+  PrepareSpeech,
   Count,
 }
 export enum SpeechChannel {
@@ -59,6 +61,10 @@ export enum VoiceLine {
   Thanks,
   Alarm,
   Death,
+  // Appended reactions retain the original native speech IDs.
+  Rain,
+  Snow,
+  Thunder,
   Count,
 }
 export enum VoiceKind {

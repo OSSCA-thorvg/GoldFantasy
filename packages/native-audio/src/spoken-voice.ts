@@ -1,4 +1,4 @@
-// Direct translation of spoken_voice.cpp.
+// Recorded speech catalog retaining the original native voice and line IDs.
 import { BodyType } from '../../engine/src/person-appearance';
 import { f32 as f, hash01 } from '../../engine/src/numeric';
 import { Clip, sounds } from './sound-library';
@@ -21,6 +21,9 @@ const lines = [
   'thanks',
   'alarm',
   'death',
+  'rain',
+  'snow',
+  'thunder',
 ];
 export function voicePrefix(line: VoiceLine, voice: VoiceKind): string {
   return line < 0 || line >= VoiceLine.Count || voice < 0 || voice >= VoiceKind.Count

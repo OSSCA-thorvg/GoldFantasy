@@ -1224,7 +1224,1286 @@
     {
       "path": "wildlife/wolf_02.ogg",
       "sha256": "65ab89ce2b9ff0f4e1e4c35697b5552b861dc843fd047e9214b3d755d137a62a"
+    },
+    {
+      "path": "voice/berserker/rain_01.ogg",
+      "sha256": "7c254f5ae4cfe5a3af8e6c43c4f6821b4add7bad6b1e1a48f1329d1a6a00211f"
+    },
+    {
+      "path": "voice/berserker/rain_02.ogg",
+      "sha256": "af368e400ca9e520fbd9f24b78df508fb4fb6c687fd9bf57933cf5d648b532fd"
+    },
+    {
+      "path": "voice/berserker/snow_01.ogg",
+      "sha256": "85106e25ac04bff6750c2d63a95300fae5d9b0b05533a0273c3a80bf336ece2d"
+    },
+    {
+      "path": "voice/berserker/snow_02.ogg",
+      "sha256": "0854a2969c1045d025da6199aff83f72c406e5a937e4d8e2c0ec975a24334a0a"
+    },
+    {
+      "path": "voice/berserker/thunder_01.ogg",
+      "sha256": "1baf787e86d21e29154a633f0c12508dccae75f0d13185d5666aba89a93b4968"
+    },
+    {
+      "path": "voice/berserker/thunder_02.ogg",
+      "sha256": "abdaa8a38d5ae6376b6d430833d2105263dddf908976a3409331b1ebaf8ae6d2"
+    },
+    {
+      "path": "voice/berserker/thunder_03.ogg",
+      "sha256": "0711e55331deffb95eb893eaddae2bab6b6bff48bf0221643845a6ab07921866"
+    },
+    {
+      "path": "voice/huntress/rain_01.ogg",
+      "sha256": "1fd402bec94bada4656b5540aa5e04c8356919430a9b09a51b4f643e28af4860"
+    },
+    {
+      "path": "voice/huntress/rain_02.ogg",
+      "sha256": "c4c7472c4cbad88d687217f2920d2d9a795675e2c0936a5f8fbbe01207dcf953"
+    },
+    {
+      "path": "voice/huntress/snow_01.ogg",
+      "sha256": "3f134906295ebe4456bbfe4e57df696ce1768a532e35015812fa2252d2ef190f"
+    },
+    {
+      "path": "voice/huntress/snow_02.ogg",
+      "sha256": "5a83826e82e184e3d37116641e60eec6e1190b65dddda8333e6777860095e395"
+    },
+    {
+      "path": "voice/huntress/thunder_01.ogg",
+      "sha256": "6567c98a9b4e9775dea0ba6d1d582194059260b1f1d6b89bd4bd111e6f6161e9"
+    },
+    {
+      "path": "voice/huntress/thunder_02.ogg",
+      "sha256": "50a968b7f0c105f9c4dcac1a060c8e195fa16034031628c5202f98005a827247"
+    },
+    {
+      "path": "voice/huntress/thunder_03.ogg",
+      "sha256": "11405af431ff8a3c905968613763cd034a7d5f2fd738d54fab02bbc6ee3badf9"
+    },
+    {
+      "path": "voice/maiden/rain_01.ogg",
+      "sha256": "40bd3bce07787c9ed460d9f56fbfda8be9c5cc89cef4303d29d19f356b3672f5"
+    },
+    {
+      "path": "voice/maiden/rain_02.ogg",
+      "sha256": "fe16c7480866d40fef4208b1d6e1c12f1287bd0baa72f3d83ac190d642b78dff"
+    },
+    {
+      "path": "voice/maiden/snow_01.ogg",
+      "sha256": "61252702a74f881262792df5950373946820245c6531c4fc186a442d9b7c484b"
+    },
+    {
+      "path": "voice/maiden/snow_02.ogg",
+      "sha256": "a7b994bca53a41c7f6a556cad0879dd93dfa5f0a3c51662c0d4b16bbb66ccd20"
+    },
+    {
+      "path": "voice/maiden/thunder_01.ogg",
+      "sha256": "a1a7b884ff2bd7ffca0f015d25e265877712a8a2556e2f9d151c37eb6ff3f408"
+    },
+    {
+      "path": "voice/maiden/thunder_02.ogg",
+      "sha256": "3f1841c83f7d4896547fe8dad6b54273efe12c0f19cd2dc7b26ac8916ccdf16c"
+    },
+    {
+      "path": "voice/maiden/thunder_03.ogg",
+      "sha256": "2fca35bfddbb4041cf5b4885a03408675568516aa6ff60f7f4c00f0d023ea4b3"
+    },
+    {
+      "path": "voice/veteran/rain_01.ogg",
+      "sha256": "dc28a28efce52dbe5c34a8f5d25b5b200ccdcb1264e14c9d78ded54feef7580d"
+    },
+    {
+      "path": "voice/veteran/rain_02.ogg",
+      "sha256": "20d8b4589b4c5efd283699484170e889e0668417f0159047beb667046280bee5"
+    },
+    {
+      "path": "voice/veteran/snow_01.ogg",
+      "sha256": "9eb7424708691804c193e9aaf1112384980b70aab90866953746c808894d8191"
+    },
+    {
+      "path": "voice/veteran/snow_02.ogg",
+      "sha256": "6b7bac8b072ab8c8099727897793cb32599b3ea225620f53f7b811ec4cc475c0"
+    },
+    {
+      "path": "voice/veteran/thunder_01.ogg",
+      "sha256": "874ce84b62cd46e842360afc3220a414d4a8507716b3418624d49d28a2055ca7"
+    },
+    {
+      "path": "voice/veteran/thunder_02.ogg",
+      "sha256": "e784c2223bf7c833bb25025b8e45b4283b443981721030ec87cc60c0ccc66c92"
+    },
+    {
+      "path": "voice/veteran/thunder_03.ogg",
+      "sha256": "4ce9b334f9a710bf29945913da820363e1129377b85fb840876dd5aa50febc56"
+    },
+    {
+      "path": "voice/young/rain_01.ogg",
+      "sha256": "a7a2809ec871a2c21c83707d2e45a3497a4445fd68de556c07efaa8b0721c283"
+    },
+    {
+      "path": "voice/young/rain_02.ogg",
+      "sha256": "0a35918d28c7cfae63d0f09e9b77c076272325f905533fa58ef77b20a3f2ef4e"
+    },
+    {
+      "path": "voice/young/snow_01.ogg",
+      "sha256": "cf468c7f4f4d4218b3ea191079a0609de641869c2950bc9856030a99d0655a90"
+    },
+    {
+      "path": "voice/young/snow_02.ogg",
+      "sha256": "88a8229413a7307d5dbd040e8d26b27a83fd79a064067b611d9e023818901405"
+    },
+    {
+      "path": "voice/young/thunder_01.ogg",
+      "sha256": "476f1bb480529aec65491e4278e61e23b8926beb4b23dfc0a2f721d9900f94c6"
+    },
+    {
+      "path": "voice/young/thunder_02.ogg",
+      "sha256": "2d69cf2e033c86a3451a1b3258d0102bd0f9c0d8d2cc3e4991cbcec5fef701e5"
+    },
+    {
+      "path": "voice/young/thunder_03.ogg",
+      "sha256": "a7c37187b3de0e3fd216c375aacf97554acd8915b4201a56a93776c058fddf0d"
     }
   ],
-  "endingsSha256": "ef8cca8e975c347bd62e8e838c514d8f993fa6b16862a793953eefd2e64f2294"
+  "endingsSha256": "41db0ce9a829e291ef87bd28419dea3af50d8573d27fc8159eec9955b9eaddf6",
+  "weatherVoiceProvenance": {
+    "source": "Synthetic speech generated offline; no human voice recordings or model runtime shipped",
+    "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+    "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+    "modelLicense": "Apache-2.0",
+    "modelCode": "https://github.com/QwenLM/Qwen3-TTS",
+    "generator": {
+      "repository": "GoldFantasy loach worktree",
+      "path": "tools/voice-qwen/generate_qwen.py",
+      "sha256": "30378f4964b239bd15b7889a72771f93d5607fa888abac4da1b6b13adbc9135e"
+    },
+    "processing": {
+      "path": "src/loach/norse_voice_takes.py::_dry",
+      "sha256": "6e66bdeec054e6f3322c4484268789d5d50a8479a335151316ca2e2ba8fc727a",
+      "silencePaddingSeconds": [
+        0.04,
+        0.1
+      ],
+      "highpassHz": 80,
+      "peakDbfs": -3,
+      "encoding": {
+        "codec": "libvorbis",
+        "quality": 4,
+        "rate": 22050,
+        "channels": 1
+      },
+      "decoder": {
+        "path": "subprojects/stb/stb_vorbis.c",
+        "sha256": "4c7cb2ff1f7011e9d67950446b7eb9ca044f2e464d76bfbb0b84dd2e23e65636"
+      }
+    },
+    "plan": {
+      "language": "English",
+      "params": {
+        "top_p": 0.9,
+        "max_new_tokens": 100
+      },
+      "seeds": [
+        47
+      ],
+      "bank_voices": [
+        "young",
+        "berserker",
+        "maiden",
+        "huntress",
+        "veteran"
+      ],
+      "actions": {
+        "rain": {
+          "texts": [
+            "Oh, rain again.",
+            "Gods, I'm soaked."
+          ]
+        },
+        "snow": {
+          "texts": [
+            "Brr, so cold.",
+            "Look, snow!"
+          ]
+        },
+        "thunder": {
+          "texts": [
+            "Oh, God!",
+            "Oh my God!",
+            "I'm scared."
+          ]
+        }
+      }
+    },
+    "syntheticReferences": [
+      {
+        "voice": "berserker",
+        "source": ".loach/voices/norse-qwen/_speakers/berserker.wav",
+        "sha256": "c29905bc67e0f4b1459fca366e0b56f188c80b30995634ff2fffde8aa08cc2f0",
+        "metadata": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "revision": "5ecdb67327fd37bb2e042aab12ff7391903235d3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Stand behind me. Nothing gets past this axe while I still breathe.",
+          "seed": 2,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 360
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000,
+          "instruct": "A large Norse man in his forties with a very low, deep bass voice. He speaks slowly and calmly from the chest, dark and resonant with a slight rasp. Dry close recording, no reverb, no background noise.",
+          "f0": 96.08289262169262
+        }
+      },
+      {
+        "voice": "huntress",
+        "source": ".loach/voices/norse-qwen/_speakers/huntress.wav",
+        "sha256": "c63fbcbef6bd6294ebf570c1b63ec32086c0892d9321178a1e59016d6113c9a4",
+        "metadata": {
+          "source": "ai",
+          "model": "nari-labs/Dia-1.6B-0626",
+          "revision": "ef2795fcc29c5abe6ffc91fd33808588b49bbc66",
+          "code": "https://github.com/nari-labs/dia/tree/876125e461a03b157ec905b0fe8b57a0f8b9e7a0",
+          "license": "Apache-2.0",
+          "text": "Keep your shields close and your eyes on the dark. Whatever sleeps down there, we will wake it together.",
+          "seed": 71,
+          "params": {
+            "cfg_scale": 3.0,
+            "temperature": 1.8,
+            "top_p": 0.9,
+            "cfg_filter_top_k": 50,
+            "max_tokens": 1800
+          },
+          "speaker": "huntress",
+          "sample_rate": 44100,
+          "f0": 294.0,
+          "from": ".loach/voices/norse/_speakers/f_young.wav",
+          "semitones": 0
+        }
+      },
+      {
+        "voice": "maiden",
+        "source": ".loach/voices/norse-qwen/_speakers/maiden.wav",
+        "sha256": "1c8a0c4b683467d9b696d96b7665f2bea25cfc88c477a003016385658118873d",
+        "metadata": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Keep your shields close and your eyes on the dark. We will hold this island together.",
+          "seed": 1,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 360
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000,
+          "instruct": "A Norse shieldmaiden around thirty. Clear, steady mid-range female voice, warm and confident, natural and unexaggerated. Dry close recording, no reverb, no background noise."
+        }
+      },
+      {
+        "voice": "veteran",
+        "source": ".loach/voices/norse-qwen/_speakers/veteran.wav",
+        "sha256": "a3ef37350bef0b3d6e615b3f1e6d6297f4dfb4c458ea8a8ab86ea9b261d0671c",
+        "metadata": {
+          "source": "ai",
+          "model": "nari-labs/Dia-1.6B-0626",
+          "revision": "ef2795fcc29c5abe6ffc91fd33808588b49bbc66",
+          "code": "https://github.com/nari-labs/dia/tree/876125e461a03b157ec905b0fe8b57a0f8b9e7a0",
+          "license": "Apache-2.0",
+          "text": "The fish are running well this morning. I will take the small boat out before the wind turns, and be back by noon.",
+          "seed": 102,
+          "params": {
+            "cfg_scale": 3.0,
+            "temperature": 1.8,
+            "top_p": 0.9,
+            "cfg_filter_top_k": 50,
+            "max_tokens": 1800
+          },
+          "speaker": "veteran",
+          "sample_rate": 44100,
+          "f0": 188.86596236381644,
+          "from": ".loach/voices/norse/_speakers/f_veteran.wav",
+          "semitones": 0
+        }
+      },
+      {
+        "voice": "young",
+        "source": ".loach/voices/norse-qwen/_speakers/young.wav",
+        "sha256": "55d94bc1fb1a81d351d127bb86029dab259ee55a50cd78fa4e680159ea345541",
+        "metadata": {
+          "source": "ai",
+          "model": "nari-labs/Dia-1.6B-0626",
+          "revision": "ef2795fcc29c5abe6ffc91fd33808588b49bbc66",
+          "code": "https://github.com/nari-labs/dia/tree/876125e461a03b157ec905b0fe8b57a0f8b9e7a0",
+          "license": "Apache-2.0",
+          "text": "The fish are running well this morning. I will take the small boat out before the wind turns, and be back by noon.",
+          "seed": 110,
+          "params": {
+            "cfg_scale": 3.0,
+            "temperature": 1.8,
+            "top_p": 0.9,
+            "cfg_filter_top_k": 50,
+            "max_tokens": 1800
+          },
+          "speaker": "young",
+          "sample_rate": 44100,
+          "f0": 190.4976489028213,
+          "from": ".loach/voices/norse/_speakers/m_young.wav",
+          "semitones": 0
+        }
+      }
+    ],
+    "clips": [
+      {
+        "path": "voice/berserker/rain_01.ogg",
+        "caption": "Oh, rain again.",
+        "rawSha256": "caf30557658378f692c64141a057efb6b308820104e5145a494c4b10a85d4baa",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, rain again.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 7299,
+          "end": 34560,
+          "inputFrames": 34560,
+          "rate": 24000
+        },
+        "processedSha256": "b84e663ee839c76fb380d0481d36733c09a7905b191152d47f970049952efa76"
+      },
+      {
+        "path": "voice/berserker/rain_02.ogg",
+        "caption": "Gods, I'm soaked.",
+        "rawSha256": "4feb0c39229fa766f3cec1f7305d7847cc8e7983638ea01e1cace0e8dcb570fb",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Gods, I'm soaked.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 1918,
+          "end": 32640,
+          "inputFrames": 32640,
+          "rate": 24000
+        },
+        "processedSha256": "0bebb990745587c80ba6a5d5e0e401a44578888e2c928662445ee135cf05efc7"
+      },
+      {
+        "path": "voice/berserker/snow_01.ogg",
+        "caption": "Brr, so cold.",
+        "rawSha256": "672cb81cc0545e7692f67ac611168ad8d036b1874375e653bf2db06c7db26e64",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Brr, so cold.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 3441,
+          "end": 48000,
+          "inputFrames": 48000,
+          "rate": 24000
+        },
+        "processedSha256": "1ff513140486e74c7a49395a99f2f443e8e2ecd4562d70ee9dd570069708226d"
+      },
+      {
+        "path": "voice/berserker/snow_02.ogg",
+        "caption": "Look, snow!",
+        "rawSha256": "b762401e985bd9aa88bea276f873e041298abb0fac4cbda0ca7f2d0d22d7502a",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Look, snow!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 3528,
+          "end": 40320,
+          "inputFrames": 40320,
+          "rate": 24000
+        },
+        "processedSha256": "e0a8217822ccea59416fddeb7b93fd4e83738d6abb2b2b279f3216c2a7241b7e"
+      },
+      {
+        "path": "voice/berserker/thunder_01.ogg",
+        "caption": "Oh, God!",
+        "rawSha256": "0699d49dd8622e67988c53d0c2613d4b2ecabd13010de637bee48f7b40fd76ba",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 7411,
+          "end": 26880,
+          "inputFrames": 26880,
+          "rate": 24000
+        },
+        "processedSha256": "df09585feffeb63e9a8fac5c387c1be808984eb30b5f30aef8e84f0522773ccb"
+      },
+      {
+        "path": "voice/berserker/thunder_02.ogg",
+        "caption": "Oh my God!",
+        "rawSha256": "c71c5615539f152661857d3c03c2c3dfc20999b572b50d1bfecd5776a06bafae",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh my God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 4119,
+          "end": 26880,
+          "inputFrames": 26880,
+          "rate": 24000
+        },
+        "processedSha256": "5ad5dde0ac7b292ca6b78d340c9a5fbb2d14da9dee089d6c9e1089908585cfaf"
+      },
+      {
+        "path": "voice/berserker/thunder_03.ogg",
+        "caption": "I'm scared.",
+        "rawSha256": "a4d3aee2b99b2b6a3dba4aa4843b6093b98ee3098871c0ab53ddbb0e3ee45c89",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "I'm scared.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "berserker",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 6992,
+          "end": 26880,
+          "inputFrames": 26880,
+          "rate": 24000
+        },
+        "processedSha256": "fc1fd173b907fc5e1d28b42c9d9ef6cb243bb905d58b73c088486fdf97dbf93a"
+      },
+      {
+        "path": "voice/huntress/rain_01.ogg",
+        "caption": "Oh, rain again.",
+        "rawSha256": "ad703f4aeb6526037593cfc589d0aedd38444f839e1face63db8820aa7429292",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, rain again.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 34560,
+          "inputFrames": 34560,
+          "rate": 24000
+        },
+        "processedSha256": "8814fc41fb3d4a001012e553a5e3087044ef50b69586a9a6b2146c996db1341e"
+      },
+      {
+        "path": "voice/huntress/rain_02.ogg",
+        "caption": "Gods, I'm soaked.",
+        "rawSha256": "6a3efc6808299fd06661a0ce10daca50608825830d377c66a491170d7e8afa92",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Gods, I'm soaked.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 44160,
+          "inputFrames": 44160,
+          "rate": 24000
+        },
+        "processedSha256": "0cafc6ada3542cae969c24b9f3171936e90706c9f01828ac25d9199729cf13a7"
+      },
+      {
+        "path": "voice/huntress/snow_01.ogg",
+        "caption": "Brr, so cold.",
+        "rawSha256": "66421156e49e7c5e67e422351155bc1294574ddcba088e5eafd1943a6211ee9e",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Brr, so cold.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 32640,
+          "inputFrames": 32640,
+          "rate": 24000
+        },
+        "processedSha256": "58d3adc88a8f5dfa300cefe481692dc3ba8b2c02e7e27245e4c80283708cc299"
+      },
+      {
+        "path": "voice/huntress/snow_02.ogg",
+        "caption": "Look, snow!",
+        "rawSha256": "bc87cdd802f0bd9d8aaa1f5c260d6d749014b5996013d0333587a7937199290a",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Look, snow!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 34560,
+          "inputFrames": 34560,
+          "rate": 24000
+        },
+        "processedSha256": "f5817416ace2a7611a74a37ce79c5751d4ba341e1420167802cdbb9d691ee288"
+      },
+      {
+        "path": "voice/huntress/thunder_01.ogg",
+        "caption": "Oh, God!",
+        "rawSha256": "5d2b5373e947305540190c544ed06dfe35509c02b770db55b4b7690e2da07eda",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 23040,
+          "inputFrames": 23040,
+          "rate": 24000
+        },
+        "processedSha256": "47965e045625b9de73e45a489ea51d8a5f3e0162dccddb180d29dfd664a414b0"
+      },
+      {
+        "path": "voice/huntress/thunder_02.ogg",
+        "caption": "Oh my God!",
+        "rawSha256": "a3c5095ef19dbd6f1867ad0fa8c0e0371823cf3e365e315effd589bbbb3c2724",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh my God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 26880,
+          "inputFrames": 26880,
+          "rate": 24000
+        },
+        "processedSha256": "9bad05a057e782f7dc7656d99aaee75fc1f594efeab44801730a58913b16c344"
+      },
+      {
+        "path": "voice/huntress/thunder_03.ogg",
+        "caption": "I'm scared.",
+        "rawSha256": "94df28046959c54cd3221cab60ecaba7a7c48d7117895e6740a4f2d021b1192b",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "I'm scared.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "huntress",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 21120,
+          "inputFrames": 21120,
+          "rate": 24000
+        },
+        "processedSha256": "7c7e4204b3aec9f084b11b2958d49f26a53144f9d97bf6ea456a47520990790a"
+      },
+      {
+        "path": "voice/maiden/rain_01.ogg",
+        "caption": "Oh, rain again.",
+        "rawSha256": "22f7eeb247d5b1366f2a0828c39b6b08d654f06d482cc091dd6492504d5a15fe",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, rain again.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 11409,
+          "end": 44160,
+          "inputFrames": 44160,
+          "rate": 24000
+        },
+        "processedSha256": "91174a93c11d5fa0473bedb217eb83281075d0f6e8eda7ccd84bf2c1daced751"
+      },
+      {
+        "path": "voice/maiden/rain_02.ogg",
+        "caption": "Gods, I'm soaked.",
+        "rawSha256": "276741c4344adaf54bc3dd4bbda7c5629cc0d5b440527917c1f86752a0bccfbf",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Gods, I'm soaked.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 712,
+          "end": 38400,
+          "inputFrames": 38400,
+          "rate": 24000
+        },
+        "processedSha256": "bfc010e033c5fa61fbcf8c5b94ca3e7e8f049ac407feaaa8330468d46cb2363d"
+      },
+      {
+        "path": "voice/maiden/snow_01.ogg",
+        "caption": "Brr, so cold.",
+        "rawSha256": "746ec6160f2e08ce71a98003a226900d395fe70d2e9b8d82d8815f1012238f7e",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Brr, so cold.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 11807,
+          "end": 53760,
+          "inputFrames": 53760,
+          "rate": 24000
+        },
+        "processedSha256": "7dff3d0bfd51bcd021f693f4bc7e0e680b672ea57ad54b2d007de65a17dbceb7"
+      },
+      {
+        "path": "voice/maiden/snow_02.ogg",
+        "caption": "Look, snow!",
+        "rawSha256": "dd9c01d987086e331e169544e6319425577659eee8e1dfd2a2518e5381146c89",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Look, snow!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 9429,
+          "end": 38400,
+          "inputFrames": 38400,
+          "rate": 24000
+        },
+        "processedSha256": "f8ada4249678180ad60f7b7516f359db14efbaf8fc08b375b339b6f20a158616"
+      },
+      {
+        "path": "voice/maiden/thunder_01.ogg",
+        "caption": "Oh, God!",
+        "rawSha256": "cd73cc0bf017ea9f26f7d31afdf0c4ed036206bb1cbed35f4a88d1c0bf0d0e33",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 11340,
+          "end": 36480,
+          "inputFrames": 36480,
+          "rate": 24000
+        },
+        "processedSha256": "d09d86ee627c5dce6e43ea9d40dad8385d89a760dab477a526ed92ebf6d1078b"
+      },
+      {
+        "path": "voice/maiden/thunder_02.ogg",
+        "caption": "Oh my God!",
+        "rawSha256": "c7ad85c1e86293481f33b8450eee15b6d1abffadcebb60f05d2500a7b668e392",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh my God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 10901,
+          "end": 31298,
+          "inputFrames": 32640,
+          "rate": 24000
+        },
+        "processedSha256": "ea1e8b1e5f90df639b6e02c43bafd32fce46b0e7109a5c4c2591285925956ff5"
+      },
+      {
+        "path": "voice/maiden/thunder_03.ogg",
+        "caption": "I'm scared.",
+        "rawSha256": "003dc6f6b30098cdd4981a357e35ae68a7dcc70117a1d26b7aaa6bc8bdbce8be",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "I'm scared.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "maiden",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 11357,
+          "end": 28800,
+          "inputFrames": 28800,
+          "rate": 24000
+        },
+        "processedSha256": "0cede991f44650f32ef53191561ca8a7865ab67aea12028ede1b42389e5d9955"
+      },
+      {
+        "path": "voice/veteran/rain_01.ogg",
+        "caption": "Oh, rain again.",
+        "rawSha256": "3d109359d5929878d15a3ac2625e7e0e50a5ae8bc88572fb531a4f8d9c3626bc",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, rain again.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 29809,
+          "inputFrames": 34560,
+          "rate": 24000
+        },
+        "processedSha256": "b949f7a5ed41a72da1c862026403e982e4209e62cb82d1bdb7cb0ba7d0625efa"
+      },
+      {
+        "path": "voice/veteran/rain_02.ogg",
+        "caption": "Gods, I'm soaked.",
+        "rawSha256": "ec6df653d21cdd02ea11f7b67e70c435c4ee5ea3a753b3d667fb2303e51a718f",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Gods, I'm soaked.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 48902,
+          "inputFrames": 49920,
+          "rate": 24000
+        },
+        "processedSha256": "3162b7850471b2b6e98448bb2118ecdf7878e27b39c8a6ba1d7c1bd3c18fdd6c"
+      },
+      {
+        "path": "voice/veteran/snow_01.ogg",
+        "caption": "Brr, so cold.",
+        "rawSha256": "6caa9c9e4cbc4c72d169352ff1cdcc5311fbb61d1b20d51d3add46f178cc6ef2",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Brr, so cold.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 59520,
+          "inputFrames": 59520,
+          "rate": 24000
+        },
+        "processedSha256": "8b2efca04066e26bd8eb11d57f8ed80b0f284d0723922f9f0230054112617ade"
+      },
+      {
+        "path": "voice/veteran/snow_02.ogg",
+        "caption": "Look, snow!",
+        "rawSha256": "b30be77dc468bc042e6bab9c1c91478b54aef5b4df550bf2616ba10fe1cdf943",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Look, snow!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 28800,
+          "inputFrames": 28800,
+          "rate": 24000
+        },
+        "processedSha256": "74bb76c306756f68af951951e373c4791c788a05f909ac6b0543ed61fb3bbb01"
+      },
+      {
+        "path": "voice/veteran/thunder_01.ogg",
+        "caption": "Oh, God!",
+        "rawSha256": "71bce2198af7f9a35e2b96c520a04b0e0270f6f95d39e9aee5da815cc673b747",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 26880,
+          "inputFrames": 26880,
+          "rate": 24000
+        },
+        "processedSha256": "51b5c757a2e6dc3b2fd1d0a8cb3b6ea122b69a97fd7fce0c598c2d37044667b1"
+      },
+      {
+        "path": "voice/veteran/thunder_02.ogg",
+        "caption": "Oh my God!",
+        "rawSha256": "6d8d1f35a494f784feba8a6ce9cb653ede18ea9321f61214b95b3cd56d8ca055",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh my God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 24960,
+          "inputFrames": 24960,
+          "rate": 24000
+        },
+        "processedSha256": "4312bf36e7f44461fa4d5359a246e4a0a13b4d94c6372e32d6a896aa1135267c"
+      },
+      {
+        "path": "voice/veteran/thunder_03.ogg",
+        "caption": "I'm scared.",
+        "rawSha256": "c0100c67da012e75b039d658bd8ba97b0f405460fc60653f1f631a3569e47973",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "I'm scared.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "veteran",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 0,
+          "end": 22497,
+          "inputFrames": 28800,
+          "rate": 24000
+        },
+        "processedSha256": "fc3f282621cf749d65ace5365d2743fdf6d905b3656f4324c29d1579bd6ac2c9"
+      },
+      {
+        "path": "voice/young/rain_01.ogg",
+        "caption": "Oh, rain again.",
+        "rawSha256": "33ed13b0fbe87a850fb2ab1c9c59108571668089c977d5baf0efedab6f7d5878",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, rain again.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 655,
+          "end": 32640,
+          "inputFrames": 32640,
+          "rate": 24000
+        },
+        "processedSha256": "120bee1a1bcc34704b3328a89ea6b942960687f13d34aebed1efb78aa846f8cd"
+      },
+      {
+        "path": "voice/young/rain_02.ogg",
+        "caption": "Gods, I'm soaked.",
+        "rawSha256": "1f17505be0bcb808fb6eea82b79942790cd101f9c55278d399624b084d05359c",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Gods, I'm soaked.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 397,
+          "end": 34560,
+          "inputFrames": 34560,
+          "rate": 24000
+        },
+        "processedSha256": "103202fb51f1bad66e57cddfbb401a7f28d19b1969b1090a0dcbb0d74c0a9677"
+      },
+      {
+        "path": "voice/young/snow_01.ogg",
+        "caption": "Brr, so cold.",
+        "rawSha256": "fde151da3e4521237d8ebb7629983463005ef170551e3edc0ac67aa3dfb54100",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Brr, so cold.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 430,
+          "end": 51840,
+          "inputFrames": 51840,
+          "rate": 24000
+        },
+        "processedSha256": "f8d1979df0e5584ff2db9ffe79b08fd199967aec5976b6a101d4f005c6e191af"
+      },
+      {
+        "path": "voice/young/snow_02.ogg",
+        "caption": "Look, snow!",
+        "rawSha256": "89aa635425a5cfacf5370cb5636525b2932246415449f3048b3a34c10a334f0e",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Look, snow!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 656,
+          "end": 35940,
+          "inputFrames": 36480,
+          "rate": 24000
+        },
+        "processedSha256": "5fe295422362df7dc5ce3e3efa5c26c97606e08c276f2554d4dd989c66177493"
+      },
+      {
+        "path": "voice/young/thunder_01.ogg",
+        "caption": "Oh, God!",
+        "rawSha256": "1849643208168d92fb785bbae9bc0bfe929b1e9898c5115a3b2137a89c1744f3",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh, God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 654,
+          "end": 21120,
+          "inputFrames": 21120,
+          "rate": 24000
+        },
+        "processedSha256": "96b627b4489d9b78c464c2cbabc0b8808d2d269c4000cdab19b5b21ac271e9b4"
+      },
+      {
+        "path": "voice/young/thunder_02.ogg",
+        "caption": "Oh my God!",
+        "rawSha256": "e223b76618f50b70cb11c1872617c7b0f627c10f252d4f2a444e710f9b1fe450",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "Oh my God!",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 655,
+          "end": 32598,
+          "inputFrames": 32640,
+          "rate": 24000
+        },
+        "processedSha256": "b150c63caccf082db0fe7f780df4221178c71c001cb4298e494d78051e7df103"
+      },
+      {
+        "path": "voice/young/thunder_03.ogg",
+        "caption": "I'm scared.",
+        "rawSha256": "c79384a1246945b1800c76caea00454e30664b047c6c37d9461d7fe423c3feca",
+        "take": {
+          "source": "ai",
+          "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "revision": "fd4b254389122332181a7c3db7f27e918eec64e3",
+          "code": "https://github.com/QwenLM/Qwen3-TTS",
+          "license": "Apache-2.0",
+          "text": "I'm scared.",
+          "seed": 47,
+          "params": {
+            "top_p": 0.9,
+            "max_new_tokens": 100
+          },
+          "speaker": "young",
+          "sample_rate": 24000
+        },
+        "trimFrames": {
+          "start": 671,
+          "end": 21120,
+          "inputFrames": 21120,
+          "rate": 24000
+        },
+        "processedSha256": "5894eb47af90ea208ea76fd3fd3d6d01246fa13423695a6275c4fe7afdf038c9"
+      }
+    ]
+  }
 }

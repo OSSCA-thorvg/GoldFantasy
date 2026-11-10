@@ -422,3 +422,126 @@ describe('audio priority lifecycle boundaries', () => {
     expect(controls[1].ambience.wind).toBe(0.999);
   });
 });
+
+describe('weather speech preparation', () => {
+  const weatherNames = (family: string, line: string) =>
+    manifest.filter((entry) => entry.name.startsWith(`voice/${family}/${line}_`)).map((entry) => entry.name);
+
+  it('warms only the requested weather takes without delaying the initial mixer or playing them', async () => {
+    const { SoundLibrary } = await import('../../packages/native-audio/src/sound-library');
+    vi.spyOn(SoundLibrary.prototype, 'loadEffects').mockResolvedValue();
+    const { BrowserSoundDevice } = await import('../../packages/native-audio/src/browser-audio');
+    const { Cue, Sound, VoiceKind, VoiceLine } = await import('../../packages/native-audio/src/sound-types');
+    const device = new BrowserSoundDevice();
+    await device.ready;
+    requests.length = 0;
+    const request = new Sound(Cue.PrepareSpeech);
+    request.voice = VoiceKind.Huntress;
+    request.line = VoiceLine.Thunder;
+    device.play(request);
+    const expected = weatherNames('huntress', 'thunder');
+    expect(expected).toHaveLength(3);
+    await settle(
+      () => nodes[0].messages.filter((message) => message.kind === 'clips').length === expected.length,
+    );
+    expect(requests.sort()).toEqual(expected.sort());
+    expect(nodes[0].messages.some((message) => message.kind === 'play')).toBe(false);
+    expect(nodes[0].messages.filter((message) => message.kind === 'init')).toHaveLength(1);
+  });
+
+  it('does not cancel pending speech when a later weather reaction is prepared', async () => {
+    const { SoundLibrary } = await import('../../packages/native-audio/src/sound-library');
+    vi.spyOn(SoundLibrary.prototype, 'loadEffects').mockResolvedValue();
+    const { BrowserSoundDevice } = await import('../../packages/native-audio/src/browser-audio');
+    const { Cue, Sound, VoiceKind, VoiceLine } = await import('../../packages/native-audio/src/sound-types');
+    blocked.add('voice/huntress/select_01');
+    const device = new BrowserSoundDevice();
+    await device.ready;
+    requests.length = 0;
+    const selected = new Sound(Cue.Speech);
+    selected.voice = VoiceKind.Huntress;
+    selected.line = VoiceLine.Select;
+    selected.speaker = 9;
+    selected.duration = 10;
+    device.play(selected);
+    await settle(() => pending.has('voice/huntress/select_01'));
+    await setImmediate();
+    expect(requests.some((name) => /\/(rain|snow|thunder)_/.test(name))).toBe(false);
+    const prepare = { ...selected, cue: Cue.PrepareSpeech, line: VoiceLine.Rain };
+    device.play(prepare);
+    await settle(() => weatherNames('huntress', 'rain').every((name) => requests.includes(name)));
+    pending.get('voice/huntress/select_01')!.resolve();
+    await settle(() => nodes[0].messages.some((message) => message.kind === 'play'));
+    const played = nodes[0].messages.filter((message) => message.kind === 'play');
+    expect(played).toHaveLength(1);
+    expect(played[0].sound.line).toBe(VoiceLine.Select);
+    expect(played[0].sound.speaker).toBe(9);
+    expect(requests.some((name) => /\/(snow|thunder)_/.test(name))).toBe(false);
+  });
+
+  it('promotes a requested weather line without warming other rare weather lines', async () => {
+    const { SoundLibrary } = await import('../../packages/native-audio/src/sound-library');
+    vi.spyOn(SoundLibrary.prototype, 'loadEffects').mockResolvedValue();
+    const { BrowserSoundDevice } = await import('../../packages/native-audio/src/browser-audio');
+    const { Cue, Sound, VoiceKind, VoiceLine } = await import('../../packages/native-audio/src/sound-types');
+    const device = new BrowserSoundDevice();
+    await device.ready;
+    requests.length = 0;
+    const sound = new Sound(Cue.Speech);
+    sound.voice = VoiceKind.Berserker;
+    sound.line = VoiceLine.Snow;
+    sound.duration = 10;
+    sound.speaker = 2;
+    device.play(sound);
+    await settle(() => weatherNames('berserker', 'snow').every((name) => requests.includes(name)));
+    await setImmediate();
+    expect(weatherNames('berserker', 'snow')).toHaveLength(2);
+    expect(requests.some((name) => /\/(rain|thunder)_/.test(name))).toBe(false);
+    expect(
+      nodes[0].messages.some((message) => message.kind === 'play' && message.sound.line === VoiceLine.Snow),
+    ).toBe(true);
+  });
+
+  it('ignores preparation in the mixer without consuming slots or speech limits', async () => {
+    const { EffectManager } = await import('../../packages/native-audio/src/effect-manager');
+    const { Cue, Sound, VoiceKind, VoiceLine } = await import('../../packages/native-audio/src/sound-types');
+    const effects = new EffectManager(() => 22050),
+      before = effects.statistics(),
+      sound = new Sound(Cue.PrepareSpeech);
+    sound.voice = VoiceKind.Young;
+    sound.line = VoiceLine.Thunder;
+    for (let i = 0; i < 100; i++) expect(effects.request(sound)).toBe(0n);
+    expect(effects.statistics()).toEqual(before);
+    sound.cue = Cue.Speech;
+    sound.speaker = 0;
+    sound.duration = 1;
+    expect(effects.request(sound)).not.toBe(0n);
+    expect(effects.statistics().speech).toBe(1);
+  });
+
+  it('discards in-flight preparation on disposal without installing clips or playing a late line', async () => {
+    const { SoundLibrary } = await import('../../packages/native-audio/src/sound-library');
+    vi.spyOn(SoundLibrary.prototype, 'loadEffects').mockResolvedValue();
+    const { BrowserSoundDevice, disposeNativeAudio } =
+      await import('../../packages/native-audio/src/browser-audio');
+    const { Cue, Sound, VoiceKind, VoiceLine } = await import('../../packages/native-audio/src/sound-types');
+    const names = weatherNames('huntress', 'rain');
+    expect(names).toHaveLength(2);
+    names.forEach((name) => blocked.add(name));
+    const device = new BrowserSoundDevice();
+    await device.ready;
+    const sound = new Sound(Cue.PrepareSpeech);
+    sound.voice = VoiceKind.Huntress;
+    sound.line = VoiceLine.Rain;
+    device.play(sound);
+    await settle(() => names.every((name) => pending.has(name)));
+    await disposeNativeAudio();
+    for (const name of names) pending.get(name)!.resolve();
+    await setImmediate();
+    expect(nodes[0].messages.some((message) => message.kind === 'play' || message.kind === 'clips')).toBe(
+      false,
+    );
+    expect(nodes[0].connected).toBe(false);
+    expect(warnings).toHaveLength(0);
+  });
+});

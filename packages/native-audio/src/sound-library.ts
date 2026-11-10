@@ -1,5 +1,5 @@
 // Native sound_library.cpp semantics. Browser decoding is confined to the host loader.
-// Rates/frame counts/captions are captured from the immutable native assets with stb_vorbis.
+// Authored Ogg metadata is captured with stb_vorbis, including appended weather takes.
 import manifest from './data/audio-manifest.json';
 import { initialEffectPrefixes } from './sound-catalog';
 import { f32 as f } from '../../engine/src/numeric';

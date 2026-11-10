@@ -1,12 +1,13 @@
-// Direct translation of game_soundscape.cpp.
+// Native soundscape timing with recorded environmental reactions.
 import { type GameSpeechApp, speakerState } from './game-speech';
 import { appearanceOf } from '../../../../packages/engine/src/person-look';
 import { distance, unproject } from '../../../../packages/engine/src/geometry';
 import { f32 as f, clamp, hash01 } from '../../../../packages/engine/src/numeric';
 import { Weather } from '../../../../packages/engine/src/climate';
-import { Thunderstorm } from '../../../../packages/engine/src/thunderstorm';
+import { Thunderstorm, type Strike } from '../../../../packages/engine/src/thunderstorm';
 import { Town } from '../../../../packages/engine/src/town';
 import { AnimalKind, type Monster } from '../../../../packages/engine/src/person';
+import { updateWeatherReactions } from './weather-reactions';
 import {
   Cue,
   Sound,
@@ -146,11 +147,13 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
       ++animalHeard;
     }
   }
+  let emittedStrike: Strike | undefined;
   if (this.gameSpeed() > 0) {
     const day = BigInt(Math.trunc(this.town.clock() / Town.secondsPerDay)),
       activity = Thunderstorm.activity(this.town.map().seed(), day),
       strike = this.storm.update(seconds, sky.weather, sky.intensity, activity);
     if (strike) {
+      emittedStrike = strike;
       this.renderer.lightning(strike);
       const loudness = [f(0.9), f(0.75), f(0.55), f(0.4)],
         thunder = new Sound(
@@ -162,5 +165,6 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
       this.cues.push(thunder);
     }
   }
+  updateWeatherReactions(this, seconds, emittedStrike);
   this.soundscaping = true;
 }

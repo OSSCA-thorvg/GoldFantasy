@@ -1,4 +1,4 @@
-// Direct translation of person_speech.cpp; all timing and selection rules are native.
+// Native speech timing and selection, with appended recorded weather reactions.
 import { Activity, type Person } from '../../engine/src/person';
 import { appearanceOf, Mood } from '../../engine/src/person-look';
 import { f32 as f, hash01 } from '../../engine/src/numeric';
@@ -42,6 +42,9 @@ const words = [
   'Thank you!',
   'To arms!',
   'Ugh...',
+  'Oh, rain again.',
+  'Brr, so cold.',
+  'Oh my God!',
 ];
 export class PersonSpeech {
   static readonly maxCharacters = 160;

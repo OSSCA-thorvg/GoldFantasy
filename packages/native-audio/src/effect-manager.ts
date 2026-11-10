@@ -117,6 +117,8 @@ export class EffectManager {
   private totals = statistics();
   constructor(private readonly voiceFrames: (line: VoiceLine, voice: VoiceKind, take: number) => number) {}
   request(sound: Sound): bigint {
+    // Prefetch requests belong to the browser host, never to an audible mixer slot.
+    if (sound.cue === Cue.PrepareSpeech) return 0n;
     if (sound.cue === Cue.SpeechStop) {
       this.stopSpeech(sound.speaker);
       return 0n;

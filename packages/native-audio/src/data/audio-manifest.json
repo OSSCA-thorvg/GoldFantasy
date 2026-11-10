@@ -1,1 +1,2322 @@
-[{"name":"music/battle/raid_last_stand","frames":3175200,"rate":44100,"channels":2},{"name":"music/battle/raid_night_raid","frames":3175200,"rate":44100,"channels":2},{"name":"music/battle/raid_village_aflame","frames":3175200,"rate":44100,"channels":2},{"name":"music/battle/saga_shieldwall","frames":3175200,"rate":44100,"channels":2},{"name":"music/build/day_hammer_harvest","frames":3175200,"rate":44100,"channels":2},{"name":"music/build/day_market_day","frames":3175200,"rate":44100,"channels":2},{"name":"music/build/saga_still_sanctuary","frames":3175200,"rate":44100,"channels":2},{"name":"music/build/saga_to_the_hall","frames":3175200,"rate":44100,"channels":2},{"name":"music/dawn/classic_morning_mood_low","frames":3175200,"rate":44100,"channels":2},{"name":"music/dawn/day_workers_morning","frames":3175200,"rate":44100,"channels":2},{"name":"music/dawn/saga_groeney_song","frames":3175200,"rate":44100,"channels":2},{"name":"music/dawn/saga_world_tree","frames":3175200,"rate":44100,"channels":2},{"name":"music/dusk/night_moonlit_fjord","frames":3175200,"rate":44100,"channels":2},{"name":"music/dusk/night_quiet_night","frames":3175200,"rate":44100,"channels":2},{"name":"music/dusk/night_starlit_watch","frames":3175200,"rate":44100,"channels":2},{"name":"music/dusk/saga_dusk_wood","frames":3175200,"rate":44100,"channels":2},{"name":"sfx/block_01","frames":13904,"rate":22050,"channels":1},{"name":"sfx/chest_01","frames":32844,"rate":22050,"channels":1},{"name":"sfx/chest_02","frames":40905,"rate":22050,"channels":1},{"name":"sfx/chop_01","frames":10996,"rate":22050,"channels":1},{"name":"sfx/clash_01","frames":21480,"rate":22050,"channels":1},{"name":"sfx/coins_01","frames":16570,"rate":22050,"channels":1},{"name":"sfx/coins_02","frames":19055,"rate":22050,"channels":1},{"name":"sfx/coins_03","frames":10597,"rate":22050,"channels":1},{"name":"sfx/collapse_01","frames":141453,"rate":22050,"channels":1},{"name":"sfx/hammer_01","frames":36612,"rate":22050,"channels":1},{"name":"sfx/horn_01","frames":175368,"rate":22050,"channels":1},{"name":"sfx/rune_wake_01","frames":109470,"rate":22050,"channels":1},{"name":"sfx/stone_door_01","frames":161663,"rate":22050,"channels":1},{"name":"sfx/swing_01","frames":13230,"rate":22050,"channels":1},{"name":"sfx/torch_01","frames":58013,"rate":22050,"channels":1},{"name":"sfx/tree_fall_01","frames":76776,"rate":22050,"channels":1},{"name":"ui/cancel_01","frames":5737,"rate":22050,"channels":1},{"name":"ui/click_01","frames":2429,"rate":22050,"channels":1},{"name":"ui/complete_01","frames":31334,"rate":22050,"channels":1},{"name":"ui/confirm_01","frames":5957,"rate":22050,"channels":1},{"name":"ui/error_01","frames":5075,"rate":22050,"channels":1},{"name":"ui/growth_01","frames":37552,"rate":22050,"channels":1},{"name":"ui/notify_01","frames":13056,"rate":22050,"channels":1},{"name":"ui/rune_01","frames":7719,"rate":22050,"channels":1},{"name":"voice/berserker/ack_01","frames":9330,"rate":22050,"channels":1,"caption":"Aye!"},{"name":"voice/berserker/ack_02","frames":9376,"rate":22050,"channels":1,"caption":"On it."},{"name":"voice/berserker/ack_03","frames":14587,"rate":22050,"channels":1,"caption":"Right away."},{"name":"voice/berserker/ack_04","frames":18611,"rate":22050,"channels":1,"caption":"It will be done."},{"name":"voice/berserker/alarm_01","frames":15914,"rate":22050,"channels":1,"caption":"To arms!"},{"name":"voice/berserker/alarm_02","frames":13671,"rate":22050,"channels":1,"caption":"Raiders!"},{"name":"voice/berserker/alarm_03","frames":12937,"rate":22050,"channels":1,"caption":"Wake up!"},{"name":"voice/berserker/attack_01","frames":9184,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/berserker/attack_02","frames":11200,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/berserker/attack_03","frames":16254,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/berserker/attack_04","frames":12417,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/berserker/complain_01","frames":18285,"rate":22050,"channels":1,"caption":"I'm hungry."},{"name":"voice/berserker/complain_02","frames":34644,"rate":22050,"channels":1,"caption":"Brr, so cold."},{"name":"voice/berserker/complain_03","frames":16378,"rate":22050,"channels":1,"caption":"Not again."},{"name":"voice/berserker/death_01","frames":11566,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/berserker/death_02","frames":14591,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/berserker/death_03","frames":13560,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/berserker/happy_01","frames":29570,"rate":22050,"channels":1,"caption":"Ha, good!"},{"name":"voice/berserker/happy_02","frames":20902,"rate":22050,"channels":1,"caption":"Wonderful!"},{"name":"voice/berserker/happy_03","frames":14408,"rate":22050,"channels":1,"caption":"Yes!"},{"name":"voice/berserker/hum_01","frames":15105,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/berserker/hum_02","frames":16913,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/berserker/hum_03","frames":9214,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/berserker/hurt_01","frames":8184,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/berserker/hurt_02","frames":6855,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/berserker/hurt_03","frames":9487,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/berserker/hurt_04","frames":5868,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/berserker/mumble_01","frames":66150,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/berserker/mumble_02","frames":65631,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/berserker/mumble_03","frames":65648,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/berserker/select_01","frames":12178,"rate":22050,"channels":1,"caption":"Yes?"},{"name":"voice/berserker/select_02","frames":13259,"rate":22050,"channels":1,"caption":"What is it?"},{"name":"voice/berserker/select_03","frames":18155,"rate":22050,"channels":1,"caption":"I'm listening."},{"name":"voice/berserker/sigh_01","frames":14406,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/berserker/sigh_02","frames":17875,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/berserker/sigh_03","frames":10781,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/berserker/sleep_01","frames":50020,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/berserker/sleep_02","frames":27708,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/berserker/sleep_03","frames":43247,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/berserker/thanks_01","frames":13001,"rate":22050,"channels":1,"caption":"Thank you!"},{"name":"voice/berserker/thanks_02","frames":11136,"rate":22050,"channels":1,"caption":"Thanks!"},{"name":"voice/berserker/thanks_03","frames":16920,"rate":22050,"channels":1,"caption":"My thanks."},{"name":"voice/berserker/work_01","frames":8843,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/berserker/work_02","frames":9021,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/berserker/work_03","frames":6771,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/berserker/work_04","frames":12763,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/berserker/yawn_01","frames":54706,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/berserker/yawn_02","frames":44621,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/berserker/yawn_03","frames":39227,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/huntress/ack_01","frames":11868,"rate":22050,"channels":1,"caption":"Aye!"},{"name":"voice/huntress/ack_02","frames":14318,"rate":22050,"channels":1,"caption":"On it."},{"name":"voice/huntress/ack_03","frames":18017,"rate":22050,"channels":1,"caption":"Right away."},{"name":"voice/huntress/ack_04","frames":20845,"rate":22050,"channels":1,"caption":"It will be done."},{"name":"voice/huntress/alarm_01","frames":19649,"rate":22050,"channels":1,"caption":"To arms!"},{"name":"voice/huntress/alarm_02","frames":15871,"rate":22050,"channels":1,"caption":"Raiders!"},{"name":"voice/huntress/alarm_03","frames":12690,"rate":22050,"channels":1,"caption":"Wake up!"},{"name":"voice/huntress/attack_01","frames":11468,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/huntress/attack_02","frames":9430,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/huntress/attack_03","frames":14112,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/huntress/attack_04","frames":11907,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/huntress/complain_01","frames":19698,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/huntress/complain_02","frames":23263,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/huntress/complain_03","frames":18727,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/huntress/death_01","frames":10222,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/huntress/death_02","frames":11778,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/huntress/death_03","frames":12965,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/huntress/happy_01","frames":7938,"rate":22050,"channels":1,"caption":"Ha, good!"},{"name":"voice/huntress/happy_02","frames":10356,"rate":22050,"channels":1,"caption":"Wonderful!"},{"name":"voice/huntress/happy_03","frames":26214,"rate":22050,"channels":1,"caption":"Yes!"},{"name":"voice/huntress/hum_01","frames":15921,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/huntress/hum_02","frames":12226,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/huntress/hum_03","frames":8540,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/huntress/hurt_01","frames":6626,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/huntress/hurt_02","frames":9223,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/huntress/hurt_03","frames":8379,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/huntress/hurt_04","frames":8540,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/huntress/mumble_01","frames":65751,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/huntress/mumble_02","frames":47681,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/huntress/mumble_03","frames":63848,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/huntress/select_01","frames":13561,"rate":22050,"channels":1,"caption":"Yes?"},{"name":"voice/huntress/select_02","frames":13746,"rate":22050,"channels":1,"caption":"What is it?"},{"name":"voice/huntress/select_03","frames":15285,"rate":22050,"channels":1,"caption":"I'm listening."},{"name":"voice/huntress/sigh_01","frames":21956,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/huntress/sigh_02","frames":19445,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/huntress/sigh_03","frames":34634,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/huntress/sleep_01","frames":47091,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/huntress/sleep_02","frames":58145,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/huntress/sleep_03","frames":49062,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/huntress/thanks_01","frames":21830,"rate":22050,"channels":1},{"name":"voice/huntress/thanks_02","frames":27186,"rate":22050,"channels":1},{"name":"voice/huntress/work_01","frames":8379,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/huntress/work_02","frames":10584,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/huntress/work_03","frames":7683,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/huntress/work_04","frames":9923,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/huntress/yawn_01","frames":55125,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/huntress/yawn_02","frames":55125,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/huntress/yawn_03","frames":43488,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/maiden/ack_01","frames":11116,"rate":22050,"channels":1,"caption":"Aye!"},{"name":"voice/maiden/ack_02","frames":13300,"rate":22050,"channels":1,"caption":"On it."},{"name":"voice/maiden/ack_03","frames":15470,"rate":22050,"channels":1,"caption":"Right away."},{"name":"voice/maiden/ack_04","frames":19013,"rate":22050,"channels":1,"caption":"It will be done."},{"name":"voice/maiden/alarm_01","frames":18488,"rate":22050,"channels":1,"caption":"To arms!"},{"name":"voice/maiden/alarm_02","frames":15083,"rate":22050,"channels":1,"caption":"Raiders!"},{"name":"voice/maiden/alarm_03","frames":15175,"rate":22050,"channels":1,"caption":"Wake up!"},{"name":"voice/maiden/attack_01","frames":12926,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/maiden/attack_02","frames":7913,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/maiden/attack_03","frames":7938,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/maiden/attack_04","frames":11052,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/maiden/complain_01","frames":17606,"rate":22050,"channels":1,"caption":"I'm hungry."},{"name":"voice/maiden/complain_02","frames":29098,"rate":22050,"channels":1,"caption":"Brr, so cold."},{"name":"voice/maiden/complain_03","frames":15946,"rate":22050,"channels":1,"caption":"Not again."},{"name":"voice/maiden/death_01","frames":12608,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/maiden/death_02","frames":12613,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/maiden/death_03","frames":12361,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/maiden/happy_01","frames":26419,"rate":22050,"channels":1,"caption":"Ha, good!"},{"name":"voice/maiden/happy_02","frames":15221,"rate":22050,"channels":1,"caption":"Wonderful!"},{"name":"voice/maiden/happy_03","frames":12551,"rate":22050,"channels":1,"caption":"Yes!"},{"name":"voice/maiden/hum_01","frames":14522,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/maiden/hum_02","frames":12627,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/maiden/hum_03","frames":10474,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/maiden/hurt_01","frames":4799,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/maiden/hurt_02","frames":10120,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/maiden/hurt_03","frames":9922,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/maiden/hurt_04","frames":9899,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/maiden/mumble_01","frames":38784,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/maiden/mumble_02","frames":33178,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/maiden/mumble_03","frames":48521,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/maiden/select_01","frames":13097,"rate":22050,"channels":1,"caption":"Yes?"},{"name":"voice/maiden/select_02","frames":15840,"rate":22050,"channels":1,"caption":"What is it?"},{"name":"voice/maiden/select_03","frames":17850,"rate":22050,"channels":1,"caption":"I'm listening."},{"name":"voice/maiden/sigh_01","frames":11045,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/maiden/sigh_02","frames":18765,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/maiden/sigh_03","frames":10239,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/maiden/sleep_01","frames":48818,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/maiden/sleep_02","frames":50163,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/maiden/sleep_03","frames":24045,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/maiden/thanks_01","frames":14443,"rate":22050,"channels":1,"caption":"Thank you!"},{"name":"voice/maiden/thanks_02","frames":11797,"rate":22050,"channels":1,"caption":"Thanks!"},{"name":"voice/maiden/thanks_03","frames":17297,"rate":22050,"channels":1,"caption":"My thanks."},{"name":"voice/maiden/work_01","frames":9309,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/maiden/work_02","frames":6566,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/maiden/work_03","frames":8428,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/maiden/work_04","frames":5905,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/maiden/yawn_01","frames":17614,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/maiden/yawn_02","frames":37137,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/maiden/yawn_03","frames":40935,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/veteran/ack_01","frames":13640,"rate":22050,"channels":1,"caption":"Aye!"},{"name":"voice/veteran/ack_02","frames":13601,"rate":22050,"channels":1,"caption":"On it."},{"name":"voice/veteran/ack_03","frames":17132,"rate":22050,"channels":1,"caption":"Right away."},{"name":"voice/veteran/ack_04","frames":25598,"rate":22050,"channels":1,"caption":"It will be done."},{"name":"voice/veteran/alarm_01","frames":17616,"rate":22050,"channels":1,"caption":"To arms!"},{"name":"voice/veteran/alarm_02","frames":15422,"rate":22050,"channels":1,"caption":"Raiders!"},{"name":"voice/veteran/alarm_03","frames":18558,"rate":22050,"channels":1,"caption":"Wake up!"},{"name":"voice/veteran/attack_01","frames":12018,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/veteran/attack_02","frames":13110,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/veteran/attack_03","frames":14664,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/veteran/attack_04","frames":13184,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/veteran/complain_01","frames":17698,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/veteran/complain_02","frames":36162,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/veteran/complain_03","frames":20501,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/veteran/death_01","frames":21301,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/veteran/death_02","frames":13484,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/veteran/death_03","frames":11966,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/veteran/happy_01","frames":29256,"rate":22050,"channels":1,"caption":"Ha, good! ... Wonderful! ... Yes!"},{"name":"voice/veteran/happy_02","frames":20560,"rate":22050,"channels":1,"caption":"Ha, good! ... Wonderful! ... Yes!"},{"name":"voice/veteran/happy_03","frames":19331,"rate":22050,"channels":1,"caption":"Ha, good! ... Wonderful! ... Yes!"},{"name":"voice/veteran/hum_01","frames":16896,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/veteran/hum_02","frames":21829,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/veteran/hum_03","frames":12305,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/veteran/hurt_01","frames":8979,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/veteran/hurt_02","frames":10247,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/veteran/hurt_03","frames":9771,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/veteran/hurt_04","frames":9832,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/veteran/mumble_01","frames":63866,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/veteran/mumble_02","frames":65815,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/veteran/mumble_03","frames":65820,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/veteran/select_01","frames":10915,"rate":22050,"channels":1,"caption":"Yes?"},{"name":"voice/veteran/select_02","frames":12122,"rate":22050,"channels":1,"caption":"What is it?"},{"name":"voice/veteran/select_03","frames":15994,"rate":22050,"channels":1,"caption":"I'm listening."},{"name":"voice/veteran/sigh_01","frames":20876,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/veteran/sigh_02","frames":33712,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/veteran/sigh_03","frames":11598,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/veteran/sleep_01","frames":33545,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/veteran/sleep_02","frames":37216,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/veteran/sleep_03","frames":56883,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/veteran/thanks_01","frames":11775,"rate":22050,"channels":1,"caption":"Thank you!"},{"name":"voice/veteran/thanks_02","frames":11577,"rate":22050,"channels":1,"caption":"Thanks!"},{"name":"voice/veteran/thanks_03","frames":12829,"rate":22050,"channels":1,"caption":"My thanks."},{"name":"voice/veteran/work_01","frames":6398,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/veteran/work_02","frames":6064,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/veteran/work_03","frames":12856,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/veteran/work_04","frames":10616,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/veteran/yawn_01","frames":55125,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/veteran/yawn_02","frames":31178,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/veteran/yawn_03","frames":34986,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/young/ack_01","frames":12225,"rate":22050,"channels":1,"caption":"Aye!"},{"name":"voice/young/ack_02","frames":15962,"rate":22050,"channels":1,"caption":"On it."},{"name":"voice/young/ack_03","frames":19103,"rate":22050,"channels":1,"caption":"Right away."},{"name":"voice/young/ack_04","frames":20822,"rate":22050,"channels":1,"caption":"It will be done."},{"name":"voice/young/alarm_01","frames":14652,"rate":22050,"channels":1,"caption":"To arms!"},{"name":"voice/young/alarm_02","frames":12331,"rate":22050,"channels":1,"caption":"Raiders!"},{"name":"voice/young/alarm_03","frames":12682,"rate":22050,"channels":1,"caption":"Wake up!"},{"name":"voice/young/attack_01","frames":15200,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/young/attack_02","frames":13627,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/young/attack_03","frames":7056,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/young/attack_04","frames":8685,"rate":22050,"channels":1,"caption":"Hah! ... Hup! ... Yah! ... Hmph!"},{"name":"voice/young/complain_01","frames":18098,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/young/complain_02","frames":36040,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/young/complain_03","frames":16965,"rate":22050,"channels":1,"caption":"I'm hungry. ... Brr, so cold. ... Not again."},{"name":"voice/young/death_01","frames":9832,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/young/death_02","frames":14829,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/young/death_03","frames":15121,"rate":22050,"channels":1,"caption":"Ugh. ... Hngh. ... Ahh."},{"name":"voice/young/happy_01","frames":11314,"rate":22050,"channels":1,"caption":"Ha, good!"},{"name":"voice/young/happy_02","frames":9922,"rate":22050,"channels":1,"caption":"Wonderful!"},{"name":"voice/young/happy_03","frames":31796,"rate":22050,"channels":1,"caption":"Yes!"},{"name":"voice/young/hum_01","frames":16190,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/young/hum_02","frames":13713,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/young/hum_03","frames":10364,"rate":22050,"channels":1,"caption":"Hmm."},{"name":"voice/young/hurt_01","frames":7810,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/young/hurt_02","frames":10461,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/young/hurt_03","frames":8487,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/young/hurt_04","frames":10513,"rate":22050,"channels":1,"caption":"Uhk! ... Ak! ... Ut! ... Nk!"},{"name":"voice/young/mumble_01","frames":23667,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/young/mumble_02","frames":42099,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/young/mumble_03","frames":43986,"rate":22050,"channels":1,"caption":"Now where did I leave that hammer... ah, there it is."},{"name":"voice/young/select_01","frames":13145,"rate":22050,"channels":1},{"name":"voice/young/select_02","frames":14537,"rate":22050,"channels":1},{"name":"voice/young/select_03","frames":22010,"rate":22050,"channels":1},{"name":"voice/young/sigh_01","frames":13067,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/young/sigh_02","frames":8600,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/young/sigh_03","frames":25513,"rate":22050,"channels":1,"caption":"Haaah."},{"name":"voice/young/sleep_01","frames":53907,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/young/sleep_02","frames":52546,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/young/sleep_03","frames":47215,"rate":22050,"channels":1,"caption":"Mmm... five more winters..."},{"name":"voice/young/thanks_01","frames":13782,"rate":22050,"channels":1,"caption":"Thank you!"},{"name":"voice/young/thanks_02","frames":10304,"rate":22050,"channels":1,"caption":"Thanks!"},{"name":"voice/young/thanks_03","frames":15310,"rate":22050,"channels":1,"caption":"My thanks."},{"name":"voice/young/work_01","frames":6064,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/young/work_02","frames":12238,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/young/work_03","frames":12238,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/young/work_04","frames":7277,"rate":22050,"channels":1,"caption":"Hup! ... Hah! ... Hnh! ... Hup!"},{"name":"voice/young/yawn_01","frames":25493,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/young/yawn_02","frames":50452,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"voice/young/yawn_03","frames":25186,"rate":22050,"channels":1,"caption":"Haaaaah... mmh."},{"name":"weather/clap_01","frames":150296,"rate":22050,"channels":1},{"name":"weather/clap_02","frames":147558,"rate":22050,"channels":1},{"name":"weather/clap_03","frames":148292,"rate":22050,"channels":1},{"name":"weather/crack_01","frames":75835,"rate":22050,"channels":1},{"name":"weather/crack_02","frames":76444,"rate":22050,"channels":1},{"name":"weather/crack_03","frames":70081,"rate":22050,"channels":1},{"name":"weather/rumble_01","frames":159692,"rate":22050,"channels":1},{"name":"weather/rumble_02","frames":162989,"rate":22050,"channels":1},{"name":"weather/rumble_03","frames":154954,"rate":22050,"channels":1},{"name":"weather/strike_01","frames":107139,"rate":22050,"channels":1},{"name":"weather/strike_02","frames":118578,"rate":22050,"channels":1},{"name":"weather/strike_03","frames":115044,"rate":22050,"channels":1},{"name":"wildlife/cat_01","frames":18522,"rate":22050,"channels":1},{"name":"wildlife/chicken_01","frames":66212,"rate":22050,"channels":1},{"name":"wildlife/chicken_02","frames":74589,"rate":22050,"channels":1},{"name":"wildlife/cow_01","frames":56282,"rate":22050,"channels":1},{"name":"wildlife/dog_01","frames":48564,"rate":22050,"channels":1},{"name":"wildlife/pig_01","frames":51439,"rate":22050,"channels":1},{"name":"wildlife/raven_01","frames":63204,"rate":22050,"channels":1},{"name":"wildlife/raven_02","frames":57095,"rate":22050,"channels":1},{"name":"wildlife/wolf_01","frames":226515,"rate":22050,"channels":1},{"name":"wildlife/wolf_02","frames":241546,"rate":22050,"channels":1}]
+[
+  {
+    "name": "music/battle/raid_last_stand",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/battle/raid_night_raid",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/battle/raid_village_aflame",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/battle/saga_shieldwall",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/build/day_hammer_harvest",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/build/day_market_day",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/build/saga_still_sanctuary",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/build/saga_to_the_hall",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dawn/classic_morning_mood_low",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dawn/day_workers_morning",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dawn/saga_groeney_song",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dawn/saga_world_tree",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dusk/night_moonlit_fjord",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dusk/night_quiet_night",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dusk/night_starlit_watch",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/dusk/saga_dusk_wood",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "sfx/block_01",
+    "frames": 13904,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/chest_01",
+    "frames": 32844,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/chest_02",
+    "frames": 40905,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/chop_01",
+    "frames": 10996,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/clash_01",
+    "frames": 21480,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/coins_01",
+    "frames": 16570,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/coins_02",
+    "frames": 19055,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/coins_03",
+    "frames": 10597,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/collapse_01",
+    "frames": 141453,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/hammer_01",
+    "frames": 36612,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/horn_01",
+    "frames": 175368,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/rune_wake_01",
+    "frames": 109470,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/stone_door_01",
+    "frames": 161663,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/swing_01",
+    "frames": 13230,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/torch_01",
+    "frames": 58013,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/tree_fall_01",
+    "frames": 76776,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/cancel_01",
+    "frames": 5737,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/click_01",
+    "frames": 2429,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/complete_01",
+    "frames": 31334,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/confirm_01",
+    "frames": 5957,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/error_01",
+    "frames": 5075,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/growth_01",
+    "frames": 37552,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/notify_01",
+    "frames": 13056,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "ui/rune_01",
+    "frames": 7719,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/berserker/ack_01",
+    "frames": 9330,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Aye!"
+  },
+  {
+    "name": "voice/berserker/ack_02",
+    "frames": 9376,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "On it."
+  },
+  {
+    "name": "voice/berserker/ack_03",
+    "frames": 14587,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Right away."
+  },
+  {
+    "name": "voice/berserker/ack_04",
+    "frames": 18611,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "It will be done."
+  },
+  {
+    "name": "voice/berserker/alarm_01",
+    "frames": 15914,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "To arms!"
+  },
+  {
+    "name": "voice/berserker/alarm_02",
+    "frames": 13671,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Raiders!"
+  },
+  {
+    "name": "voice/berserker/alarm_03",
+    "frames": 12937,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wake up!"
+  },
+  {
+    "name": "voice/berserker/attack_01",
+    "frames": 9184,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/berserker/attack_02",
+    "frames": 11200,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/berserker/attack_03",
+    "frames": 16254,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/berserker/attack_04",
+    "frames": 12417,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/berserker/complain_01",
+    "frames": 18285,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry."
+  },
+  {
+    "name": "voice/berserker/complain_02",
+    "frames": 34644,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/berserker/complain_03",
+    "frames": 16378,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Not again."
+  },
+  {
+    "name": "voice/berserker/death_01",
+    "frames": 11566,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/berserker/death_02",
+    "frames": 14591,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/berserker/death_03",
+    "frames": 13560,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/berserker/happy_01",
+    "frames": 29570,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good!"
+  },
+  {
+    "name": "voice/berserker/happy_02",
+    "frames": 20902,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wonderful!"
+  },
+  {
+    "name": "voice/berserker/happy_03",
+    "frames": 14408,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes!"
+  },
+  {
+    "name": "voice/berserker/hum_01",
+    "frames": 15105,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/berserker/hum_02",
+    "frames": 16913,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/berserker/hum_03",
+    "frames": 9214,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/berserker/hurt_01",
+    "frames": 8184,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/berserker/hurt_02",
+    "frames": 6855,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/berserker/hurt_03",
+    "frames": 9487,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/berserker/hurt_04",
+    "frames": 5868,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/berserker/mumble_01",
+    "frames": 66150,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/berserker/mumble_02",
+    "frames": 65631,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/berserker/mumble_03",
+    "frames": 65648,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/berserker/select_01",
+    "frames": 12178,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes?"
+  },
+  {
+    "name": "voice/berserker/select_02",
+    "frames": 13259,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "What is it?"
+  },
+  {
+    "name": "voice/berserker/select_03",
+    "frames": 18155,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm listening."
+  },
+  {
+    "name": "voice/berserker/sigh_01",
+    "frames": 14406,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/berserker/sigh_02",
+    "frames": 17875,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/berserker/sigh_03",
+    "frames": 10781,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/berserker/sleep_01",
+    "frames": 50020,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/berserker/sleep_02",
+    "frames": 27708,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/berserker/sleep_03",
+    "frames": 43247,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/berserker/thanks_01",
+    "frames": 13001,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thank you!"
+  },
+  {
+    "name": "voice/berserker/thanks_02",
+    "frames": 11136,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thanks!"
+  },
+  {
+    "name": "voice/berserker/thanks_03",
+    "frames": 16920,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "My thanks."
+  },
+  {
+    "name": "voice/berserker/work_01",
+    "frames": 8843,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/berserker/work_02",
+    "frames": 9021,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/berserker/work_03",
+    "frames": 6771,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/berserker/work_04",
+    "frames": 12763,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/berserker/yawn_01",
+    "frames": 54706,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/berserker/yawn_02",
+    "frames": 44621,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/berserker/yawn_03",
+    "frames": 39227,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/huntress/ack_01",
+    "frames": 11868,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Aye!"
+  },
+  {
+    "name": "voice/huntress/ack_02",
+    "frames": 14318,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "On it."
+  },
+  {
+    "name": "voice/huntress/ack_03",
+    "frames": 18017,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Right away."
+  },
+  {
+    "name": "voice/huntress/ack_04",
+    "frames": 20845,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "It will be done."
+  },
+  {
+    "name": "voice/huntress/alarm_01",
+    "frames": 19649,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "To arms!"
+  },
+  {
+    "name": "voice/huntress/alarm_02",
+    "frames": 15871,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Raiders!"
+  },
+  {
+    "name": "voice/huntress/alarm_03",
+    "frames": 12690,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wake up!"
+  },
+  {
+    "name": "voice/huntress/attack_01",
+    "frames": 11468,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/huntress/attack_02",
+    "frames": 9430,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/huntress/attack_03",
+    "frames": 14112,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/huntress/attack_04",
+    "frames": 11907,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/huntress/complain_01",
+    "frames": 19698,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/huntress/complain_02",
+    "frames": 23263,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/huntress/complain_03",
+    "frames": 18727,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/huntress/death_01",
+    "frames": 10222,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/huntress/death_02",
+    "frames": 11778,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/huntress/death_03",
+    "frames": 12965,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/huntress/happy_01",
+    "frames": 7938,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good!"
+  },
+  {
+    "name": "voice/huntress/happy_02",
+    "frames": 10356,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wonderful!"
+  },
+  {
+    "name": "voice/huntress/happy_03",
+    "frames": 26214,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes!"
+  },
+  {
+    "name": "voice/huntress/hum_01",
+    "frames": 15921,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/huntress/hum_02",
+    "frames": 12226,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/huntress/hum_03",
+    "frames": 8540,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/huntress/hurt_01",
+    "frames": 6626,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/huntress/hurt_02",
+    "frames": 9223,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/huntress/hurt_03",
+    "frames": 8379,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/huntress/hurt_04",
+    "frames": 8540,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/huntress/mumble_01",
+    "frames": 65751,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/huntress/mumble_02",
+    "frames": 47681,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/huntress/mumble_03",
+    "frames": 63848,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/huntress/select_01",
+    "frames": 13561,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes?"
+  },
+  {
+    "name": "voice/huntress/select_02",
+    "frames": 13746,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "What is it?"
+  },
+  {
+    "name": "voice/huntress/select_03",
+    "frames": 15285,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm listening."
+  },
+  {
+    "name": "voice/huntress/sigh_01",
+    "frames": 21956,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/huntress/sigh_02",
+    "frames": 19445,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/huntress/sigh_03",
+    "frames": 34634,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/huntress/sleep_01",
+    "frames": 47091,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/huntress/sleep_02",
+    "frames": 58145,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/huntress/sleep_03",
+    "frames": 49062,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/huntress/thanks_01",
+    "frames": 21830,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/huntress/thanks_02",
+    "frames": 27186,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/huntress/work_01",
+    "frames": 8379,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/huntress/work_02",
+    "frames": 10584,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/huntress/work_03",
+    "frames": 7683,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/huntress/work_04",
+    "frames": 9923,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/huntress/yawn_01",
+    "frames": 55125,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/huntress/yawn_02",
+    "frames": 55125,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/huntress/yawn_03",
+    "frames": 43488,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/maiden/ack_01",
+    "frames": 11116,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Aye!"
+  },
+  {
+    "name": "voice/maiden/ack_02",
+    "frames": 13300,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "On it."
+  },
+  {
+    "name": "voice/maiden/ack_03",
+    "frames": 15470,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Right away."
+  },
+  {
+    "name": "voice/maiden/ack_04",
+    "frames": 19013,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "It will be done."
+  },
+  {
+    "name": "voice/maiden/alarm_01",
+    "frames": 18488,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "To arms!"
+  },
+  {
+    "name": "voice/maiden/alarm_02",
+    "frames": 15083,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Raiders!"
+  },
+  {
+    "name": "voice/maiden/alarm_03",
+    "frames": 15175,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wake up!"
+  },
+  {
+    "name": "voice/maiden/attack_01",
+    "frames": 12926,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/maiden/attack_02",
+    "frames": 7913,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/maiden/attack_03",
+    "frames": 7938,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/maiden/attack_04",
+    "frames": 11052,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/maiden/complain_01",
+    "frames": 17606,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry."
+  },
+  {
+    "name": "voice/maiden/complain_02",
+    "frames": 29098,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/maiden/complain_03",
+    "frames": 15946,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Not again."
+  },
+  {
+    "name": "voice/maiden/death_01",
+    "frames": 12608,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/maiden/death_02",
+    "frames": 12613,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/maiden/death_03",
+    "frames": 12361,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/maiden/happy_01",
+    "frames": 26419,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good!"
+  },
+  {
+    "name": "voice/maiden/happy_02",
+    "frames": 15221,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wonderful!"
+  },
+  {
+    "name": "voice/maiden/happy_03",
+    "frames": 12551,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes!"
+  },
+  {
+    "name": "voice/maiden/hum_01",
+    "frames": 14522,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/maiden/hum_02",
+    "frames": 12627,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/maiden/hum_03",
+    "frames": 10474,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/maiden/hurt_01",
+    "frames": 4799,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/maiden/hurt_02",
+    "frames": 10120,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/maiden/hurt_03",
+    "frames": 9922,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/maiden/hurt_04",
+    "frames": 9899,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/maiden/mumble_01",
+    "frames": 38784,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/maiden/mumble_02",
+    "frames": 33178,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/maiden/mumble_03",
+    "frames": 48521,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/maiden/select_01",
+    "frames": 13097,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes?"
+  },
+  {
+    "name": "voice/maiden/select_02",
+    "frames": 15840,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "What is it?"
+  },
+  {
+    "name": "voice/maiden/select_03",
+    "frames": 17850,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm listening."
+  },
+  {
+    "name": "voice/maiden/sigh_01",
+    "frames": 11045,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/maiden/sigh_02",
+    "frames": 18765,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/maiden/sigh_03",
+    "frames": 10239,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/maiden/sleep_01",
+    "frames": 48818,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/maiden/sleep_02",
+    "frames": 50163,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/maiden/sleep_03",
+    "frames": 24045,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/maiden/thanks_01",
+    "frames": 14443,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thank you!"
+  },
+  {
+    "name": "voice/maiden/thanks_02",
+    "frames": 11797,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thanks!"
+  },
+  {
+    "name": "voice/maiden/thanks_03",
+    "frames": 17297,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "My thanks."
+  },
+  {
+    "name": "voice/maiden/work_01",
+    "frames": 9309,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/maiden/work_02",
+    "frames": 6566,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/maiden/work_03",
+    "frames": 8428,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/maiden/work_04",
+    "frames": 5905,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/maiden/yawn_01",
+    "frames": 17614,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/maiden/yawn_02",
+    "frames": 37137,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/maiden/yawn_03",
+    "frames": 40935,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/veteran/ack_01",
+    "frames": 13640,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Aye!"
+  },
+  {
+    "name": "voice/veteran/ack_02",
+    "frames": 13601,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "On it."
+  },
+  {
+    "name": "voice/veteran/ack_03",
+    "frames": 17132,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Right away."
+  },
+  {
+    "name": "voice/veteran/ack_04",
+    "frames": 25598,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "It will be done."
+  },
+  {
+    "name": "voice/veteran/alarm_01",
+    "frames": 17616,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "To arms!"
+  },
+  {
+    "name": "voice/veteran/alarm_02",
+    "frames": 15422,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Raiders!"
+  },
+  {
+    "name": "voice/veteran/alarm_03",
+    "frames": 18558,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wake up!"
+  },
+  {
+    "name": "voice/veteran/attack_01",
+    "frames": 12018,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/veteran/attack_02",
+    "frames": 13110,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/veteran/attack_03",
+    "frames": 14664,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/veteran/attack_04",
+    "frames": 13184,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/veteran/complain_01",
+    "frames": 17698,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/veteran/complain_02",
+    "frames": 36162,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/veteran/complain_03",
+    "frames": 20501,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/veteran/death_01",
+    "frames": 21301,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/veteran/death_02",
+    "frames": 13484,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/veteran/death_03",
+    "frames": 11966,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/veteran/happy_01",
+    "frames": 29256,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good! ... Wonderful! ... Yes!"
+  },
+  {
+    "name": "voice/veteran/happy_02",
+    "frames": 20560,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good! ... Wonderful! ... Yes!"
+  },
+  {
+    "name": "voice/veteran/happy_03",
+    "frames": 19331,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good! ... Wonderful! ... Yes!"
+  },
+  {
+    "name": "voice/veteran/hum_01",
+    "frames": 16896,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/veteran/hum_02",
+    "frames": 21829,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/veteran/hum_03",
+    "frames": 12305,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/veteran/hurt_01",
+    "frames": 8979,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/veteran/hurt_02",
+    "frames": 10247,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/veteran/hurt_03",
+    "frames": 9771,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/veteran/hurt_04",
+    "frames": 9832,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/veteran/mumble_01",
+    "frames": 63866,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/veteran/mumble_02",
+    "frames": 65815,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/veteran/mumble_03",
+    "frames": 65820,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/veteran/select_01",
+    "frames": 10915,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes?"
+  },
+  {
+    "name": "voice/veteran/select_02",
+    "frames": 12122,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "What is it?"
+  },
+  {
+    "name": "voice/veteran/select_03",
+    "frames": 15994,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm listening."
+  },
+  {
+    "name": "voice/veteran/sigh_01",
+    "frames": 20876,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/veteran/sigh_02",
+    "frames": 33712,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/veteran/sigh_03",
+    "frames": 11598,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/veteran/sleep_01",
+    "frames": 33545,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/veteran/sleep_02",
+    "frames": 37216,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/veteran/sleep_03",
+    "frames": 56883,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/veteran/thanks_01",
+    "frames": 11775,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thank you!"
+  },
+  {
+    "name": "voice/veteran/thanks_02",
+    "frames": 11577,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thanks!"
+  },
+  {
+    "name": "voice/veteran/thanks_03",
+    "frames": 12829,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "My thanks."
+  },
+  {
+    "name": "voice/veteran/work_01",
+    "frames": 6398,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/veteran/work_02",
+    "frames": 6064,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/veteran/work_03",
+    "frames": 12856,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/veteran/work_04",
+    "frames": 10616,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/veteran/yawn_01",
+    "frames": 55125,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/veteran/yawn_02",
+    "frames": 31178,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/veteran/yawn_03",
+    "frames": 34986,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/young/ack_01",
+    "frames": 12225,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Aye!"
+  },
+  {
+    "name": "voice/young/ack_02",
+    "frames": 15962,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "On it."
+  },
+  {
+    "name": "voice/young/ack_03",
+    "frames": 19103,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Right away."
+  },
+  {
+    "name": "voice/young/ack_04",
+    "frames": 20822,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "It will be done."
+  },
+  {
+    "name": "voice/young/alarm_01",
+    "frames": 14652,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "To arms!"
+  },
+  {
+    "name": "voice/young/alarm_02",
+    "frames": 12331,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Raiders!"
+  },
+  {
+    "name": "voice/young/alarm_03",
+    "frames": 12682,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wake up!"
+  },
+  {
+    "name": "voice/young/attack_01",
+    "frames": 15200,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/young/attack_02",
+    "frames": 13627,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/young/attack_03",
+    "frames": 7056,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/young/attack_04",
+    "frames": 8685,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hah! ... Hup! ... Yah! ... Hmph!"
+  },
+  {
+    "name": "voice/young/complain_01",
+    "frames": 18098,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/young/complain_02",
+    "frames": 36040,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/young/complain_03",
+    "frames": 16965,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm hungry. ... Brr, so cold. ... Not again."
+  },
+  {
+    "name": "voice/young/death_01",
+    "frames": 9832,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/young/death_02",
+    "frames": 14829,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/young/death_03",
+    "frames": 15121,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ugh. ... Hngh. ... Ahh."
+  },
+  {
+    "name": "voice/young/happy_01",
+    "frames": 11314,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Ha, good!"
+  },
+  {
+    "name": "voice/young/happy_02",
+    "frames": 9922,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Wonderful!"
+  },
+  {
+    "name": "voice/young/happy_03",
+    "frames": 31796,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Yes!"
+  },
+  {
+    "name": "voice/young/hum_01",
+    "frames": 16190,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/young/hum_02",
+    "frames": 13713,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/young/hum_03",
+    "frames": 10364,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hmm."
+  },
+  {
+    "name": "voice/young/hurt_01",
+    "frames": 7810,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/young/hurt_02",
+    "frames": 10461,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/young/hurt_03",
+    "frames": 8487,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/young/hurt_04",
+    "frames": 10513,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Uhk! ... Ak! ... Ut! ... Nk!"
+  },
+  {
+    "name": "voice/young/mumble_01",
+    "frames": 23667,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/young/mumble_02",
+    "frames": 42099,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/young/mumble_03",
+    "frames": 43986,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Now where did I leave that hammer... ah, there it is."
+  },
+  {
+    "name": "voice/young/select_01",
+    "frames": 13145,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/young/select_02",
+    "frames": 14537,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/young/select_03",
+    "frames": 22010,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/young/sigh_01",
+    "frames": 13067,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/young/sigh_02",
+    "frames": 8600,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/young/sigh_03",
+    "frames": 25513,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaah."
+  },
+  {
+    "name": "voice/young/sleep_01",
+    "frames": 53907,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/young/sleep_02",
+    "frames": 52546,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/young/sleep_03",
+    "frames": 47215,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Mmm... five more winters..."
+  },
+  {
+    "name": "voice/young/thanks_01",
+    "frames": 13782,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thank you!"
+  },
+  {
+    "name": "voice/young/thanks_02",
+    "frames": 10304,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Thanks!"
+  },
+  {
+    "name": "voice/young/thanks_03",
+    "frames": 15310,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "My thanks."
+  },
+  {
+    "name": "voice/young/work_01",
+    "frames": 6064,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/young/work_02",
+    "frames": 12238,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/young/work_03",
+    "frames": 12238,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/young/work_04",
+    "frames": 7277,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Hup! ... Hah! ... Hnh! ... Hup!"
+  },
+  {
+    "name": "voice/young/yawn_01",
+    "frames": 25493,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/young/yawn_02",
+    "frames": 50452,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "voice/young/yawn_03",
+    "frames": 25186,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Haaaaah... mmh."
+  },
+  {
+    "name": "weather/clap_01",
+    "frames": 150296,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/clap_02",
+    "frames": 147558,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/clap_03",
+    "frames": 148292,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/crack_01",
+    "frames": 75835,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/crack_02",
+    "frames": 76444,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/crack_03",
+    "frames": 70081,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/rumble_01",
+    "frames": 159692,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/rumble_02",
+    "frames": 162989,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/rumble_03",
+    "frames": 154954,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/strike_01",
+    "frames": 107139,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/strike_02",
+    "frames": 118578,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "weather/strike_03",
+    "frames": 115044,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/cat_01",
+    "frames": 18522,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/chicken_01",
+    "frames": 66212,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/chicken_02",
+    "frames": 74589,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/cow_01",
+    "frames": 56282,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/dog_01",
+    "frames": 48564,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/pig_01",
+    "frames": 51439,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/raven_01",
+    "frames": 63204,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/raven_02",
+    "frames": 57095,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/wolf_01",
+    "frames": 226515,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "wildlife/wolf_02",
+    "frames": 241546,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "voice/berserker/rain_01",
+    "frames": 25047,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, rain again."
+  },
+  {
+    "name": "voice/berserker/rain_02",
+    "frames": 28226,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Gods, I'm soaked."
+  },
+  {
+    "name": "voice/berserker/snow_01",
+    "frames": 40938,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/berserker/snow_02",
+    "frames": 33803,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Look, snow!"
+  },
+  {
+    "name": "voice/berserker/thunder_01",
+    "frames": 17888,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, God!"
+  },
+  {
+    "name": "voice/berserker/thunder_02",
+    "frames": 20912,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh my God!"
+  },
+  {
+    "name": "voice/berserker/thunder_03",
+    "frames": 18273,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm scared."
+  },
+  {
+    "name": "voice/huntress/rain_01",
+    "frames": 31752,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, rain again."
+  },
+  {
+    "name": "voice/huntress/rain_02",
+    "frames": 40572,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Gods, I'm soaked."
+  },
+  {
+    "name": "voice/huntress/snow_01",
+    "frames": 29988,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/huntress/snow_02",
+    "frames": 31752,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Look, snow!"
+  },
+  {
+    "name": "voice/huntress/thunder_01",
+    "frames": 21168,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, God!"
+  },
+  {
+    "name": "voice/huntress/thunder_02",
+    "frames": 24696,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh my God!"
+  },
+  {
+    "name": "voice/huntress/thunder_03",
+    "frames": 19404,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm scared."
+  },
+  {
+    "name": "voice/maiden/rain_01",
+    "frames": 30090,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, rain again."
+  },
+  {
+    "name": "voice/maiden/rain_02",
+    "frames": 34626,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Gods, I'm soaked."
+  },
+  {
+    "name": "voice/maiden/snow_01",
+    "frames": 38545,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/maiden/snow_02",
+    "frames": 26618,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Look, snow!"
+  },
+  {
+    "name": "voice/maiden/thunder_01",
+    "frames": 23098,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, God!"
+  },
+  {
+    "name": "voice/maiden/thunder_02",
+    "frames": 18740,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh my God!"
+  },
+  {
+    "name": "voice/maiden/thunder_03",
+    "frames": 16026,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm scared."
+  },
+  {
+    "name": "voice/veteran/rain_01",
+    "frames": 27388,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, rain again."
+  },
+  {
+    "name": "voice/veteran/rain_02",
+    "frames": 44929,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Gods, I'm soaked."
+  },
+  {
+    "name": "voice/veteran/snow_01",
+    "frames": 54684,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/veteran/snow_02",
+    "frames": 26460,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Look, snow!"
+  },
+  {
+    "name": "voice/veteran/thunder_01",
+    "frames": 24696,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, God!"
+  },
+  {
+    "name": "voice/veteran/thunder_02",
+    "frames": 22932,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh my God!"
+  },
+  {
+    "name": "voice/veteran/thunder_03",
+    "frames": 20670,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm scared."
+  },
+  {
+    "name": "voice/young/rain_01",
+    "frames": 29387,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, rain again."
+  },
+  {
+    "name": "voice/young/rain_02",
+    "frames": 31388,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Gods, I'm soaked."
+  },
+  {
+    "name": "voice/young/snow_01",
+    "frames": 47233,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Brr, so cold."
+  },
+  {
+    "name": "voice/young/snow_02",
+    "frames": 32418,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Look, snow!"
+  },
+  {
+    "name": "voice/young/thunder_01",
+    "frames": 18804,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh, God!"
+  },
+  {
+    "name": "voice/young/thunder_02",
+    "frames": 29348,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "Oh my God!"
+  },
+  {
+    "name": "voice/young/thunder_03",
+    "frames": 18788,
+    "rate": 22050,
+    "channels": 1,
+    "caption": "I'm scared."
+  }
+]

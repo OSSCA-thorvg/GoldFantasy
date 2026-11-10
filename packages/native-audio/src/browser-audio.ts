@@ -1,5 +1,5 @@
-// The mixer changed with work contacts; avoid reusing a cached pre-contact processor.
-const processorUrl = `${import.meta.env?.BASE_URL ?? '/'}vendor/goldfantasy-audio.js?v=work-contacts-1`;
+// New speech catalog entries must reach the worklet after an application update.
+const processorUrl = `${import.meta.env?.BASE_URL ?? '/'}vendor/goldfantasy-audio.js?v=weather-voices-1`;
 import { SoundLibrary } from './sound-library';
 import effectEndings from './data/effect-endings.json';
 import { Playback } from './sound-board';
@@ -155,7 +155,9 @@ export class BrowserSoundDevice {
     // Transient effects belong to the moment they occur, not a burst after a slow download.
   }
   play(sound: Sound): void {
-    if (sound.cue === Cue.Music && sound.track) {
+    if (sound.cue === Cue.PrepareSpeech) {
+      this.prepareSpeech(sound);
+    } else if (sound.cue === Cue.Music && sound.track) {
       if (!this.acceptMusic || this.disposed || this.failed) return;
       const serial = ++this.musicSerial;
       const { context, library } = this.session;
@@ -182,6 +184,17 @@ export class BrowserSoundDevice {
       this.send({ kind: 'play', sound });
     }
   }
+  private prepareSpeech(sound: Sound): void {
+    if (this.disposed || this.failed || this.session.closed || this.session.failed) return;
+    const { context, library, abort } = this.session,
+      prefix = voicePrefix(sound.line, sound.voice);
+    if (!context || !prefix) return;
+    // A pending weather reaction warms only its own takes, without reserving a
+    // speech channel or replacing a line that is currently loading or playing.
+    for (const entry of library.entries)
+      if (entry.name.startsWith(prefix))
+        void library.load(context, entry.name, undefined, abort.signal, 2).catch(() => {});
+  }
   private playSpeech(sound: Sound): void {
     if (this.disposed || this.failed || !this.acceptMusic || this.session.closed || this.session.failed)
       return;
@@ -197,9 +210,15 @@ export class BrowserSoundDevice {
       const common = [VoiceLine.Select, VoiceLine.Ack, VoiceLine.Work].map((line) =>
           voicePrefix(line, sound.voice),
         ),
+        unrequestedWeather = [VoiceLine.Rain, VoiceLine.Snow, VoiceLine.Thunder]
+          .filter((line) => line !== sound.line)
+          .map((line) => voicePrefix(line, sound.voice)),
         family = voicePrefix(VoiceLine.Select, sound.voice).split('/').slice(0, 2).join('/') + '/';
       for (const entry of library.entries)
-        if (entry.name.startsWith(family))
+        if (
+          entry.name.startsWith(family) &&
+          !unrequestedWeather.some((prefix) => entry.name.startsWith(prefix))
+        )
           void library
             .load(
               context,

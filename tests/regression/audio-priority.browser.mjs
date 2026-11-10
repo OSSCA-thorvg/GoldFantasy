@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+const effectCount = JSON.parse(
+  readFileSync(new URL('../../packages/native-audio/src/data/audio-manifest.json', import.meta.url), 'utf8'),
+).filter((entry) => !entry.name.startsWith('music/')).length;
 
 const port = Number(process.env.AUDIO_TEST_PORT ?? 0);
 let server,
@@ -98,15 +103,12 @@ try {
     await page.waitForRequest((request) => isMusicRequest(request.url()), { timeout: 15000 });
   }
   assert.equal(await read('probe.ready'), false, 'Critical effects remain blocked during music fetch');
-  assert.ok(
-    requests.some(isMusicRequest),
-    'Music fetch starts before critical effects finish',
-  );
+  assert.ok(requests.some(isMusicRequest), 'Music fetch starts before critical effects finish');
   releaseHammer();
   await until('probe.ready');
   await until('probe.sample() > .0001');
   assert.equal(await read('probe.device.session.library.hasClip("voice/berserker/ack_01")'), false);
-  assert.ok(await read('probe.device.session.library.snapshot().clips.length < 290'));
+  assert.ok(await read(`probe.device.session.library.snapshot().clips.length < ${effectCount}`));
   await read('probe.speak()');
   releaseVoice();
   await until('probe.device.session.library.hasClip("voice/berserker/ack_01")');
@@ -116,7 +118,7 @@ try {
   await page.touchscreen.tap(70, 50);
   await until('probe.device.session.context.state === "running"');
   await until('probe.sample() > .0001');
-  await until('probe.device.session.library.snapshot().clips.length === 290');
+  await until(`probe.device.session.library.snapshot().clips.length === ${effectCount}`);
   await read('probe.dispose()');
   assert.equal(await read('probe.device.session.context.state'), 'closed');
   assert.deepEqual(errors, []);
@@ -124,11 +126,11 @@ try {
     JSON.stringify({
       strictMobileTouchBeforeCriticalReady: true,
       musicFetchBeforeCriticalReady: true,
-      audibleBeforeAll290Effects: true,
+      audibleBeforeAllEffects: true,
       incrementalClipInstallation: true,
       requestedVoicePlays: true,
       laterSuspensionResumes: true,
-      all290Loaded: true,
+      loadedEffects: effectCount,
       errors,
     }),
   );
