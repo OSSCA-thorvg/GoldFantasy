@@ -16,6 +16,7 @@ import { WorldRendererState } from './world-renderer-state';
 import { registerDepth } from './world-depth';
 import { registerPick } from './world-pick-registry';
 import type { WorldObjectRef } from './world-picking-types';
+import { registerResourceHit, setResourceWind } from './resource-hit';
 const canopyBases = new WeakMap<SceneNode, number>();
 export const sprouting = (s: WorldRendererState, cell: number, index: number): boolean =>
   s.growingTrees.some((tree) => tree.cell === cell && tree.index === index);
@@ -79,6 +80,8 @@ export function buildTreeRow(
       foot: { ...at },
       ellipse: { rx: canopy ? 7 : 9, ry: canopy ? 3 : 4 },
     });
+    if (ref?.kind === 'tree' || ref?.kind === 'rock')
+      registerResourceHit(scene, ref.kind, ref.id, ref.instanceIndex ?? 0, at);
     if (canopy) {
       s.rowCanopies[row].push(scene);
       canopyBases.set(scene, project(at.x, at.y).y);
@@ -145,7 +148,7 @@ export function swayTrees(s: WorldRendererState, wind: number, seconds: number):
   if (!active) {
     if (s.swaying)
       for (const canopies of s.rowCanopies)
-        for (const canopy of canopies) canopy.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+        for (const canopy of canopies) setResourceWind(canopy, [1, 0, 0, 0, 1, 0, 0, 0, 1]);
     s.swaying = false;
     return;
   }
@@ -176,7 +179,7 @@ export function swayTrees(s: WorldRendererState, wind: number, seconds: number):
       );
     for (const canopy of canopies) {
       const base = canopyBases.get(canopy)!;
-      canopy.transform([1, -k, f32(k * base), 0, 1, 0, 0, 0, 1]);
+      setResourceWind(canopy, [1, -k, f32(k * base), 0, 1, 0, 0, 0, 1]);
     }
   }
 }

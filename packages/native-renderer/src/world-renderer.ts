@@ -18,6 +18,7 @@ import type {
   GroundSelectionMarker,
 } from './world-picking-types';
 import { GroundSelection } from './ground-selection';
+import { hasResourceHits, resetResourceHits, updateResourceHits } from './resource-hit';
 import { buildingCatalogGeneration } from './building-assets';
 import { resize, fitToView, paintMapName, buildPreview, updateGroundChunks } from './world-ground';
 import { paintGround, tintGround, paintFields } from './terrain-painter';
@@ -76,6 +77,7 @@ export class WorldRenderer extends WorldRendererState {
     this.picker.invalidate();
   }
   override dispose(): void {
+    resetResourceHits(this);
     this.picker.invalidate();
     this.pickedTown = null;
     super.dispose();
@@ -85,6 +87,7 @@ export class WorldRenderer extends WorldRendererState {
     return (
       this.fallingTrees.length !== 0 ||
       this.growingTrees.length !== 0 ||
+      hasResourceHits(this) ||
       [...this.visuals.values()].some((v) => v.frame < v.layout.frames)
     );
   }
@@ -92,6 +95,7 @@ export class WorldRenderer extends WorldRendererState {
     return this.currentVisibility.sample(at) >= 119;
   }
   invalidateMap(): void {
+    resetResourceHits(this);
     this.invalidatePresentation();
     for (const tree of this.fallingTrees) this.rows[tree.row]?.remove(tree.paint);
     this.fallingTrees = [];
@@ -324,6 +328,7 @@ export class WorldRenderer extends WorldRendererState {
       moveAgents(this, town, traffic, seconds, selected);
       updateFelling(this, town);
       updateGrowth(this, town, seconds);
+      updateResourceHits(this, town);
       animate(this, town, seconds);
     }
     sortWorldObjects(this);
