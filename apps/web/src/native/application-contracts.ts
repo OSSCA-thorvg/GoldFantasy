@@ -41,6 +41,9 @@ export interface Application {
   title(): string;
   scene(): Scene;
   render(width: number, height: number, seconds: number): void;
+  /** Native hit geometry is valid only after the host has presented the Canvas. */
+  presented?(pixelRatio: number): void;
+  invalidatePresentation?(): void;
   event(event: AppEvent): void;
   properties(): Property[];
   property(id: string, value: number): boolean;

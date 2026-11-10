@@ -46,6 +46,8 @@ jobs:
         run: npm run test:splash
       - name: Draw and complete roads around the first camp
         run: npm run test:roads
+      - name: Verify visible-object picking and friendly selection across renderers
+        run: npm run test:picking
       - name: Verify splash and priority audio loading
         run: npm run test:loading
       - name: Verify mobile audio before background samples finish

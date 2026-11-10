@@ -14,6 +14,8 @@ import { TreeBatch, treeAt } from './tree-painter';
 import { PeakBatch, peakAt } from './mountain-peaks';
 import { WorldRendererState } from './world-renderer-state';
 import { registerDepth } from './world-depth';
+import { registerPick } from './world-pick-registry';
+import type { WorldObjectRef } from './world-picking-types';
 const canopyBases = new WeakMap<SceneNode, number>();
 export const sprouting = (s: WorldRendererState, cell: number, index: number): boolean =>
   s.growingTrees.some((tree) => tree.cell === cell && tree.index === index);
@@ -57,7 +59,13 @@ export function buildTreeRow(
   trees.remove();
   s.rowCanopies[row] = [];
   const bounds: Rect[] = [];
-  const append = (at: Point, key: string, shapes: ShapeNode[], canopy = false) => {
+  const append = (
+    at: Point,
+    key: string,
+    shapes: ShapeNode[],
+    canopy = false,
+    ref: WorldObjectRef | null = null,
+  ) => {
     const scene = new SceneNode(),
       box = shapesBounds(shapes);
     for (const shape of shapes) if (shape.commands.length) scene.add(shape);
@@ -65,6 +73,12 @@ export function buildTreeRow(
     trees.add(scene);
     bounds.push(box);
     registerDepth(scene, at, key, box);
+    registerPick(scene, {
+      ref,
+      body: [scene],
+      foot: { ...at },
+      ellipse: { rx: canopy ? 7 : 9, ry: canopy ? 3 : 4 },
+    });
     if (canopy) {
       s.rowCanopies[row].push(scene);
       canopyBases.set(scene, project(at.x, at.y).y);
@@ -78,7 +92,11 @@ export function buildTreeRow(
       const tree = treeAt(map, x, y, i),
         batch = new TreeBatch(climate);
       batch.add(tree);
-      append(tree.foot, `tree:${x}:${y}:${i}`, batch.finish(project(tree.foot.x, tree.foot.y).y), true);
+      append(tree.foot, `tree:${x}:${y}:${i}`, batch.finish(project(tree.foot.x, tree.foot.y).y), true, {
+        kind: 'tree',
+        id: y * map.width() + x,
+        instanceIndex: i,
+      });
     }
     const peak = peakAt(map, x, y);
     if (peak) {
@@ -93,7 +111,7 @@ export function buildTreeRow(
       appendStone(lit, shade, project(foot.x, foot.y), mining.size(map, x, y));
       fill(lit, opaque(stoneLit));
       fill(shade, opaque(stoneShade));
-      append(foot, `stone:${x}:${y}`, [lit, shade]);
+      append(foot, `stone:${x}:${y}`, [lit, shade], false, { kind: 'rock', id: y * map.width() + x });
     }
   }
   if (!bounds.length) {
@@ -204,6 +222,12 @@ export function sprout(
   leaves.fill(126, 156, 98).opacity(0);
   paint.add(leaves).add(body);
   registerDepth(paint, tree.foot, `sprout:${x}:${y}:${index}`);
+  registerPick(paint, {
+    ref: { kind: 'tree', id: y * map.width() + x, instanceIndex: index },
+    body: [body],
+    foot: { ...tree.foot },
+    ellipse: { rx: 7 * tree.size, ry: 3 * tree.size },
+  });
   s.rows[row].add(paint);
   s.growingTrees.push({
     paint,
@@ -267,7 +291,12 @@ export function updateFelling(s: WorldRendererState, town: Town): void {
   for (const event of town.treeEvents()) {
     if (event.serial < s.seenTreeEvent) continue;
     s.seenTreeEvent = event.serial + 1n;
-    if (event.kind !== TreeWorkKind.Fall || now - event.at >= treeFallTiming.duration || s.fallingTrees.length >= 64) continue;
+    if (
+      event.kind !== TreeWorkKind.Fall ||
+      now - event.at >= treeFallTiming.duration ||
+      s.fallingTrees.length >= 64
+    )
+      continue;
     const x = event.cell % map.width(),
       y = Math.trunc(f32(event.cell / map.width())),
       tree = treeAt(map, x, y, event.index),

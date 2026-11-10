@@ -22,7 +22,8 @@ import { rowOf, drawRow, giantFootprint, volcanoFootprint, registerDepth } from 
 import { lightYmir, paintYmir } from './ymir-statue';
 import { lightVolcano, paintVolcano, paintSteam } from './volcano-painter';
 import { Flicker } from './light-flicker';
-import { dungeonSprite } from './world-sprites';
+import { dungeonSprite, dungeonBody } from './world-sprites';
+import { registerPick } from './world-pick-registry';
 import { paintOrnaments } from './world-ground';
 import { sprout, buildTreeRow } from './world-trees';
 import { Rect } from '../../native-ui/src/types';
@@ -160,6 +161,12 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       if (renew(s.ymirPaint, key))
         s.ymirLight = paintYmir(s.ymirPaint.paint!, project(heart.x, heart.y), climate, inWater);
       registerDepth(s.ymirPaint.paint!, giantFootprint(giant!), 'landmark:ymir');
+      registerPick(s.ymirPaint.paint!, {
+        ref: { kind: 'landmark', id: 0 },
+        body: [s.ymirPaint.paint!],
+        foot: heart,
+        groundOutline: giantFootprint(giant!).corners(),
+      });
       here.add(s.ymirPaint.paint!);
       lightYmir(s.lights, project(heart.x, heart.y));
       addPool(s, pool(s.ymirLight!.dais, 190, 95));
@@ -176,6 +183,12 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       if (renew(s.volcanoPaint, key))
         s.volcanoLight = paintVolcano(s.volcanoPaint.paint!, project(heart.x, heart.y), map.seed());
       registerDepth(s.volcanoPaint.paint!, volcanoFootprint(volcano!), 'landmark:volcano');
+      registerPick(s.volcanoPaint.paint!, {
+        ref: { kind: 'landmark', id: 1 },
+        body: [s.volcanoPaint.paint!],
+        foot: heart,
+        groundOutline: volcanoFootprint(volcano!).corners(),
+      });
       here.add(s.volcanoPaint.paint!);
       lightVolcano(s.lights, s.volcanoLight!);
       addPool(s, pool(s.volcanoLight!.crater, 260, 130, [200, 80, 30], Flicker.Fire));
@@ -203,6 +216,12 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
         ),
       );
       here.add(visual.picture).add(damagePaint(s, b));
+      registerPick(here, {
+        ref: { kind: 'building', id: b.id },
+        body: [visual.picture],
+        foot: { ...b.center },
+        groundOutline: b.footprint().corners(),
+      });
       const size = structureSpec(b.kind).size,
         middle = b.center;
       if (b.kind === Structure.Torch && b.built()) {
@@ -285,6 +304,12 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
         `dungeon:${site.origin.x}:${site.origin.y}`,
       );
       const pulse = dungeonSprite(here, s.lights, site, s.measureText);
+      registerPick(here, {
+        ref: { kind: 'dungeon', id: map.dungeons().indexOf(site) },
+        body: dungeonBody(here),
+        foot: point(site.origin.x + 1, site.origin.y + 1),
+        ellipse: { rx: 48, ry: 18 },
+      });
       if (pulse) s.pulses.push(pulse);
       addPool(s, pool(project(f32(site.origin.x + 1), f32(site.origin.y + 1)), 90, 45));
       const tint =

@@ -86,6 +86,14 @@ export class SceneApplication implements Application {
   scene(): Scene {
     return this.root;
   }
+  presented(pixelRatio: number): void {
+    const active = this.current === 'Game' ? this.gameSession : this.editorSession;
+    if (this.current !== 'Title') active?.presented?.(pixelRatio);
+  }
+  invalidatePresentation(): void {
+    this.gameSession?.invalidatePresentation?.();
+    this.editorSession?.invalidatePresentation?.();
+  }
 
   render(width: number, height: number, seconds: number): void {
     width = f(width);

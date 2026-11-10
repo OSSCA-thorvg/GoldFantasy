@@ -15,6 +15,7 @@ import { residentSelection } from '../../apps/web/src/native/game-unit-panel';
 import { selectPeople, selectTool, personAt, pointerUp } from '../../apps/web/src/native/game-input';
 import type { GameHudApp } from '../../apps/web/src/native/game-hud-contract';
 import { Building } from '../../packages/engine/src/town-models';
+import { presentedHit } from './fixtures/presented-hit';
 import { Structure } from '../../packages/engine/src/building-catalog';
 
 function fixture() {
@@ -44,6 +45,8 @@ function fixture() {
     chosen: people.map((p) => p.id),
     status: '',
     mouse: point(50, 50),
+    hoveredWorldTarget: { screen: point(50, 50), hit: null },
+    context: { controlAt: () => false },
     cursor: point(12, 12),
     stoppedWork: new Map(),
     workSerial: 1n,
@@ -104,12 +107,19 @@ describe('player command ownership boundary', () => {
       expect(residentSelection.call(app as unknown as GameHudApp)).toBe(false);
     }
   });
+  it('filters roster group selection while keeping individual inspection available', () => {
+    const { app } = fixture();
+    selectPeople.call(app, [0, 1, 2, 3, 0]);
+    expect(app.chosen).toEqual([0, 1]);
+    selectPeople.call(app, [2]);
+    expect(app.chosen).toEqual([2]);
+  });
   it('does not build, repair or assign work in a neutral building on contextual click', () => {
     const { app, town } = fixture();
     const building = new Building(5, Structure.Lumberyard, point(12, 12), 0, 0);
     building.faction = 2;
     town.building.mockReturnValue(building);
-    app.buildingAtScreen = () => 5;
+    app.hoveredWorldTarget!.hit = presentedHit('building', 5);
     issueOrder.call(app, Order.Work);
     expect(town.orderBuild).not.toHaveBeenCalled();
     expect(town.assignJob).not.toHaveBeenCalled();
@@ -130,13 +140,13 @@ it('does not pick a neutral resident through player fog', () => {
   app.town.people = () => [people[2]];
   app.camera = { zoom: 1 } as any;
   app.toScreen = () => point(50, 50);
-  app.renderer = { visible: () => false } as any;
+  app.hoveredWorldTarget = { screen: point(50, 41), hit: null };
   expect(personAt.call(app, point(50, 41))).toBe(-1);
-  app.renderer.visible = () => true;
+  app.hoveredWorldTarget.hit = presentedHit('person', people[2].id);
   expect(personAt.call(app, point(50, 41))).toBe(people[2].id);
 });
 
-it('marquee inspects every visible person while later commands filter control ownership', () => {
+it('marquee groups only visible player residents, including overwhelmed residents', () => {
   const { app, people } = fixture();
   app.town.people = () => people;
   app.boxFrom = point(0, 0);
@@ -145,10 +155,11 @@ it('marquee inspects every visible person while later commands filter control ow
   };
   app.toScreen = () => point(50, 50);
   app.camera = { zoom: 1 } as any;
-  app.renderer = { visible: () => true } as any;
+  app.renderer = { querySelection: () => people.map((p) => presentedHit('person', p.id)) } as any;
   app.context = { controlAt: () => false } as any;
   pointerUp.call(app, 100, 100, PointerButton.Primary);
-  expect(app.chosen).toEqual([0, 1, 2, 3]);
+  expect(app.chosen).toEqual([0, 1]);
+  expect(app.selectedObjects).toEqual([]);
 });
 it('retires queued work on orphaned neutral roads without relying on a surviving Camp', () => {
   const { app, town, people } = fixture();

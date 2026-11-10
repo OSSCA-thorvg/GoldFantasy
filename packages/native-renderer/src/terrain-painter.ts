@@ -1,3 +1,4 @@
+import { registerPick } from './world-pick-registry';
 import {
   add,
   sub,
@@ -360,8 +361,8 @@ export interface FieldTown {
   calendar(): { season: number };
   climate(): Climate;
   tendedFieldAcres(): number;
-  fields(): readonly { outline: Point[]; acres(): number }[];
-  buildings(): readonly { built(): boolean; footprint(): { corners(): Point[] } }[];
+  fields(): readonly { id?: number; outline: Point[]; acres(): number }[];
+  buildings(): readonly { id?: number; built(): boolean; footprint(): { corners(): Point[] } }[];
 }
 function crop(season: number, tended: boolean): { ground: Rgb; furrow: Rgb } {
   if (!tended && season !== 3) return { ground: [52, 58, 40], furrow: [64, 72, 46] };
@@ -389,6 +390,13 @@ export function paintFields(iso: SceneNode, town: FieldTown): void {
     fill(plot, opaque(colors.ground));
     plot.strokeWidth(f(0.06)).strokeJoin('round').strokeFill(46, 34, 26);
     iso.add(plot);
+    if (field.id !== undefined)
+      registerPick(plot, {
+        ref: { kind: 'field', id: field.id },
+        body: [plot],
+        foot: centroid(outline),
+        groundOutline: outline,
+      });
     let along: Point = { x: 1, y: 0 },
       longest = 0;
     for (let i = 0; i < outline.length; i++) {
@@ -428,6 +436,13 @@ export function paintFields(iso: SceneNode, town: FieldTown): void {
     const stakes = new ShapeNode();
     for (const p of corners) stakes.appendCircle(p.x, p.y, f(0.07), f(0.07));
     stakes.fill(120, 90, 60);
+    if (item.id !== undefined)
+      registerPick(line, {
+        ref: { kind: 'building', id: item.id },
+        body: [line, stakes],
+        foot: centroid(corners),
+        groundOutline: corners,
+      });
     iso.add(stakes);
   }
 }

@@ -3,6 +3,7 @@ import type { BuildingDocumentFiles } from '../../../../packages/native-editors/
 import type { GameRenderApp } from './game-render';
 import { Plan } from './game-app-state';
 import { Town } from '../../../../packages/engine/src/town';
+import { isPlayerResident } from '../../../../packages/engine/src/faction';
 import { Traffic } from '../../../../packages/engine/src/traffic';
 import { WorldMap } from '../../../../packages/engine/src/world-map';
 import { Camera, project, point } from '../../../../packages/engine/src/geometry';
@@ -85,7 +86,10 @@ export function startMap(this: GameEditorsApp, map: WorldMap): void {
   this.traffic = new Traffic(seed);
   this.renderer.invalidateMap();
   this.speakers.clear();
-  this.chosen = this.town.people().map((person) => person.id);
+  this.chosen = this.town
+    .people()
+    .filter(isPlayerResident)
+    .map((person) => person.id);
   const at = project(this.town.map().camp().x, this.town.map().camp().y);
   this.camera = new Camera(at.x, at.y, Math.fround(1.4));
   this.dismissBuildDrawer();
@@ -95,6 +99,8 @@ export function startMap(this: GameEditorsApp, map: WorldMap): void {
   this.pending = Order.None;
   this.card = -1;
   this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+  this.selectedTreeInstance = -1;
+  this.hoveredWorldTarget = null;
   this.workQueue = [];
   this.stoppedWork.clear();
   this.workSerial = 0n;

@@ -5,6 +5,7 @@ import { Order, PointerButton, Tool } from '../../packages/engine/src/game-tools
 import { point } from '../../packages/engine/src/geometry';
 import { AnimalKind, Calling, Person, Race, Role, Monster } from '../../packages/engine/src/person';
 import { GameApplication } from '../../apps/web/src/native/game-application';
+import { presentedHit } from './fixtures/presented-hit';
 import type { AppEvent } from '../../apps/web/src/native/application-contracts';
 
 function fixture() {
@@ -17,6 +18,7 @@ function fixture() {
     chosen: [0, 1],
     selectedObjects: [],
     mouse: point(50, 50),
+    hoveredWorldTarget: { screen: point(50, 50), hit: null },
     cursor: point(12, 12),
     tool: Tool.Select,
     pending: Order.None,
@@ -41,6 +43,7 @@ function fixture() {
       monsterAt: () => -1,
       creature: () => animal,
       orderMove: vi.fn(),
+      sendExpedition: vi.fn(() => true),
       orderAttack: vi.fn(),
       orderAttackPerson: vi.fn(),
       orderAttackMove: vi.fn(),
@@ -101,14 +104,14 @@ describe('target input and group commands', () => {
   });
   it('contextual targeting of a neutral animal approaches without attacking', () => {
     const { app } = fixture();
-    app.animalAtScreen = () => 10;
+    app.hoveredWorldTarget!.hit = presentedHit('animal', 10);
     issueOrder.call(app, Order.Work);
     expect(app.town.orderAttack).not.toHaveBeenCalled();
     expect(app.town.orderMove).toHaveBeenCalledWith([0, 1], app.cursor);
   });
   it('explicit Attack still hunts the clicked animal', () => {
     const { app } = fixture();
-    app.animalAtScreen = () => 10;
+    app.hoveredWorldTarget!.hit = presentedHit('animal', 10);
     app.town.orderAttack = vi.fn(() => true);
     app.town.approachOrder = vi.fn();
     issueOrder.call(app, Order.Attack);
@@ -117,15 +120,32 @@ describe('target input and group commands', () => {
   it('contextual targeting can defend against an already hostile animal', () => {
     const { app, animal } = fixture();
     animal.angry = true;
-    app.animalAtScreen = () => 10;
+    app.hoveredWorldTarget!.hit = presentedHit('animal', 10);
     app.town.orderAttack = vi.fn(() => true);
     app.town.approachOrder = vi.fn();
     issueOrder.call(app, Order.Work);
     expect(app.town.orderAttack).toHaveBeenCalledTimes(2);
   });
+  it('an explicit Attack targets the front person without changing group selection', () => {
+    const { app } = fixture();
+    app.hoveredWorldTarget!.hit = presentedHit('person', 1);
+    issueOrder.call(app, Order.Attack);
+    expect(app.town.orderAttackPerson).toHaveBeenCalledWith([0, 1], 1);
+    expect(app.chosen).toEqual([0, 1]);
+  });
+  it('contextual dungeon targeting uses the same front hit and falls back to movement if rejected', () => {
+    const { app } = fixture();
+    app.hoveredWorldTarget!.hit = presentedHit('dungeon', 2);
+    issueOrder.call(app, Order.Work);
+    expect(app.town.sendExpedition).toHaveBeenCalledWith([0, 1], 2);
+    expect(app.town.orderMove).not.toHaveBeenCalled();
+    app.town.sendExpedition = vi.fn(() => false);
+    issueOrder.call(app, Order.Work);
+    expect(app.town.orderMove).toHaveBeenCalledWith([0, 1], app.cursor);
+  });
   it('right-clicking a companion approaches without friendly fire', () => {
     const { app, people } = fixture();
-    app.personAt = () => 1;
+    app.hoveredWorldTarget!.hit = presentedHit('person', 1);
     issueOrder.call(app, Order.Work);
     expect(app.town.orderAttackPerson).not.toHaveBeenCalled();
     expect(app.town.orderMove).toHaveBeenCalledWith([0, 1], people[1].position);

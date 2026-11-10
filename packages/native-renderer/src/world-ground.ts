@@ -19,6 +19,7 @@ import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { appendPolygon, ellipse, fill, opaque } from './vector-paint';
 import { appendRoad, roadStrokes } from './road-painter';
 import { paintHvergelmir } from './hvergelmir-painter';
+import { registerPick } from './world-pick-registry';
 import { paintGround, tintGround } from './terrain-painter';
 import { WorldRendererState, isoLayer, type GroundChunk } from './world-renderer-state';
 import type { TileRegion } from './render-types';
@@ -207,8 +208,19 @@ export function paintOrnaments(s: WorldRendererState, map: WorldMap, climate: Re
   if (
     map.inside(Math.trunc(spring.x), Math.trunc(spring.y)) &&
     map.at(Math.trunc(spring.x), Math.trunc(spring.y)).revealed
-  )
-    paintHvergelmir(s.ornaments, map);
+  ) {
+    const springPaint = new SceneNode();
+    paintHvergelmir(springPaint, map);
+    if (springPaint.children.length) {
+      s.ornaments.add(springPaint);
+      registerPick(springPaint, {
+        ref: { kind: 'landmark', id: 2 },
+        body: [springPaint],
+        foot: spring,
+        ellipse: { rx: 64, ry: 32 },
+      });
+    }
+  }
 }
 export function buildPreview(s: WorldRendererState, preview: Preview): void {
   s.overlay.remove();

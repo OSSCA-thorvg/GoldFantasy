@@ -1,24 +1,20 @@
-import { describe, it, expect } from 'vitest';
-import { WorldMap } from '../../packages/engine/src/world-map';
-import { Layer, makeTile, Giant, Volcano, Terrain } from '../../packages/engine/src/world-types';
+import { describe, it, expect, vi } from 'vitest';
 import { Person, Role, Calling, Race, Monster, AnimalKind } from '../../packages/engine/src/person';
-import { Building, Field } from '../../packages/engine/src/town-models';
+import { Building } from '../../packages/engine/src/town-models';
 import { Structure } from '../../packages/engine/src/building-catalog';
-import { Camera, point, project } from '../../packages/engine/src/geometry';
-import { RoadNetwork } from '../../packages/engine/src/road-network';
-import { targetsInBox, worldTarget, hoveredTarget } from '../../apps/web/src/native/world-targets';
+import { point } from '../../packages/engine/src/geometry';
+import { targetsInBox, worldTarget, hoveredTarget, targetKey } from '../../apps/web/src/native/world-targets';
 import type { GameCommandApp } from '../../apps/web/src/native/game-commands';
 import { worldObjectPanel } from '../../apps/web/src/native/game-selection-panel';
 import { Rect } from '../../packages/native-ui/src';
-import { SceneNode, ShapeNode } from '../../packages/native-renderer/src/paint';
 import { select } from '../../apps/web/src/native/game-input';
+import { presentedHit } from './fixtures/presented-hit';
+import type {
+  WorldObjectRef,
+  SelectionGeometry,
+} from '../../packages/native-renderer/src/world-picking-types';
 
 function fixture() {
-  const map = new WorldMap();
-  map.columns = map.rows = 32;
-  map.tiles = Array.from({ length: 1024 }, makeTile);
-  map.layers = Array.from({ length: Layer.Count }, () => new Float32Array(65 * 65));
-  map.seen = [{ center: point(16, 16), radius: 100 }];
   const people = [0, 1, 2].map(
     (id) =>
       new Person(
@@ -32,189 +28,110 @@ function fixture() {
       ),
   );
   people[2].faction = 2;
-  const building = new Building(4, Structure.Tent, point(12, 12), 0, 1),
-    field = new Field(5, [point(9, 9), point(10, 9), point(10, 10), point(9, 10)]);
+  const building = new Building(4, Structure.Tent, point(12, 12), 0, 1);
   const monster = new Monster(6, -1, point(10, 11)),
     animal = new Monster(7, -1, point(11, 11));
   animal.animal = AnimalKind.Cow;
-  map.at(9, 10).trees = 1;
-  const at = project(11, 11),
-    camera = new Camera(at.x, at.y, 1),
-    network = new RoadNetwork();
+  const refs: WorldObjectRef[] = [
+    ...people.map((p) => ({ kind: 'person' as const, id: p.id })),
+    { kind: 'building', id: 4 },
+    { kind: 'monster', id: 6 },
+    { kind: 'animal', id: 7 },
+    { kind: 'tree', id: 329, instanceIndex: 0 },
+    { kind: 'field', id: 5 },
+    { kind: 'landmark', id: 0 },
+  ];
+  const geometry = new Map<string, SelectionGeometry>(
+    refs.map((ref) => [targetKey(ref), presentedHit(ref.kind, ref.id, ref.instanceIndex).geometry]),
+  );
   const app = {
-    camera,
-    viewWidth: 800,
-    viewHeight: 600,
-    mouse: point(400, 300),
+    mouse: point(50, 50),
     cursor: point(11, 11),
-    toScreen: (p: ReturnType<typeof point>) => camera.toScreen(project(p.x, p.y), 800, 600),
-    renderer: { visible: () => true, buildingRoof: () => null },
+    chosen: [],
+    selectedObjects: [],
+    hoveredWorldTarget: { screen: point(50, 50), hit: presentedHit('monster', 6) },
+    renderer: {
+      pick: vi.fn(),
+      selectionGeometry: vi.fn((ref: WorldObjectRef) => geometry.get(targetKey(ref)) ?? null),
+      querySelection: vi.fn(() => refs.map((ref) => presentedHit(ref.kind, ref.id, ref.instanceIndex))),
+    },
     context: { controlAt: () => false },
     town: {
-      map: () => map,
-      people: () => people,
       person: (id: number) => people[id] ?? null,
-      buildings: () => [building],
       building: (id: number) => (id === 4 ? building : null),
-      monsters: () => [monster],
-      wildlife: () => [animal],
       creature: (id: number) => (id === 6 ? monster : id === 7 ? animal : null),
-      fields: () => [field],
-      field: () => field,
-      fieldAt: () => -1,
-      roads: () => network,
-      monsterAt: () => 6,
+      field: () => ({ id: 5 }),
     },
-    personAt: () => -1,
-    animalAtScreen: () => -1,
-    buildingAtScreen: () => -1,
-    treeAtScreen: () => -1,
-    rockAtScreen: () => -1,
+    selectPeople: vi.fn(),
   } as unknown as GameCommandApp;
-  return { app, people, map, monster };
+  return { app, geometry };
 }
-describe('visible world inspection', () => {
-  it('marquee hits residents, visitors, neutral people, buildings, wildlife, monsters, trees and fields', () => {
+describe('presented world inspection', () => {
+  it('marquee admits only player residents from the renderer spatial query', () => {
     const { app } = fixture(),
-      refs = targetsInBox(app, { x: 0, y: 0, w: 800, h: 600 });
-    expect(refs).toEqual(
-      expect.arrayContaining([
-        { kind: 'person', id: 0 },
-        { kind: 'person', id: 1 },
-        { kind: 'person', id: 2 },
-        { kind: 'building', id: 4 },
-        { kind: 'monster', id: 6 },
-        { kind: 'animal', id: 7 },
-        { kind: 'tree', id: 329 },
-        { kind: 'field', id: 5 },
-      ]),
-    );
+      box = { x: 0, y: 0, w: 100, h: 100 };
+    expect(targetsInBox(app, box)).toEqual([{ kind: 'person', id: 0 }]);
+    expect(app.renderer.querySelection).toHaveBeenCalledWith(box);
   });
-  it('resolves the name and silhouette of an ordinary monster and permits hover inspection', () => {
-    const { app } = fixture();
+  it('resolves names while using renderer geometry unchanged', () => {
+    const { app, geometry } = fixture();
     expect(hoveredTarget(app)).toEqual({ kind: 'monster', id: 6 });
-    expect(worldTarget(app, { kind: 'monster', id: 6 })).toMatchObject({ name: 'Monster', key: 'monster:6' });
+    const target = worldTarget(app, { kind: 'monster', id: 6 })!;
+    expect(target).toMatchObject({ name: 'Monster', key: 'monster:6' });
+    expect(target.geometry).toBe(geometry.get('monster:6'));
+    expect(target.bounds).toBe(target.geometry.bounds);
+    expect(app.renderer.pick).not.toHaveBeenCalled();
   });
-  it('click and hover use the same front target when a monster overlaps a building', () => {
+  it('click and hover use the same front object rather than a hard-coded object-type order', () => {
     const { app } = fixture();
-    app.buildingAtScreen = () => 4;
     select.call(app);
     expect(app.selectedObjects).toEqual([{ kind: 'monster', id: 6 }]);
-    expect(app.selected).toBe(-1);
+    app.hoveredWorldTarget!.hit = presentedHit('building', 4);
+    select.call(app);
+    expect(app.selected).toBe(4);
+    expect(app.selectedObjects).toEqual([]);
+    expect(hoveredTarget(app)).toEqual({ kind: 'building', id: 4 });
   });
-  it('does not expose hidden creatures and ignores objects outside the actual marquee', () => {
-    const { app } = fixture();
-    app.renderer.visible = () => false;
+  it('does not recreate hidden geometry or enumerate the world when the presented query is empty', () => {
+    const { app, geometry } = fixture();
+    geometry.delete('monster:6');
     expect(worldTarget(app, { kind: 'monster', id: 6 })).toBeNull();
+    app.renderer.querySelection = vi.fn(() => []);
     expect(targetsInBox(app, { x: 2, y: 2, w: 5, h: 5 })).toEqual([]);
   });
-});
-
-describe('landmark inspection', () => {
-  it('includes Ymir’s visible head above its ground footprint even through unexplored fog', () => {
-    const { app, map } = fixture();
-    map.ymir = new Giant({ x: 8, y: 8 });
-    map.seen = [];
-    app.town.monsterAt = () => -1;
-    app.camera.y -= 300;
-    const target = worldTarget(app, { kind: 'landmark', id: 0 });
-    expect(target?.name).toBe('Ymir');
-    expect(target!.bounds.h).toBeGreaterThan(450);
-    const at = app.toScreen(map.ymir.center());
-    expect(target!.bounds.y).toBeLessThan(at.y - 400);
-    app.mouse = point(at.x, at.y - 400);
-    expect(hoveredTarget(app)).toEqual({ kind: 'landmark', id: 0 });
-    expect(targetsInBox(app, { x: at.x - 10, y: at.y - 410, w: 20, h: 20 })).toContainEqual({
-      kind: 'landmark',
-      id: 0,
-    });
+  it('keeps each tree instance distinct while its resource command still identifies the cell', () => {
+    const { app, geometry } = fixture();
+    const tiny = presentedHit('tree', 329, 0).geometry,
+      tall = presentedHit('tree', 329, 1).geometry;
+    tall.bounds = { x: 10, y: 10, w: 30, h: 60 };
+    geometry.set('tree:329:1', tall);
+    expect(worldTarget(app, { kind: 'tree', id: 329, instanceIndex: 0 })!.bounds).toEqual(tiny.bounds);
+    expect(worldTarget(app, { kind: 'tree', id: 329, instanceIndex: 1 })!.bounds).toBe(tall.bounds);
+    app.hoveredWorldTarget!.hit = presentedHit('tree', 329, 0);
+    select.call(app);
+    expect(app.selectedTree).toBe(329);
+    expect(app.selectedTreeInstance).toBe(0);
+  });
+  it('takes new landmark geometry after camera/repaint changes and rejects invalidated or absent art', () => {
+    const { app, geometry } = fixture();
+    expect(worldTarget(app, { kind: 'landmark', id: 0 })!.name).toBe('Ymir');
+    const updated = { ...geometry.get('landmark:0')!, bounds: { x: 50, y: -100, w: 800, h: 1160 } };
+    geometry.set('landmark:0', updated);
+    expect(worldTarget(app, { kind: 'landmark', id: 0 })!.geometry).toBe(updated);
+    geometry.delete('landmark:0');
+    expect(worldTarget(app, { kind: 'landmark', id: 0 })).toBeNull();
+    for (const id of [1, 2, 9]) expect(worldTarget(app, { kind: 'landmark', id })).toBeNull();
+  });
+  it('allows individual landmark inspection without adding it to a group selection', () => {
+    const { app } = fixture();
+    app.hoveredWorldTarget!.hit = presentedHit('landmark', 0);
     select.call(app);
     expect(app.selectedObjects).toEqual([{ kind: 'landmark', id: 0 }]);
+    expect(app.chosen).toEqual([]);
   });
-  it('reveals volcano inspection only after exploration and includes its smoke silhouette', () => {
-    const { app, map } = fixture();
-    map.fire = new Volcano({ x: 8, y: 8 });
-    map.seen = [];
-    expect(worldTarget(app, { kind: 'landmark', id: 1 })).toBeNull();
-    map.seen.push({ center: map.fire.center(), radius: 1 });
-    const target = worldTarget(app, { kind: 'landmark', id: 1 })!;
-    expect(target.name).toBe('Fire Mountain');
-    expect(target.bounds.w).toBeGreaterThan(900);
-    expect(target.bounds.y).toBeLessThan(app.toScreen(map.fire.center()).y - 700);
-  });
-  it('excludes a hidden or nonexistent spring and follows the drawn lake rim once revealed', () => {
-    const { app, map } = fixture(),
-      center = point(16, 16);
-    map.hvergelmir = () => center;
-    map.seen = [];
-    map.value = (layer, p) =>
-      layer === Layer.Land
-        ? Math.hypot(p.x - center.x, p.y - center.y) < 3
-          ? 0.8
-          : 0
-        : layer === Layer.Elevation
-          ? 0.1
-          : 0.5;
-    map.at(16, 16).terrain = Terrain.Water;
-    expect(worldTarget(app, { kind: 'landmark', id: 2 })).toBeNull();
-    map.reveal(16, 16, 5);
-    const target = worldTarget(app, { kind: 'landmark', id: 2 })!;
-    expect(target.name).toBe('Hvergelmir');
-    expect(target.bounds.w).toBeGreaterThan(200);
-    map.value = () => 0;
-    expect(worldTarget(app, { kind: 'landmark', id: 2 })).toBeNull();
-  });
-});
-
-it('keeps landmark bounds attached to the actual retained art while the camera pans and zooms', () => {
-  const { app, map } = fixture();
-  map.ymir = new Giant({ x: 8, y: 8 });
-  const base = project(11, 11),
-    paint = new SceneNode().add(new ShapeNode().appendRect(base.x - 200, base.y - 500, 400, 580));
-  (app.renderer as any).ymirPaint = { paint, key: 1n };
-  const first = worldTarget(app, { kind: 'landmark', id: 0 })!.bounds;
-  expect(first.w).toBe(400);
-  expect(first.h).toBe(580);
-  app.camera.zoom = 2;
-  app.camera.x += 40;
-  const second = worldTarget(app, { kind: 'landmark', id: 0 })!.bounds;
-  expect(second.w).toBe(first.w * 2);
-  expect(second.h).toBe(first.h * 2);
-  expect(second.x).toBe(app.camera.toScreen(point(base.x - 200, base.y - 500), 800, 600).x);
-  paint.remove().add(new ShapeNode().appendRect(base.x - 220, base.y - 520, 440, 600));
-  expect(worldTarget(app, { kind: 'landmark', id: 0 })!.bounds.h).toBe(1200);
-  map.ymir = null;
-  expect(worldTarget(app, { kind: 'landmark', id: 0 })).toBeNull();
-});
-it('refreshes spring silhouette bounds after terrain repaint and never invents an absent landmark', () => {
-  const { app, map } = fixture(),
-    center = point(16, 16);
-  let radius = 3;
-  map.hvergelmir = () => center;
-  map.seen = [];
-  map.reveal(16, 16, 20);
-  map.value = (layer, p) =>
-    layer === Layer.Land
-      ? Math.hypot(p.x - center.x, p.y - center.y) < radius
-        ? 0.8
-        : 0
-      : layer === Layer.Elevation
-        ? 0.1
-        : 0.5;
-  const ornaments = new SceneNode();
-  (app.renderer as any).ornaments = ornaments;
-  const before = worldTarget(app, { kind: 'landmark', id: 2 })!.bounds;
-  radius = 6;
-  ornaments.remove();
-  const after = worldTarget(app, { kind: 'landmark', id: 2 })!.bounds;
-  expect(after.w).toBeGreaterThan(before.w * 1.5);
-  expect(worldTarget(app, { kind: 'landmark', id: 0 })).toBeNull();
-  expect(worldTarget(app, { kind: 'landmark', id: 1 })).toBeNull();
-  expect(worldTarget(app, { kind: 'landmark', id: 9 })).toBeNull();
 });
 it('shows a static landmark description without building or unit command actions', () => {
-  const { app, map } = fixture();
-  map.ymir = new Giant({ x: 8, y: 8 });
+  const { app } = fixture();
   const text: string[] = [],
     controls: string[] = [],
     color = { r: 255, g: 255, b: 255, a: 255 };

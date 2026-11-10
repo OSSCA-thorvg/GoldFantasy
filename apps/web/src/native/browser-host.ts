@@ -87,6 +87,7 @@ export class BrowserHost {
         this.stop();
         this.resumeAfterRestore = running;
         this.surfaceLost = true;
+        this.app.invalidatePresentation?.();
         this.releaseInput();
         this.canvas.remove();
         this.canvas.destroy();
@@ -295,6 +296,7 @@ export class BrowserHost {
     if (width === this.width && height === this.height) return;
     this.width = width;
     this.height = height;
+    this.app.invalidatePresentation?.();
     this.canvas.resize(width, height);
   }
   render(seconds = (performance.now() - this.started) / 1000): void {
@@ -305,6 +307,7 @@ export class BrowserHost {
     if (this.closed || this.surfaceLost) return;
     this.syncTextInput();
     this.canvas.update().render();
+    this.app.presented?.(this.canvas.dpr);
     this.element.style.cursor = applicationCursor(this.app);
   }
   start(): void {

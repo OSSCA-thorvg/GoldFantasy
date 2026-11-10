@@ -170,12 +170,17 @@ export function worldObjectPanel(this: GameHudApp, panel: Rect): void {
     text(58, 'Mine, carry, store +3 stone', t.muted);
   } else {
     if (!map.at(x, y).trees) return;
-    const tree = treeAt(map, x, y, f32(map.at(x, y).trees - 1));
+    const instance =
+      this.selectedTreeInstance >= 0 && this.selectedTreeInstance < map.at(x, y).trees
+        ? this.selectedTreeInstance
+        : map.at(x, y).trees - 1;
+    const tree = treeAt(map, x, y, f32(instance));
     tree.foot = point();
     const climate = this.town.climate();
     c.paint(
       JSON.stringify([
         'tree-profile',
+        instance,
         map.seed(),
         cell,
         map.at(x, y).trees,

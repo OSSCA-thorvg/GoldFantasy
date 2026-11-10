@@ -38,3 +38,5 @@ export * from './stone-giant';
 export * from './world-renderer';
 
 export * from './mining-stone';
+
+export * from './world-picking-types';

@@ -125,132 +125,43 @@ function fixture() {
     },
   };
 }
-it('draws selected unit feedback after an opaque foreground world object', () => {
-  const view = fixture();
-  try {
-    const plain = view.draw([]);
-    view.capture('covered-unselected');
-    const selected = view.draw([view.p.id]);
-    view.capture('covered-selected');
-    let changed = 0;
-    for (let i = 0; i < plain.length; i += 4)
-      if (plain[i] !== selected[i] || plain[i + 1] !== selected[i + 1] || plain[i + 2] !== selected[i + 2])
-        changed++;
-    expect(changed, 'selection must remain visible above overlapping world geometry').toBeGreaterThan(40);
-  } finally {
-    view.dispose();
-  }
-});
-it('tracks selected residents and camera changes without scaling corner strokes or adding circles', () => {
+it('leaves selection feedback to the shared app overlay without duplicate native markers', () => {
   const view = fixture();
   try {
     view.occluder.opacity(0);
-    const second = new Person(
-      8,
-      'Second settler',
-      Role.Resident,
-      Calling.Settler,
-      Race.Human,
-      899504,
-      point(10.2, 10.1),
-    );
-    view.people.push(second);
-    view.draw([view.p.id, second.id]);
-    expect(view.state.selectionMarkers.size).toBe(2);
-    const marker = view.state.selectionMarkers.get(view.p.id)!;
-    const before = marker.edge.commands.map((command) => [...command]);
-    const start = marker.edge.commands[0];
-    expect(start[0]).toBe('M');
-    view.p.position.x += 0.25;
-    view.draw([view.p.id, second.id]);
-    const moved = marker.edge.commands[0];
-    expect(moved[1]! - start[1]!).toBeCloseTo(32, 4);
-    expect(moved[2]! - start[2]!).toBeCloseTo(16, 4);
-    for (const zoom of [0.5, 1, 2, 4]) {
-      view.state.view.zoom = zoom;
-      view.draw([view.p.id]);
-      expect(view.state.selectionMarkers.size).toBe(1);
-      expect(marker.edge.width).toBe(1.5);
-      expect(marker.under.width).toBe(3.5);
-      expect(marker.edge.commands.every((command) => command[0] === 'M' || command[0] === 'L')).toBe(true);
-      const [begin, corner] = marker.edge.commands;
-      expect(Math.abs(begin[2]! - corner[2]!)).toBeCloseTo(6, 4);
-      view.capture(`visible-zoom-${zoom}`);
+    const plain = view.draw([]);
+    expect(view.draw([view.p.id])).toEqual(plain);
+    expect(view.state.selection.children).toHaveLength(0);
+    expect(view.state.selectionMarkers.size).toBe(0);
+    const count = view.state.adapter.retainedPaintCount;
+    for (let i = 0; i < 30; i++) {
+      view.draw(i % 2 ? [view.p.id] : []);
+      expect(view.state.adapter.retainedPaintCount).toBe(count);
     }
-    expect(marker.edge.commands).not.toEqual(before);
-    view.state.view.x += 2000;
+    view.reset();
     view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.size).toBe(0);
-    view.state.view.x -= 2000;
-    view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.size).toBe(1);
-    view.people.length = 0;
-    view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.size).toBe(0);
     expect(view.state.selection.children).toHaveLength(0);
   } finally {
     view.dispose();
   }
 });
-it('does not reveal units through fog or an entered doorway and fades with partial visibility', () => {
+it('keeps figure alpha authoritative through fog and doorway transitions', () => {
   const view = fixture();
   try {
     view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.size).toBe(1);
+    expect(view.state.figures.get(view.p.id)!.paint.alpha).toBe(255);
     view.setVisible(false);
-    const hidden = view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.size).toBe(0);
-    expect(hidden).toEqual(view.draw([]));
+    view.draw([view.p.id]);
+    expect(view.state.figures.get(view.p.id)!.paint.alpha).toBe(0);
     view.setVisible(true);
     view.p.inside = true;
     view.p.doorway = 1;
-    const indoors = view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.size).toBe(0);
-    expect(indoors).toEqual(view.draw([]));
+    view.draw([view.p.id]);
+    expect(view.state.figures.get(view.p.id)!.paint.alpha).toBe(0);
     view.p.doorway = 0.5;
     view.draw([view.p.id]);
-    expect(view.state.selectionMarkers.get(view.p.id)!.alpha).toBe(
-      view.state.figures.get(view.p.id)!.paint.alpha,
-    );
-    expect(view.state.selectionMarkers.get(view.p.id)!.alpha).toBeLessThan(255);
-    view.draw([]);
-    expect(view.state.selectionMarkers.size).toBe(0);
-    expect(view.state.selection.children).toHaveLength(0);
-  } finally {
-    view.dispose();
-  }
-});
-
-it('retires native selection paints after repeated deselection, offscreen culling and map resets', () => {
-  const view = fixture();
-  try {
-    view.draw([]);
-    const baseline = view.state.adapter.retainedPaintCount;
-    for (let cycle = 0; cycle < 36; cycle++) {
-      view.draw([view.p.id]);
-      const marker = view.state.selectionMarkers.get(view.p.id)!;
-      const nativePaints = [marker, marker.under, marker.edge].map((node) => view.state.adapter.sync(node));
-      expect(view.state.adapter.retainedPaintCount).toBe(baseline + 3);
-      expect(nativePaints.every((paint) => paint.ptr !== 0)).toBe(true);
-      switch (cycle % 3) {
-        case 0:
-          view.draw([]);
-          break;
-        case 1:
-          view.state.view.x += 2000;
-          view.draw([view.p.id]);
-          view.state.view.x -= 2000;
-          break;
-        default:
-          view.reset();
-          view.draw([]);
-          break;
-      }
-      expect(view.state.selectionMarkers.size).toBe(0);
-      expect(view.state.selection.children).toHaveLength(0);
-      expect(view.state.adapter.retainedPaintCount, `native paint count after cycle ${cycle}`).toBe(baseline);
-      for (const paint of nativePaints) expect(() => paint.ptr).toThrow('Object has been disposed');
-    }
+    expect(view.state.figures.get(view.p.id)!.paint.alpha).toBeGreaterThan(0);
+    expect(view.state.figures.get(view.p.id)!.paint.alpha).toBeLessThan(255);
   } finally {
     view.dispose();
   }

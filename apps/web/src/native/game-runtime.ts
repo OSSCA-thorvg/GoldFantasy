@@ -13,6 +13,8 @@ export interface GameRuntime extends GameEditorsApp {
   view(): Camera;
   setView(camera: { x: number; y: number; zoom: number }): void;
   worldScene(): Scene;
+  worldPresented(pixelRatio: number): boolean;
+  invalidatePresentation(): void;
   hudScene(): Scene;
   renderScene(width: number, height: number): void;
   render(

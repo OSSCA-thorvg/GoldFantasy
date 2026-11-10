@@ -26,17 +26,10 @@ import { harvestTiming, harvestDuration, hammerTiming, workElapsed } from '../..
 import { workItem, equippedItem, type WorkKind } from '../../engine/src/equipment';
 import { ceremonySeconds } from '../../engine/src/town-devotion';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
-import { SelectionMarker, selectionFrame } from './selection-marker';
+import { registerPick } from './world-pick-registry';
 import { WorldRendererState, type Sprite, type Figure } from './world-renderer-state';
 import { standingRow, registerDepth } from './world-depth';
-import {
-  agentSprite,
-  personSprite,
-  personSpeechAnchor,
-  PersonParts,
-  stridePose,
-  monsterParts,
-} from './world-sprites';
+import { agentSprite, personSprite, PersonParts, stridePose, monsterParts } from './world-sprites';
 import { animalSprite } from './wildlife-sprites';
 import { moodOf } from './person-portrait';
 import { canIdleGesture, idleGesture, animateGesture, IdleGesture } from './idle-gesture';
@@ -69,7 +62,6 @@ export function moveAgents(
   seconds: number,
   selected: readonly number[],
 ): void {
-  const marked = new Set<number>();
   for (const sprite of s.sprites.values()) sprite.seen = false;
   const count = s.rows.length;
   for (const agent of traffic.agents()) {
@@ -238,28 +230,12 @@ export function moveAgents(
     figure.paint.opacity(
       !s.sceneView && !inSight(s, person.position) ? 0 : lround(f(255 * person.visibility())),
     );
-    if (selected.includes(person.id) && figure.paint.alpha > 0) {
-      const at = s.view.toScreen(screen, s.viewWidth, s.viewHeight),
-        halfWidth = Math.max(5.8, 4.2 * (person.customLook?.bodyWidth ?? 1) + 1.6) * s.view.zoom,
-        top = personSpeechAnchor(person).y * s.view.zoom,
-        bounds = { x: at.x - halfWidth, y: at.y + top, w: halfWidth * 2, h: -top },
-        frame = selectionFrame(bounds);
-      if (
-        frame.x + frame.w >= 0 &&
-        frame.y + frame.h >= 0 &&
-        frame.x <= s.viewWidth &&
-        frame.y <= s.viewHeight
-      ) {
-        let marker = s.selectionMarkers.get(person.id);
-        if (!marker) {
-          marker = new SelectionMarker();
-          s.selectionMarkers.set(person.id, marker);
-          s.selection.add(marker);
-        }
-        marker.update(bounds, figure.paint.alpha);
-        marked.add(person.id);
-      }
-    }
+    registerPick(figure.paint, {
+      ref: { kind: 'person', id: person.id },
+      body: figure.parts.body ? [figure.parts.body] : [],
+      foot: { ...person.position },
+      ellipse: { rx: 6, ry: 2.6 },
+    });
     figure.parts.alert?.opacity(
       !person.stressRecovery && (person.stress > f(0.7) || person.food < f(0.15)) ? 255 : 0,
     );
@@ -366,11 +342,6 @@ export function moveAgents(
     if (figure.row >= 0) s.rows[figure.row].remove(figure.paint);
     s.figures.delete(id);
   }
-  for (const [id, marker] of s.selectionMarkers) {
-    if (marked.has(id)) continue;
-    s.selection.remove(marker);
-    s.selectionMarkers.delete(id);
-  }
   for (const sprite of s.beasts.values()) sprite.seen = false;
   for (const group of [town.monsters(), town.wildlife()])
     for (const beast of group) {
@@ -425,6 +396,12 @@ export function moveAgents(
       if (rig) rig.facing = facing;
       sprite.paint.transform([facing, 0, screen.x, 0, 1, screen.y, 0, 0, 1]);
       sprite.paint.opacity(inSight(s, beast.position) ? 255 : 0);
+      registerPick(sprite.paint, {
+        ref: { kind: beast.animal == null ? 'monster' : 'animal', id: beast.id },
+        body: rig ? [rig.body] : sprite.paint.children.slice(1),
+        foot: { ...beast.position },
+        ellipse: { rx: beast.giant() ? 14 : 9, ry: beast.giant() ? 6 : 3.5 },
+      });
     }
   for (const [id, sprite] of s.beasts) {
     if (sprite.seen) continue;

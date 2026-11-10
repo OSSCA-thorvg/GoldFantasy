@@ -31,6 +31,8 @@ import * as objectives from './game-objectives';
 import * as skyHud from './game-sky-hud';
 import * as speech from './game-speech';
 import * as soundscape from './game-soundscape';
+import { refreshHoveredTarget } from './world-targets';
+import { isPlayerResident } from '../../../../packages/engine/src/faction';
 const {
   pointerDown: rawDown,
   pointerUp: rawUp,
@@ -91,7 +93,10 @@ export class GameApp extends GameAppState implements GameRuntime {
     if (source) {
       this.theme = copyNative(source.theme);
       this.camera = copyNative(source.camera);
-      this.chosen = [...source.chosen];
+      this.chosen =
+        source.chosen.length > 1
+          ? source.chosen.filter((id) => isPlayerResident(town.person(id)))
+          : [...source.chosen];
       this.speed = source.speed;
       this.paused = source.paused;
       this.workQueue = copyNative(source.workQueue);
@@ -103,17 +108,35 @@ export class GameApp extends GameAppState implements GameRuntime {
       this.camera = town.map().giant()
         ? new Camera(focus.x, Math.fround(focus.y - 207), Math.fround(0.7))
         : new Camera(focus.x, focus.y, Math.fround(1.4));
-      this.chosen = town.people().map((person) => person.id);
+      this.chosen = town
+        .people()
+        .filter(isPlayerResident)
+        .map((person) => person.id);
     }
   }
   state(): Town {
     return this.town;
+  }
+  worldPresented(pixelRatio: number): boolean {
+    if (this.editor || this.atlas || this.buildings) {
+      this.invalidatePresentation();
+      return false;
+    }
+    const previous = this.hoveredWorldTarget?.hit?.key ?? '';
+    this.renderer.presented(pixelRatio);
+    refreshHoveredTarget(this);
+    return previous !== (this.hoveredWorldTarget?.hit?.key ?? '');
+  }
+  invalidatePresentation(): void {
+    this.hoveredWorldTarget = null;
+    this.renderer.invalidatePresentation();
   }
   view(): Camera {
     return this.camera;
   }
   setView(camera: { x: number; y: number; zoom: number }): void {
     this.camera = new Camera(Math.fround(camera.x), Math.fround(camera.y), Math.fround(camera.zoom));
+    this.invalidatePresentation();
   }
   selectedBuilding(): number {
     return this.selected;

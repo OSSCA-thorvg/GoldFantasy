@@ -5,7 +5,7 @@ import { GameAppState, type Plan, type WorldRenderer } from './game-app-state';
 import type { Traffic } from '../../../../packages/engine/src/traffic';
 import type { Town } from '../../../../packages/engine/src/town';
 import { Tool, Preview } from '../../../../packages/engine/src/game-tools';
-import { Camera, distance, type Point } from '../../../../packages/engine/src/geometry';
+import { Camera, distance, unproject, type Point } from '../../../../packages/engine/src/geometry';
 import { clamp, f32 as f } from '../../../../packages/engine/src/numeric';
 import { Cue, Sound, SpeechChannel, noticeCue } from '../../../../packages/native-audio/src/sound-types';
 import { Moment } from '../../../../packages/native-audio/src/music-director';
@@ -162,7 +162,14 @@ export function render(
     const speed = f(f(620 / this.camera.zoom) * f(elapsed));
     this.camera.x = f(this.camera.x + f(this.pan.x * speed));
     this.camera.y = f(this.camera.y + f(this.pan.y * speed));
-    if (this.mouse.x >= 0) this.pointerMove(this.mouse.x, this.mouse.y);
+    this.hoveredWorldTarget = null;
+    this.renderer.invalidatePresentation();
+    if (this.mouse.x >= 0) {
+      const projected = this.camera.toWorld(this.mouse, width, height);
+      this.cursor = unproject(projected.x, projected.y);
+      this.context.pointerMove(this.mouse.x, this.mouse.y);
+      this.sampleRoad();
+    }
   }
   if (simulate) {
     this.town.advance(editing ? 0 : elapsed * this.gameSpeed());

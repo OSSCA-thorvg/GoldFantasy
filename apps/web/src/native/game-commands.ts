@@ -1,14 +1,13 @@
 // Direct translation of native game_commands.cpp.
 import type { GameInputApp } from './game-input';
 import { Tool, Order } from '../../../../packages/engine/src/game-tools';
-import { type Point, point, distance, unproject } from '../../../../packages/engine/src/geometry';
+import { type Point, point, distance } from '../../../../packages/engine/src/geometry';
 import { f32 as f } from '../../../../packages/engine/src/numeric';
-import { animalSpec } from '../../../../packages/engine/src/wildlife';
 import { Activity } from '../../../../packages/engine/src/person';
 import { isHome, structureSpec } from '../../../../packages/engine/src/building-catalog';
 import { treePosition } from '../../../../packages/engine/src/world-map';
 import * as mining from '../../../../packages/engine/src/mining';
-import { treeAt } from '../../../../packages/native-renderer/src/tree-painter';
+import { cachedWorldHit } from './world-targets';
 import {
   canControl,
   isPlayerBuilding,
@@ -43,106 +42,23 @@ function interruptible(activity: Activity): boolean {
     Activity.Collecting,
   ].includes(activity);
 }
+// These compatibility helpers inspect the same frontmost presented hit. They
+// must never search behind a different object or revive a rejected broad hit.
 export function treeAtScreen(this: GameCommandApp, screen: Point): number {
-  const ground = this.camera.toWorld(screen, this.viewWidth, this.viewHeight),
-    tile = unproject(ground.x, ground.y),
-    map = this.town.map();
-  let found = -1,
-    best = Infinity;
-  for (
-    let y = Math.max(0, Math.trunc(tile.y) - 4);
-    y <= Math.min(map.height() - 1, Math.trunc(tile.y) + 4);
-    ++y
-  )
-    for (
-      let x = Math.max(0, Math.trunc(tile.x) - 4);
-      x <= Math.min(map.width() - 1, Math.trunc(tile.x) + 4);
-      ++x
-    )
-      for (let index = 0; index < map.at(x, y).trees; ++index) {
-        const tree = treeAt(map, x, y, index);
-        if (!map.revealed(tree.foot)) continue;
-        const feet = this.toScreen(tree.foot),
-          height = f(f(f(5 + f(38 * tree.slender)) * tree.size) * this.camera.zoom),
-          width = f(f(f(11 * tree.size) * this.camera.zoom) + 3);
-        if (
-          screen.y < f(feet.y - height) ||
-          screen.y > f(feet.y + 3) ||
-          Math.abs(f(screen.x - feet.x)) > width
-        )
-          continue;
-        const gap = distance(screen, feet);
-        if (gap < best) {
-          best = gap;
-          found = y * map.width() + x;
-        }
-      }
-  return found;
+  const hit = cachedWorldHit(this, screen);
+  return hit?.kind === 'tree' ? hit.id : -1;
 }
 export function rockAtScreen(this: GameCommandApp, screen: Point): number {
-  const ground = this.camera.toWorld(screen, this.viewWidth, this.viewHeight),
-    tile = unproject(ground.x, ground.y),
-    map = this.town.map();
-  let found = -1,
-    best = Infinity;
-  for (
-    let y = Math.max(0, Math.trunc(tile.y) - 2);
-    y <= Math.min(map.height() - 1, Math.trunc(tile.y) + 2);
-    ++y
-  )
-    for (
-      let x = Math.max(0, Math.trunc(tile.x) - 2);
-      x <= Math.min(map.width() - 1, Math.trunc(tile.x) + 2);
-      ++x
-    ) {
-      const foot = mining.position(x, y);
-      if (!mining.deposit(map, x, y) || !map.revealed(foot)) continue;
-      const at = this.toScreen(foot),
-        size = f(mining.size(map, x, y) * this.camera.zoom);
-      if (
-        screen.x < f(f(at.x - size) - 3) ||
-        screen.x > f(f(at.x + size) + 3) ||
-        screen.y < f(f(at.y - f(size * f(1.1))) - 3) ||
-        screen.y > f(at.y + 5)
-      )
-        continue;
-      const gap = distance(screen, at);
-      if (gap < best) {
-        best = gap;
-        found = y * map.width() + x;
-      }
-    }
-  return found;
+  const hit = cachedWorldHit(this, screen);
+  return hit?.kind === 'rock' ? hit.id : -1;
 }
 export function buildingAtScreen(this: GameCommandApp, screen: Point): number {
-  const at = this.camera.toWorld(screen, this.viewWidth, this.viewHeight),
-    id = this.renderer.buildingDrawnAt(this.town, at);
-  const found = id >= 0 ? id : this.town.buildingAt(unproject(at.x, at.y));
-  const building = this.town.building(found);
-  return building && building.faction > 0 && !this.town.map().revealed(building.center) ? -1 : found;
+  const hit = cachedWorldHit(this, screen);
+  return hit?.kind === 'building' ? hit.id : -1;
 }
 export function animalAtScreen(this: GameCommandApp, screen: Point): number {
-  let found = -1,
-    best = Infinity;
-  for (const animal of this.town.wildlife()) {
-    if (animal.animal === null || animal.health <= 0 || !this.town.map().revealed(animal.position)) continue;
-    const spec = animalSpec(animal.animal),
-      feet = this.toScreen(animal.position),
-      w = f(spec.width * this.camera.zoom),
-      h = f(spec.height * this.camera.zoom);
-    if (
-      Math.abs(f(screen.x - feet.x)) > f(f(w * f(0.5)) + 3) ||
-      screen.y < f(f(feet.y - f(h * f(88 / 96))) - 3) ||
-      screen.y > f(feet.y + 4)
-    )
-      continue;
-    const gap = distance(screen, point(feet.x, f(feet.y - f(h * f(0.45)))));
-    if (gap < best) {
-      best = gap;
-      found = animal.id;
-    }
-  }
-  return found;
+  const hit = cachedWorldHit(this, screen);
+  return hit?.kind === 'animal' ? hit.id : -1;
 }
 export function prepare(this: GameCommandApp, order: Order): void {
   if (!this.chosen.length) {
@@ -238,47 +154,45 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
     return;
   }
   this.status = '';
-  const personTarget = this.personAt(this.mouse);
-  if (order === Order.Work && personTarget >= 0) {
-    const target = this.town.person(personTarget);
-    if (target) this.town.orderMove(ids, target.position);
-    this.cue(Cue.Order);
-    return;
-  }
-  const animal = this.animalAtScreen(this.mouse);
-  const monster = animal >= 0 ? animal : this.town.monsterAt(this.cursor, f(1.2)),
-    tree = this.treeAtScreen(this.mouse),
-    rock = this.rockAtScreen(this.mouse),
-    id = this.buildingAtScreen(this.mouse),
-    place = this.town.building(id),
+  // Resolve once. Selection, hover and every command see the same top drawn object.
+  const hit = cachedWorldHit(this),
+    personTarget = hit?.kind === 'person' ? this.town.person(hit.id) : null,
+    creature =
+      hit?.kind === 'animal' || hit?.kind === 'monster' ? this.town.creature(hit.id) : null,
+    place = hit?.kind === 'building' ? this.town.building(hit.id) : null,
     moving: number[] = [];
   if (order === Order.Move) this.town.orderMove(ids, this.cursor);
-  else if (order === Order.Attack && personTarget >= 0) this.town.orderAttackPerson(ids, personTarget);
-  else if (order === Order.Attack && monster < 0 && tree < 0 && rock < 0)
+  else if (personTarget) {
+    if (order === Order.Attack) this.town.orderAttackPerson(ids, personTarget.id);
+    else this.town.orderMove(ids, personTarget.position);
+  } else if (order === Order.Work && hit?.kind === 'dungeon') {
+    if (!this.town.sendExpedition(ids, hit.id)) this.town.orderMove(ids, this.cursor);
+  } else if (order === Order.Attack && !creature && hit?.kind !== 'tree' && hit?.kind !== 'rock') {
     this.town.orderAttackMove(ids, this.cursor);
-  else
-    for (const person of ids) {
-      const unit = [person];
+  } else {
+    for (const id of ids) {
+      const unit = [id];
       let accepted = false;
-      if (monster >= 0 && (animal < 0 || order === Order.Attack || this.town.creature(monster)?.angry))
-        accepted = this.town.orderAttack(unit, monster);
-      else if (tree >= 0) accepted = this.town.orderChop(unit, tree);
-      else if (rock >= 0) accepted = this.town.orderMine(unit, rock);
+      if (creature && (creature.animal === null || order === Order.Attack || creature.angry))
+        accepted = this.town.orderAttack(unit, creature.id);
+      else if (hit?.kind === 'tree') accepted = this.town.orderChop(unit, hit.id);
+      else if (hit?.kind === 'rock') accepted = this.town.orderMine(unit, hit.id);
       else if (place && !isPlayerBuilding(place)) this.status = buildingControlReason(place);
-      else if (place && (!place.built() || place.health < 1)) accepted = this.town.orderBuild(unit, id);
-      else if (place && isHome(place.kind)) accepted = this.town.orderRest(unit, id);
-      else if (place && structureSpec(place.kind).jobs > 0) accepted = this.town.assignJob(unit, id);
-      else {
-        const road = this.town.roads().road(this.hoveredRoad());
+      else if (place && (!place.built() || place.health < 1))
+        accepted = this.town.orderBuild(unit, place.id);
+      else if (place && isHome(place.kind)) accepted = this.town.orderRest(unit, place.id);
+      else if (place && structureSpec(place.kind).jobs > 0) accepted = this.town.assignJob(unit, place.id);
+      else if (hit?.kind === 'road') {
+        const road = this.town.roads().road(hit.id);
         if (road && (road.built < 1 || road.paving >= 0 || road.wear > 0))
-          accepted = this.town.orderRoadwork(unit, road.id);
+          accepted = this.town.orderRoadwork(unit, hit.id);
       }
       if (accepted) {
-        const target = this.town.creature(monster);
-        if (!target || target.animal === null) this.town.approachOrder(unit, this.cursor);
-      } else moving.push(person);
+        if (!creature || creature.animal === null) this.town.approachOrder(unit, this.cursor);
+      } else moving.push(id);
     }
-  if (moving.length) this.town.orderMove(moving, place ? place.door() : this.cursor);
+    if (moving.length) this.town.orderMove(moving, place ? place.door() : this.cursor);
+  }
   this.cue(Cue.Order);
 }
 export function queueWork(this: GameCommandApp, activity: Activity, target: number): void {

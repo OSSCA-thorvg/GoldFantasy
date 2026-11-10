@@ -23,7 +23,8 @@
     "test:lifetime": "node tests/regression/webcanvas-lifetime.browser.mjs",
     "test:editor": "node tests/regression/map-editor-lifecycle.browser.mjs",
     "test:splash": "node tests/regression/splash-runtime.browser.mjs",
-    "test:work": "node tests/regression/work-contact.browser.mjs"
+    "test:work": "node tests/regression/work-contact.browser.mjs",
+    "test:picking": "node tests/regression/picking.browser.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

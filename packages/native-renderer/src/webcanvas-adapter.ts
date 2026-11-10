@@ -1,4 +1,13 @@
-import type { Paint, Shape, Scene, Text, Picture, Animation, ThorVGNamespace } from '@thorvg/webcanvas';
+import type {
+  Paint,
+  Shape,
+  Scene,
+  Text,
+  Picture,
+  Animation,
+  Accessor,
+  ThorVGNamespace,
+} from '@thorvg/webcanvas';
 import {
   PaintNode,
   ShapeNode,
@@ -27,6 +36,7 @@ interface Entry {
   clipper?: PaintNode;
   masking?: PaintNode;
   maskMethod?: 'alpha' | 'inverseAlpha';
+  hitShapes?: { version: number; paints: Paint[] };
 }
 function matrix(value: Matrix) {
   return {
@@ -51,6 +61,7 @@ export class WebCanvasAdapter {
   private entries = new Map<PaintNode, Entry>();
   private parents = new WeakMap<Paint, Entry>();
   private rasterGeneration = rasterGeneration;
+  private hitAccessor?: Accessor;
   constructor(readonly tvg: ThorVGNamespace) {}
   sync(node: PaintNode): Paint {
     if (this.rasterGeneration !== rasterGeneration) {
@@ -176,6 +187,43 @@ export class WebCanvasAdapter {
   get retainedPaintCount(): number {
     return this.entries.size;
   }
+  /** Read only the native geometry prepared by the last Canvas update. Never sync while picking. */
+  intersectsRendered(node: PaintNode, region: { x: number; y: number; w: number; h: number }): boolean {
+    if (!node.alpha) return false;
+    const entry = this.entries.get(node);
+    if (!entry) return false;
+    if (entry.paint.intersects(region.x, region.y, region.w, region.h, true)) return true;
+    // The pinned SDK's Lottie Picture root can miss transformed children. Its
+    // actual prepared leaf shapes still carry the full ancestor/clip transform.
+    if (
+      entry.hitShapes?.paints.some((paint) => paint.intersects(region.x, region.y, region.w, region.h, true))
+    )
+      return true;
+    return node instanceof SceneNode && node.children.some((child) => this.intersectsRendered(child, region));
+  }
+  /** Borrowed wrappers are frame-scoped; collecting them never changes native ownership. */
+  prepareHitTest(node: PaintNode): void {
+    const entry = this.entries.get(node);
+    if (!entry || !node.alpha) return;
+    if (node instanceof AnimationNode && entry.hitShapes?.version !== node.version) {
+      const paints: Paint[] = [];
+      this.hitAccessor ??= new this.tvg.Accessor();
+      this.hitAccessor.set(entry.paint, (paint) => {
+        if (paint instanceof this.tvg.Shape || paint instanceof this.tvg.Text) paints.push(paint);
+        return true;
+      });
+      entry.hitShapes = { version: node.version, paints };
+    }
+    if (node instanceof SceneNode) node.children.forEach((child) => this.prepareHitTest(child));
+  }
+  renderedBounds(node: PaintNode): { x: number; y: number; w: number; h: number } | null {
+    const paint = this.entries.get(node)?.paint;
+    if (!paint) return null;
+    const bounds = paint.bounds();
+    return Number.isFinite(bounds.x + bounds.y + bounds.width + bounds.height)
+      ? { x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height }
+      : null;
+  }
   /** Call after syncing every live root to release paints detached by a rebuild. */
   collect(roots: readonly PaintNode[]): void {
     const live = new Set<PaintNode>();
@@ -195,6 +243,8 @@ export class WebCanvasAdapter {
       }
   }
   dispose(): void {
+    this.hitAccessor?.dispose();
+    this.hitAccessor = undefined;
     for (const entry of this.entries.values()) this.release(entry);
     this.entries.clear();
   }

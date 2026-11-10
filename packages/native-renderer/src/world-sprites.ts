@@ -1219,6 +1219,8 @@ export function stridePose(parts: PersonParts, stride: number, walking: boolean)
     setTransform(parts.feet[i], [1, 0, f32((i ? -f32(0.75) : f32(0.75)) * swing), 0, 1, -lift, 0, 0, 1]);
   }
 }
+const dungeonBodies = new WeakMap<SceneNode, readonly PaintNode[]>();
+export const dungeonBody = (paint: SceneNode): readonly PaintNode[] => dungeonBodies.get(paint) ?? [];
 export function dungeonSprite(
   objects: SceneNode,
   lights: SceneNode,
@@ -1521,6 +1523,10 @@ export function dungeonSprite(
       break;
     }
   }
+  dungeonBodies.set(
+    objects,
+    objects.children.filter((paint) => paint !== pulse),
+  );
   label(objects, point(c.x, f32(c.y - 66)), site.name, measure);
   return pulse;
 }

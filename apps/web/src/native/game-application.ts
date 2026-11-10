@@ -113,6 +113,12 @@ export class GameApplication implements Application {
   private lastHeight = 0;
   private inspected = 'world';
   private authoredSelection = 'world';
+  presented(pixelRatio: number): void {
+    if (this.game.worldPresented(pixelRatio)) this.dirty = true;
+  }
+  invalidatePresentation(): void {
+    this.game.invalidatePresentation();
+  }
   constructor(
     private readonly options: LaunchOptions,
     private readonly services: GameApplicationServices,

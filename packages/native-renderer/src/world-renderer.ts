@@ -9,6 +9,8 @@ import type { Building } from '../../engine/src/town-models';
 import type { Strike } from '../../engine/src/thunderstorm';
 import type { TileRegion } from './render-types';
 import { WorldRendererState } from './world-renderer-state';
+import { WorldPicker } from './world-picking';
+import type { PickBounds, SelectionGeometry, WorldHit, WorldObjectRef } from './world-picking-types';
 import { buildingCatalogGeneration } from './building-assets';
 import { resize, fitToView, paintMapName, buildPreview, updateGroundChunks } from './world-ground';
 import { paintGround, tintGround, paintFields } from './terrain-painter';
@@ -43,6 +45,29 @@ const intersects = (a: TileRegion, b: TileRegion) =>
   a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
 export class WorldRenderer extends WorldRendererState {
+  private readonly picker = new WorldPicker(this);
+  private pickedTown: Town | null = null;
+  pick(screen: Point): WorldHit | null {
+    return this.picker.pick(screen);
+  }
+  querySelection(region: PickBounds): WorldHit[] {
+    return this.picker.querySelection(region);
+  }
+  selectionGeometry(ref: WorldObjectRef): SelectionGeometry | null {
+    return this.picker.selectionGeometry(ref);
+  }
+  presented(dpr: number): void {
+    if (this.pickedTown) this.picker.presented(this.pickedTown, dpr);
+  }
+  invalidatePresentation(): void {
+    this.picker.invalidate();
+  }
+  override dispose(): void {
+    this.picker.invalidate();
+    this.pickedTown = null;
+    super.dispose();
+  }
+
   animating(): boolean {
     return (
       this.fallingTrees.length !== 0 ||
@@ -54,6 +79,7 @@ export class WorldRenderer extends WorldRendererState {
     return this.currentVisibility.sample(at) >= 119;
   }
   invalidateMap(): void {
+    this.invalidatePresentation();
     for (const tree of this.fallingTrees) this.rows[tree.row]?.remove(tree.paint);
     this.fallingTrees = [];
     this.seenTreeEvent = 0n;
@@ -183,6 +209,8 @@ export class WorldRenderer extends WorldRendererState {
     preview: Preview,
     selected: readonly number[] = [],
   ): void {
+    this.picker.beginFrame();
+    this.pickedTown = town;
     resize(this, width, height);
     this.view = new Camera(camera.x, camera.y, camera.zoom);
     this.renderedAt = seconds;

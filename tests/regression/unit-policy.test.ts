@@ -1,3 +1,4 @@
+import { presentedHit } from './fixtures/presented-hit';
 import { footBoxesOverlap } from '../../packages/engine/src/person-collision';
 import { dispatchWork, queueWork, issueOrder, type GameCommandApp } from '../../apps/web/src/native/game-commands';
 import { Order } from '../../packages/engine/src/game-tools';
@@ -317,7 +318,7 @@ describe('resident automatic policy', () => {
   });
   it('right-clicking an animal targets it, while explicit Move remains movement', () => {
     const town=fixture(),p=town.people()[0],animal=new Monster(88,-1,add(p.position,point(.6,0)));animal.animal=AnimalKind.Pig;animal.health=3;animal.home={...animal.position};town.animals.push(animal);
-    const app={town,chosen:[p.id],mouse:point(),cursor:animal.position,status:'',animalAtScreen:()=>animal.id,treeAtScreen:()=>-1,rockAtScreen:()=>-1,buildingAtScreen:()=>-1,hoveredRoad:()=>-1,personAt:()=>-1,cue(){}} as unknown as GameCommandApp;
+    const app={town,chosen:[p.id],mouse:point(),hoveredWorldTarget:{screen:point(),hit:presentedHit('animal',animal.id)},context:{controlAt:()=>false},cursor:animal.position,status:'',animalAtScreen:()=>animal.id,treeAtScreen:()=>-1,rockAtScreen:()=>-1,buildingAtScreen:()=>-1,hoveredRoad:()=>-1,personAt:()=>-1,cue(){}} as unknown as GameCommandApp;
     issueOrder.call(app,Order.Work);expect(p.task).toBe(Activity.Moving);town.advance(.1);expect(animal.health).toBe(3);
     issueOrder.call(app,Order.Move);expect(p.task).toBe(Activity.Moving);
   });

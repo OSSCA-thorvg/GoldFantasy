@@ -11,10 +11,20 @@ import type { Building } from '../../../../packages/engine/src/town-models';
 import { CampResourceHud } from './camp-resource-hud';
 import { gameTheme } from './game-theme';
 import type { WorldObjectRef } from './world-targets';
+import type {
+  WorldHit,
+  SelectionGeometry,
+  PickBounds,
+} from '../../../../packages/native-renderer/src/world-picking-types';
 export { gameTheme } from './game-theme';
 
 export interface WorldRenderer {
   scene(): Scene;
+  pick(screen: Point): WorldHit | null;
+  querySelection(screen: PickBounds): readonly WorldHit[];
+  selectionGeometry(ref: WorldObjectRef): SelectionGeometry | null;
+  presented(pixelRatio: number): void;
+  invalidatePresentation(): void;
   // Traffic is supplied by the native application render loop.
   visible(at: Point): boolean;
   buildingDrawnAt(town: Town, projected: Point): number;
@@ -68,6 +78,8 @@ export class GameAppState {
   fieldFrom: Point | null = null;
   chosen: number[] = [];
   selectedObjects: WorldObjectRef[] = [];
+  selectedTreeInstance = -1;
+  hoveredWorldTarget: { screen: Point; hit: WorldHit | null } | null = null;
   objectPage = 0;
   equipmentTab: 'profile' | 'equipment' | 'craft' = 'equipment';
   inventorySelected = -1;

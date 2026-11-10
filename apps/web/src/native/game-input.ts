@@ -43,7 +43,7 @@ import { controllableIds } from './game-control';
 import { Cue } from '../../../../packages/native-audio/src/sound-types';
 import { Key } from '../../../../packages/native-ui/src';
 import type { AppEvent } from './application-contracts';
-import { targetsInBox, hoveredTarget } from './world-targets';
+import { targetsInBox, hoveredTarget, cachedWorldHit, refreshHoveredTarget } from './world-targets';
 
 export interface GameInputApp extends GameAppState {
   cue(sound: Cue): void;
@@ -76,19 +76,8 @@ export interface GameInputApp extends GameAppState {
   zoomBy(factor: number, screen: Point): void;
 }
 export function personAt(this: GameInputApp, screen: Point): number {
-  let best = -1,
-    bestGap = f(13 * Math.max(this.camera.zoom, f(0.7)));
-  for (const person of this.town.people()) {
-    if (person.visibility() <= f(0.05) || (person.faction > 0 && !this.renderer.visible(person.position)))
-      continue;
-    const feet = this.toScreen(person.position),
-      gap = distance(screen, point(feet.x, f(feet.y - f(9 * this.camera.zoom))));
-    if (gap < bestGap) {
-      bestGap = gap;
-      best = person.id;
-    }
-  }
-  return best;
+  const hit = cachedWorldHit(this as import('./game-commands').GameCommandApp, screen);
+  return hit?.kind === 'person' ? hit.id : -1;
 }
 export function fieldRectangle(this: GameInputApp, from: Point, to: Point): Outline {
   const nearest = this.town.roads().distance(from),
@@ -356,7 +345,8 @@ export function selectTool(this: GameInputApp, value: Tool, useSelection = false
   if (this.tool !== value) this.cue(Cue.Click);
   this.tool = value;
   this.dismissBuildDrawer();
-  if (value !== Tool.Select) this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+  if (value !== Tool.Select)
+    this.selectedTreeInstance = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
   this.crew = useSelection ? controllableIds(this.town, this.chosen) : [];
   this.pending = Order.None;
   this.roadStroke = [];
@@ -369,12 +359,19 @@ export function selectTool(this: GameInputApp, value: Tool, useSelection = false
 }
 export function selectPeople(this: GameInputApp, ids: number[]): void {
   this.selectTool(Tool.Select);
-  this.chosen = [...ids];
+  const unique = [...new Set(ids)];
+  this.chosen = unique.length > 1 ? unique.filter((id) => isPlayerResident(this.town.person(id))) : unique;
   this.selectedObjects = [];
   this.inventorySelected = -1;
   this.craftWorkshopFilter = null;
   this.craftPage = 0;
-  this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+  this.selected =
+    this.selectedDungeon =
+    this.selectedTreeInstance =
+    this.selectedTree =
+    this.selectedRock =
+    this.selectedAnimal =
+      -1;
 }
 export function selectBuilding(this: GameInputApp, id: number): void {
   this.selectTool(Tool.Select);
@@ -382,7 +379,12 @@ export function selectBuilding(this: GameInputApp, id: number): void {
   this.selectedObjects = [];
   this.residentPage = 0;
   this.inspectorPerson = -1;
-  this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+  this.selectedDungeon =
+    this.selectedTreeInstance =
+    this.selectedTree =
+    this.selectedRock =
+    this.selectedAnimal =
+      -1;
   this.chosen = [];
 }
 export function cancel(this: GameInputApp): void {
@@ -424,7 +426,13 @@ export function cancel(this: GameInputApp): void {
     this.selectedObjects.length ||
     this.chosen.length
   ) {
-    this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+    this.selected =
+      this.selectedDungeon =
+      this.selectedTreeInstance =
+      this.selectedTree =
+      this.selectedRock =
+      this.selectedAnimal =
+        -1;
     this.chosen = [];
     this.selectedObjects = [];
   } else this.tool = Tool.Select;
@@ -459,21 +467,31 @@ export function cancelPointer(this: GameInputApp): void {
   this.skyHovered = false;
   this.questsAnimating = false;
   this.questPulseAt = -1;
+  this.hoveredWorldTarget = null;
   this.context.setPointerPosition(-1, -1);
   this.context.cancelPointer();
 }
 export function select(this: GameInputApp): void {
+  this.chosen = [];
   this.selectedObjects = [];
   this.selected = -1;
   this.residentPage = 0;
   this.inspectorPerson = -1;
-  this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+  this.selectedDungeon =
+    this.selectedTreeInstance =
+    this.selectedTree =
+    this.selectedRock =
+    this.selectedAnimal =
+      -1;
   const target = hoveredTarget(this as unknown as import('./game-commands').GameCommandApp);
   if (!target) return;
   if (target.kind === 'person') this.selectPeople([target.id]);
   else if (target.kind === 'building') this.selected = target.id;
   else if (target.kind === 'animal') this.selectedAnimal = target.id;
-  else if (target.kind === 'tree') this.selectedTree = target.id;
+  else if (target.kind === 'tree') {
+    this.selectedTree = target.id;
+    this.selectedTreeInstance = target.instanceIndex ?? -1;
+  }
   else if (target.kind === 'rock') this.selectedRock = target.id;
   else if (target.kind === 'dungeon') this.selectedDungeon = target.id;
   else this.selectedObjects = [target];
@@ -569,12 +587,15 @@ export function pointerMove(this: GameInputApp, x: number, y: number): void {
       this.camera.x = f(this.camera.x - f(f(x - this.panFrom.x) / this.camera.zoom));
       this.camera.y = f(this.camera.y - f(f(y - this.panFrom.y) / this.camera.zoom));
       this.panFrom = point(x, y);
+      this.renderer.invalidatePresentation();
+      this.hoveredWorldTarget = null;
     }
   }
   this.mouse = point(x, y);
   const world = this.camera.toWorld(this.mouse, this.viewWidth, this.viewHeight);
   this.cursor = unproject(world.x, world.y);
   this.context.pointerMove(x, y);
+  refreshHoveredTarget(this as import('./game-commands').GameCommandApp);
   this.sampleRoad();
 }
 export function pointerUp(this: GameInputApp, x: number, y: number, button: PointerButton): void {
@@ -584,21 +605,7 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
     this.panFrom = this.pressAt = null;
     this.panMoved = false;
     if (click && this.tool === Tool.Select && this.chosen.length && !this.context.controlAt(x, y)) {
-      const tile = this.town.map().cell(this.cursor);
-      const dungeonClick =
-        (this.pending === Order.None || this.pending === Order.Work) &&
-        tile &&
-        tile.dungeon >= 0 &&
-        tile.dungeon < this.town.map().dungeons().length &&
-        this.town.map().dungeons()[tile.dungeon].discovered &&
-        this.animalAtScreen(this.mouse) < 0 &&
-        this.town.monsterAt(this.cursor, f(1.2)) < 0 &&
-        this.treeAtScreen(this.mouse) < 0 &&
-        this.rockAtScreen(this.mouse) < 0 &&
-        this.buildingAtScreen(this.mouse) < 0;
-      if (dungeonClick && this.town.sendExpedition(controllableIds(this.town, this.chosen), tile.dungeon))
-        this.cue(Cue.Order);
-      else this.issueOrder(Order.Work);
+      this.issueOrder(Order.Work);
       this.pending = Order.None;
     } else if (click && this.tool === Tool.Field) this.finish();
     return;
@@ -628,17 +635,18 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
         h: y1 - y0,
       });
       this.chosen = targets.filter((t) => t.kind === 'person').map((t) => t.id);
-      this.selectedObjects = targets.filter((t) => t.kind !== 'person');
+      this.selectedObjects = [];
       this.objectPage = 0;
-      this.selected = this.selectedDungeon = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;
+      this.selected =
+        this.selectedDungeon =
+        this.selectedTreeInstance =
+        this.selectedTree =
+        this.selectedRock =
+        this.selectedAnimal =
+          -1;
       return;
     }
-    const id = this.personAt(this.mouse);
-    if (id >= 0) this.selectPeople([id]);
-    else {
-      this.chosen = [];
-      this.select();
-    }
+    this.select();
     return;
   }
   if (this.fieldFrom) {
@@ -662,6 +670,8 @@ export function zoomBy(this: GameInputApp, factor: number, screen: Point): void 
   const after = this.camera.toWorld(screen, this.viewWidth, this.viewHeight);
   this.camera.x = f(this.camera.x + f(before.x - after.x));
   this.camera.y = f(this.camera.y + f(before.y - after.y));
+  this.renderer.invalidatePresentation();
+  this.hoveredWorldTarget = null;
   this.pointerMove(screen.x, screen.y);
 }
 export function sceneEvent(this: GameInputApp, event: AppEvent): boolean {
@@ -673,6 +683,8 @@ export function sceneEvent(this: GameInputApp, event: AppEvent): boolean {
     return false;
   }
   if (event.type === 'PointerDown') {
+    this.mouse = screen;
+    refreshHoveredTarget(this as import('./game-commands').GameCommandApp);
     if (event.button !== 1) {
       this.scenePanAt = screen;
       return false;
@@ -682,9 +694,15 @@ export function sceneEvent(this: GameInputApp, event: AppEvent): boolean {
       this.selectPeople([person]);
       this.sceneDragOrigin = { ...this.town.person(person)!.position };
     } else {
-      this.selectBuilding(this.town.buildingAt(world));
-      const building = this.town.building(this.selected);
-      this.sceneDragOrigin = building ? { ...building.center } : null;
+      const hit = cachedWorldHit(this as import('./game-commands').GameCommandApp, screen);
+      if (hit?.kind === 'building') {
+        this.selectBuilding(hit.id);
+        const building = this.town.building(hit.id);
+        this.sceneDragOrigin = building ? { ...building.center } : null;
+      } else {
+        this.select();
+        this.sceneDragOrigin = null;
+      }
     }
     this.sceneDragAt = world;
     return true;
@@ -694,6 +712,8 @@ export function sceneEvent(this: GameInputApp, event: AppEvent): boolean {
       this.camera.x = f(this.camera.x - f(f(screen.x - this.scenePanAt.x) / this.camera.zoom));
       this.camera.y = f(this.camera.y - f(f(screen.y - this.scenePanAt.y) / this.camera.zoom));
       this.scenePanAt = screen;
+      this.renderer.invalidatePresentation();
+      this.hoveredWorldTarget = null;
       return true;
     }
     if (this.sceneDragAt && this.sceneDragOrigin) {
@@ -724,6 +744,8 @@ export function sceneEvent(this: GameInputApp, event: AppEvent): boolean {
     const after = this.camera.toWorld(screen, this.viewWidth, this.viewHeight);
     this.camera.x = f(this.camera.x + f(projected.x - after.x));
     this.camera.y = f(this.camera.y + f(projected.y - after.y));
+    this.renderer.invalidatePresentation();
+    this.hoveredWorldTarget = null;
     return true;
   }
   if (event.type === 'KeyDown') {
@@ -733,6 +755,8 @@ export function sceneEvent(this: GameInputApp, event: AppEvent): boolean {
     else if (event.key === Key.Up) this.camera.y = f(this.camera.y - step);
     else if (event.key === Key.Down) this.camera.y = f(this.camera.y + step);
     else return false;
+    this.renderer.invalidatePresentation();
+    this.hoveredWorldTarget = null;
     return true;
   }
   return false;

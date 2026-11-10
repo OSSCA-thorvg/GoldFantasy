@@ -164,6 +164,7 @@ export function renderDockContent(this: GameHudApp, panel: Rect): void {
         this.selected =
           this.selectedDungeon =
           this.selectedTree =
+          this.selectedTreeInstance =
           this.selectedRock =
           this.selectedAnimal =
             -1;
@@ -269,6 +270,7 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
         this.selected =
           this.selectedDungeon =
           this.selectedTree =
+          this.selectedTreeInstance =
           this.selectedRock =
           this.selectedAnimal =
             -1;
