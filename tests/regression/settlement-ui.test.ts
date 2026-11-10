@@ -2,7 +2,7 @@ import { beforeAll, afterAll, expect, it, vi } from 'vitest';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import ThorVG, { type ThorVGNamespace } from '@thorvg/webcanvas';
 import { parseFontMetrics } from '../../packages/native-ui/src/fonts';
-import { Context, Rect } from '../../packages/native-ui/src';
+import { Context, Rect, Key } from '../../packages/native-ui/src';
 import { civicInspector } from '../../apps/web/src/native/game-civic-panel';
 import { Structure, Resources } from '../../packages/engine/src/building-catalog';
 import { Building } from '../../packages/engine/src/town-models';
@@ -11,9 +11,16 @@ import { Activity, Calling, Role, Person, Race } from '../../packages/engine/src
 import { point } from '../../packages/engine/src/geometry';
 import { GameAppState, DockView } from '../../apps/web/src/native/game-app-state';
 import { addInventory } from '../../packages/engine/src/equipment';
-import { updateContextDock, renderDockContent } from '../../apps/web/src/native/game-context-dock';
+import {
+  updateContextDock,
+  renderDockContent,
+  dismissBuildDrawer,
+  taskbar,
+} from '../../apps/web/src/native/game-context-dock';
 import { rosterPanel, rosterBounds } from '../../apps/web/src/native/game-roster';
-import { commandCard, inspector } from '../../apps/web/src/native/game-hud';
+import { commandCard, inspector, buildMenuBounds, buildGroups } from '../../apps/web/src/native/game-hud';
+import * as input from '../../apps/web/src/native/game-input';
+import { PointerButton } from '../../packages/engine/src/game-tools';
 import { actionButton } from '../../apps/web/src/native/hud-actions';
 import {
   worldNameplateBounds,
@@ -227,6 +234,121 @@ it('draws action tooltips after clipped icons and outside every control', () => 
     ui.dispose();
   }
 });
+
+it.each([
+  [390, 844],
+  [844, 390],
+])(
+  'opens pictogram build categories by pointer and keyboard with full labels, and a tooltip-free Back arrow at %sx%s',
+  (width, height) => {
+    const ui = fixture(width, height);
+    try {
+      ui.town.placed = Array.from({ length: Structure.Count }, (_, kind) => {
+        const building = new Building(kind, kind, point(8, 8), 0, 0);
+        building.progress = 1;
+        return building;
+      });
+      while (ui.town.folk.length < 30)
+        ui.town.folk.push(
+          new Person(
+            ui.town.folk.length,
+            'Resident',
+            Role.Resident,
+            Calling.Settler,
+            Race.Human,
+            5,
+            point(8, 8),
+          ),
+        );
+      ui.app.globalCard = 0;
+      ui.app.dismissBuildDrawer = dismissBuildDrawer.bind(ui.app);
+      const draw = () =>
+        ui.draw(() =>
+          commandCard.call(ui.app, buildMenuBounds.call(ui.app, width, height, true), 1, true, true),
+        );
+      draw();
+      const groups = buildGroups(ui.town);
+      expect(groups.length).toBeGreaterThan(1);
+      for (const [i, group] of groups.entries()) {
+        const id = `global/card-group-${group.name}`;
+        const bounds = ui.controls.mock.calls.find(([key]) => key === id)![1];
+        expect(bounds.h).toBeGreaterThanOrEqual(28);
+        expect(bounds.x).toBeGreaterThanOrEqual(0);
+        expect(bounds.x + bounds.w).toBeLessThanOrEqual(width);
+        expect(ui.labels.mock.calls.some(([, text]) => text === group.name)).toBe(false);
+        ui.context.pointerMove(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+        draw();
+        expect(ui.labels.mock.calls.at(-1)?.[1]).toBe(group.name);
+        ui.context.pointerDown(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+        ui.context.pointerUp(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+        expect(ui.app.globalCard).toBe(i + 1);
+        draw();
+        ui.context.focus('global/card-back');
+        ui.context.pointerMove(-1, -1);
+        draw();
+        expect(ui.labels.mock.calls.some(([, text]) => text === 'Back')).toBe(false);
+        ui.context.key(Key.Enter);
+        expect(ui.app.globalCard).toBe(0);
+        draw();
+        ui.context.focus(id);
+        draw();
+        expect(ui.labels.mock.calls.at(-1)?.[1]).toBe(group.name);
+        ui.context.key(Key.Enter);
+        expect(ui.app.globalCard).toBe(i + 1);
+        ui.app.globalCard = 0;
+        ui.context.focus('');
+        draw();
+      }
+      ui.capture(`build-categories-${width}x${height}`);
+    } finally {
+      ui.dispose();
+    }
+  },
+);
+
+it.each(['build', 'units', 'selection'] as const)(
+  'dismisses the %s panel on an empty-world click without redundant close controls',
+  (kind) => {
+    const ui = fixture(390, 844);
+    try {
+      const app = Object.assign(ui.app, {
+        pointerMove: input.pointerMove.bind(ui.app as any),
+        cancelStroke: input.cancelStroke.bind(ui.app as any),
+        sampleRoad: input.sampleRoad.bind(ui.app as any),
+        press: input.press.bind(ui.app as any),
+        select: input.select.bind(ui.app as any),
+        dismissBuildDrawer: dismissBuildDrawer.bind(ui.app),
+        renderDockContent: renderDockContent.bind(ui.app),
+        commandCard: commandCard.bind(ui.app),
+        rosterPanel: rosterPanel.bind(ui.app),
+        personPanel: personPanel.bind(ui.app),
+      });
+      app.renderer.pick = () => null;
+      app.viewWidth = 390;
+      app.viewHeight = 844;
+      app.dockProgress = 1;
+      app.dockBounds = app.dockTarget = new Rect(12, 480, 366, 352);
+      app.chosen = kind === 'selection' ? [ui.town.folk[0].id] : [];
+      app.rosterOpen = kind === 'units';
+      app.globalCard = kind === 'build' ? 0 : -1;
+      app.dockView = kind === 'build' ? DockView.Build : kind === 'units' ? DockView.Roster : DockView.Unit;
+      ui.draw(() => taskbar.call(app, 390, 844));
+      expect(ui.controls.mock.calls.map(([id]) => id)).not.toContain('dock-close');
+      expect(ui.controls.mock.calls.map(([id]) => id)).not.toContain('roster-close');
+      input.pointerDown.call(app as any, 100, 200, PointerButton.Primary);
+      input.pointerUp.call(app as any, 100, 200, PointerButton.Primary);
+      expect(app.rosterOpen).toBe(false);
+      expect(app.card).toBe(-1);
+      expect(app.globalCard).toBe(-1);
+      expect(app.chosen).toEqual([]);
+      expect(app.selected).toBe(-1);
+    } finally {
+      ui.app.dockContent?.dispose();
+      ui.app.dockContent = null;
+      ui.dispose();
+    }
+  },
+);
 
 it('shows one viewport-clamped pointer tooltip instead of a competing focused tooltip', () => {
   const ui = fixture(390, 844);

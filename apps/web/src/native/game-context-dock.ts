@@ -1,4 +1,4 @@
-import { Rect, ButtonStyle, button, setTransform } from '../../../../packages/native-ui/src';
+import { Rect, setTransform } from '../../../../packages/native-ui/src';
 import { Tool, Order } from '../../../../packages/engine/src/game-tools';
 import { f32 as f, clamp } from '../../../../packages/engine/src/numeric';
 import { DockView } from './game-app-state';
@@ -255,30 +255,6 @@ export function taskbar(this: GameHudApp, width: number, height: number): void {
       },
       true,
       false,
-    );
-  } else if (this.dockView !== DockView.Menu && this.dockView !== DockView.Roster) {
-    actionButton(
-      c,
-      'dock-close',
-      new Rect(this.dockBounds.x + this.dockBounds.w - 30, this.dockBounds.y + 3, 26, 24),
-      'close',
-      'Close panel',
-      () => {
-        this.rosterOpen = false;
-        this.chosen = [];
-        this.selectedObjects = [];
-        this.selected =
-          this.selectedDungeon =
-          this.selectedTree =
-          this.selectedTreeInstance =
-          this.selectedRock =
-          this.selectedAnimal =
-            -1;
-        this.tool = Tool.Select;
-        this.card = this.globalCard = -1;
-        this.drawerPinned = false;
-        this.drawerSuppressed = true;
-      },
     );
   }
 }

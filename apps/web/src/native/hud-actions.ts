@@ -11,7 +11,14 @@ export type HudGlyph =
   | 'gear'
   | 'craft'
   | 'back'
-  | 'next';
+  | 'next'
+  | 'roads'
+  | 'housing'
+  | 'materials'
+  | 'storage'
+  | 'trade'
+  | 'lodging'
+  | 'faith';
 function tooltipPlacement(
   viewport: Rect,
   anchor: Rect,
@@ -91,6 +98,7 @@ export function actionButton(
   run: () => void,
   active = false,
   enabled = true,
+  tooltip = true,
 ): void {
   const s = button(c, id, r, '', run, active ? ButtonStyle.Primary : ButtonStyle.Quiet, enabled),
     t = c.theme();
@@ -140,12 +148,79 @@ export function actionButton(
     line(-9, 0, 9, 0);
     line(0, -9, 0, 9);
     c.rect(new Rect(x - 3, y - 3, 6, 6), t.surface, 3, color);
+  } else if (glyph === 'roads') {
+    line(-8, 9, -4, -9);
+    line(8, 9, 4, -9);
+    for (const offset of [-7, -1, 5]) line(0, offset, 0, offset + 3, 1.4);
+  } else if (glyph === 'housing') {
+    line(-10, -1, 0, -9);
+    line(0, -9, 10, -1);
+    line(-7, -3, -7, 8);
+    line(-7, 8, 7, 8);
+    line(7, 8, 7, -3);
+    line(-2, 8, -2, 2);
+    line(-2, 2, 2, 2);
+    line(2, 2, 2, 8);
+  } else if (glyph === 'materials') {
+    line(-3, 9, -3, -9);
+    for (const offset of [-6, -1, 4]) {
+      line(-3, offset + 2, -8, offset - 2);
+      line(-3, offset + 2, 2, offset - 2);
+    }
+    line(4, 8, 3, 2);
+    line(3, 2, 7, -1);
+    line(7, -1, 10, 4);
+    line(10, 4, 9, 8);
+    line(9, 8, 4, 8);
+  } else if (glyph === 'storage') {
+    line(-9, -3, 9, -3);
+    line(-9, -3, -7, 9);
+    line(-7, 9, 7, 9);
+    line(7, 9, 9, -3);
+    line(-8, 3, 8, 3);
+    line(-4, -3, -4, 9, 1.2);
+    line(4, -3, 4, 9, 1.2);
+    line(0, -10, -3, -6);
+    line(-3, -6, 0, -4);
+    line(0, -4, 3, -6);
+    line(3, -6, 0, -10);
+  } else if (glyph === 'trade') {
+    line(-9, -8, 9, -8);
+    line(-9, -8, -11, -1);
+    line(-11, -1, 11, -1);
+    line(11, -1, 9, -8);
+    line(-4, -8, -4, -1, 1.2);
+    line(4, -8, 4, -1, 1.2);
+    line(-8, -1, -8, 9);
+    line(8, -1, 8, 9);
+    line(-8, 4, 8, 4);
+    line(-8, 9, 8, 9);
+  } else if (glyph === 'lodging') {
+    line(-9, -7, -9, 9);
+    line(-9, 5, 10, 5);
+    line(10, -2, 10, 9);
+    line(-9, -2, 10, -2);
+    line(-8, -6, -3, -6);
+    line(-3, -6, -3, -2);
+  } else if (glyph === 'faith') {
+    line(-9, 9, 9, 9);
+    line(-6, 5, 6, 5);
+    line(-4, 5, -4, 9);
+    line(4, 5, 4, 9);
+    line(0, -10, 5, -4);
+    line(5, -4, 0, 2);
+    line(0, 2, -5, -4);
+    line(-5, -4, 0, -10);
+    line(0, -8, 0, 0, 1.2);
+  } else if (glyph === 'back') {
+    line(8, 0, -8, 0);
+    line(-8, 0, -2, -6);
+    line(-8, 0, -2, 6);
   } else {
-    const d = glyph === 'back' ? -1 : 1;
-    line(-3 * d, -5, 3 * d, 0);
-    line(3 * d, 0, -3 * d, 5);
+    line(-3, -5, 3, 0);
+    line(3, 0, -3, 5);
   }
-  if (s.hovered || s.focused) {
+  if (tooltip && (s.hovered || s.focused)) {
     c.deferOverlay(
       (area, controls) => {
         const anchor = controls.find((control) => control.id === id)?.bounds;

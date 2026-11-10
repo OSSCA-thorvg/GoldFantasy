@@ -25,16 +25,35 @@ function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder = fals
     c.line(x + a * s, y + b * s, x + d * s, y + e * s, ink, w * s);
   if (!item) return;
   if (item.category === 'resource') {
-    if (item.id === 'wood' || item.id === 'planks') {
+    if (item.id === 'wood') {
       line(-8, 7, 7, -7, 7);
       line(-9, 6, 5, -8, 1);
-    } else if (item.id === 'stone' || item.id === 'cut-stone') {
+    } else if (item.id === 'planks') {
+      for (const offset of [-7, 0, 7]) {
+        line(-10, offset - 2, 10, offset - 2, 1.5);
+        line(10, offset - 2, 10, offset + 2, 1.5);
+        line(10, offset + 2, -10, offset + 2, 1.5);
+        line(-10, offset + 2, -10, offset - 2, 1.5);
+        line(-6, offset, 5, offset, 0.8);
+      }
+    } else if (item.id === 'stone') {
       line(-9, 7, -6, -5);
       line(-6, -5, 4, -9);
       line(4, -9, 10, 5);
       line(10, 5, -9, 7);
       line(-6, -5, 1, 1);
       line(1, 1, 10, 5);
+    } else if (item.id === 'cut-stone') {
+      for (const [left, top, width] of [
+        [-10, 1, 9],
+        [1, 1, 9],
+        [-6, -7, 12],
+      ]) {
+        line(left, top, left + width, top, 1.5);
+        line(left + width, top, left + width, top + 6, 1.5);
+        line(left + width, top + 6, left, top + 6, 1.5);
+        line(left, top + 6, left, top, 1.5);
+      }
     } else if (item.id === 'water') {
       line(0, -10, -7, 3);
       line(-7, 3, 0, 9);

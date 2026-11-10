@@ -60,16 +60,6 @@ export function rosterPanel(this: GameHudApp, panel: Rect): void {
     17,
     true,
   );
-  button(
-    c,
-    'roster-close',
-    new Rect(panel.x + panel.w - 40, panel.y + (panel.y < 52 ? 42 : 20), 26, 25),
-    'X',
-    () => {
-      this.rosterOpen = false;
-    },
-    ButtonStyle.Quiet,
-  );
   const tabY = panel.y + (short ? 36 : 52),
     tabW = Math.min(132, (panel.w - 32) / 2);
   for (const tab of ['units', 'guests'] as const) {

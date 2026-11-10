@@ -88,26 +88,33 @@ const tools: ToolInfo[] = [
 ];
 interface Group {
   name: string;
+  glyph: HudGlyph;
   tools: Tool[];
 }
 const groups: Group[] = [
-  { name: 'Roads', tools: [Tool.Road, Tool.Pave, Tool.Torch] },
-  { name: 'Housing', tools: [Tool.Camp, Tool.Tent] },
+  { name: 'Roads', glyph: 'roads', tools: [Tool.Road, Tool.Pave, Tool.Torch] },
+  { name: 'Housing', glyph: 'housing', tools: [Tool.Camp, Tool.Tent] },
   {
     name: 'Food & materials',
+    glyph: 'materials',
     tools: [Tool.Farm, Tool.Field, Tool.Lumberyard, Tool.Quarry, Tool.Sawmill, Tool.Stoneworks],
   },
   {
     name: 'Water & storage',
+    glyph: 'storage',
     tools: [Tool.Well, Tool.Storehouse, Tool.WoodStore, Tool.Granary, Tool.StoneStore],
   },
-  { name: 'Trade & outfitters', tools: [Tool.Market, Tool.Weaponsmith, Tool.Armorer, Tool.Apothecary] },
-  { name: 'Lodging & leisure', tools: [Tool.Inn, Tool.Tavern, Tool.Guild] },
-  { name: 'Faith & arcane', tools: [Tool.Chapel, Tool.Shrine, Tool.MageTower, Tool.Portal] },
+  {
+    name: 'Trade & outfitters',
+    glyph: 'trade',
+    tools: [Tool.Market, Tool.Weaponsmith, Tool.Armorer, Tool.Apothecary],
+  },
+  { name: 'Lodging & leisure', glyph: 'lodging', tools: [Tool.Inn, Tool.Tavern, Tool.Guild] },
+  { name: 'Faith & arcane', glyph: 'faith', tools: [Tool.Chapel, Tool.Shrine, Tool.MageTower, Tool.Portal] },
 ];
 export function buildGroups(town: Town): Group[] {
   return groups
-    .map((group) => ({ name: group.name, tools: group.tools.filter((tool) => toolAvailable(town, tool)) }))
+    .map((group) => ({ ...group, tools: group.tools.filter((tool) => toolAvailable(town, tool)) }))
     .filter((group) => group.tools.length);
 }
 const dungeonKind = (kind: DungeonKind) =>
@@ -720,15 +727,19 @@ export function commandCard(
       if (global) this.globalCard = next;
       else this.card = next;
     };
-  drawButton(
-    'card-back',
-    new Rect(f32(area.x + 10), f32(area.y + 9), 46, 24),
+  actionButton(
+    c,
+    `${global ? 'global/' : 'unit/'}card-back`,
+    new Rect(f32(area.x + 10), f32(area.y + 5), 34, 32),
+    'back',
     'Back',
     () => {
       if (page > 0) setPage(0);
       else this.dismissBuildDrawer();
     },
-    ButtonStyle.Quiet,
+    false,
+    true,
+    false,
   );
   let title = page === 0 ? 'Build' : groups[f32(page - 1)].name;
   if (!global && this.chosen.length === 1) {
@@ -756,9 +767,8 @@ export function commandCard(
       );
   if (page === 0) {
     for (let i = 0; i < count; i++) {
-      const name = groups[i].name,
-        index = name.indexOf(' ');
-      drawButton('card-group-' + name, cell(i), index < 0 ? name : name.slice(0, index), () =>
+      const { name, glyph } = groups[i];
+      actionButton(c, `${global ? 'global/' : 'unit/'}card-group-${name}`, cell(i), glyph, name, () =>
         setPage(f32(i + 1)),
       );
     }
