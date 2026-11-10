@@ -8,6 +8,38 @@ import { Reach } from '../../engine/src/thunderstorm';
 import { point, add, lerp, distance, type Point } from '../../engine/src/geometry';
 import { f32 as f, clamp, hash01 } from '../../engine/src/numeric';
 const byte = (value: number) => Math.trunc(value) & 255;
+interface PrecipitationMotion {
+  at: number;
+  rainX: number;
+  rainFall: number;
+  snowX: number;
+}
+const precipitationMotion = new WeakMap<WorldRendererState, PrecipitationMotion>();
+function advancePrecipitation(s: WorldRendererState, wind: number, seconds: number): PrecipitationMotion {
+  const scale = f(1 / Math.max(s.view.zoom, f(0.6))),
+    rainSpeed = f(f(50 + f(230 * wind)) * scale),
+    snowSpeed = f(24 + f(60 * wind));
+  let motion = precipitationMotion.get(s);
+  if (!motion || seconds < motion.at) {
+    motion = {
+      at: seconds,
+      rainX: rainSpeed * seconds,
+      rainFall: scale * seconds,
+      snowX: snowSpeed * seconds,
+    };
+    precipitationMotion.set(s, motion);
+  } else {
+    const elapsed = seconds - motion.at;
+    // Integrate velocity. Multiplying a changing gust by absolute time makes
+    // particles jump or travel against the wind when the gust weakens.
+    motion.rainX += rainSpeed * elapsed;
+    motion.rainFall += scale * elapsed;
+    motion.snowX += snowSpeed * elapsed;
+    motion.at = seconds;
+  }
+  motion.rainX = ((motion.rainX % 320) + 320) % 320;
+  return motion;
+}
 export function paintStorm(s: WorldRendererState, seconds: number, night: number): void {
   s.storm.remove();
   const strike = s.strike;
@@ -75,6 +107,7 @@ export function paintStorm(s: WorldRendererState, seconds: number, night: number
   s.storm.add(ellipse(s.struck, f(9 * pixel), f(4 * pixel), opaque([255, 255, 255], byte(f(255 * pulse)))));
 }
 export function weather(s: WorldRendererState, climate: Climate, seconds: number): void {
+  const motion = advancePrecipitation(s, climate.wind, seconds);
   let grey = 0,
     sun = 1,
     shade = 1,
@@ -131,7 +164,7 @@ export function weather(s: WorldRendererState, climate: Climate, seconds: number
       const depth = f(f(0.7) + f(f(0.6) * hash01(9, i, 0, 3)));
       const x = wrap(
         f(hash01(9, i, 0, 1) * s.viewWidth) +
-          f(f(24 + f(60 * climate.wind)) * depth) * seconds +
+          motion.snowX * depth +
           Math.sin(seconds * 1.3 + i) * 6 -
           f(s.view.x * s.view.zoom),
         s.viewWidth,
@@ -169,16 +202,22 @@ export function weather(s: WorldRendererState, climate: Climate, seconds: number
     y1 = Math.floor(f(f(s.view.y + halfH) / tile)) + 1,
     tiles = (x1 - x0 + 1) * (y1 - y0 + 1),
     each = clamp(Math.trunc(wanted / Math.max(1, tiles)), 0, 40);
-  const t = f(seconds),
-    wind = f(50 + f(230 * climate.wind)),
+  const wind = f(50 + f(230 * climate.wind)),
     streak = f(9 + f(9 * s.fallingIntensity));
   for (let ty = y0; ty <= y1; ++ty)
     for (let tx = x0; tx <= x1; ++tx)
       for (let i = 0; i < each; ++i) {
-        const speed = f(f(620 + f(hash01(9, i, tx, 3) * 260)) * k),
-          x = f(f(tx * tile) + f(f(f(hash01(9, i, tx * 131 + ty, 1) * tile) + f(f(wind * k) * t)) % tile)),
-          y = f(f(ty * tile) + f(f(f(hash01(9, i, tx * 131 + ty, 2) * tile) + f(speed * t)) % tile));
-        s.precipitation.moveTo(x, y).lineTo(f(x - f(f(wind * f(0.025)) * k)), f(y - f(streak * k)));
+        const fallSpeed = f(620 + f(hash01(9, i, tx, 3) * 260)),
+          speed = f(fallSpeed * k),
+          x = f(f(tx * tile) + f(f(f(hash01(9, i, tx * 131 + ty, 1) * tile) + motion.rainX) % tile)),
+          y = f(
+            f(ty * tile) +
+              f(f(f(hash01(9, i, tx * 131 + ty, 2) * tile) + fallSpeed * motion.rainFall) % tile),
+          ),
+          trailTime = f(f(streak * k) / speed);
+        // The trail points backward along this drop's actual velocity, including
+        // its individual falling speed, rather than an unrelated fixed x offset.
+        s.precipitation.moveTo(x, y).lineTo(f(x - f(f(wind * k) * trailTime)), f(y - f(streak * k)));
       }
   s.precipitation
     .fill(0, 0, 0, 0)
