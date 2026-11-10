@@ -19,7 +19,7 @@ const duration = 0.75,
     'Planks',
     'Cut stone',
   ],
-  artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7, 1, 2];
+  artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7, 9, 10];
 const amount = (value: number) =>
   value < 10000
     ? String(value)
@@ -68,7 +68,7 @@ class Icon {
 interface Pending {
   camp: number;
   kind: number;
-  at: number;
+  amount: number;
 }
 interface Pop {
   icon: Icon;
@@ -76,6 +76,7 @@ interface Pop {
   kind: number;
   lane: number;
   started: number;
+  amount: number;
 }
 export interface CampMarker {
   camp: number;
@@ -89,6 +90,7 @@ export class CampResourceHud {
     kind: 0,
     lane: 0,
     started: -1,
+    amount: 0,
   }));
   private pending: Pending[] = [];
   private nextReceipt = 0n;
@@ -153,15 +155,16 @@ export class CampResourceHud {
         ];
         for (let kind = 0; kind < gains.length; kind++) {
           if (gains[kind] <= 0) continue;
-          const active = this.pops.some((p) => p.started >= 0 && p.camp === receipt.camp && p.kind === kind),
-            queued = this.pending.some((p) => p.camp === receipt.camp && p.kind === kind);
-          if (!active && !queued && this.pending.length < 64)
-            this.pending.push({ camp: receipt.camp, kind, at: now });
+          const queued = this.pending.find((p) => p.camp === receipt.camp && p.kind === kind);
+          if (queued) {
+            queued.amount += gains[kind];
+          } else if (this.pending.length < 64)
+            this.pending.push({ camp: receipt.camp, kind, amount: gains[kind] });
         }
       }
     for (let at = 0; at < this.pending.length;) {
       const pending = this.pending[at];
-      if (!marker(pending.camp) || now > pending.at + 2) {
+      if (!marker(pending.camp)) {
         this.pending.splice(at, 1);
         continue;
       }
@@ -172,7 +175,10 @@ export class CampResourceHud {
           lanes[pop.lane] = true;
           active++;
         }
-      if (active >= 3) {
+      if (
+        active >= 3 ||
+        this.pops.some((p) => p.started >= 0 && p.camp === pending.camp && p.kind === pending.kind)
+      ) {
         at++;
         continue;
       }
@@ -182,12 +188,14 @@ export class CampResourceHud {
       if (!free) break;
       free.camp = pending.camp;
       free.kind = pending.kind;
+      free.amount = pending.amount;
       free.lane = lanes.indexOf(false);
       free.started = now + (reduced ? 0 : active * 0.06);
       this.pending.splice(at, 1);
     }
     context.clip(viewport, () => {
-      const offsets = [0, -28, 28];
+      const offsets = [0, -78, 78],
+        occupied: Rect[] = [];
       for (const pop of this.pops) {
         if (pop.started < 0) continue;
         this.moving = true;
@@ -199,15 +207,44 @@ export class CampResourceHud {
           rise = reduced ? 0 : f(24 * eased),
           fade = reduced ? 1 : f(1 - f(Math.pow(clamp(f(f(progress - f(0.65)) / f(0.35)), 0, 1), 2))),
           x = f(anchor.roof.x + offsets[pop.lane]),
-          y = f(f(anchor.roof.y - 12) - rise);
-        if (context.controlAt(x, y)) continue;
-        pop.icon.draw(
-          context,
-          pop.kind,
-          new Rect(x - 14, y - 14, 28, 28),
-          reduced ? 0 : progress,
-          lround(f(255 * fade)),
+          y = f(f(anchor.roof.y - 12) - rise),
+          label = '+' + amount(pop.amount),
+          size = 34,
+          textWidth = context.textWidth(label, 13, true),
+          width = size + 3 + textWidth,
+          box = new Rect(
+            clamp(
+              x - width / 2,
+              viewport.x + 4,
+              Math.max(viewport.x + 4, viewport.x + viewport.w - width - 4),
+            ),
+            y - size / 2,
+            width,
+            size,
+          );
+        while (
+          occupied.some(
+            (r) =>
+              box.x < r.x + r.w + 4 &&
+              box.x + box.w + 4 > r.x &&
+              box.y < r.y + r.h + 2 &&
+              box.y + box.h + 2 > r.y,
+          )
+        )
+          box.y -= size + 4;
+        occupied.push(box);
+        if (context.controlAt(box.x + box.w / 2, box.y + box.h / 2)) continue;
+        const opacity = lround(f(255 * fade));
+        pop.icon.draw(context, pop.kind, new Rect(box.x, box.y, size, size), reduced ? 0 : progress, opacity);
+        const number = new Rect(box.x + size + 3, box.y + (size - 20) / 2, textWidth + 1, 20);
+        context.text(
+          new Rect(number.x, number.y + 1, number.w, number.h),
+          label,
+          rgba(20, 18, 15, Math.round(opacity * 0.85)),
+          13,
+          true,
         );
+        context.text(number, label, { ...theme.accent, a: opacity }, 13, true);
       }
     });
     this.moving = this.moving || this.pending.length > 0;
@@ -273,7 +310,7 @@ export class CampResourceHud {
     for (let i = 0; i < names.length; i++) {
       const cell = f(f(w - 16) / 3),
         box = new Rect(f(f(x + 8) + f((i % 3) * cell)), f(f(y + 34) + f(Math.trunc(i / 3) * row)), cell, row),
-        size = row < 40 ? 22 : 28;
+        size = row < 40 ? 26 : 32;
       this.tipIcons[i].draw(context, i, new Rect(box.x + 2, f(box.y + f(f(row - size) / 2)), size, size));
       const textX = f(f(box.x + size) + 6),
         textWidth = f(f(f(box.x + cell) - textX) - 4);

@@ -7,10 +7,22 @@ import mana from '../../../../packages/native-ui/assets/game/resource-mana.json'
 import residents from '../../../../packages/native-ui/assets/game/resource-residents.json';
 import guests from '../../../../packages/native-ui/assets/game/resource-guests.json';
 import renown from '../../../../packages/native-ui/assets/game/resource-renown.json';
+import planks from '../../../../packages/native-ui/assets/game/resource-planks.json';
+import cutStone from '../../../../packages/native-ui/assets/game/resource-cut-stone.json';
 import mural from '../../../../packages/native-ui/assets/game/sky-mural.svg?raw';
-export const resourceIcons = [gold, wood, stone, food, water, mana, residents, guests, renown].map((value) =>
-  JSON.stringify(value),
-);
+export const resourceIcons = [
+  gold,
+  wood,
+  stone,
+  food,
+  water,
+  mana,
+  residents,
+  guests,
+  renown,
+  planks,
+  cutStone,
+].map((value) => JSON.stringify(value));
 export const skyMural = mural;
 /** C printf fixed precision: nearest decimal, ties to even, from the exact binary64 value. */
 export function nativeFixed(value: number, digits: number): string {
