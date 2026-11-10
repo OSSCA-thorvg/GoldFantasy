@@ -14,11 +14,12 @@ import { portraitBackdrop } from '../../../../packages/native-renderer/src/portr
 import type { Building } from '../../../../packages/engine/src/town-models';
 import type { GameHudApp } from './game-hud-contract';
 import { hudPaint } from './hud-paint';
+import { statueInspector } from './game-prayer';
 
 export function civicInspector(this: GameHudApp, building: Building, panel: Rect, draw: boolean): number {
   const c = this.context,
     t = this.theme;
-  const altar = building.kind === Structure.Shrine;
+  if (building.kind === Structure.Shrine) return statueInspector.call(this, building, panel, draw);
   const compact = this.viewHeight < 560;
   const h = compact ? 204 : 286;
   const residents = this.town.people().filter(isPlayerResident);
@@ -34,9 +35,7 @@ export function civicInspector(this: GameHudApp, building: Building, panel: Rect
   line(9, structureSpec(building.kind).name, t.text, 17, true);
   line(
     compact ? 30 : 34,
-    altar
-      ? 'Pray at the gate. A new resident arrives when the rite is complete.'
-      : `Choose one class · ${building.trainingCount} residents trained`,
+    `Choose one class · ${building.trainingCount} residents trained`,
     t.muted,
     compact ? 10 : 12,
   );
@@ -113,113 +112,63 @@ export function civicInspector(this: GameHudApp, building: Building, panel: Rect
       compact ? 10 : 11,
     );
   } else line(top, 'No residents are available.', t.muted);
-  if (altar) {
-    const status = this.town.altarStatus(building.id);
-    const preparing = this.town
-      .people()
-      .find((p) => p.health > 0 && p.task === Activity.Praying && p.taskSite === building.id);
-    const reason = person
-      ? this.town.prayerReason(person.id, building.id)
-      : 'A resident must visit the altar.';
-    line(
-      compact ? 104 : 140,
-      status.pendingBirths
-        ? 'Awaiting a safe arrival at the gate'
-        : preparing
-          ? `${preparing.name}: prayer in progress`
-          : 'No resident expected yet',
-      status.pendingBirths ? t.success : t.muted,
-      12,
+  const options = person ? this.town.guildTrainingOptions(person.id, building.id) : [];
+  const option = options.find((option) => option.calling === this.inspectorCalling) ?? options[0];
+  if (option) this.inspectorCalling = option.calling;
+  const tabsY = compact ? 103 : 139,
+    tabW = (w - 16) / 5;
+  for (let i = 0; i < options.length; ++i) {
+    const choice = options[i];
+    button(
+      c,
+      `guild-class-${choice.calling}`,
+      new Rect(x + i * (tabW + 4), y + tabsY, tabW, 25),
+      choice.name,
+      () => {
+        this.inspectorCalling = choice.calling;
+      },
+      choice === option ? ButtonStyle.Primary : ButtonStyle.Default,
       true,
     );
+  }
+  if (person && option) {
+    // Preview only the class field; health, level and equipment remain this resident's.
+    const preview = copyNative(person);
+    preview.calling = option.calling;
     line(
-      compact ? 123 : 165,
-      `Offering: ${describe(status.cost)} · paid when the prayer finishes`,
-      t.muted,
-      compact ? 10 : 11,
+      compact ? 131 : 171,
+      `Power ${this.town.power(preview).toFixed(1)} · Reach ${reachOf(preview).toFixed(1)} · Vitality ${preview.vitalityMultiplier().toFixed(1)}x`,
+      t.accent,
+      compact ? 10 : 12,
+      true,
     );
+    if (!compact) line(195, option.description, t.muted, 11);
+    const training = person.task === Activity.Training && person.taskSite === building.id;
+    const reason = option.reason;
     line(
-      compact ? 144 : 198,
-      reason || 'Walk to the altar and pray for 5 seconds.',
+      compact ? 147 : 220,
+      training
+        ? `Training ordered: ${callingName(person.trainingCalling)}`
+        : reason || `${describe(option.cost)} · permanent class choice`,
       reason ? t.danger : t.muted,
-      compact ? 10 : 11,
+      compact ? 9 : 11,
     );
     button(
       c,
-      'altar-pray',
+      'guild-train',
       new Rect(x, y + h - 39, w, 28),
-      preparing ? 'Prayer in progress' : 'Pray for a resident',
+      training ? 'Training in progress' : `Train as ${option.name}`,
       () => {
         if (
-          person &&
           canControl(this.town.person(person.id)) &&
-          this.town.orderPrayAtAltar([person.id], building.id)
+          this.town.orderTrainAtGuild(person.id, building.id, option.calling)
         )
-          this.status = 'Prayer ordered';
-        else this.status = person ? this.town.prayerReason(person.id, building.id) : reason;
+          this.status = 'Training ordered';
+        else this.status = this.town.trainingReason(person.id, building.id, option.calling);
       },
       ButtonStyle.Primary,
-      !!person && !preparing && !reason && canControl(person),
+      !training && !reason && canControl(person),
     );
-  } else {
-    const options = person ? this.town.guildTrainingOptions(person.id, building.id) : [];
-    const option = options.find((option) => option.calling === this.inspectorCalling) ?? options[0];
-    if (option) this.inspectorCalling = option.calling;
-    const tabsY = compact ? 103 : 139,
-      tabW = (w - 16) / 5;
-    for (let i = 0; i < options.length; ++i) {
-      const choice = options[i];
-      button(
-        c,
-        `guild-class-${choice.calling}`,
-        new Rect(x + i * (tabW + 4), y + tabsY, tabW, 25),
-        choice.name,
-        () => {
-          this.inspectorCalling = choice.calling;
-        },
-        choice === option ? ButtonStyle.Primary : ButtonStyle.Default,
-        true,
-      );
-    }
-    if (person && option) {
-      // Preview only the class field; health, level and equipment remain this resident's.
-      const preview = copyNative(person);
-      preview.calling = option.calling;
-      line(
-        compact ? 131 : 171,
-        `Power ${this.town.power(preview).toFixed(1)} · Reach ${reachOf(preview).toFixed(1)} · Vitality ${preview.vitalityMultiplier().toFixed(1)}x`,
-        t.accent,
-        compact ? 10 : 12,
-        true,
-      );
-      if (!compact) line(195, option.description, t.muted, 11);
-      const training = person.task === Activity.Training && person.taskSite === building.id;
-      const reason = option.reason;
-      line(
-        compact ? 147 : 220,
-        training
-          ? `Training ordered: ${callingName(person.trainingCalling)}`
-          : reason || `${describe(option.cost)} · permanent class choice`,
-        reason ? t.danger : t.muted,
-        compact ? 9 : 11,
-      );
-      button(
-        c,
-        'guild-train',
-        new Rect(x, y + h - 39, w, 28),
-        training ? 'Training in progress' : `Train as ${option.name}`,
-        () => {
-          if (
-            canControl(this.town.person(person.id)) &&
-            this.town.orderTrainAtGuild(person.id, building.id, option.calling)
-          )
-            this.status = 'Training ordered';
-          else this.status = this.town.trainingReason(person.id, building.id, option.calling);
-        },
-        ButtonStyle.Primary,
-        !training && !reason && canControl(person),
-      );
-    }
   }
   return h;
 }

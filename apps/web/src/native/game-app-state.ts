@@ -11,6 +11,7 @@ import type { Building } from '../../../../packages/engine/src/town-models';
 import { CampResourceHud } from './camp-resource-hud';
 import { gameTheme } from './game-theme';
 import type { WorldObjectRef } from './world-targets';
+import type { PrayerDialog } from './game-prayer';
 import type {
   WorldHit,
   SelectionGeometry,
@@ -88,6 +89,7 @@ export class GameAppState {
   craftWorkshopFilter: Structure | null = null;
   speed = 1;
   paused = false;
+  prayer: PrayerDialog | null = null;
   card = -1;
   globalCard = -1;
   drawerOpen = false;

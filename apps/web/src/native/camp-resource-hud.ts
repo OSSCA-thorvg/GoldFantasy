@@ -18,8 +18,9 @@ const duration = 0.75,
     'Guests',
     'Planks',
     'Cut stone',
+    'Bones',
   ],
-  artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7, 9, 10];
+  artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7, 9, 10, 11];
 const amount = (value: number) =>
   value < 10000
     ? String(value)
@@ -152,6 +153,7 @@ export class CampResourceHud {
           receipt.guests,
           receipt.gain.planks,
           receipt.gain.cutStone,
+          receipt.gain.bones,
         ];
         for (let kind = 0; kind < gains.length; kind++) {
           if (gains[kind] <= 0) continue;
@@ -266,6 +268,7 @@ export class CampResourceHud {
         town.guests(hovered),
         stock.planks,
         stock.cutStone,
+        stock.bones,
       ],
       limits = [
         0,
@@ -279,6 +282,7 @@ export class CampResourceHud {
         town.guestBeds(hovered),
         capacity.planks,
         capacity.cutStone,
+        capacity.bones,
       ],
       w = Math.min(336, viewport.w),
       row = viewport.h < 220 ? 36 : 46,

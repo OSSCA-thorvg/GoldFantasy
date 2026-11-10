@@ -54,6 +54,10 @@ function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder = fals
         line(left + width, top + 6, left, top + 6, 1.5);
         line(left, top + 6, left, top, 1.5);
       }
+    } else if (item.id === 'bones') {
+      line(-7, 6, 7, -6, 5);
+      for (const [dx, dy] of [[-9, 4], [-6, 8], [6, -8], [9, -4]])
+        c.rect(new Rect(x + (dx - 3) * s, y + (dy - 3) * s, 6 * s, 6 * s), ink, 3 * s);
     } else if (item.id === 'water') {
       line(0, -10, -7, 3);
       line(-7, 3, 0, 9);

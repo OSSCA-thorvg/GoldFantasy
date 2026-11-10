@@ -108,7 +108,7 @@ export function migrateSettlements(this: SettlementTown): void {
 export function credit(this: SettlementTown, gain: Resources, id: number): void {
   const current = this.reserves(id),
     received = new Resources();
-  for (const key of ['gold', 'wood', 'stone', 'food', 'water', 'mana', 'planks', 'cutStone'] as const) {
+  for (const key of ['gold', 'wood', 'stone', 'food', 'water', 'mana', 'planks', 'cutStone', 'bones'] as const) {
     const before = current[key];
     current[key] = clamp(current[key] + gain[key], 0, 2147483647);
     received[key] = Math.max(0, current[key] - before);

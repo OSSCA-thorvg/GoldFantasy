@@ -4,6 +4,7 @@ import ThorVG, { type ThorVGNamespace } from '@thorvg/webcanvas';
 import { parseFontMetrics } from '../../packages/native-ui/src/fonts';
 import { Context, Rect, Key } from '../../packages/native-ui/src';
 import { civicInspector } from '../../apps/web/src/native/game-civic-panel';
+import { closePrayer, renderPrayer } from '../../apps/web/src/native/game-prayer';
 import { Structure, Resources } from '../../packages/engine/src/building-catalog';
 import { Building } from '../../packages/engine/src/town-models';
 import { Town } from '../../packages/engine/src/town';
@@ -422,32 +423,55 @@ it('keeps overwhelmed player residents in Units while excluding defectors and gu
   }
 });
 
-it('uses real altar eligibility and pending arrival state, and sends the selected resident through the Pray control', () => {
+it('opens resource offerings from the statue without choosing or ordering a resident', () => {
   const ui = fixture();
   try {
     const { altar } = civicTown(ui.town);
     ui.app.viewHeight = 800;
-    ui.app.inspectorPerson = ui.town.folk[0].id;
-    const order = vi.spyOn(ui.town, 'orderPrayAtAltar').mockReturnValue(true);
-    const draw = () => ui.draw(() => civicInspector.call(ui.app, altar, new Rect(100, 200, 620, 286), true));
-    draw();
+    ui.app.paused = false;
+    const before = ui.town.people().map((p) => ({ id: p.id, task: p.task, site: p.taskSite }));
+    const order = vi.spyOn(ui.town, 'orderPrayAtAltar');
+    ui.draw(() => civicInspector.call(ui.app, altar, new Rect(100, 200, 620, 286), true));
+    expect(ui.controls.mock.calls.some((call) => String(call[0]).startsWith('civic-person-'))).toBe(false);
     const action = ui.controls.mock.calls.find((call) => call[0] === 'altar-pray')!;
     expect(action[3]).toBe(true);
     ui.context.pointerDown(action[1].x + 10, action[1].y + 10);
     ui.context.pointerUp(action[1].x + 10, action[1].y + 10);
-    expect(order).toHaveBeenCalledWith([ui.town.folk[0].id], altar.id);
-    ui.town.folk[0].task = Activity.Praying;
-    ui.town.folk[0].taskSite = altar.id;
-    draw();
-    expect(ui.labels.mock.calls.some((call) => call[1] === 'Prayer in progress')).toBe(true);
-    expect(ui.controls.mock.calls.find((call) => call[0] === 'altar-pray')![3]).toBe(false);
-    ui.town.folk[0].task = Activity.Idle;
+    expect(ui.app.prayer?.altar).toBe(altar.id);
+    expect(ui.app.paused).toBe(true);
+    expect(order).not.toHaveBeenCalled();
+    expect(ui.town.people().map((p) => ({ id: p.id, task: p.task, site: p.taskSite }))).toEqual(before);
+    ui.draw(() => renderPrayer.call(ui.app, 880, 600));
+    for (const key of ['water', 'bones', 'gold', 'food', 'stone'])
+      expect(ui.controls.mock.calls.some((call) => call[0] === 'offering-' + key)).toBe(true);
+    // An edit and click can share a browser frame. Validate the current input,
+    // then let the next valid edit clear the rejection without reopening.
+    const confirm = ui.controls.mock.calls.find((call) => call[0] === 'prayer-confirm')!;
+    ui.app.prayer!.inputs.food.value = '0';
+    ui.context.pointerDown(confirm[1].x + 10, confirm[1].y + 10);
+    ui.context.pointerUp(confirm[1].x + 10, confirm[1].y + 10);
+    expect(ui.app.prayer!.started).toBe(-1);
+    ui.draw(() => renderPrayer.call(ui.app, 880, 600));
+    expect(ui.controls.mock.calls.find((call) => call[0] === 'prayer-confirm')![3]).toBe(false);
+    ui.app.prayer!.inputs.food.value = '4';
+    ui.draw(() => renderPrayer.call(ui.app, 880, 600));
+    expect(ui.controls.mock.calls.find((call) => call[0] === 'prayer-confirm')![3]).toBe(true);
+    closePrayer.call(ui.app);
+    expect(ui.app.paused).toBe(false);
+    ui.draw(() => {});
     altar.devotionDueDay = 2;
-    draw();
-    expect(ui.labels.mock.calls.some((call) => call[1] === 'Awaiting a safe arrival at the gate')).toBe(true);
-    expect(ui.controls.mock.calls.find((call) => call[0] === 'altar-pray')![3]).toBe(false);
+    ui.draw(() => civicInspector.call(ui.app, altar, new Rect(100, 200, 620, 286), true));
+    const next = ui.controls.mock.calls.find((call) => call[0] === 'altar-pray')!;
+    ui.context.pointerDown(next[1].x + 10, next[1].y + 10);
+    ui.context.pointerUp(next[1].x + 10, next[1].y + 10);
+    ui.draw(() => renderPrayer.call(ui.app, 880, 600));
+    expect(ui.controls.mock.calls.find((call) => call[0] === 'prayer-confirm')![3]).toBe(false);
+    closePrayer.call(ui.app);
+    ui.draw(() => {});
   } finally {
+    const pending = ui.app.prayer;
     ui.dispose();
+    pending?.adapter.dispose();
   }
 });
 it('previews class stats without mutating the resident and disables a second profession', () => {

@@ -67,11 +67,13 @@ const resourcesCodec: Codec<Resources> = {
   read(a) {
     const value = legacyResourcesCodec.read(a);
     if (a.formatVersion >= 9) a.fields(value, { planks: i32, cutStone: i32 });
+    if (a.formatVersion >= 12) a.fields(value, { bones: i32 });
     return value;
   },
   write(a, value) {
     legacyResourcesCodec.write(a, value);
     if (a.formatVersion >= 9) a.fields(value as Resources, { planks: i32, cutStone: i32 });
+    if (a.formatVersion >= 12) a.fields(value as Resources, { bones: i32 });
   },
 };
 const ledgerCodec = raw('CampEconomy::Ledger', () => new Ledger());
@@ -718,7 +720,13 @@ export function encodeTown(town: SaveTown): string {
     [town.provisions, ...town.villages].some((v) => v.faction !== 0);
   const equipment = town.folk.some(p => p.inventory.some(Boolean) || equipmentSlots.some(slot => p.equipment[slot] >= 0) || p.craftItem !== null || p.craftWorkshop >= 0 || p.craftProgress !== 0 || p.activity === Activity.Crafting || p.task === Activity.Crafting);
   for (const p of town.folk) if (!validInventory(p)) throw new Error('Invalid inventory');
-  a.formatVersion = equipment
+  const bones = [town.provisions, ...town.villages].some(v => v.stock.bones !== 0) ||
+    town.placed.some(b => b.materials.required.bones !== 0 || b.materials.delivered.bones !== 0) ||
+    town.network.list.some(r => r.materials.required.bones !== 0 || r.materials.delivered.bones !== 0) ||
+    town.folk.some(p => p.carriedProduct === Product.Bones && p.carrying > 0);
+  a.formatVersion = bones
+    ? 12
+    : equipment
     ? 11
     : allegiance
     ? 10
@@ -765,10 +773,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 11) climateSize = u32.read(a);
+  if (version >= 2 && version <= 12) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 11 ||
+    version > 12 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

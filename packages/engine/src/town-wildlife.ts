@@ -81,6 +81,9 @@ export function stirWildlife(this: WildlifeTown, dt: number): void {
       const hunter = this.person(animal.provokedBy),
         village = hunter ? this.settlementOf(hunter) : this.settlementAt(animal.position),
         before = this.stock(village).food;
+      const remains = new Resources();
+      remains.bones = Math.max(1, Math.ceil(spec.food / 3));
+      this.store(remains, village);
       if (hunter?.hunting && hunter.foe === animal.id) {
         hunter.hunting = false; hunter.foe = -1; hunter.path = [];
         hunter.carriedProduct = Product.Food; hunter.carrying += spec.food;

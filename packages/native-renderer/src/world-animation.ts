@@ -1,4 +1,4 @@
-import { point, add } from '../../engine/src/geometry';
+import { point, add, project } from '../../engine/src/geometry';
 import { f32, clamp, lround } from '../../engine/src/numeric';
 import { Town } from '../../engine/src/town';
 import { WorldRendererState } from './world-renderer-state';
@@ -18,6 +18,11 @@ export function animate(s: WorldRendererState, town: Town, seconds: number): voi
     if (frame !== item.frame) {
       item.picture.frame(Math.min(frame, f32(item.layout.frames - 1)));
       item.frame = frame;
+    }
+    if (item.statue && b) {
+      const at = project(b.center.x, b.center.y);
+      item.statue.transform([.10, 0, at.x, 0, .10 * Math.max(.04, b.progress), at.y, 0, 0, 1]);
+      item.statue.opacity(b.built() ? 255 : 170);
     }
   }
   const climate = town.climate(),

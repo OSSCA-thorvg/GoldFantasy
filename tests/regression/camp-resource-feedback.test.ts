@@ -130,7 +130,7 @@ it('shows credited quantities and preserves deliveries queued while the same res
   }
 });
 
-it('renders sawn boards and dressed blocks differently from logs and unprocessed rock', () => {
+it('renders bones, sawn boards and dressed blocks distinctly from logs and unprocessed rock', () => {
   const surface = new MemoryCanvas(96, 96),
     canvas = new tvg.Canvas(surface as unknown as OffscreenCanvas, {
       width: 96,
@@ -139,7 +139,7 @@ it('renders sawn boards and dressed blocks differently from logs and unprocessed
     }),
     signatures = new Map<number, string>();
   try {
-    for (const kind of [1, 2, 9, 10]) {
+    for (const kind of [1, 2, 9, 10, 11]) {
       const animation = new tvg.Animation().load(resourceIcons[kind]);
       try {
         animation.picture.size(96, 96);
@@ -157,7 +157,7 @@ it('renders sawn boards and dressed blocks differently from logs and unprocessed
         animation.dispose();
       }
     }
-    expect(new Set(signatures.values()).size).toBe(4);
+    expect(new Set(signatures.values()).size).toBe(5);
   } finally {
     canvas.destroy();
   }

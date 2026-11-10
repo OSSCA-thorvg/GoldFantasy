@@ -433,8 +433,8 @@
     "storage": 300
   },
   {
-    "name": "Altar",
-    "description": "A sacred altar. A resident prays here with 4 food; a new resident appears here the next day if a home is free. Nearby homes grow twice as fast.",
+    "name": "Statue of Ymir",
+    "description": "Offer water, bones, gold, food and stone before Ymir to shape a new resident.",
     "size": 1,
     "cost": {
       "gold": 0,

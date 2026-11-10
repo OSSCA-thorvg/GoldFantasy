@@ -26,6 +26,7 @@ export interface CombatTown extends TownState {
   settlementOf(p: Person | Building): number;
   settlementAt(at: Point): number;
   credit(gain: Resources, village: number): void;
+  store(gain: Resources, village: number): void;
   rewardExperience(p: Person, points: number): void;
   creatureTarget(id: number): Monster | null;
   strike(p: Person, foe: Monster): void;
@@ -268,6 +269,11 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
     attacker: p.id,
   });
   if (foe.health <= 0) {
+    if (foe.animal === null) {
+      const remains = new Resources();
+      remains.bones = foe.giant() ? 6 : 2;
+      this.store(remains, this.settlementOf(p));
+    }
     const health =
         foe.animal !== null
           ? animalSpec(foe.animal).health

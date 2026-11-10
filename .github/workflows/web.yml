@@ -8,7 +8,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -31,6 +31,8 @@ jobs:
         run: npm run test:splash
       - name: Draw and complete roads around the first camp
         run: npm run test:roads
+      - name: Verify offerings, paused prayer and unarmed arrivals across weather
+        run: npm run test:prayer
       - name: Verify visible-object picking and friendly selection across renderers
         run: npm run test:picking
       - name: Verify splash and priority audio loading

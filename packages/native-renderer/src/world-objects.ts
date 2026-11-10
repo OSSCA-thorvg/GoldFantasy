@@ -203,22 +203,34 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
     for (const b of buildingRows[row]) {
       const here = new SceneNode(),
         visual = s.visuals.get(b.id)!;
+      if (b.kind === Structure.Shrine && (!visual.statue || visual.statueSnow !== (climate.snow > .3))) {
+        visual.statue = new SceneNode();
+        visual.statueSnow = climate.snow > .3;
+        paintYmir(visual.statue, point(), climate, false);
+      }
+      const body = b.kind === Structure.Shrine ? visual.statue! : visual.picture,
+        statueAt = project(b.center.x, b.center.y);
+      if (b.kind === Structure.Shrine) {
+        body.transform([.10, 0, statueAt.x, 0, .10 * Math.max(.04, b.progress), statueAt.y, 0, 0, 1]);
+        body.opacity(b.built() ? 255 : 170);
+      }
       s.rowBuildings[row].add(here);
       registerDepth(
         here,
         b.footprint(),
         `building:${b.id}`,
-        new Rect(
+        b.kind === Structure.Shrine ? new Rect(statueAt.x - 18, statueAt.y - 50, 36, 60) : new Rect(
           visual.picture.matrix[2],
           visual.picture.matrix[5],
           visual.layout.width,
           visual.layout.height,
         ),
       );
-      here.add(visual.picture).add(damagePaint(s, b));
+      here.add(body);
+      if (b.kind !== Structure.Shrine) here.add(damagePaint(s, b));
       registerPick(here, {
         ref: { kind: 'building', id: b.id },
-        body: [visual.picture],
+        body: [body],
         foot: { ...b.center },
         groundOutline: b.footprint().corners(),
       });
@@ -259,7 +271,7 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
         here.add(s.flame).add(s.flameCore);
         s.lastFlicker = -1;
       } else if (!b.built()) continue;
-      else if ([Structure.Shrine, Structure.MageTower, Structure.Portal].includes(b.kind)) {
+      else if ([Structure.MageTower, Structure.Portal].includes(b.kind)) {
         const tower = b.kind !== Structure.Shrine,
           aura = glow(project(middle.x, middle.y), 40, 20, tower ? violetWisp : arcaneWisp, 60);
         s.lights.add(aura);

@@ -46,6 +46,8 @@ jobs:
         run: npm run test:splash
       - name: Draw and complete roads around the first camp
         run: npm run test:roads
+      - name: Verify offerings, paused prayer and unarmed arrivals across weather
+        run: npm run test:prayer
       - name: Verify visible-object picking and friendly selection across renderers
         run: npm run test:picking
       - name: Verify splash and priority audio loading

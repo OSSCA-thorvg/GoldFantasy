@@ -9,6 +9,7 @@ import type { Tool, Order, PointerButton } from '../../../../packages/engine/src
 import type { Key } from '../../../../packages/native-ui/src';
 /** Native application window boundary; implementations retain original GameApp semantics. */
 export interface GameRuntime extends GameEditorsApp {
+  handlePrayerEvent?(event: AppEvent): boolean;
   state(): Town;
   view(): Camera;
   setView(camera: { x: number; y: number; zoom: number }): void;

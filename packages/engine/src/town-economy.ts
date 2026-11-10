@@ -209,7 +209,7 @@ export function capacity(this: EconomyTown, village = this.camp()?.id ?? -1): Re
             : 0;
   for (const item of this.placed)
     if (item.built() && this.settlementOf(item) === village) room += structureSpec(item.kind).storage;
-  const capacity = new Resources(0, room, room, room, 0, room, room, room);
+  const capacity = new Resources(0, room, room, room, 0, room, room, room, room);
   for (const item of this.placed) {
     if (!item.built() || this.settlementOf(item) !== village) continue;
     if (item.kind === Structure.WoodStore) {

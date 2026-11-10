@@ -2,7 +2,7 @@
   "format": "building-asset",
   "version": 1,
   "id": "shrine",
-  "name": "Altar",
+  "name": "Statue of Ymir",
   "footprint": 1,
   "variants": [
     {
@@ -10,33 +10,33 @@
       "blocks": [
         {
           "bounds": [
-            0.06,
-            0.07,
-            0.94,
-            0.94
+            0.04,
+            0.04,
+            0.96,
+            0.96
           ],
           "wall": 4,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            83,
-            91,
-            88
+            98,
+            106,
+            103
           ],
           "wallShade": [
-            51,
-            60,
-            61
+            59,
+            68,
+            72
           ],
           "roofLit": [
-            109,
-            117,
-            105
+            98,
+            106,
+            103
           ],
           "roofShade": [
-            51,
-            60,
-            61
+            59,
+            68,
+            72
           ],
           "base": 0,
           "delay": 0,
@@ -57,459 +57,36 @@
         },
         {
           "bounds": [
-            0.12,
-            0.16,
-            0.32,
-            0.41
+            0.15,
+            0.15,
+            0.85,
+            0.85
           ],
-          "wall": 3,
+          "wall": 4,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            108,
-            111,
-            108
+            112,
+            120,
+            116
           ],
           "wallShade": [
             65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 4,
-          "delay": 3,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.68,
-            0.16,
-            0.88,
-            0.41
-          ],
-          "wall": 3,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            108,
-            111,
-            108
-          ],
-          "wallShade": [
-            65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 4,
-          "delay": 3,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.16,
-            0.2,
-            0.28,
-            0.37
-          ],
-          "wall": 29,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            108,
-            111,
-            108
-          ],
-          "wallShade": [
-            65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 7,
-          "delay": 6,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.72,
-            0.2,
-            0.84,
-            0.37
-          ],
-          "wall": 29,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            108,
-            111,
-            108
-          ],
-          "wallShade": [
-            65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 7,
-          "delay": 6,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.3,
-            0.25,
-            0.7,
-            0.265
-          ],
-          "wall": 28,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            62,
-            125,
-            127
-          ],
-          "wallShade": [
-            38,
-            80,
-            87
-          ],
-          "roofLit": [
-            124,
-            191,
-            174
-          ],
-          "roofShade": [
-            38,
-            80,
-            87
-          ],
-          "base": 6,
-          "delay": 10,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.13,
-            0.17,
-            0.87,
-            0.4
-          ],
-          "wall": 7,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            108,
-            111,
-            108
-          ],
-          "wallShade": [
-            65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 36,
-          "delay": 18,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.1,
-            0.14,
-            0.34,
-            0.43
-          ],
-          "wall": 2,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            108,
-            111,
-            108
-          ],
-          "wallShade": [
-            65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 36,
-          "delay": 19,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.66,
-            0.14,
-            0.9,
-            0.43
-          ],
-          "wall": 2,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            108,
-            111,
-            108
-          ],
-          "wallShade": [
-            65,
-            72,
-            75
-          ],
-          "roofLit": [
-            134,
-            135,
-            121
-          ],
-          "roofShade": [
-            65,
-            72,
-            75
-          ],
-          "base": 36,
-          "delay": 19,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.39,
-            0.19,
-            0.61,
-            0.38
-          ],
-          "wall": 3,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            121,
-            124,
-            112
-          ],
-          "wallShade": [
             73,
-            81,
-            80
+            78
           ],
           "roofLit": [
-            158,
-            155,
-            130
+            112,
+            120,
+            116
           ],
           "roofShade": [
+            65,
             73,
-            81,
-            80
-          ],
-          "base": 43,
-          "delay": 21,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.34,
-            0.65,
-            0.66,
-            0.86
-          ],
-          "wall": 7,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            110,
-            111,
-            99
-          ],
-          "wallShade": [
-            64,
-            71,
-            68
-          ],
-          "roofLit": [
-            144,
-            141,
-            117
-          ],
-          "roofShade": [
-            64,
-            71,
-            68
+            78
           ],
           "base": 4,
-          "delay": 10,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -527,83 +104,36 @@
         },
         {
           "bounds": [
-            0.3,
-            0.61,
-            0.7,
-            0.9
+            0.26,
+            0.18,
+            0.74,
+            0.42
           ],
-          "wall": 2,
+          "wall": 39,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            128,
-            127,
-            111
+            87,
+            97,
+            105
           ],
           "wallShade": [
-            80,
-            85,
-            76
+            47,
+            57,
+            67
           ],
           "roofLit": [
-            164,
-            157,
-            126
-          ],
-          "roofShade": [
-            80,
-            85,
-            76
-          ],
-          "base": 11,
-          "delay": 13,
-          "windows": 0,
-          "door": false,
-          "trim": "none",
-          "glass": [
-            232,
-            162,
-            72
-          ],
-          "ornament": "none",
-          "accent": [
-            132,
-            194,
-            180
-          ]
-        },
-        {
-          "bounds": [
-            0.44,
-            0.7,
-            0.56,
-            0.81
-          ],
-          "wall": 1.8,
-          "roof": 0,
-          "shape": "flat",
-          "wallLit": [
-            143,
-            125,
-            81
-          ],
-          "wallShade": [
-            85,
-            79,
-            54
-          ],
-          "roofLit": [
-            199,
-            173,
+            87,
+            97,
             105
           ],
           "roofShade": [
-            85,
-            79,
-            54
+            47,
+            57,
+            67
           ],
-          "base": 13,
-          "delay": 16,
+          "base": 8,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -621,36 +151,36 @@
         },
         {
           "bounds": [
-            0.208,
-            0.372,
-            0.222,
-            0.381
+            0.34,
+            0.37,
+            0.66,
+            0.68
           ],
-          "wall": 12,
+          "wall": 20,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            145,
-            191,
-            174
+            107,
+            117,
+            123
           ],
           "wallShade": [
-            91,
-            135,
-            128
+            61,
+            72,
+            83
           ],
           "roofLit": [
-            190,
-            215,
-            188
+            107,
+            117,
+            123
           ],
           "roofShade": [
-            91,
-            135,
-            128
+            61,
+            72,
+            83
           ],
-          "base": 16,
-          "delay": 23,
+          "base": 8,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -668,36 +198,36 @@
         },
         {
           "bounds": [
-            0.208,
-            0.372,
-            0.253,
-            0.381
+            0.22,
+            0.44,
+            0.35,
+            0.75
           ],
-          "wall": 1.1,
+          "wall": 14,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            145,
-            191,
-            174
+            99,
+            110,
+            115
           ],
           "wallShade": [
-            91,
-            135,
-            128
+            52,
+            64,
+            76
           ],
           "roofLit": [
-            190,
-            215,
-            188
+            99,
+            110,
+            115
           ],
           "roofShade": [
-            91,
-            135,
-            128
+            52,
+            64,
+            76
           ],
-          "base": 25,
-          "delay": 23,
+          "base": 8,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -715,36 +245,36 @@
         },
         {
           "bounds": [
-            0.208,
-            0.372,
-            0.244,
-            0.381
+            0.65,
+            0.44,
+            0.78,
+            0.75
           ],
-          "wall": 1.1,
+          "wall": 14,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            145,
-            191,
-            174
+            99,
+            110,
+            115
           ],
           "wallShade": [
-            91,
-            135,
-            128
+            52,
+            64,
+            76
           ],
           "roofLit": [
-            190,
-            215,
-            188
+            99,
+            110,
+            115
           ],
           "roofShade": [
-            91,
-            135,
-            128
+            52,
+            64,
+            76
           ],
-          "base": 21.5,
-          "delay": 23,
+          "base": 8,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -762,36 +292,36 @@
         },
         {
           "bounds": [
-            0.768,
-            0.372,
-            0.782,
-            0.381
+            0.37,
+            0.39,
+            0.63,
+            0.65
           ],
-          "wall": 12,
+          "wall": 11,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            145,
-            191,
-            174
+            126,
+            138,
+            140
           ],
           "wallShade": [
-            91,
-            135,
-            128
+            74,
+            87,
+            98
           ],
           "roofLit": [
-            190,
-            215,
-            188
+            126,
+            138,
+            140
           ],
           "roofShade": [
-            91,
-            135,
-            128
+            74,
+            87,
+            98
           ],
-          "base": 16,
-          "delay": 23,
+          "base": 28,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -809,36 +339,36 @@
         },
         {
           "bounds": [
-            0.768,
-            0.372,
-            0.8130000000000001,
-            0.381
+            0.34,
+            0.36,
+            0.66,
+            0.66
           ],
-          "wall": 1.1,
+          "wall": 3,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            145,
-            191,
-            174
+            167,
+            185,
+            189
           ],
           "wallShade": [
-            91,
-            135,
-            128
+            94,
+            117,
+            132
           ],
           "roofLit": [
-            190,
-            215,
-            188
+            167,
+            185,
+            189
           ],
           "roofShade": [
-            91,
-            135,
-            128
+            94,
+            117,
+            132
           ],
-          "base": 25,
-          "delay": 23,
+          "base": 39,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",
@@ -856,36 +386,36 @@
         },
         {
           "bounds": [
-            0.768,
-            0.372,
-            0.804,
-            0.381
+            0.41,
+            0.33,
+            0.59,
+            0.61
           ],
-          "wall": 1.1,
+          "wall": 4,
           "roof": 0,
           "shape": "flat",
           "wallLit": [
-            145,
-            191,
-            174
+            179,
+            198,
+            205
           ],
           "wallShade": [
-            91,
+            111,
             135,
-            128
+            150
           ],
           "roofLit": [
-            190,
-            215,
-            188
+            179,
+            198,
+            205
           ],
           "roofShade": [
-            91,
+            111,
             135,
-            128
+            150
           ],
-          "base": 21.5,
-          "delay": 23,
+          "base": 42,
+          "delay": 0,
           "windows": 0,
           "door": false,
           "trim": "none",

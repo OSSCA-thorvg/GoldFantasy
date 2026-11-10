@@ -12,6 +12,7 @@ import { Moment } from '../../../../packages/native-audio/src/music-director';
 import { Rect } from '../../../../packages/native-ui/src';
 import { queueWorkSounds } from './work-audio';
 import { objectSelectionOverlay } from './selection-overlay';
+import { renderPrayer } from './game-prayer';
 import {
   type CharacterEditor,
   type BuildingEditor,
@@ -158,7 +159,7 @@ export function render(
   this.viewHeight = height;
   const elapsed = !simulate || this.last < 0 ? 0 : clamp(seconds - this.last, 0, maxDelta);
   this.last = seconds;
-  if (!editing && (this.pan.x !== 0 || this.pan.y !== 0)) {
+  if (!editing && !this.prayer && (this.pan.x !== 0 || this.pan.y !== 0)) {
     const speed = f(f(620 / this.camera.zoom) * f(elapsed));
     this.camera.x = f(this.camera.x + f(this.pan.x * speed));
     this.camera.y = f(this.camera.y + f(this.pan.y * speed));
@@ -172,8 +173,8 @@ export function render(
     }
   }
   if (simulate) {
-    this.town.advance(editing ? 0 : elapsed * this.gameSpeed());
-    if (!editing) this.dispatchWork();
+    this.town.advance(editing || this.prayer ? 0 : elapsed * this.gameSpeed());
+    if (!editing && !this.prayer) this.dispatchWork();
   }
   this.chosen = this.chosen.filter((id) => !!this.town.person(id));
   for (const id of this.speakers.keys()) if (!this.town.person(id)) this.speakers.delete(id);
@@ -231,6 +232,11 @@ export function render(
   );
   if (simulate || this.town.isTitleAutoplay()) this.updateSpeech(seconds);
   this.context.begin(this.theme, new Rect(0, 0, width, height), uiSeconds >= 0 ? uiSeconds : seconds);
+  if (this.prayer) {
+    renderPrayer.call(this, width, height);
+    this.context.end();
+    return;
+  }
   if (!editing) objectSelectionOverlay(this);
   else this.renderer.setGroundSelection([]);
   if (
@@ -300,6 +306,7 @@ export function nextFrameDelay(this: GameRenderApp): number {
 }
 export function animatingUi(this: GameRenderApp): boolean {
   return (
+    this.prayer !== null ||
     this.dockProgress < 1 ||
     this.campResources.animating() ||
     this.context.motionActive() ||

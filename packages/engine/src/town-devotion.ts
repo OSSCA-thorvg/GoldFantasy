@@ -5,6 +5,8 @@ import { Building } from './town-models';
 import { CampReceipt } from './camp-economy';
 import { canControl, sameFaction, belongsToFaction } from './faction';
 import { distance, type Point } from './geometry';
+import { offeringReason, offeringOutcome } from './prayer-offering';
+import { emptyEquipment } from './equipment';
 
 export const ceremonySeconds = 5;
 export interface DevotionEvent {
@@ -91,7 +93,7 @@ function reservedHomes(town: DevotionTown, place: Building, exceptPerson = -1): 
   }
   return pending + praying.size;
 }
-function altarReason(town: DevotionTown, id: number, personId = -1): string {
+function altarReason(town: DevotionTown, id: number, personId = -1, checkFood = true): string {
   const place = town.building(id);
   if (!altar(place)) return 'Complete an altar first.';
   if (!belongsToFaction(place, town.controlFaction)) return 'This altar belongs to another settlement.';
@@ -106,7 +108,7 @@ function altarReason(town: DevotionTown, id: number, personId = -1): string {
     return 'A resident is already preparing this altar.';
   if (localResidents(town, place) + reservedHomes(town, place, personId) >= localHousing(town, place))
     return 'No free resident bed. Complete a home in this settlement.';
-  if (town.stock(camp.id).food < 4) return 'Need 4 food for the altar offering.';
+  if (checkFood && town.stock(camp.id).food < 4) return 'Need 4 food for the altar offering.';
   return '';
 }
 export function altarStatus(this: DevotionTown, id: number): AltarStatus {
@@ -117,6 +119,47 @@ export function altarStatus(this: DevotionTown, id: number): AltarStatus {
     dueDay: altar(place) ? place.devotionDueDay : -1,
     cost: new Resources(0, 0, 0, 4),
   };
+}
+export function altarOfferingReason(this: DevotionTown, id: number, offering: Resources): string {
+  const invalid = offeringReason(offering);
+  if (invalid) return invalid;
+  const reason = altarReason(this, id, -1, false);
+  if (reason) return reason;
+  const place = this.building(id)!;
+  if (!this.folk.some(p => canControl(p, this.controlFaction) && sameFaction(p, place) &&
+    this.settlementOf(p) === this.settlementOf(place) && p.activity !== Activity.Expedition))
+    return 'An available resident must be present in this settlement.';
+  if (!this.stock(this.settlementOf(place)).covers(offering)) return 'The settlement does not have enough resources for this offering.';
+  return '';
+}
+/** The presentation calls this once at transformation, while the world is paused.
+ * Validation, payment and arrival are atomic. Closing before transformation costs nothing. */
+export function summonFromOffering(this: DevotionTown, id: number, offering: Resources): Person | null {
+  if (altarOfferingReason.call(this, id, offering)) return null;
+  const place = this.building(id)!, village = this.settlementOf(place),
+    outcome = offeringOutcome(offering, () => this.roll());
+  const born = this.makePerson(Role.Resident, outcome.calling, this.grid.nearestWalkable(place.door()));
+  born.faction = place.faction;
+  born.village = village;
+  born.faith = place.faith;
+  born.level = outcome.level;
+  born.trained = outcome.calling !== Calling.Settler;
+  born.past = 'Shaped from an offering before the statue of Ymir.';
+  born.food = born.rest = born.hydration = born.health = 1;
+  born.stress = 0;
+  born.purse = 0;
+  born.inventory.fill(null);
+  born.equipment = emptyEquipment();
+  this.stock(village).subtract(offering);
+  this.folk.push(born);
+  this.altarEvents.push({ serial: this.nextDevotionEvent++, altar: id, person: born.id,
+    at: this.time, position: { ...born.position } });
+  this.assignHomes();
+  this.staff();
+  this.recordReceipt(new CampReceipt(0n, village, new Resources(), 0, 0, 1));
+  this.notify(born.name + ' is shaped by the offering and joins the settlement.');
+  ++this.changes;
+  return born;
 }
 export function prayerReason(this: DevotionTown, personId: number, altarId: number): string {
   const p = this.person(personId),

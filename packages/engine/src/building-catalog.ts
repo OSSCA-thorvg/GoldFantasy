@@ -38,8 +38,8 @@ export enum Structure {
   StoneStore,
   Count,
 }
-export const resourceKeys = ['gold', 'wood', 'stone', 'food', 'mana', 'water', 'planks', 'cutStone'] as const;
-export const storedResourceKeys = ['wood', 'stone', 'food', 'water', 'planks', 'cutStone'] as const;
+export const resourceKeys = ['gold', 'wood', 'stone', 'food', 'mana', 'water', 'planks', 'cutStone', 'bones'] as const;
+export const storedResourceKeys = ['wood', 'stone', 'food', 'water', 'planks', 'cutStone', 'bones'] as const;
 export class Resources {
   constructor(
     public gold = 0,
@@ -50,6 +50,7 @@ export class Resources {
     public water = 0,
     public planks = 0,
     public cutStone = 0,
+    public bones = 0,
   ) {}
   covers(cost: Resources): boolean {
     return resourceKeys.every((key) => this[key] >= cost[key]);
@@ -97,6 +98,7 @@ export enum Product {
   Water,
   Planks,
   CutStone,
+  Bones,
 }
 export interface StructureSpec {
   name: string;

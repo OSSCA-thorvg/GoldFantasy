@@ -4,7 +4,8 @@ import type { Resources } from '../../../../packages/engine/src/building-catalog
 import { f32 as f, clamp } from '../../../../packages/engine/src/numeric';
 import { resourceIcons, nativeFixed } from './hud-assets';
 const gainDuration = 0.7,
-  names = ['Gold', 'Wood', 'Stone', 'Food', 'Water', 'Mana', 'Residents', 'Guests', 'Renown'];
+  names = ['Gold', 'Wood', 'Stone', 'Food', 'Water', 'Mana', 'Residents', 'Guests', 'Renown', 'Bones'];
+const artwork = [0, 1, 2, 3, 4, 5, 6, 7, 8, 11];
 const colors = [
   rgba(247, 198, 92),
   rgba(214, 155, 98),
@@ -15,6 +16,7 @@ const colors = [
   rgba(162, 215, 179),
   rgba(244, 177, 117),
   rgba(244, 198, 103),
+  rgba(233, 225, 198),
 ];
 const signedAmount = (value: number) => (value >= 0 ? '+' : '') + value;
 export function compact(value: number): string {
@@ -101,6 +103,7 @@ export class ResourceBar {
         population.residents,
         population.guests,
         renown,
+        stock.bones,
       ],
       limits = [
         0,
@@ -112,6 +115,7 @@ export class ResourceBar {
         population.housing,
         population.guestBeds,
         100,
+        capacity.bones,
       ];
     this.lastTime = now;
     this.bounds = bounds;
@@ -124,7 +128,7 @@ export class ResourceBar {
     for (let row = 0; row < this.slots.length; row++) {
       const i = (row + this.slots.length - 1) % this.slots.length,
         slot = this.slots[i];
-      slot.animation ??= new context.tvg.Animation().load(resourceIcons[i]);
+      slot.animation ??= new context.tvg.Animation().load(resourceIcons[artwork[i]]);
       if (slot.started >= 0 && now >= slot.started + gainDuration) {
         slot.started = -1;
         slot.gained = 0;
@@ -150,7 +154,7 @@ export class ResourceBar {
         this.hoveredCell = cell;
         context.rect(cell.inset(3), theme.raised, theme.radius);
         this.description = names[i] + '  ' + values[i];
-        if (i > 0 && i < 5) this.description += ' / ' + limits[i] + ' capacity';
+        if ((i > 0 && i < 5) || i === 9) this.description += ' / ' + limits[i] + ' capacity';
         if (i === 6) this.description += ' / ' + limits[i] + ' housing';
         if (i === 7) this.description += ' / ' + limits[i] + ' beds';
         if (i === 8) this.description += ' / 100 settlement reputation';
@@ -191,7 +195,7 @@ export class ResourceBar {
           f(f(f(cell.x + cell.w) - textX) - captionWidth),
           compactRows ? 15 : 19,
         );
-      let color = i > 0 && i < 5 && values[i] >= limits[i] ? theme.danger : theme.text;
+      let color = ((i > 0 && i < 5) || i === 9) && values[i] >= limits[i] ? theme.danger : theme.text;
       if (i === 8) color = theme.accent;
       if (!compactRows)
         context.text(

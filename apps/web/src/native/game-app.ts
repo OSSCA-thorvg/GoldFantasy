@@ -33,6 +33,7 @@ import * as speech from './game-speech';
 import * as soundscape from './game-soundscape';
 import { refreshHoveredTarget } from './world-targets';
 import { isPlayerResident } from '../../../../packages/engine/src/faction';
+import { openPrayer, closePrayer, handlePrayerEvent } from './game-prayer';
 const {
   pointerDown: rawDown,
   pointerUp: rawUp,
@@ -44,6 +45,7 @@ const {
 const { SpeakerState, speakerState: unusedSpeakerFactory, ...speechMethods } = speech;
 const { buildGroups: unusedBuildGroups, ...hudMethods } = hud;
 const methods = {
+  openPrayer, closePrayer, handlePrayerEvent,
   ...inputMethods,
   ...commands,
   ...ambience,
@@ -98,7 +100,7 @@ export class GameApp extends GameAppState implements GameRuntime {
           ? source.chosen.filter((id) => isPlayerResident(town.person(id)))
           : [...source.chosen];
       this.speed = source.speed;
-      this.paused = source.paused;
+      this.paused = source.prayer?.previousPaused ?? source.paused;
       this.workQueue = copyNative(source.workQueue);
       this.stoppedWork = new Map(source.stoppedWork);
       this.workSerial = source.workSerial;
@@ -233,6 +235,8 @@ export class GameApp extends GameAppState implements GameRuntime {
   }
   dispose(): void {
     this.context.dispose();
+    this.prayer?.adapter.dispose();
+    this.prayer = null;
     this.atlas?.dispose();
     this.buildings?.dispose();
     this.campResources.dispose();

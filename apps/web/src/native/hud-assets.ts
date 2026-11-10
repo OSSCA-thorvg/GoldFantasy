@@ -9,6 +9,7 @@ import guests from '../../../../packages/native-ui/assets/game/resource-guests.j
 import renown from '../../../../packages/native-ui/assets/game/resource-renown.json';
 import planks from '../../../../packages/native-ui/assets/game/resource-planks.json';
 import cutStone from '../../../../packages/native-ui/assets/game/resource-cut-stone.json';
+import bones from '../../../../packages/native-ui/assets/game/resource-bones.json';
 import mural from '../../../../packages/native-ui/assets/game/sky-mural.svg?raw';
 export const resourceIcons = [
   gold,
@@ -22,6 +23,7 @@ export const resourceIcons = [
   renown,
   planks,
   cutStone,
+  bones,
 ].map((value) => JSON.stringify(value));
 export const skyMural = mural;
 /** C printf fixed precision: nearest decimal, ties to even, from the exact binary64 value. */

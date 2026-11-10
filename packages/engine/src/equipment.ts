@@ -141,6 +141,7 @@ export const itemCatalog: readonly ItemSpec[] = [
   entry('cut-stone', 'Cut stone', { product: Product.CutStone }),
   entry('gold', 'Gold', { product: Product.Goods }),
   entry('mana', 'Mana', { product: Product.Mana }),
+  entry('bones', 'Bones', { product: Product.Bones, description: 'Remains gathered from hunts and defeated monsters. Offered to Ymir to shape a new life.' }),
   tool('axe', 'Wood axe', 'axe', ['woodcutting'], 0.6, 2, 2),
   tool('pickaxe', 'Stone pick', 'pickaxe', ['mining'], 0.5, 2, 3),
   tool('hammer', 'Craft hammer', 'hammer', ['construction', 'crafting'], 0.4, 1, 2),
