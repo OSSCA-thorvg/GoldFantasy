@@ -11,8 +11,10 @@ import { prepareFarmWork } from './farm-work';
 import { roadWorkSpot, buildingWorkSpot } from './person-navigation';
 import type { Town } from './town';
 import { canControl } from './faction';
+import { clearAutomaticConstruction } from './automatic-work';
 export interface OrderTown extends TownState {
   resumeDevotionOrder(p: Person): boolean;
+  resumeCraftOrder(p: Person): boolean;
   recount(): void;
   staff(): void;
   walkTo(p: Person, to: Point): boolean;
@@ -28,6 +30,7 @@ export interface OrderTown extends TownState {
   constructionRoad(id: number): number;
   site(id: number): Building | null;
   roadWorkTarget(id: number): number;
+  roadWorkTargetFor(p: Person): number;
   orderBuild(ids: number[], id: number): boolean;
   orderRoadwork(ids: number[], id: number): boolean;
   orderChop(ids: number[], cell: number): boolean;
@@ -45,7 +48,9 @@ export interface OrderTown extends TownState {
   fellTree(p: Person, cell: number): boolean;
 }
 export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1): void {
+  clearAutomaticConstruction(p);
   if (task !== Activity.Training) p.trainingCalling = -1;
+  if (task !== Activity.Crafting) { p.craftItem = null; p.craftWorkshop = -1; p.craftProgress = 0; }
   p.approachingOrder = false;
   p.hunting = false; p.attackPerson = p.workField = -1;
   p.recoveringRest = p.recoveringHealth = false;
@@ -69,6 +74,7 @@ export function orderStop(this: OrderTown, ids: number[]): void {
     p.autoMode = false;
     p.ordered = false;
     p.trainingCalling = -1;
+    p.craftItem = null; p.craftWorkshop = -1; p.craftProgress = 0;
     p.task = Activity.Idle;
     p.taskSite = -1;
     p.supplyTarget = -1;
@@ -96,6 +102,7 @@ export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
       p.approachingOrder = false;
       p.ordered = false;
       p.trainingCalling = -1;
+      p.craftItem = null; p.craftWorkshop = -1; p.craftProgress = 0;
     p.task = Activity.Idle;
       p.taskSite = -1;
       p.supplyTarget = -1;
@@ -346,6 +353,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     if (target && target.health > 0 && target.activity !== Activity.Leaving) { p.activity = Activity.Fighting; return true; }
   }
   if (p.task === Activity.Praying || p.task === Activity.Training) return this.resumeDevotionOrder(p);
+  if (p.task === Activity.Crafting) return this.resumeCraftOrder(p);
   const wait = (): void => {
     p.activity = Activity.Holding;
     p.path = [];
@@ -450,7 +458,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     case Activity.Roadwork: {
       const wanted = this.network.road(p.taskSite);
       if (wanted && (wanted.built < 1 || wanted.paving >= 0 || wanted.wear > 0)) {
-        const road = this.network.road(this.roadWorkTarget(p.taskSite));
+        const road = this.network.road(this.roadWorkTargetFor(p));
         if (road) {
           if (p.carrying && this.prepareConstruction(p, Activity.Roadwork, road.id)) return true;
           const tree = this.constructionTree(p, Activity.Roadwork, road.id);

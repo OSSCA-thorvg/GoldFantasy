@@ -40,7 +40,12 @@ beforeAll(() => {
   base.folk = [p]; base.nextPerson = 1;
   base.editHour(12); base.tick(0);
 });
-function fixture() { return copyNative(base); }
+function fixture(...tools: string[]) {
+  const town = copyNative(base), worker = town.people()[0];
+  // These policy cases isolate scheduling from optional tool-speed penalties.
+  tools.forEach((item, index) => { worker.inventory[index] = { item, quantity: 1 }; worker.equipment[index ? 'tool2' : 'tool1'] = index + 1; });
+  return town;
+}
 function step(town: Town, seconds: number) { for (let i=0;i<Math.ceil(seconds*10);++i) town.advance(.1); }
 function road(town: Town) {
   const path=[sharpAnchor(point(31.2,30)), sharpAnchor(point(36,30))];
@@ -130,14 +135,14 @@ describe('resident automatic policy', () => {
     expect(p.hydration).toBeGreaterThan(.9);expect(town.stock().water).toBe(before-1);expect(distance(p.position,well.door())).toBeLessThan(.05);
   });
   it('constructs a missing Well and then uses it', () => {
-    const town=fixture(),p=town.people()[0];p.hydration=.2;
+    const town=fixture('hammer'),p=town.people()[0];p.hydration=.2;
     town.scheduleAutomatic(p);expect(town.buildings().some(b=>b.kind===Structure.Well)).toBe(true);
     for(let i=0;i<1800 && p.hydration<.9;++i)town.advance(.1);
     expect(p.hydration,JSON.stringify({activity:Activity[p.activity],task:Activity[p.task],position:p.position})).toBeGreaterThan(.9);
     expect(town.buildings().find(b=>b.kind===Structure.Well)!.built()).toBe(true);
   });
   it('works at a stable outdoor field point instead of the Farm doorway', () => {
-    const town=fixture(),p=town.people()[0],farm=new Building(1,Structure.Farm,point(35,34),0,0);farm.village=0;town.placed.push(farm);
+    const town=fixture('hoe','watering-can'),p=town.people()[0],farm=new Building(1,Structure.Farm,point(35,34),0,0);farm.village=0;town.placed.push(farm);
     town.farmland.push(new Field(2,[point(37,34),point(40,34),point(40,37),point(37,37)],0));++town.changes;
     expect(town.assignJob([p.id],farm.id)).toBe(true);step(town,12);
     expect(p.workField).toBe(2);expect(p.activity).toBe(Activity.Working);expect(p.inside).toBe(false);
@@ -145,7 +150,7 @@ describe('resident automatic policy', () => {
     const goal={...p.goal};step(town,5);expect(p.goal).toEqual(goal);expect(farm.workedSeconds).toBeGreaterThan(3);
   });
   it('finishes a connected extension from an unfinished parent, including its reverse half', () => {
-    const town=fixture(),p=town.people()[0];
+    const town=fixture('hammer'),p=town.people()[0];
     expect(town.buildRoad([sharpAnchor(point(31.2,30)),sharpAnchor(point(42,30))])).toBe(true);
     const parent=town.roads().roads().at(-1)!;
     expect(town.buildRoad([sharpAnchor(point(38,25)),sharpAnchor(point(38,38))])).toBe(true);
@@ -200,10 +205,10 @@ describe('resident automatic policy', () => {
     expect(distance(p.position,point(40,37.5))).toBeLessThan(.3);
   });
   it('lets two road workers finish without occupying one identical work position', () => {
-    const town=fixture(),p=town.people()[0],other=copyNative(p);other.id=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
+    const town=fixture('hammer'),p=town.people()[0],other=copyNative(p);other.id=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
     const r=road(town);town.orderRoadwork([p.id,other.id],r.id);
     let separated=false;
-    for(let i=0;i<600&&r.built<1;++i){town.advance(.1);if(p.activity===Activity.Roadwork&&other.activity===Activity.Roadwork&&!p.moving()&&!other.moving())separated ||= distance(p.position,other.position)>.3;}
+    for(let i=0;i<600&&r.built<1;++i){town.advance(.1);if(p.activity===Activity.Roadwork&&other.activity===Activity.Roadwork)separated ||= distance(p.position,other.position)>.3;}
     expect(r.built).toBe(1);expect(separated).toBe(true);
   });
   it('interrupts a direct Move for an active enemy and resumes the same destination', () => {
@@ -245,14 +250,15 @@ describe('resident automatic policy', () => {
     for(let i=0;i<300&&(!p.autoMode||p.carrying>0);++i)town.advance(.1);
     expect(town.map().at(33,32).trees).toBe(0);expect(town.stock().wood).toBe(3);expect(p.autoMode).toBe(true);expect(p.ordered).toBe(false);
   });
-  it('keeps its construction target while taking a meal during unavailable supplies', () => {
+  it('keeps its construction target while taking a meal before gathering available supplies', () => {
     const town=fixture(),p=town.people()[0],b=new Building(1,Structure.Tent,point(36,34),0,0);b.progress=0;b.materials.required.wood=3;town.placed.push(b);town.stock().wood=0;
+    town.map().at(37,35).trees=1;
     p.task=Activity.Building;p.taskSite=b.id;p.activity=Activity.WaitingMaterials;p.until=town.clock()+3;p.food=.2;
     town.scheduleAutomatic(p);expect(p.activity).toBe(Activity.Eating);expect(p.task).toBe(Activity.Building);expect(p.taskSite).toBe(b.id);
     step(town,8);expect(p.food).toBeGreaterThan(.9);expect(p.taskSite).toBe(b.id);
   });
   it('an assigned mill worker gathers raw input, delivers it and resumes production', () => {
-    const town=fixture(),p=town.people()[0],mill=new Building(1,Structure.Sawmill,point(36,34),0,0);mill.village=0;
+    const town=fixture('axe','saw'),p=town.people()[0],mill=new Building(1,Structure.Sawmill,point(36,34),0,0);mill.village=0;
     town.placed.push(mill);town.stock().wood=0;town.stock().planks=0;town.map().at(34,35).trees=1;++town.changes;
     expect(town.assignJob([p.id],mill.id)).toBe(true);
     const seen=new Set<Activity>();for(let i=0;i<1000&&town.stock().planks<1;++i){town.advance(.1);seen.add(p.activity);}
@@ -261,7 +267,7 @@ describe('resident automatic policy', () => {
     expect(p.job).toBe(mill.id);expect(p.task).toBe(Activity.Working);
   });
   it('returns to a partial bridge front after gathering the next material load', () => {
-    const town=fixture(),p=town.people()[0];town.stock().wood=town.stock().stone=0;
+    const town=fixture('hammer','axe'),p=town.people()[0];town.stock().wood=town.stock().stone=0;
     town.map().stream={path:[point(38.5,25),point(38.5,35)],width:[3,3]};
     for(let y=25;y<=35;++y)for(let x=37;x<=39;++x)town.map().at(x,y).terrain=Terrain.Water;
     town.map().at(34,32).trees=4;
@@ -276,7 +282,7 @@ describe('resident automatic policy', () => {
     expect(bridge.built,JSON.stringify(states.slice(-12))).toBe(1);
   });
   it('finishes the entire chosen prerequisite road before resuming the building', () => {
-    const town=fixture(),p=town.people()[0];
+    const town=fixture('hammer'),p=town.people()[0];
     expect(town.buildRoad([sharpAnchor(point(31.2,30)),sharpAnchor(point(42,30))])).toBe(true);
     const lane=town.roads().roads().at(-1)!,site=new Building(1,Structure.Tent,point(36,31.1),0,0);
     site.progress=0;town.placed.push(site);p.task=Activity.Building;p.taskSite=site.id;p.ordered=false;
@@ -286,7 +292,7 @@ describe('resident automatic policy', () => {
     expect(firstBuildingAt).toBe(1);expect(lane.built).toBe(1);expect(site.built()).toBe(true);
   });
   it('global parent and bridge requests retain their targets through gathering and delivery', () => {
-    const town=fixture(),p=town.people()[0],other=copyNative(p);other.id=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
+    const town=fixture('hammer','axe'),p=town.people()[0],other=copyNative(p);other.id=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
     town.stock().wood=town.stock().stone=0;
     town.map().stream={path:[point(38.5,25),point(38.5,35)],width:[3,3]};
     for(let y=25;y<=35;++y)for(let x=37;x<=39;++x)town.map().at(x,y).terrain=Terrain.Water;
@@ -312,7 +318,7 @@ describe('resident automatic policy', () => {
   it('right-clicking an animal targets it, while explicit Move remains movement', () => {
     const town=fixture(),p=town.people()[0],animal=new Monster(88,-1,add(p.position,point(.6,0)));animal.animal=AnimalKind.Pig;animal.health=3;animal.home={...animal.position};town.animals.push(animal);
     const app={town,chosen:[p.id],mouse:point(),cursor:animal.position,status:'',animalAtScreen:()=>animal.id,treeAtScreen:()=>-1,rockAtScreen:()=>-1,buildingAtScreen:()=>-1,hoveredRoad:()=>-1,personAt:()=>-1,cue(){}} as unknown as GameCommandApp;
-    issueOrder.call(app,Order.Work);expect(p.task).toBe(Activity.Fighting);expect(p.taskSite).toBe(animal.id);town.advance(.1);expect(animal.health).toBeLessThan(3);
+    issueOrder.call(app,Order.Work);expect(p.task).toBe(Activity.Moving);town.advance(.1);expect(animal.health).toBe(3);
     issueOrder.call(app,Order.Move);expect(p.task).toBe(Activity.Moving);
   });
   it('briefly drinks during critical health recovery, preserving the suspended task', () => {

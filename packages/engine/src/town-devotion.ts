@@ -4,9 +4,20 @@ import { Resources, Structure, isHome, structureSpec } from './building-catalog'
 import { Building } from './town-models';
 import { CampReceipt } from './camp-economy';
 import { canControl, sameFaction, belongsToFaction } from './faction';
-import type { Point } from './geometry';
+import { distance, type Point } from './geometry';
 
 export const ceremonySeconds = 5;
+export interface DevotionEvent {
+  serial: bigint;
+  altar: number;
+  person: number;
+  at: number;
+  position: Point;
+}
+export function devotionEvents(this: TownState): readonly DevotionEvent[] {
+  this.altarEvents = this.altarEvents.filter((event) => this.time - event.at <= 3);
+  return this.altarEvents;
+}
 export interface AltarStatus {
   reason: string;
   pendingBirths: number;
@@ -24,6 +35,7 @@ export interface DevotionTown extends TownState {
   walkTo(person: Person, to: Point): boolean;
   setOrder(person: Person, task: Activity, site?: number): void;
   arrive(person: Person): void;
+  processDevotion(): void;
   prayerReason(personId: number, altarId: number): string;
   trainingReason(personId: number, guildId: number, calling: Calling): string;
 }
@@ -85,7 +97,7 @@ function altarReason(town: DevotionTown, id: number, personId = -1): string {
   if (!belongsToFaction(place, town.controlFaction)) return 'This altar belongs to another settlement.';
   const camp = town.camp(town.settlementOf(place));
   if (!camp?.built() || !sameFaction(camp, place)) return 'Complete a camp for this altar.';
-  if (place.devotionDueDay >= 0) return 'A new resident is expected here the next day.';
+  if (place.devotionDueDay >= 0) return 'A resident is waiting for an available home.';
   if (
     town.folk.some(
       (p) => p.id !== personId && p.health > 0 && p.task === Activity.Praying && p.taskSite === id,
@@ -129,7 +141,7 @@ export function orderPrayAtAltar(this: DevotionTown, ids: number[], altarId: num
     p.activity = Activity.Praying;
     if (!p.moving()) this.arrive(p);
     ++this.changes;
-    return true; // One worshipper is enough for one altar's next-day arrival.
+    return true; // One completed offering creates one resident at this altar.
   }
   return false;
 }
@@ -174,7 +186,6 @@ export function completeAltarPrayer(this: DevotionTown, p: Person): boolean {
     p.task !== Activity.Praying ||
     p.activity !== Activity.Praying ||
     p.target !== p.taskSite ||
-    !p.inside ||
     p.crossingDoorway() ||
     p.moving() ||
     this.time < p.until
@@ -182,16 +193,17 @@ export function completeAltarPrayer(this: DevotionTown, p: Person): boolean {
     return false;
   const place = this.building(p.taskSite),
     reason = this.prayerReason(p.id, p.taskSite);
+  if (place && distance(p.position, place.door()) > 0.05) return false;
   if (reason || !altar(place)) {
     finishCeremony(this, p);
     if (reason) this.notify(reason);
     return false;
   }
   this.stock(this.settlementOf(place)).food -= 4;
-  place.devotionDueDay = this.days + 1;
+  place.devotionDueDay = this.days;
   p.prayedAt = this.time;
   finishCeremony(this, p);
-  this.notify('The offering is accepted. A new resident will appear at this altar the next day.');
+  this.processDevotion();
   ++this.changes;
   return true;
 }
@@ -221,6 +233,11 @@ export function processDevotion(this: DevotionTown): void {
     born.stress = 0;
     born.autoMode = true;
     this.folk.push(born);
+    this.altarEvents = this.altarEvents.filter((event) => this.time - event.at <= 3);
+    this.altarEvents.push({
+      serial: this.nextDevotionEvent++, altar: place.id, person: born.id,
+      at: this.time, position: { ...born.position },
+    });
     place.devotionDueDay = -1;
     this.assignHomes();
     this.staff();

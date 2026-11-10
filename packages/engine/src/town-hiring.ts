@@ -40,9 +40,9 @@ export interface TrainingTown extends TownState {
   trainingReason(personId: number, guildId: number, calling: Calling): string;
 }
 const professions: readonly { calling: Calling; description: string }[] = [
-  { calling: Calling.Warrior, description: 'A close-combat fighter with a strong melee strike.' },
-  { calling: Calling.Ranger, description: 'A bow-wielding fighter who attacks from a distance.' },
-  { calling: Calling.Mage, description: 'A rune caster who attacks from a distance.' },
+  { calling: Calling.Warrior, description: 'A close-combat profession. Equip a crafted weapon for stronger attacks.' },
+  { calling: Calling.Ranger, description: 'A ranged-combat profession. Equip a crafted bow to attack from a distance.' },
+  { calling: Calling.Mage, description: 'A rune-casting profession. Equip a crafted staff to attack from a distance.' },
   { calling: Calling.Cleric, description: 'A sworn guardian who fights at close range.' },
   { calling: Calling.Bard, description: 'A keeper of songs who can fight at close range.' },
 ];

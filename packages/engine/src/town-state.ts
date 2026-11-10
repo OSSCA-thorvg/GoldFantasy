@@ -10,10 +10,12 @@ import { Resources } from './building-catalog';
 import { Sky } from './climate';
 import { f32 } from './numeric';
 import { NeutralSettlement } from './neutral-state';
+import type { DevotionEvent } from './town-devotion';
 export class TownState {
   /** Scoped settlement planners execute the same rules for their own faction. */
   controlFaction = 0;
   neutralSettlements: NeutralSettlement[] = [];
+  altarEvents: DevotionEvent[] = []; nextDevotionEvent = 0n;
   static readonly secondsPerDay = 300; static readonly daysPerMonth = 5; static readonly maxRoadLength = 24; static readonly maxBridgeSpan = 7; static readonly roadHalfWidth = f32(.3); static readonly maxFieldAcres = 48; static readonly farmReach = 6; static readonly joinReach = f32(.8); static readonly campReach = 12; static readonly paidWorkSeconds = f32(300 * f32(.12)); static readonly maxRaiders = 16;
   titleAutoplay = false; titleBuilder = -1; titleFoodUntil = -1; titlePlanTimer = 0; titleWeatherTimer = 0; titleAnchors: Point[] = [];
   network = new RoadNetwork(); placed: Building[] = []; farmland: Field[] = []; folk: Person[] = []; grid = new WalkGrid(); sky: Sky;

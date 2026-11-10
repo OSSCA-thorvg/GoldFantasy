@@ -126,7 +126,7 @@ describe('temporary lodging visitors', () => {
   });
 });
 
-describe('altar prayer and next-day residents', () => {
+describe('altar prayer and immediate residents', () => {
   it('autoplay grows through physical altar prayer without reassigning the worshipper to staffing', () => {
     const town = fixture();
     for (const [kind, at] of [
@@ -145,8 +145,7 @@ describe('altar prayer and next-day residents', () => {
     expect(p.task).toBe(Activity.Praying);
     expect(p.taskSite).toBe(1);
     advance(town, 25);
-    expect(town.building(1)!.devotionDueDay).toBe(town.days + 1);
-    town.newDay();
+    expect(town.building(1)!.devotionDueDay).toBe(-1);
     expect(town.population(0)).toBe(2);
   });
 
@@ -198,7 +197,7 @@ describe('altar prayer and next-day residents', () => {
     expect(cost.planks + cost.cutStone).toBe(0);
     expect(structureSpec(Structure.Shrine).requiredPopulation).toBe(0);
   });
-  it('requires real travel and prayer, pays once, and produces one resident at that altar next day', () => {
+  it('requires real travel and visible prayer, pays once, and produces one resident immediately', () => {
     const town = fixture(),
       p = town.people()[0],
       altar = town.building(1)!,
@@ -208,14 +207,13 @@ describe('altar prayer and next-day residents', () => {
     expect(town.completeAltarPrayer(p)).toBe(false);
     expect(town.population(0)).toBe(1);
     expect(town.stock(0).food).toBe(food);
-    advance(town, 25);
-    expect(altar.devotionDueDay).toBe(town.days + 1);
+    for (let i = 0; i < 250 && town.population(0) < 2; i++) advance(town, .1);
+    expect(altar.devotionDueDay).toBe(-1);
     expect(town.stock(0).food).toBe(food - 4);
     expect(p.task).toBe(Activity.Idle);
     expect(p.autoMode).toBe(true);
-    expect(town.population(0)).toBe(1);
+    expect(town.population(0)).toBe(2);
     expect(town.completeAltarPrayer(p)).toBe(false);
-    town.newDay();
     const born = town.people().at(-1)!;
     expect(town.population(0)).toBe(2);
     expect(born.role).toBe(Role.Resident);
@@ -238,8 +236,9 @@ describe('altar prayer and next-day residents', () => {
     const [first, other] = town.people();
     expect(town.orderPrayAtAltar([first.id], altar.id)).toBe(true);
     expect(town.prayerReason(other.id, second.id)).toContain('No free resident bed');
-    advance(town, 25);
-    expect(altar.devotionDueDay).toBeGreaterThanOrEqual(0);
+    // A legacy saved offering still holds its home until arrival is possible.
+    town.orderStop([first.id]);
+    altar.devotionDueDay = town.days;
     town.recruit(Role.Resident, Calling.Settler, 1, 0);
     town.newDay();
     expect(town.population(0)).toBe(5);
@@ -269,12 +268,10 @@ describe('altar prayer and next-day residents', () => {
     expect(neutral.faction).toBe(1);
     expect(town.prayerReason(neutral.id, altar.id)).toBe('');
   });
-  it('preserves pending birth day through a save and creates the same identity exactly once', () => {
+  it('preserves a legacy pending birth day through a save and creates the same identity exactly once', () => {
     const town = fixture(),
       p = town.people()[0];
-    expect(town.orderPrayAtAltar([p.id], 1)).toBe(true);
-    advance(town, 25);
-    expect(town.building(1)!.devotionDueDay).toBe(town.days + 1);
+    town.building(1)!.devotionDueDay = town.days + 1;
     const text = encodeTown(town),
       loaded = decodeTown(text, (map) => new Town(map, 32, false));
     expect(loaded).toBeTruthy();

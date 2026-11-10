@@ -5,6 +5,7 @@ import { Building } from './town-models';
 import { Structure } from './building-catalog';
 import { add, distance, normalized, point, rotated, scale, sub } from './geometry';
 import { f32 as f } from './numeric';
+import { automaticConstructionAllowed, registerAutomaticConstruction } from './automatic-work';
 
 export function orderAutomatic(this: Town, ids: number[]): void {
   for (const p of this.folk) {
@@ -90,11 +91,17 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
   }
   if (p.activity === Activity.Collecting || p.activity === Activity.Hauling) return true;
   if (p.carrying > 0 && this.haulCargo(p)) return true;
-  const automatic = (accepted: boolean): boolean => { if (accepted) p.ordered = false; return accepted; };
+  const automatic = (accepted: boolean): boolean => {
+    if (accepted) {
+      registerAutomaticConstruction(this, p, p.task, p.taskSite);
+      p.ordered = false;
+    }
+    return accepted;
+  };
   for (const road of this.network.roads())
-    if ((road.built < 1 || road.paving >= 0 || road.wear > 0) && automatic(this.orderRoadwork([p.id], road.id))) return true;
+    if ((road.built < 1 || road.paving >= 0 || road.wear > 0) && automaticConstructionAllowed(this,p,Activity.Roadwork,road.id) && automatic(this.orderRoadwork([p.id], road.id))) return true;
   for (const b of this.placed)
-    if ((!b.built() || b.health < 1) && automatic(this.orderBuild([p.id], b.id))) return true;
+    if ((!b.built() || b.health < 1) && automaticConstructionAllowed(this,p,Activity.Building,b.id) && automatic(this.orderBuild([p.id], b.id))) return true;
 
   if (p.food < f(.25) && (this.eat(p) || this.huntFood(p))) return true;
   if (p.hydration < f(.25) && this.drink(p)) return true;

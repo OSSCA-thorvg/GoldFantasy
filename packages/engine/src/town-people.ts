@@ -9,7 +9,7 @@ import { f32 as f } from './numeric';
 import { DungeonKind, Dungeon } from './world-types';
 import { CampEconomy } from './camp-economy';
 import { enter } from './town-residents';
-import { harvestTiming } from './work-timing';
+import { harvestDuration } from './work-timing';
 import { prepareFarmWork } from './farm-work';
 import { buildingWorkSpot } from './person-navigation';
 import type { Town } from './town';
@@ -173,6 +173,7 @@ export function arrive(this: PeopleTown, p: Person): void {
         Activity.Relaxing,
         Activity.Praying,
         Activity.Training,
+        Activity.Crafting,
         Activity.Shopping,
         Activity.Hauling,
         Activity.Building,
@@ -199,6 +200,11 @@ export function arrive(this: PeopleTown, p: Person): void {
     return;
   }
   switch (p.activity) {
+    case Activity.Crafting:
+      if (!place || !place.built() || p.craftWorkshop !== place.id) { p.activity = Activity.Idle; break; }
+      enter(p, place.threshold());
+      p.until = this.time;
+      break;
     case Activity.FetchingMaterials:
       this.fetchConstructionMaterials(p);
       break;
@@ -255,7 +261,8 @@ export function arrive(this: PeopleTown, p: Person): void {
         p.activity = Activity.Idle;
         break;
       }
-      enter(p, place.threshold());
+      if (p.activity !== Activity.Praying || place.kind !== Structure.Shrine)
+        enter(p, place.threshold());
       p.until = this.time + ([Activity.Praying, Activity.Training].includes(p.activity) ? ceremonySeconds : 6);
       break;
     case Activity.Shopping:
@@ -283,10 +290,10 @@ export function arrive(this: PeopleTown, p: Person): void {
       break;
     }
     case Activity.Felling:
-      p.until = this.time + harvestTiming.duration;
+      p.until = this.time + harvestDuration(p);
       break;
     case Activity.Mining:
-      p.until = this.time + harvestTiming.duration;
+      p.until = this.time + harvestDuration(p, true);
       break;
     case Activity.Leaving:
       p.health = -1;

@@ -13,6 +13,7 @@ import { distance, point, type Point } from './geometry';
 import { f32 as f } from './numeric';
 import { TownState } from './town-state';
 import { belongsToFaction, sameFaction } from './faction';
+import { deferAutomaticConstruction } from './automatic-work';
 
 function constructionOwner(town: Town, work: Activity, id: number): { faction: number } | null {
   return work === Activity.Roadwork ? town.network.road(id) : town.building(id);
@@ -121,6 +122,9 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
     // unusable surplus at the construction site. Keep the builder's task intact.
     if (!resourceAmount(materials.required, p.carriedProduct) && this.haulCargo(p)) return true;
     if (go(Activity.DeliveringMaterials, id, at)) return true;
+    // A changed obstacle can invalidate the delivery leg after collection.
+    // Retain the cargo, release the impossible job, and let Auto store it.
+    if (deferAutomaticConstruction(this, p)) return true;
     p.activity = Activity.WaitingMaterials;
     p.path = [];
     p.until = this.time + 3;
@@ -209,6 +213,7 @@ export function prepareConstruction(this: Town, p: Person, work: Activity, id: n
     return true;
   if (this.produceConstructionMaterial(p, wanted)) return true;
   if (this.titleAutoplay && this.seekTitleMaterials(p, wanted)) return true;
+  if (deferAutomaticConstruction(this, p)) return true;
   p.activity = Activity.WaitingMaterials;
   p.target = id;
   p.path = [];

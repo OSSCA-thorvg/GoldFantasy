@@ -4,6 +4,7 @@ import { Building } from './town-models';
 import { isSeat } from './building-catalog';
 import { Point, distance, closestOnSegment } from './geometry';
 import { f32 as f } from './numeric';
+import { Activity, type Person } from './person';
 export interface RoadConstructionTown extends TownState { camp(id?: number): Building | null; settlementAt(at: Point): number; roadReady(id: number): boolean; roadWorkTarget(id: number): number; }
 export function connectRoad(this: RoadConstructionTown, road: Road): boolean {
   if (!this.camp() || road.line.length < 2) return false;
@@ -15,4 +16,16 @@ export function connectRoad(this: RoadConstructionTown, road: Road): boolean {
 }
 export function roadReady(this: RoadConstructionTown, id: number): boolean { let road = this.network.road(id); for (let depth = 0; road && depth <= this.network.roads().length; ++depth) { if (road.parent < 0) return this.placed.some(seat => isSeat(seat.kind) && seat.built() && distance(road!.along(road!.constructionStart), seat.center) <= f(1.31)); const parent = this.network.road(road.parent); if (!parent || parent.wear >= 1 || road.parentAt < f(parent.laidBegin() - f(.0001)) || road.parentAt > f(parent.laidEnd() + f(.0001)) || distance(road.along(road.constructionStart), parent.along(road.parentAt)) > TownState.joinReach) return false; road = parent; } return false; }
 export function roadWorkTarget(this: RoadConstructionTown, id: number): number { let road = this.network.road(id); for (let depth = 0; road && depth <= this.network.roads().length; ++depth) { if (this.roadReady(road.id)) return road.id; road = this.network.road(road.parent); } return -1; }
+/** A prerequisite is a committed work transaction, including its supply trips. */
+export function roadWorkTargetFor(this: RoadConstructionTown, person: Person): number {
+  const current = this.network.road(person.activity === Activity.Roadwork ? person.target : person.supplyRoad ? person.supplyTarget : -1);
+  if (current && (current.built < 1 || current.paving >= 0 || current.wear > 0) && this.roadReady(current.id)) {
+    let wanted = this.network.road(person.taskSite);
+    for (let depth = 0; wanted && depth <= this.network.list.length; ++depth) {
+      if (wanted.id === current.id) return current.id;
+      wanted = this.network.road(wanted.parent);
+    }
+  }
+  return this.roadWorkTarget(person.taskSite);
+}
 export function roadWorkPosition(this: RoadConstructionTown, id: number): Point | null { return this.network.road(this.roadWorkTarget(id))?.workPoint() ?? null; }

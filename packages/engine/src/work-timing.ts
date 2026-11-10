@@ -1,5 +1,10 @@
+import type { Person } from './person';
+import { workEfficiency } from './equipment';
+
 /** Shared simulation-time contacts for work poses and discrete sound events. */
 export const harvestTiming = { duration: 6, period: 0.9, impact: 0.6 } as const;
+export const harvestDuration = (person: Person, stone = false): number =>
+  harvestTiming.duration / workEfficiency(person, stone ? 'mining' : 'woodcutting');
 export const hammerTiming = { period: 1.05, impact: 0.68 } as const;
 export const treeFallTiming = { duration: 0.8, impact: 0.64 } as const;
 export const titleAutoplayRate = 4;

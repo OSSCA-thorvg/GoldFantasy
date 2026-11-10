@@ -76,6 +76,7 @@ describe('resident work foot bounds', () => {
     mill.village = 0;
     town.placed.push(mill);
     town.stock().wood = 30;
+    for (const p of town.people()) { p.inventory[0] = { item: 'saw', quantity: 1 }; p.equipment.tool1 = 1; }
     town.changes++;
     expect(town.assignJob([0, 1], mill.id)).toBe(true);
     advance(town, 8);

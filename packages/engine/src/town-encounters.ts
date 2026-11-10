@@ -9,6 +9,7 @@ import { point, add, sub, scale, rotated, normalized, distance, type Point } fro
 import { f32 as f, lround } from './numeric';
 import { breedOf, steps } from './town-monsters';
 import { planRaiderApproach, separateMonsters } from './monster-navigation';
+import { armorProtection } from './equipment';
 export interface EncounterTown extends TownState {
   wakeGiants(): void;
   stirWildlife(dt: number): void;
@@ -103,9 +104,7 @@ export function stir(this: EncounterTown, dt: number): void {
         )
           beast.position = next;
       } else if (this.time >= beast.ready) {
-        let bite = f(breed.bite * beast.strength * (prey.calling === Calling.Warrior ? f(0.6) : 1));
-        if (prey.role === Role.Resident && this.staffed(Structure.Armorer)) bite = f(bite * f(0.6));
-        bite = f(bite / f(1 + f(f(0.3) * prey.gear)));
+        const bite = f(breed.bite * beast.strength * (1 - armorProtection(prey)));
         prey.health = f(prey.health - f(bite / prey.vitalityMultiplier()));
         this.blows.push({
           serial: this.nextBlow++,

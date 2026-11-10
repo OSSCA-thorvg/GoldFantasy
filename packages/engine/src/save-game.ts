@@ -52,6 +52,7 @@ import { CampEconomy, Ledger } from './camp-economy';
 import { point } from './geometry';
 import { defaultAppearance } from './person-look';
 import { NeutralSettlement } from './neutral-state';
+import { backpackSize, equipmentSlots, itemSpec, validInventory, type ItemStack } from './equipment';
 export interface SaveTown extends TownState {
   camp(id?: number): Building | null;
   settlement(id: number): CampEconomy;
@@ -265,6 +266,7 @@ const wildlifeCodec: Codec<Monster[]> = {
     }
   },
 };
+const inventoryItemCodec = record<ItemStack>(() => ({ item: '', quantity: 0 }), { item: string, quantity: i32 });
 function personFields(a: SaveArchive, v: Person): void {
   a.fields(v, {
     id: i32,
@@ -354,6 +356,16 @@ function personFields(a: SaveArchive, v: Person): void {
         v.trainingCalling > Calling.Bard)
     )
       throw new Error('Invalid resident allegiance');
+  }
+  if (a.formatVersion >= 11) {
+    v.inventory = a.value(vector(optional(inventoryItemCodec), backpackSize), v.inventory);
+    for (const slot of equipmentSlots) v.equipment[slot] = a.value(i32, v.equipment[slot]);
+    a.fields(v, { craftItem: optional(string), craftWorkshop: i32, craftProgress: f64 });
+    const item = v.craftItem === null ? null : itemSpec(v.craftItem);
+    if (!validInventory(v) || !Number.isFinite(v.craftProgress) || v.craftProgress < 0 ||
+        v.craftWorkshop < -1 || (v.craftItem !== null && (!item || item.workshop === null || v.craftWorkshop < 0 || v.craftProgress > item.seconds + .25)) ||
+        (v.craftItem === null && (v.craftWorkshop !== -1 || v.craftProgress !== 0)))
+      throw new Error('Invalid inventory or crafting state');
   }
   if (
     a.reading &&
@@ -704,7 +716,11 @@ export function encodeTown(town: SaveTown): string {
     town.network.list.some((r) => r.faction !== 0) ||
     town.farmland.some((field) => field.faction !== 0) ||
     [town.provisions, ...town.villages].some((v) => v.faction !== 0);
-  a.formatVersion = allegiance
+  const equipment = town.folk.some(p => p.inventory.some(Boolean) || equipmentSlots.some(slot => p.equipment[slot] >= 0) || p.craftItem !== null || p.craftWorkshop >= 0 || p.craftProgress !== 0 || p.activity === Activity.Crafting || p.task === Activity.Crafting);
+  for (const p of town.folk) if (!validInventory(p)) throw new Error('Invalid inventory');
+  a.formatVersion = equipment
+    ? 11
+    : allegiance
     ? 10
     : extended
       ? 9
@@ -749,10 +765,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 10) climateSize = u32.read(a);
+  if (version >= 2 && version <= 11) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 10 ||
+    version > 11 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

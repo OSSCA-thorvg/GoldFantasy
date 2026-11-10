@@ -2,23 +2,29 @@ import { Faith, Product } from './building-catalog';
 import { distance, point, type Point } from './geometry';
 import { clamp, f32 } from './numeric';
 import type { Appearance } from './person-appearance';
+import { backpackSize, emptyEquipment, type ItemStack } from './equipment';
 export enum Role { Resident, Guest }
 export enum Calling { Settler, Traveller, Warrior, Ranger, Mage, Cleric, Bard }
 export enum Race { Human, God, Giant }
-export enum Activity { Idle, Moving, Holding, Building, Roadwork, Working, Eating, Sleeping, Relaxing, Exploring, Brooding, Arriving, Leaving, Guarding, Fighting, Expedition, Praying, Shopping, Hauling, Felling, Collecting, Mining, Treating, FetchingMaterials, DeliveringMaterials, WaitingMaterials, Drinking, Training }
+export enum Activity { Idle, Moving, Holding, Building, Roadwork, Working, Eating, Sleeping, Relaxing, Exploring, Brooding, Arriving, Leaving, Guarding, Fighting, Expedition, Praying, Shopping, Hauling, Felling, Collecting, Mining, Treating, FetchingMaterials, DeliveringMaterials, WaitingMaterials, Drinking, Training, Crafting }
 export enum AnimalKind { Cow, Pig, Chicken, Wolf, Dog, Cat, Count }
 export const callingName = (calling: Calling): string => ['Settler', 'Traveller', 'Warrior', 'Ranger', 'Mage', 'Cleric', 'Bard'][calling] || '';
 export const raceName = (race: Race): string => ['Human', 'God', 'Giant'][race] || '';
-export const activityName = (activity: Activity): string => ['Idle', 'Moving on orders', 'Holding position', 'Building', 'Working on a road', 'Working', 'Eating', 'Sleeping', 'Relaxing at the tavern', 'Delving the dungeon', 'Brooding', 'Arriving', 'Leaving', 'On watch', 'Fighting', 'On an expedition', 'Praying', 'Buying gear', 'Carrying goods', 'Felling a tree', 'Collecting resources', 'Mining stone', 'Receiving treatment', 'Fetching supplies', 'Delivering materials', 'Waiting for materials', 'Drinking water', 'Training at the guild'][activity] || '';
+export const activityName = (activity: Activity): string => ['Idle', 'Moving on orders', 'Holding position', 'Building', 'Working on a road', 'Working', 'Eating', 'Sleeping', 'Relaxing at the tavern', 'Delving the dungeon', 'Brooding', 'Arriving', 'Leaving', 'On watch', 'Fighting', 'On an expedition', 'Praying', 'Buying gear', 'Carrying goods', 'Felling a tree', 'Collecting resources', 'Mining stone', 'Receiving treatment', 'Fetching supplies', 'Delivering materials', 'Waiting for materials', 'Drinking water', 'Training at the guild', 'Crafting equipment'][activity] || '';
 export class Monster {
   health = 3; strength = 1; raider = false; angry = false; ready = 0; home = point(); prey = -1; race: Race | null = null; insideLair = false; provokedBy = -1; animal: AnimalKind | null = null;
   constructor(public id: number, public lair: number, public position: Point, public path: Point[] = []) {}
   giant(): boolean { return this.race === Race.Giant; }
 }
-export interface Hit { serial: bigint; from: Point; to: Point; damage: number; onPerson: boolean; ranged: boolean; at: number; person: number; }
+export interface Hit { serial: bigint; from: Point; to: Point; damage: number; onPerson: boolean; ranged: boolean; at: number; person: number; attacker?: number; }
 export interface Expedition { dungeon: number; members: number[]; returnAt: number; }
 export class Person {
   static readonly maximumLevel = 30;
+  inventory: (ItemStack | null)[] = Array.from({ length: backpackSize }, () => null);
+  equipment = emptyEquipment();
+  craftItem: string | null = null;
+  craftWorkshop = -1;
+  craftProgress = 0;
   faction = 0;
   stressRecovery = false;
   lastBreakdownAt = -1;
@@ -38,7 +44,7 @@ export class Person {
   customLook: Appearance | null = null; lookRevision = 0n; entrance = point(); threshold = point(); doorway = 0; faith = Faith.Dawn; past = ''; village = -1; supplyTarget = -1; supplyRoad = false; scheduleAt = 0;
   constructor(public id: number, public name: string, public role: Role, public calling: Calling, public race: Race, public look: number, public position: Point, public path: Point[] = []) {}
   experienceToNextLevel(): number { return this.level >= Person.maximumLevel ? 0 : 30 + 20 * (this.level - 1); }
-  attackMultiplier(): number { return f32(1 + f32(f32(.15) * (this.level - 1))); }
+  attackMultiplier(): number { return 1; }
   vitalityMultiplier(): number { return f32(1 + f32(f32(.1) * (this.level - 1))); }
   gainExperience(points: number): number {
     if (points <= 0 || this.health <= 0 || this.level >= Person.maximumLevel) return 0;

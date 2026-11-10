@@ -165,6 +165,8 @@ describe('new player road requests after the first Camp', () => {
       town = app.town,
       worker = town.people()[0];
     town.folk = [worker];
+    // Isolate request priority from the separately tested barehand work rate.
+    worker.inventory[0] = { item: 'hammer', quantity: 1 }; worker.equipment.tool1 = 1;
     const first = requestRoad(app, radial(app, point(1, 0)), [worker.id]);
     worker.ordered = false;
     advanceUntil(app, () => first.built >= 0.2, 30);

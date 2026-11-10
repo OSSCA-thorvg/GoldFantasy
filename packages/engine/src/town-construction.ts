@@ -648,6 +648,13 @@ export function regrow(this: ConstructionTown): void {
   for (let y = 0; y < this.world.height(); ++y)
     for (let x = 0; x < this.world.width(); ++x) {
       const tile = this.world.at(x, y);
+      // Exhausted natural stone slowly returns (10% per game day), using a
+      // separate deterministic salt. Roads, buildings and fields reserve land.
+      if (
+        tile.terrain === Terrain.Rock && tile.quarried && !taken[y * this.world.width() + x] &&
+        hash01(this.world.seed(), x, y, (this.days + 0x51a7) >>> 0) < f32(0.1)
+      )
+        tile.quarried = false;
       if (
         tile.trees < tile.wild &&
         !taken[f32(f32(y * this.world.width()) + x)] &&

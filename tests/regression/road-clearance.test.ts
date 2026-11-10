@@ -143,6 +143,8 @@ describe('roads remain open between legally placed buildings', () => {
   it('mines and delivers missing stone to complete paving in the same corridor', () => {
     const { town, worker, road, flank, map } = fixture();
     flank();
+    worker.inventory[0] = { item: 'hammer', quantity: 1 }; worker.inventory[1] = { item: 'pickaxe', quantity: 1 };
+    worker.equipment.tool1 = 1; worker.equipment.tool2 = 2;
     town.stock().stone = 0;
     for (let y = 22; y <= 25; ++y) for (let x = 22; x <= 25; ++x) map.at(x, y).terrain = Terrain.Rock;
     ++town.changes;

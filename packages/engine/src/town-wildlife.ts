@@ -6,6 +6,7 @@ import { Region } from './world-types';
 import { Point, point, add, sub, scale, normalized, rotated, distance, lerp } from './geometry';
 import { f32 as f, hash01, clamp, lround } from './numeric';
 import { animalKindCount, animalSpec } from './wildlife';
+import { armorProtection } from './equipment';
 export interface WildlifeTown extends TownState {
   settlementOf(p: Person): number;
   economy(village: number): CampEconomy;
@@ -26,7 +27,9 @@ export function creatureTarget(this: TownState, id: number): Monster | null {
 export function populateWildlife(this: WildlifeTown): void {
   if (this.wildlifeDay === this.days) return;
   this.wildlifeDay = this.days;
-  const perKind = clamp(Math.trunc((this.world.width() * this.world.height()) / 1800), 4, 16),
+  // Sparse populations leave room for settlement activity: 30 animals on the
+  // default map, with smaller maps retaining a few of each native species.
+  const perKind = clamp(Math.trunc((this.world.width() * this.world.height()) / 6000), 2, 5),
     clearing = this.world.camp(),
     approach = this.grid.nearestWalkable(clearing);
   const habitat = (p: Point): boolean =>
@@ -40,7 +43,7 @@ export function populateWildlife(this: WildlifeTown): void {
     let nearby = this.animals.filter(
       (m) => m.animal === kind && m.health > 0 && distance(m.home, clearing) <= 11,
     ).length;
-    const nearbyTarget = kind === AnimalKind.Wolf ? 0 : 2;
+    const nearbyTarget = kind === AnimalKind.Wolf ? 0 : 1;
     let attempts = 0;
     while (count < perKind && attempts++ < 2000) {
       const salt = kind * 2000 + attempts,
@@ -109,7 +112,7 @@ export function stirWildlife(this: WildlifeTown, dt: number): void {
       animal.path = [];
       if (gap <= f(0.8) && this.time >= animal.ready) {
         const bite = f(
-          (animal.animal === AnimalKind.Wolf ? f(0.07) : f(0.045)) / attacker.vitalityMultiplier(),
+          (animal.animal === AnimalKind.Wolf ? f(0.07) : f(0.045)) * (1 - armorProtection(attacker)) / attacker.vitalityMultiplier(),
         );
         attacker.health = f(attacker.health - bite);
         attacker.stress = Math.min(1, f(attacker.stress + f(0.02)));

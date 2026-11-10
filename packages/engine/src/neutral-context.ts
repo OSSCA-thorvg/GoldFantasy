@@ -136,9 +136,11 @@ export function neutralContext(root: Town, state: NeutralSettlement): Town {
   town.nextBlow = root.nextBlow;
   town.nextTreeEvent = root.nextTreeEvent;
   town.nextAnimalCall = root.nextAnimalCall;
+  town.nextDevotionEvent = root.nextDevotionEvent;
   town.blows = root.blows;
   town.timberEvents = root.timberEvents;
   town.animalCalls = root.animalCalls;
+  town.altarEvents = root.altarEvents;
   town.changes = root.changes;
   town.roadChanges = root.roadChanges;
   town.roadOnlyChanges = root.roadOnlyChanges;
@@ -178,9 +180,11 @@ export function commitNeutralContext(root: Town, town: Town, state: NeutralSettl
   root.nextBlow = town.nextBlow;
   root.nextTreeEvent = town.nextTreeEvent;
   root.nextAnimalCall = town.nextAnimalCall;
+  root.nextDevotionEvent = town.nextDevotionEvent;
   root.blows = town.blows;
   root.timberEvents = town.timberEvents;
   root.animalCalls = town.animalCalls;
+  root.altarEvents = town.altarEvents;
   root.changes = town.changes;
   root.roadChanges = town.roadChanges;
   root.roadOnlyChanges = town.roadOnlyChanges;

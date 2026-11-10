@@ -13,7 +13,7 @@ import { Building } from '../../packages/engine/src/town-models';
 import { Structure } from '../../packages/engine/src/building-catalog';
 import { Terrain } from '../../packages/engine/src/world-types';
 import { point } from '../../packages/engine/src/geometry';
-import { hammerTiming, workElapsed } from '../../packages/engine/src/work-timing';
+import { hammerTiming, harvestDuration, workElapsed } from '../../packages/engine/src/work-timing';
 
 function fixture() {
   const town = new Town(5, 32, false);
@@ -35,13 +35,14 @@ function fixture() {
   town.tick(0);
   return { town, p };
 }
-function harvest(step: number) {
+function harvest(step: number, equipped = true) {
   const { town, p } = fixture();
+  if (equipped) { p.inventory[0] = { item: 'axe', quantity: 1 }; p.equipment.tool1 = 1; }
   town.map().at(20, 20).trees = 1;
   expect(town.orderChop([p.id], 20 * 32 + 20)).toBe(true);
-  for (let i = 0; i < 1000 && (p.moving() || p.until > town.clock() + 10); i++) town.advance(step);
+  for (let i = 0; i < 1000 && (p.moving() || p.until > town.clock() + 100); i++) town.advance(step);
   expect(p.activity).toBe(Activity.Felling);
-  const started = p.until - 6,
+  const started = p.until - harvestDuration(p),
     events: TreeWorkEvent[] = [];
   let heard = 0n;
   for (let i = 0; i < 1000 && !events.some((e) => e.kind === TreeWorkKind.Fall); i++) {
@@ -66,6 +67,13 @@ describe('work contacts use one simulation timeline', () => {
       expect(chops.at(-1)!.at).toBeCloseTo(fall.at, 8);
       expect(p.carrying).toBe(3);
     });
+  it('keeps barehand contacts on the same timeline until the slower fifteen-second harvest completes', () => {
+    const { events, p } = harvest(.1, false),
+      contacts = events.filter(e => e.kind === TreeWorkKind.Chop),
+      fall = events.find(e => e.kind === TreeWorkKind.Fall)!;
+    expect(contacts.map(e => Number(e.at.toFixed(6)))).toEqual(Array.from({length: 17}, (_,i) => Number((.6 + i * .9).toFixed(6))));
+    expect(fall.at).toBeCloseTo(15,8);expect(contacts.at(-1)!.at).toBeCloseTo(fall.at,8);expect(p.carrying).toBe(3);
+  });
   it('emits hammer contacts only while a worker actually advances construction', () => {
     const { town, p } = fixture(),
       site = new Building(town.nextId++, Structure.Storehouse, point(20, 18), 0, 0);

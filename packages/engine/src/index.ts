@@ -32,3 +32,4 @@ export * from "./building-appearance";
 export * from './construction-materials';
 
 export * from './day-cycle';
+export * from './equipment';

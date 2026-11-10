@@ -13,6 +13,7 @@ import { animalSpec } from './wildlife';
 import { spreadFighter } from './person-navigation';
 import { planRaiderApproach } from './monster-navigation';
 import { dungeonThreat } from './raid-progression';
+import { attackDamage, attackReach, armorProtection } from './equipment';
 export interface CombatTown extends TownState {
   walk(p: Person, dt: number): void;
   reveal(x: number, y: number, radius: number): void;
@@ -64,48 +65,10 @@ export function steps(map: WorldMap, to: Point): boolean {
   const tile = map.cell(to);
   return !!tile && !impassable(tile.terrain);
 }
-export const reachOf = (p: Person): number =>
-  p.calling === Calling.Ranger ? 3 : p.calling === Calling.Mage ? f(2.5) : f(0.9);
-export function blowOf(p: Person): number {
-  switch (p.calling) {
-    case Calling.Warrior:
-      return f(1.5);
-    case Calling.Mage:
-      return f(1.2);
-    case Calling.Ranger:
-      return f(0.9);
-    default:
-      return 1;
-  }
-}
+export const reachOf = (p: Person): number => f(attackReach(p));
+export const blowOf = (p: Person): number => f(attackDamage(p));
 export function power(this: CombatTown, p: Person): number {
-  let base = 1;
-  switch (p.calling) {
-    case Calling.Warrior:
-      base = 3;
-      break;
-    case Calling.Ranger:
-    case Calling.Mage:
-      base = f(2.5);
-      break;
-    case Calling.Cleric:
-      base = 2;
-      break;
-    default:
-      break;
-  }
-  let kit = f(1 + f(f(0.25) * p.gear));
-  if (p.role === Role.Resident)
-    kit = f(
-      kit *
-        f(
-          (this.staffed(Structure.Weaponsmith) ? f(1.2) : 1) * (this.staffed(Structure.Armorer) ? f(1.1) : 1),
-        ),
-    );
-  return f(
-    f(f(f(base * kit) * p.attackMultiplier()) * f(f(0.4) + f(f(0.6) * Math.max(0, p.health)))) *
-      f(1 - f(f(0.5) * p.stress)),
-  );
+  return f(attackDamage(p));
 }
 export function raiding(this: TownState): boolean {
   return this.beasts.some((m) => m.raider);
@@ -279,8 +242,7 @@ export function rewardExperience(this: TownState, p: Person, points: number): vo
 }
 export function strike(this: CombatTown, p: Person, foe: Monster): void {
   if (foe.health <= 0 || foe.insideLair) return;
-  let blow = f(f(blowOf(p) * f(1 + f(f(0.25) * p.gear))) * p.attackMultiplier());
-  if (p.role === Role.Resident && this.staffed(Structure.Weaponsmith)) blow = f(blow * f(1.4));
+  const blow = blowOf(p);
   foe.health = f(foe.health - blow);
   if (foe.animal !== null && (!foe.angry || foe.health <= 0))
     this.animalCalls.push({
@@ -293,7 +255,7 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
   if (!foe.raider) foe.angry = true;
   if (foe.giant() || foe.animal !== null) foe.provokedBy = p.id;
   p.ready = this.time + 1;
-  const ranged = p.calling === Calling.Ranger || p.calling === Calling.Mage;
+  const ranged = reachOf(p) > 1;
   this.blows.push({
     serial: this.nextBlow++,
     from: { ...p.position },
@@ -303,6 +265,7 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
     ranged,
     at: this.time,
     person: p.id,
+    attacker: p.id,
   });
   if (foe.health <= 0) {
     const health =
@@ -378,10 +341,10 @@ export function fight(this: CombatTown, p: Person, dt: number): void {
   if (this.time < p.ready) return;
   if (foe) this.strike(p,foe);
   else {
-    const damage = f(f(blowOf(p) * f(1 + f(.25 * p.gear))) * p.attackMultiplier() * .1 / person!.vitalityMultiplier());
+    const damage = f(blowOf(p) * .1 * (1 - armorProtection(person!)) / person!.vitalityMultiplier());
     person!.health = f(person!.health - damage);
     p.ready = this.time + 1;
-    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:p.calling===Calling.Ranger||p.calling===Calling.Mage,at:this.time,person:person!.id});
+    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:reachOf(p)>1,at:this.time,person:person!.id,attacker:p.id});
     this.hurtGuest(person!,person!.health <= 0);
     if (person!.health <= 0) { person!.health = -1; person!.activity = Activity.Leaving; this.notify(person!.name + ' was killed'); }
   }

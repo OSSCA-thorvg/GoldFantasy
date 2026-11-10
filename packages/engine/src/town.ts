@@ -19,6 +19,7 @@ import * as housing from './unit-housing';
 import * as residents from './town-residents';
 import * as hiring from './town-hiring';
 import * as devotion from './town-devotion';
+import * as equipment from './town-equipment';
 import * as stress from './stress-control';
 import * as neutral from './neutral-settlements';
 import * as harvesting from './resource-harvesting';
@@ -38,7 +39,7 @@ const { fieldAcres: totalFields, tendedFieldAcres: totalTended, ...economyMethod
 const { finishCeremony: unusedCeremonyHelper, ceremonySeconds: unusedCeremonySeconds, ...devotionMethods } = devotion;
 const { stressPolicy: unusedStressPolicy, ...stressMethods } = stress;
 const { defectionPolicy: unusedDefectionPolicy, ...neutralMethods } = neutral;
-const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...devotionMethods, ...stressMethods, ...neutralMethods, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...production, ...settlementMethods, ...title };
+const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...devotionMethods, ...equipment, ...stressMethods, ...neutralMethods, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...production, ...settlementMethods, ...title };
 type Bound<T> = { [K in keyof T]: T[K] extends (...args: infer A) => infer R ? (...args: A) => R : never };
 export interface Town extends Bound<typeof methods> {}
 export class Town extends TownState {
