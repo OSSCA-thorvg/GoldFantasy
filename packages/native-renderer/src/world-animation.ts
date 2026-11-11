@@ -19,11 +19,6 @@ export function animate(s: WorldRendererState, town: Town, seconds: number): voi
       item.picture.frame(Math.min(frame, f32(item.layout.frames - 1)));
       item.frame = frame;
     }
-    if (item.statue && b) {
-      const at = project(b.center.x, b.center.y);
-      item.statue.transform([.10, 0, at.x, 0, .10 * Math.max(.04, b.progress), at.y, 0, 0, 1]);
-      item.statue.opacity(b.built() ? 255 : 170);
-    }
   }
   const climate = town.climate(),
     dark = climate.night > f32(0.002);

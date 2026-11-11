@@ -607,7 +607,7 @@ it('keeps overwhelmed player residents in Units while excluding defectors and gu
   }
 });
 
-it('opens resource offerings from the statue without choosing or ordering a resident', () => {
+it('opens resource offerings from the altar without choosing or ordering a resident', () => {
   const ui = fixture();
   try {
     const { altar } = civicTown(ui.town);

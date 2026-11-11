@@ -299,7 +299,7 @@ try {
     report.cases.push({ weather, before, born, after, passed: true });
     console.log(`${weather}: prayer, transformation, unarmed arrival and pause restoration PASS`);
   }
-  const statueHit = await page.evaluate(() => {
+  const altarHit = await page.evaluate(() => {
     prayerProbe.reset('Clear', 12, false);
     const g = prayerProbe.game;
     g.selected = -1;
@@ -313,16 +313,16 @@ try {
       }
     const v = g.renderer.visuals.get(1);
     throw Error(
-      'The rendered Ymir statue could not be picked by its real silhouette: ' +
+      'The rendered altar could not be picked by its real silhouette: ' +
         JSON.stringify({
           at,
           geometry: g.renderer.selectionGeometry({ kind: 'building', id: 1 }),
-          bounds: v?.statue && g.renderer.adapter.renderedBounds(v.statue),
+          bounds: v?.picture && g.renderer.adapter.renderedBounds(v.picture),
           candidates: g.renderer.picker.candidates.map((c) => ({ hit: c.hit?.key, bounds: c.bounds })),
         }),
     );
   });
-  await page.mouse.click(statueHit.x, statueHit.y);
+  await page.mouse.click(altarHit.x, altarHit.y);
   await frame(0.2);
   assert.equal(await page.evaluate(() => prayerProbe.game.selectedBuilding()), 1);
   await page.setViewportSize({ width: 390, height: 844 });

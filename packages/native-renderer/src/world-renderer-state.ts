@@ -30,8 +30,6 @@ import type { CloudMottle } from './cloud-mottle';
 export const isoLayer = (): SceneNode => new SceneNode().transform(isoMatrix() as unknown as Matrix);
 export interface Visual {
   picture: AnimationNode;
-  statue?: SceneNode;
-  statueSnow?: boolean;
   layout: RiseAnimation;
   version: number;
   appearances: bigint[];

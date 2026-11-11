@@ -14,12 +14,12 @@ import { portraitBackdrop } from '../../../../packages/native-renderer/src/portr
 import type { Building } from '../../../../packages/engine/src/town-models';
 import type { GameHudApp } from './game-hud-contract';
 import { hudPaint } from './hud-paint';
-import { statueInspector } from './game-prayer';
+import { altarInspector } from './game-prayer';
 
 export function civicInspector(this: GameHudApp, building: Building, panel: Rect, draw: boolean): number {
   const c = this.context,
     t = this.theme;
-  if (building.kind === Structure.Shrine) return statueInspector.call(this, building, panel, draw);
+  if (building.kind === Structure.Shrine) return altarInspector.call(this, building, panel, draw);
   const compact = this.viewHeight < 560;
   const h = compact ? 204 : 286;
   const residents = this.town.people().filter(isPlayerResident);

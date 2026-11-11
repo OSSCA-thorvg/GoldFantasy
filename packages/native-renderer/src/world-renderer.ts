@@ -339,7 +339,7 @@ export class WorldRenderer extends WorldRendererState {
     // Native caches hold independent references even while their rows are culled.
     this.adapter.collect([
       this.root,
-      ...[...this.visuals.values()].flatMap(v => v.statue ? [v.picture, v.statue] : [v.picture]),
+      ...[...this.visuals.values()].map(v => v.picture),
       ...[...this.figures.values(), ...this.beasts.values()].map((v) => v.paint),
       ...[this.ymirPaint.paint, this.volcanoPaint.paint].filter((p) => p !== undefined),
     ]);

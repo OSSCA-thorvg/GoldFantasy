@@ -48,14 +48,14 @@ const resourceHints: Record<OfferingKey, string> = {
   food: 'Food strengthens vitality and favors Rangers.',
   stone: 'Stone raises potential level; favors Warriors and Clerics.',
 };
-export function statueInspector(this: GameAppState, building: Building, panel: Rect, draw: boolean): number {
+export function altarInspector(this: GameAppState, building: Building, panel: Rect, draw: boolean): number {
   const h = this.viewHeight < 560 ? 118 : 148;
   if (!draw) return h;
   const c = this.context,
     t = this.theme,
     x = panel.x + 12,
     w = panel.w - 24;
-  c.text(new Rect(x, panel.y + 8, w, 24), 'Statue of Ymir', t.text, 17, true);
+  c.text(new Rect(x, panel.y + 8, w, 24), 'Altar of Ymir', t.text, 17, true);
   c.text(new Rect(x, panel.y + 37, w, 19), 'Shape a new life from an offering.', t.muted, 12);
   if (h > 120) c.text(new Rect(x, panel.y + 62, w, 26), 'Water · Bones · Gold · Food · Stone', t.accent, 11);
   button(

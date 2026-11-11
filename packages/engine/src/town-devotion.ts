@@ -144,7 +144,7 @@ export function summonFromOffering(this: DevotionTown, id: number, offering: Res
   born.faith = place.faith;
   born.level = outcome.level;
   born.trained = outcome.calling !== Calling.Settler;
-  born.past = 'Shaped from an offering before the statue of Ymir.';
+  born.past = 'Shaped from an offering at the altar of Ymir.';
   born.food = born.rest = born.hydration = born.health = 1;
   born.stress = 0;
   born.purse = 0;

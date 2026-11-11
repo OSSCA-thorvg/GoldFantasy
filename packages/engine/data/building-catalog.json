@@ -433,8 +433,8 @@
     "storage": 300
   },
   {
-    "name": "Statue of Ymir",
-    "description": "Offer water, bones, gold, food and stone before Ymir to shape a new resident.",
+    "name": "Altar of Ymir",
+    "description": "Offer water, bones, gold, food and stone at the altar to shape a new resident.",
     "size": 1,
     "cost": {
       "gold": 0,

@@ -76,7 +76,7 @@ const tools: ToolInfo[] = [
   { label: 'Smith', key: 'B', hint: '' },
   { label: 'Armor', key: 'N', hint: '' },
   { label: 'Potion', key: 'O', hint: '' },
-  { label: 'Shrine', key: 'H', hint: '' },
+  { label: 'Altar', key: 'H', hint: '' },
   { label: 'Mage', key: 'K', hint: '' },
   { label: 'Portal', key: 'V', hint: '' },
   { label: 'Clear', key: 'X', hint: 'Demolish a building, a field or a road.' },

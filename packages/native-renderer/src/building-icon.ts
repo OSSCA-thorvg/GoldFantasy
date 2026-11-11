@@ -7,7 +7,6 @@ import { validateBuildingAsset } from './building-asset';
 import { buildingFaces, Motion, FaceStyle } from './building-faces';
 import { depthBatches } from './building-depth';
 import { structureModel } from './building-assets';
-import { paintYmir } from './ymir-statue';
 export function buildingIcon(
   source: Model,
   size: number,
@@ -81,10 +80,5 @@ export function buildingIcon(
   return icon;
 }
 export function structureIcon(kind: Structure, width: number, height: number): SceneNode {
-  if (kind === Structure.Shrine) {
-    const node = new SceneNode(), s = Math.min(width / 350, height / 570);
-    paintYmir(node, point(), { snow: 0, frost: 0, summer: 0, autumn: 0, night: 0 }, false);
-    return node.transform([s, 0, width / 2, 0, s, height - 86 * s, 0, 0, 1]);
-  }
   return buildingIcon(structureModel(kind, 4), structureSpec(kind).size, width, height);
 }

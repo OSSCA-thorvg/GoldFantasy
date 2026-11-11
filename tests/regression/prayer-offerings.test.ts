@@ -115,7 +115,7 @@ describe('offerings shape an unarmed resident', () => {
       expect(town.summonFromOffering(1, gift)).toBeNull();
       expect(encodeTown(town)).toBe(before);
     });
-  it('rejects insufficient stock, forbidden materials, foreign statues and missing housing', () => {
+  it('rejects insufficient stock, forbidden materials, foreign altars and missing housing', () => {
     for (const change of [
       (t: Town, gift: Resources) => {
         t.stock().bones = gift.bones - 1;
