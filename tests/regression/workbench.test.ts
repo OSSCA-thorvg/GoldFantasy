@@ -7,7 +7,7 @@ import { Building } from '../../packages/engine/src/town-models';
 import { Resources, Structure, buildWork, structureSpec } from '../../packages/engine/src/building-catalog';
 import { Tool, toolStructure } from '../../packages/engine/src/game-tools';
 import { distance, point } from '../../packages/engine/src/geometry';
-import { itemCatalog, itemMaterial, itemSpec, isCraftStation } from '../../packages/engine/src/equipment';
+import { itemCatalog, itemMaterial, itemSpec, isCraftStation, workItem } from '../../packages/engine/src/equipment';
 import { buildingUnlock } from '../../packages/engine/src/settlement-progression';
 import { BUILDING_ASSETS } from '../../packages/content/src/assets';
 import { decodeBuildingAsset } from '../../packages/native-renderer/src/building-asset';
@@ -103,7 +103,7 @@ describe('the workbench building', () => {
 });
 
 describe('crafting at the bench', () => {
-  it('walks to the bench, works in the open at its door, then takes the item and puts it in hand', () => {
+  it('walks to the bench, works in the open at its door, then puts the tool to work from the pack', () => {
     const { town, bench, a } = fixture();
     expect(town.orderCraft(a.id, bench.id, 'wooden-axe')).toBe(true);
     expect(a.activity).toBe(Activity.Moving);
@@ -121,10 +121,10 @@ describe('crafting at the bench', () => {
       }
     }
     expect(worked).toBeGreaterThan(100);
-    expect(a.equipment.tool1).toBe(1);
+    expect(workItem(a, 'woodcutting')?.id).toBe('wooden-axe');
     expect(town.notices.slice(-2)).toEqual([
       'Asa crafted Wooden axe',
-      'Wooden axe in hand · Fells trees faster',
+      'Wooden axe in the pack · Fells trees faster',
     ]);
     expect(town.craftingAt(bench.id)).toBeNull();
   });
@@ -189,7 +189,7 @@ describe('calling off a craft', () => {
     expect(town.craftingAt(bench.id)?.id).toBe(b.id);
     expect(town.craftQueue(bench.id)).toEqual([]);
     // Waiting: the queue empties and the bench is free once the worker is called off too.
-    expect(town.orderCraft(a.id, bench.id, 'wooden-sword')).toBe(true);
+    expect(town.orderCraft(a.id, bench.id, 'wooden-shovel')).toBe(true);
     for (let i = 0; i < 400 && (a.moving() || a.activity !== Activity.Holding); ++i) step(town);
     expect(town.craftQueue(bench.id).map((p) => p.id)).toEqual([a.id]);
     expect(town.cancelCraft(a.id)).toBe(true);
@@ -221,13 +221,14 @@ describe('what gear is made of', () => {
       if (/^Wooden /.test(item.name)) expect(item.material, item.id).toBe('wood');
       if (/^Iron /.test(item.name)) expect(item.material, item.id).toBe('iron');
       if (/^(Stone|Flint) /.test(item.name)) expect(item.material, item.id).toBe('stone');
-      // The bench works wood and stone; iron is the smith's.
-      if (item.workshop === Structure.Workbench) expect(['wood', 'stone'], item.id).toContain(item.material);
+      // A level-1 bench works wood; stone and iron need it upgraded.
+      if (item.workshop === Structure.Workbench && item.material) expect(item.stationLevel, item.id).toBe(item.tier);
     }
     expect(itemMaterial('shield')).toBe('wood');
     expect(itemMaterial('mace')).toBe('stone');
     expect(itemMaterial('bow')).toBe('wood');
-    expect(itemMaterial('staff')).toBe('wood');
+    expect(itemMaterial('staff')).toBe('stone');
+    expect(itemMaterial('wooden-staff')).toBe('wood');
     expect(itemMaterial('wood')).toBeNull();
     // Ids stay, so saves still load; only the names say the metal.
     expect(['axe', 'pickaxe', 'hammer', 'hoe', 'saw'].map((id) => itemSpec(id)!.name)).toEqual([
@@ -239,7 +240,8 @@ describe('what gear is made of', () => {
     ]);
     for (const id of ['axe', 'pickaxe', 'hammer', 'hoe', 'saw', 'watering-can']) {
       expect(itemMaterial(id), id).toBe('iron');
-      expect(itemSpec(id)!.workshop).toBe(Structure.Weaponsmith);
+      expect(itemSpec(id)!.workshop).toBe(Structure.Workbench);
+      expect(itemSpec(id)!.stationLevel).toBe(3);
     }
   });
 });

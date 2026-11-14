@@ -708,6 +708,90 @@
     "channels": 1
   },
   {
+    "name": "sfx/bard/lyre_01",
+    "frames": 84386,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_02",
+    "frames": 87252,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_03",
+    "frames": 79380,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_04",
+    "frames": 90405,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_05",
+    "frames": 84386,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_06",
+    "frames": 81784,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_07",
+    "frames": 83063,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_08",
+    "frames": 102996,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_09",
+    "frames": 93889,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_10",
+    "frames": 51818,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_11",
+    "frames": 90405,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_12",
+    "frames": 50715,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_13",
+    "frames": 85797,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/bard/lyre_14",
+    "frames": 88796,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
     "name": "ui/cancel_01",
     "frames": 5737,
     "rate": 22050,

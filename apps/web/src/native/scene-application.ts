@@ -28,7 +28,7 @@ import {
 
 import { Cue, Sound } from '../../../../packages/native-audio/src/sound-types';
 import { gameTheme, reducedMotionPreferred } from './game-theme';
-import { TitleCamera } from './title-camera';
+import { startTitlePlay, type TitlePlay } from './title-session';
 import { drawTitleWordmark } from './title-wordmark';
 import { IntroSaga } from './intro-saga';
 import { structureSpec } from '../../../../packages/engine/src/building-catalog';
@@ -72,7 +72,7 @@ export class SceneApplication implements Application {
   private loadPath = '';
   private message = '';
   private messageUntil = -1;
-  private titleFollow = new TitleCamera();
+  private titlePlay: TitlePlay | undefined;
   private preview: Preview | undefined;
   private titleSound: NativeSound | undefined;
   private hoveredTitleItem = '';
@@ -163,12 +163,15 @@ export class SceneApplication implements Application {
         this.save(autoSlot, true);
     }
     if (this.current === 'Title' && this.preview) {
-      this.preview.state().advanceTitleAutoplay(dt);
-      if (this.intro === 'None') {
-        this.preview.setView(
-          this.titleFollow.update(this.preview.state(), width, height, dt, reducedMotionPreferred()),
-        );
-        const subject = this.preview.state().titleAutoplaySubject();
+      this.titlePlay?.advance(dt);
+      // A run that has ended (or run long) gives way to a fresh world while nobody is starting a game.
+      if (this.titlePlay?.finished() && this.intro === 'None') {
+        this.preparePreview();
+        this.stage();
+      }
+      if (this.intro === 'None' && this.titlePlay) {
+        this.preview.setView(this.titlePlay.camera(width, height, dt, reducedMotionPreferred()));
+        const subject = this.titlePlay.subject();
         if (subject) {
           const selected = this.preview.selectedPeople();
           if (selected.length !== 1 || selected[0] !== subject.id) this.preview.selectPeople([subject.id]);
@@ -212,7 +215,7 @@ export class SceneApplication implements Application {
         Align.Center,
       );
       drawTitleWordmark(this.overlay, titleCenter, f(height * f(0.22)), titleWidth);
-      const subject = this.preview?.state().titleAutoplaySubject();
+      const subject = this.titlePlay?.subject();
       if (subject) {
         let activity = activityName(subject.activity);
         if (subject.task === Activity.Building) {
@@ -919,8 +922,7 @@ export class SceneApplication implements Application {
       else this.message = 'Could not preview the save. Showing a new world.';
     } else if (this.options.mapFile) this.preview.loadMapFile(this.options.mapFile);
     this.preview.selectPeople([]);
-    this.preview.state().startTitleAutoplay(this.services.randomDevice(), this.previewFromSave);
-    this.titleFollow.reset();
+    this.titlePlay = startTitlePlay(this.preview, this.services.randomDevice(), this.previewFromSave);
     if (!this.titleSound) this.titleSound = this.services.createSound();
     this.titleSound.fadeIn();
   }

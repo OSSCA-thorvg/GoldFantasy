@@ -51,7 +51,7 @@ const ids = [
   'workbench',
 ];
 const slots = [
-  1, 12, 6, 6, 6, 4, 12, 4, 1, 1, 1, 1, 1, 1, 1, 1, 3, 4, 3, 3, 1, 1, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 12, 6, 6, 6, 4, 12, 4, 1, 1, 1, 1, 1, 1, 1, 1, 3, 4, 3, 3, 1, 1, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
 ];
 const originals = Object.values(BUILDING_ASSETS);
 let assets: BuildingAsset[] = [];

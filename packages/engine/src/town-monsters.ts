@@ -14,7 +14,7 @@ import { spreadFighter } from './person-navigation';
 import { planRaiderApproach } from './monster-navigation';
 import { campTier, dungeonThreat, raidKind, raidMuster, raidShape, RaidKind } from './raid-progression';
 import { gateSealed, sealable } from './gate-seals';
-import { attackDamage, attackReach, armorProtection, combatItem, equippedItem } from './equipment';
+import { attackDamage, attackReach, armorProtection, combatItem, equippedItem, raisedShield } from './equipment';
 import { songOf, wardOf } from './calling-auras';
 import { CombatCue, MonsterRank, combatRules } from './combat-events';
 import { Boon, boon, boonRules } from './gate-boons';
@@ -238,7 +238,8 @@ export function monsterBite(
   const slowed = slowedBy(town, beast);
   beast.ready = town.time + (breed.pause * rankPause(beast)) / slowed;
   beast.swingAt = town.time;
-  if (!area && equippedItem(prey, 'offhand')?.id === 'shield' && town.roll() < combatRules.blockChance) {
+  const shield = area ? null : raisedShield(prey);
+  if (shield && town.roll() < shield.block) {
     town.blows.push({
       serial: town.nextBlow++,
       from: { ...beast.position },

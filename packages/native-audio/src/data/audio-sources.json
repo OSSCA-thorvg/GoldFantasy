@@ -474,6 +474,62 @@
       "sha256": "bf80564c4bb3fd422d7f12f123d5c496d141eb12f8b2e0d84321bf93d7211ff0"
     },
     {
+      "path": "sfx/bard/lyre_01.ogg",
+      "sha256": "8b927933030f1d23cc93e2a5e851a15082a2f21c20a112dc806ec224627dc2e6"
+    },
+    {
+      "path": "sfx/bard/lyre_02.ogg",
+      "sha256": "c045fceb824b257876cfdde817a426040e191b9e77af36b45687a903cf46b570"
+    },
+    {
+      "path": "sfx/bard/lyre_03.ogg",
+      "sha256": "1da586d3401f0d52ba63950bb1da6d13c37564019db483534b8c763f5a46fa97"
+    },
+    {
+      "path": "sfx/bard/lyre_04.ogg",
+      "sha256": "70a5268f28d5213d761331538163db1ff727c4ba04464f0e5f379d33407346f6"
+    },
+    {
+      "path": "sfx/bard/lyre_05.ogg",
+      "sha256": "70eecbe19bd46ece72b8a9ac2bf36edd8d4634f5d09902ed9f8c65e0872da039"
+    },
+    {
+      "path": "sfx/bard/lyre_06.ogg",
+      "sha256": "d697bcff97c982fc300b0699865ad7148da77837df9667bf3355c3d4518c01a6"
+    },
+    {
+      "path": "sfx/bard/lyre_07.ogg",
+      "sha256": "fbebd02f42c0785aa42b54d9be225b7e694455dbb6e590815d530f70fd95f553"
+    },
+    {
+      "path": "sfx/bard/lyre_08.ogg",
+      "sha256": "e3cb8c5d00a8306f294355b2d26ddf18108b8119b13b9cb0ef5b1503d84343ea"
+    },
+    {
+      "path": "sfx/bard/lyre_09.ogg",
+      "sha256": "ee8a8cc44e83920525e05944f2548d8d507256388e9d5cccd1335c5ef37a0a6a"
+    },
+    {
+      "path": "sfx/bard/lyre_10.ogg",
+      "sha256": "59f1ec91474aa6c92e759799736327638a079869fd9499ea580753c2bd9d44f5"
+    },
+    {
+      "path": "sfx/bard/lyre_11.ogg",
+      "sha256": "56a39a7a0c75b58d4868f1e9fa090a9df11307ac1de58a632fd2208d257e3c70"
+    },
+    {
+      "path": "sfx/bard/lyre_12.ogg",
+      "sha256": "9908f81ba4e022f099d1cfd1a8951a3611b5ca109afcb4f60c749e21066f6fd8"
+    },
+    {
+      "path": "sfx/bard/lyre_13.ogg",
+      "sha256": "a940f9a0cd8e7bcf9659d544af9a3232a8ec228f56f37b9e3c32744012698935"
+    },
+    {
+      "path": "sfx/bard/lyre_14.ogg",
+      "sha256": "4a381a0078542a2ab28020e1f67c9731b18d34ba132071a4584a917d6016b764"
+    },
+    {
       "path": "ui/cancel_01.ogg",
       "sha256": "2bbfd483caa4a626573edf41c7ad44a26e9f26abb67d7afa842dcf68cde2885a"
     },
@@ -1710,7 +1766,7 @@
       "sha256": "a7c37187b3de0e3fd216c375aacf97554acd8915b4201a56a93776c058fddf0d"
     }
   ],
-  "endingsSha256": "b2ba7a86b7e7c91c5e47627a500b32a1fbd8b6d4d0cb3e5c5764c629379c85a9",
+  "endingsSha256": "a80580b997994aeffe3fdcec07f6ce747d8daf65954b1c47a6eb5dfe566e173b",
   "weatherVoiceProvenance": {
     "source": "Synthetic speech generated offline; no human voice recordings or model runtime shipped",
     "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",

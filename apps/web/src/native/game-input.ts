@@ -43,6 +43,8 @@ import { draftRoad } from './road-stroke';
 import { toolRequirements } from './build-menu-tools';
 import { cancelSkill, currentAim, releaseSkill } from './skill-commands';
 import { callingOnScreen } from './army-orders';
+import { orderClear, rememberCrew } from './clear-order-hud';
+import { clearTargetAt } from '../../../../packages/engine/src/town-clearing';
 
 export interface GameInputApp extends GameAppState {
   cue(sound: Cue): void;
@@ -381,6 +383,7 @@ export function cancelPointer(this: GameInputApp): void {
   this.context.cancelPointer();
 }
 export function select(this: GameInputApp): void {
+  rememberCrew(this, this.chosen);
   this.chosen = [];
   this.selectedObjects = [];
   this.selected = -1;
@@ -477,9 +480,10 @@ export function press(this: GameInputApp): void {
         this.status = buildingControlReason(target);
         return;
       }
-      const check = this.town.canDemolish(this.cursor);
-      if (this.town.demolish(this.cursor)) this.cueAt(Cue.Demolish, this.cursor);
-      else this.status = check.reason;
+      const spot = clearTargetAt(this.town, this.cursor),
+        result = spot ? orderClear(this, this.town, spot, this.crew) : null;
+      if (result?.check.ok) this.cueAt(Cue.Demolish, this.cursor);
+      else this.status = result?.check.reason ?? 'Nothing to clear';
       return;
     }
   }
@@ -529,6 +533,8 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
       this.issueOrder(Order.Work);
       this.pending = Order.None;
     } else if (click && this.tool === Tool.Field) this.finish();
+    // A right-click puts down whatever tool is in hand.
+    else if (click && this.tool !== Tool.Select && !this.context.controlAt(x, y)) this.selectTool(Tool.Select);
     return;
   }
   if (this.hudPointer) {
@@ -590,6 +596,12 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
   if (this.tool === Tool.Road) this.finishRoad();
 }
 export function wheel(this: GameInputApp, x: number, y: number, amount: number): void {
+  // With a building in hand the wheel turns it; the camera zooms otherwise.
+  if (toolStructure(this.tool) !== undefined && amount) {
+    this.freeAngle = f(this.freeAngle + f(Math.sign(amount) * (Math.PI / 12)));
+    this.pointerMove(x, y);
+    return;
+  }
   this.zoomBy(f(Math.pow(f(1.12), f(amount))), point(x, y));
 }
 export function zoomBy(this: GameInputApp, factor: number, screen: Point): void {

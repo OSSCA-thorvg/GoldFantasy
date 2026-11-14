@@ -13,6 +13,7 @@ import { NeutralSettlement } from './neutral-state';
 import type { DevotionEvent } from './town-devotion';
 import type { RealmArea, RealmPlan } from './realm-layout';
 import type { RealmReward } from './town-realm';
+import type { ExpeditionRecord, ExpeditionResult } from './expedition-record';
 import { Chronicle, type CombatCue, type CombatEvent, type Fallen } from './combat-events';
 import { CombatState } from './combat-state';
 import { ThorVisit } from './thor-visit';
@@ -25,6 +26,8 @@ export class TownState {
   realmGate = -1; realmFloor = 0; realmLoot = new Resources(); realmCleared = false; realmGuardian = -1; realmArea: RealmArea | null = null;
   // Transient presentation and cache state.
   realmRevision = 0; realmReward: RealmReward | null = null; realmPlanKey = ''; realmPlanCache: RealmPlan | null = null;
+  /** The running expedition's record and the last one's result for the HUD; presentation only, never read by the simulation. */
+  realmRecord: ExpeditionRecord | null = null; realmOutcome: ExpeditionResult | null = null;
   realmPatrol: number[] = []; realmPatrolAt = 0; realmBroodCalled = false;
   raidWarnedDay = -1; volleyAt = new Map<number, number>();
   /** Short-lived combat cues for the renderer, HUD and sound; pruned after combatRules.eventSeconds. */
@@ -43,7 +46,7 @@ export class TownState {
   /** Thor's visits: whether he is here, when he came and when he comes again. */
   thor = new ThorVisit();
   static readonly secondsPerDay = 300; static readonly daysPerMonth = 5; static readonly maxRoadLength = 24; static readonly maxBridgeSpan = 7; static readonly roadHalfWidth = f32(.3); static readonly maxFieldAcres = 48; static readonly farmReach = 6; static readonly joinReach = f32(.8); static readonly campReach = 12; static readonly paidWorkSeconds = f32(300 * f32(.12)); static readonly maxRaiders = 64;
-  titleAutoplay = false; /** Daylight a save's title preview stays at, so Continue reveals the sky already on screen. */ titleSky: { year: number; day: number } | null = null; titleBuilder = -1; titleFoodUntil = -1; titlePlanTimer = 0; titleWeatherTimer = 0; titleAnchors: Point[] = [];
+  titleAutoplay = false; /** Shown behind the title and played by the title player under the ordinary rules; the guide and the game's windows stay quiet. Not saved. */ titleShowcase = false; /** Daylight a save's title preview stays at, so Continue reveals the sky already on screen. */ titleSky: { year: number; day: number } | null = null; titleBuilder = -1; titleFoodUntil = -1; titlePlanTimer = 0; titleWeatherTimer = 0; titleAnchors: Point[] = [];
   network = new RoadNetwork(); placed: Building[] = []; farmland: Field[] = []; folk: Person[] = []; grid = new WalkGrid(); sky: Sky;
   open: Uint8Array; depth: number[] = []; beasts: Monster[] = []; animals: Monster[] = []; animalCalls: AnimalCall[] = []; nextAnimalCall = 0n; wildlifeDay = -1;
   parties: Expedition[] = []; nextMonster = 0; giantDay = -1; raidedDay = -1; raidCount = 0; raidKills = 0; raidBounty = 0; blows: Hit[] = []; nextBlow = 0n; timberEvents: TreeWorkEvent[] = []; nextTreeEvent = 0n;
@@ -53,7 +56,7 @@ export class TownState {
   building(id: number): Building | null { return this.placed.find(b => b.id === id) ?? null; } person(id: number): Person | null { return this.folk.find(p => p.id === id) ?? null; }
   opened(dungeon: number): boolean { return dungeon >= 0 && dungeon < this.open.length && !!this.open[dungeon]; }
   settlements(): readonly CampEconomy[] { return this.villages; } receipts(): readonly CampReceipt[] { return this.deliveries; } monsters(): readonly Monster[] { return this.beasts; } wildlife(): readonly Monster[] { return this.animals; } wildlifeCalls(): readonly AnimalCall[] { return this.animalCalls; } hits(): readonly Hit[] { return this.blows; } treeEvents(): readonly TreeWorkEvent[] { return this.timberEvents; } expeditions(): readonly Expedition[] { return this.parties; }
-  raids(): number { return this.raidCount; } clock(): number { return this.time; } climate() { return this.sky.now(); } weather(): Sky { return this.sky; } isTitleAutoplay(): boolean { return this.titleAutoplay; } titleAutoplaySubject(): Person | null { return this.person(this.titleBuilder); }
+  raids(): number { return this.raidCount; } clock(): number { return this.time; } climate() { return this.sky.now(); } weather(): Sky { return this.sky; } isTitleAutoplay(): boolean { return this.titleAutoplay || this.titleShowcase; } titleAutoplaySubject(): Person | null { return this.person(this.titleBuilder); }
   revision(): bigint { return this.changes; } roadRevision(): bigint { return this.roadChanges; } objectRevision(): bigint { return this.changes - this.roadOnlyChanges; }
   roadChanged(onlyRoad = true): void { ++this.changes; ++this.roadChanges; if (onlyRoad) ++this.roadOnlyChanges; }
   notify(text: string): void { this.notices.push(text); }

@@ -10,7 +10,7 @@ import {
   type SettlementGoal,
   type UnlockRequirement,
 } from '../../../../packages/engine/src/settlement-progression';
-import { Structure, Product } from '../../../../packages/engine/src/building-catalog';
+import { Structure, Product, structureSpec } from '../../../../packages/engine/src/building-catalog';
 import type { Building } from '../../../../packages/engine/src/town-models';
 import { Activity, Role, callingName, type Person } from '../../../../packages/engine/src/person';
 import { distance, project } from '../../../../packages/engine/src/geometry';
@@ -19,6 +19,7 @@ import { canControl, isPlayerBuilding } from '../../../../packages/engine/src/fa
 import {
   equipmentSlots,
   equippedItem,
+  carriedTools,
   gearEffect,
   isCraftStation,
   itemSpec,
@@ -196,10 +197,7 @@ export function trackGearUse(app: GameHudApp): void {
   if (!seen) {
     seen = new Set();
     for (const p of town.people())
-      for (const slot of equipmentSlots) {
-        const item = equippedItem(p, slot);
-        if (item) seen.add(item.id);
-      }
+      for (const item of [...carriedTools(p), ...equipmentSlots.map((slot) => equippedItem(p, slot))]) if (item) seen.add(item.id);
     gearSeen.set(town, seen);
   }
   for (const p of town.people()) {
@@ -286,11 +284,8 @@ export function jumpToGate(app: GameHudApp): void {
   app.selectTool(Tool.Select, true);
   openExpedition(app, best, app.chosen);
 }
-const inHand = (p: Person): boolean =>
-  equipmentSlots.some((slot) => {
-    const item = equippedItem(p, slot);
-    return item?.category === 'tool' || item?.category === 'weapon';
-  });
+// Tools work from the pack; a weapon counts once it is in hand.
+const inHand = (p: Person): boolean => carriedTools(p).length > 0 || !!equippedItem(p, 'weapon');
 /** The resident to craft for a quest: the selected one, else the nearest to the camp still lacking `items`. */
 export function questCrafter(app: GameHudApp, items: readonly string[], bare = false): Person | null {
   const town = app.town,
@@ -328,11 +323,13 @@ export function questCrafter(app: GameHudApp, items: readonly string[], bare = f
 function craftAction(app: GameHudApp, goal: SettlementGoal): QuestAction | null {
   const equip = goal.kind === GoalKind.Equip,
     camp = app.town.camp(),
-    bench = camp ? nearestStation(app.town, camp.center) : null;
+    // The station that makes the goal's items: the smithy for weapons, shields and armor.
+    kind = goal.kind === GoalKind.Station ? goal.building : (itemSpec(goal.items[0] ?? '')?.workshop ?? Structure.Workbench),
+    bench = camp ? nearestStation(app.town, camp.center, kind) : null;
   if (!bench) {
     const site = app.town
       .buildings()
-      .find((b) => b.kind === Structure.Workbench && !b.built() && isPlayerBuilding(b));
+      .find((b) => b.kind === kind && !b.built() && isPlayerBuilding(b));
     if (site)
       return {
         label: 'Find construction site',
@@ -341,13 +338,14 @@ function craftAction(app: GameHudApp, goal: SettlementGoal): QuestAction | null 
           look(app, site.center.x, site.center.y);
         },
       };
-    return app.town.camp() ? placeAction(app, Tool.Workbench) : placeAction(app, Tool.Camp);
+    const tool = toolOf(kind);
+    return app.town.camp() && tool !== undefined ? placeAction(app, tool) : placeAction(app, Tool.Camp);
   }
   const p = questCrafter(app, goal.items, equip);
   if (!p) return null;
-  // The bench's own list opens with the best crafter chosen; the player starts the work there.
+  // The station's own list opens with the best crafter chosen; the player starts the work there.
   return {
-    label: equip ? `Craft gear for ${p.name}` : 'Open the workbench',
+    label: equip ? `Craft gear for ${p.name}` : `Open the ${structureSpec(kind).name.toLowerCase()}`,
     run: () => {
       openStation(app, bench, p.id);
       look(app, bench.center.x, bench.center.y);
@@ -384,6 +382,7 @@ export function questAction(app: GameHudApp, goal: SettlementGoal): QuestAction 
   switch (goal.kind) {
     case GoalKind.Craft:
     case GoalKind.Equip:
+    case GoalKind.Station:
       return craftAction(app, goal);
     case GoalKind.Building: {
       const site = town.buildings().find((b) => b.kind === goal.building && !b.built() && isPlayerBuilding(b));
@@ -425,7 +424,7 @@ export function questAction(app: GameHudApp, goal: SettlementGoal): QuestAction 
     case GoalKind.Deed:
       if (gateDeeds.has(goal.deed)) return { label: 'Plan an expedition', run: () => jumpToGate(app) };
       if (goal.deed === 'sworn') return visitAction(app, Structure.Guild, 'Open the guild');
-      if (goal.deed === 'weaponsForged') return visitAction(app, Structure.Weaponsmith, 'Open the weaponsmith');
+      if (goal.deed === 'weaponsForged') return visitAction(app, Structure.Weaponsmith, 'Open the smithy');
       return null;
     default:
       return null;

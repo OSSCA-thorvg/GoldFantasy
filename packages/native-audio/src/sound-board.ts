@@ -25,7 +25,7 @@ const rate = 44100,
   stingSeconds = 2.5,
   duckFall = f(1 / f(rate * f(0.3))),
   duckRise = f(1 / f(rate * f(1.5)));
-const stingCue = (cue: Cue) => cue === Cue.DenFall || cue === Cue.BroodBreak || cue === Cue.WaveHorn,
+const stingCue = (cue: Cue) => cue === Cue.DenFall || cue === Cue.BroodBreak || cue === Cue.WaveHorn || cue === Cue.Fall,
   interfaceCue = (cue: Cue) =>
     [Cue.Click, Cue.Order, Cue.Place, Cue.Refuse, Cue.Open, Cue.Notice].includes(cue),
   thunderCue = (cue: Cue) => cue >= Cue.ThunderCrack && cue <= Cue.ThunderRumble;
@@ -156,8 +156,10 @@ export class SoundBoard {
     const key = sound.cue % this.lastTake.length;
     let take = Math.trunc(f(next() * takes)) % takes;
     if (takes > 1 && take === this.lastTake[key]) take = (take + 1) % takes;
+    // The simulation chose the phrase; it is played as written.
+    if (sound.cue === Cue.Lyre) take = Math.max(0, Math.trunc(sound.take)) % takes;
     this.lastTake[key] = take;
-    const spread = f(sound.cue === Cue.TreeFall ? 0 : interfaceCue(sound.cue) ? 0.02 : 0.05),
+    const spread = f(sound.cue === Cue.TreeFall || sound.cue === Cue.Lyre ? 0 : interfaceCue(sound.cue) ? 0.02 : 0.05),
       speed = f(
         f(1 + f(f(f(next() * 2) - 1) * spread)) *
           (Number.isFinite(sound.pitch) && sound.pitch > 0 ? sound.pitch : 1) *

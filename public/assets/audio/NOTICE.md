@@ -44,3 +44,9 @@ SoundFonts or models. Like the `sfx/combat/` cues they are original works made f
 distributed under the project license. Seeds are fixed per world and floor (`Realm.seed * 10 + floor`), so with the
 same Loach, NumPy and ffmpeg the script rebuilds every track bit for bit; it writes each track's float WAV and a JSON
 of its seed, mode, tempo and score counts to its work directory.
+
+`sfx/bard/` holds the bard's lyre phrases: fourteen short figures in D dorian composed and rendered by
+`scripts/audio/bard_phrases.py` from Loach's gut-string lyre (`folk_instruments.harp`, a procedural plucked string),
+filtered, levelled and encoded like the other one-shots, with no recordings, SoundFonts or models. They are original
+works made for this project with Loach and are distributed under the project license. Seeds are fixed per phrase
+(4100 + its index), so the script rebuilds every clip bit for bit with the same Loach, NumPy and ffmpeg.

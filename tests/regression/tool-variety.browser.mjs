@@ -126,10 +126,31 @@ async function open(width, height, mobile) {
               const bench = town.buildings().at(-1);
               bench.progress = 1;
               bench.materials.delivered = bench.materials.required.clone();
+              // Upgraded once: stone tools are on the list.
+              bench.variant = 1;
               town.stock().add(new Resources(20, 120, 120));
               town.changes++;
               this.advance(1);
               return bench.id;
+            }
+          return -1;
+        },
+        /** A finished level-1 smithy beside the camp, for the weapons that left the bench. */
+        smithy() {
+          const camp = town.camp();
+          for (let r = 3; r < 10; r += 0.5)
+            for (let a = 0; a < 24; ++a) {
+              const at = {
+                x: camp.center.x + r * Math.cos((a * Math.PI) / 12),
+                y: camp.center.y + r * Math.sin((a * Math.PI) / 12),
+              };
+              if (!town.canPlace(Structure.Weaponsmith, at, 0).ok || !town.place(Structure.Weaponsmith, at, 0)) continue;
+              const smith = town.buildings().at(-1);
+              smith.progress = 1;
+              smith.materials.delivered = smith.materials.required.clone();
+              town.changes++;
+              this.advance(1);
+              return smith.id;
             }
           return -1;
         },
@@ -291,12 +312,13 @@ try {
   await away();
   await frames(10);
   const ids = (await controls()).map((c) => c.id);
-  for (const tab of ['tools', 'weapons', 'gear']) assert(ids.includes(`station-group-${tab}-${bench}`), tab);
+  for (const tab of ['tools', 'gear']) assert(ids.includes(`station-group-${tab}-${bench}`), tab);
+  assert(!ids.includes(`station-group-weapons-${bench}`), 'weapons are made at the smithy now');
   assert(
-    ids.includes('station-craft-stone-axe') && ids.includes('station-craft-wooden-shovel'),
+    ids.includes('station-craft-stone-axe') && ids.includes('station-craft-wooden-pick') && ids.includes(`station-page-next-${bench}`),
     ids.join(', '),
   );
-  assert(!ids.includes('station-craft-wooden-spear'), 'weapons are on their own tab');
+  assert(!ids.includes('station-craft-wooden-spear'), 'weapons are not on the bench');
   await shot('01-bench-tools');
 
   // 2. A stone axe from the Tools tab, by the crafter the panel names.
@@ -316,23 +338,25 @@ try {
     'the stone axe is made',
   );
 
-  // 3. The Weapons tab, and a wooden spear from it.
-  await click(`station-group-weapons-${bench}`);
+  // 3. A wooden spear from the smithy's Weapons tab.
+  const smith = await page.evaluate(() => probe.smithy());
+  assert(smith >= 0, 'a smithy stands');
+  await page.evaluate(
+    ([smith, b]) => {
+      probe.game.selectPeople([b]);
+      probe.game.selectBuilding(smith);
+      probe.lookBuilding(smith);
+    },
+    [smith, b],
+  );
   await away();
   await frames(6);
-  await shot('02-bench-weapons');
-  await page.evaluate(
-    ([bench, b]) => {
-      probe.game.selectPeople([b]);
-      probe.game.selectBuilding(bench);
-    },
-    [bench, b],
-  );
-  await frames(4);
+  await shot('02-smithy-weapons');
+  await click(`station-page-next-${smith}`);
   await click('station-craft-wooden-spear');
   const spearMaker = await page.evaluate(
-    (bench) => probe.town.people().find((p) => p.craftWorkshop === bench)?.id ?? -1,
-    bench,
+    (smith) => probe.town.people().find((p) => p.craftWorkshop === smith)?.id ?? -1,
+    smith,
   );
   assert(spearMaker >= 0, 'someone goes to make the spear');
   await page.evaluate((id) => probe.advance(200, () => !probe.town.person(id).craftItem), spearMaker);
@@ -341,14 +365,23 @@ try {
     'the spear is made',
   );
 
-  // 4. The Gear tab.
+  // 4. The bench's Gear tab.
+  await page.evaluate((bench) => {
+    probe.game.selectBuilding(bench);
+    probe.lookBuilding(bench);
+  }, bench);
+  await frames(4);
   await click(`station-group-gear-${bench}`);
   await away();
   await frames(6);
   await shot('03-bench-gear');
 
   // 5. A shovel, then a basket called off half made: the button at the bench, then the bench free and nothing spent.
-  await page.evaluate(([bench, a]) => probe.town.orderCraft(a, bench, 'wooden-shovel'), [bench, axeMaker]);
+  const shovelReason = await page.evaluate(
+    ([bench, a]) => probe.town.craftReason(a, bench, 'wooden-shovel') || String(probe.town.orderCraft(a, bench, 'wooden-shovel')),
+    [bench, axeMaker],
+  );
+  assert.equal(shovelReason, 'true', 'the shovel is ordered: ' + shovelReason);
   await page.evaluate((id) => probe.advance(200, () => !probe.town.person(id).craftItem), axeMaker);
   assert(
     (await page.evaluate((id) => probe.held(id), axeMaker)).includes('wooden-shovel'),
@@ -461,7 +494,7 @@ try {
   ]) {
     await page.evaluate(
       ([id, item]) => {
-        probe.town.person(id).level = 3;
+        probe.town.person(id).level = 5;
         probe.equip(id, [item]);
         probe.pose(id);
       },
@@ -506,14 +539,14 @@ try {
     const tabs = probe.controls().filter((c) => c.id.startsWith('station-group-'));
     return { tabs, crafts: probe.controls().filter((c) => c.id.startsWith('station-craft-')).length, bench };
   }, phoneBench);
-  assert.equal(small.tabs.length, 3, 'three tabs at phone width');
+  assert.equal(small.tabs.length, 2, 'two tabs at phone width');
   for (const tab of small.tabs)
     assert(tab.bounds.x >= 0 && tab.bounds.x + tab.bounds.w <= 390, `${tab.id} fits`);
   report.timings.phone = small;
   await phone.evaluate((bench) => {
     const t = probe.town,
       [p] = probe.founders();
-    t.orderCraft(p, bench, 'wooden-spear');
+    t.orderCraft(p, bench, 'stone-pick');
     probe.advance(60, () => t.person(p).craftProgress > 2);
     probe.frames(6);
   }, phoneBench);

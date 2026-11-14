@@ -4,8 +4,8 @@ import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
 
 // Walks crafting at a workbench in the real app: found the camp, build the bench, fell wood by hand,
-// open the bench from the quest, craft a wooden axe there, see it taken and put in hand, queue a second
-// crafter, open the smith's list and the unit window's way to the bench; then fell again, faster.
+// open the bench from the quest, craft a wooden axe there, see it go to the pack and work from there, queue a
+// second crafter, open the smithy's list and the unit window's way to the bench; then fell again, faster.
 const output = 'artifacts/regression/workbench';
 const width = 1280,
   height = 800;
@@ -311,7 +311,7 @@ try {
   await frames(4);
   await shot('05-world-progress');
 
-  // 6. The axe is taken, then put in hand: two notices, in that order.
+  // 6. The axe is made and works from the pack: two notices, in that order.
   await page.evaluate((id) => probe.advance(60, () => !probe.town.person(id).craftItem), crafter);
   for (let i = 0; i < 2; ++i) {
     await frames(4, 0.1, true);
@@ -321,7 +321,7 @@ try {
   const name = (await page.evaluate((id) => probe.founder(id), crafter)).name;
   const said = await page.evaluate(() => probe.history.slice());
   const taken = said.indexOf(`${name} crafted Wooden axe`),
-    inHand = said.indexOf('Wooden axe in hand · Fells trees faster');
+    inHand = said.indexOf('Wooden axe in the pack · Fells trees faster');
   assert(taken >= 0 && inHand > taken, JSON.stringify(said));
   assert.equal((await page.evaluate((id) => probe.founder(id), crafter)).held.includes('wooden-axe'), true);
   await page.evaluate((id) => probe.advance(120, () => !probe.town.person(id).craftItem), second);
@@ -350,14 +350,14 @@ try {
     'the unit window button selects the bench',
   );
 
-  // 8. The smith works the same way: its own list.
+  // 8. The smithy works the same way: its own list of weapons, shields and armor.
   const smith = await page.evaluate(() => {
     probe.town
       .stock()
       .add({ gold: 99, wood: 99, stone: 99, food: 0, mana: 0, water: 0, planks: 20, cutStone: 20, bones: 0 });
     return probe.build('Weaponsmith');
   });
-  assert(smith >= 0, 'a weaponsmith stands');
+  assert(smith >= 0, 'a smithy stands');
   await page.evaluate((id) => {
     probe.game.selectPeople([]);
     probe.game.selectBuilding(id);
@@ -366,10 +366,10 @@ try {
   await away();
   await frames(10);
   assert(
-    (await controls()).some((c) => c.id === 'station-craft-axe'),
-    'the smith lists its own recipes',
+    (await controls()).some((c) => c.id === 'station-craft-wooden-sword'),
+    'the smithy lists its own recipes',
   );
-  await shot('08-smith-recipes');
+  await shot('08-smithy-recipes');
 
   // 9. Fell again with the axe: faster.
   const axe = await page.evaluate((id) => probe.fell(id), crafter);

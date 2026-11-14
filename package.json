@@ -34,7 +34,9 @@
     "test:combat-effects": "node tests/regression/combat-effects.browser.mjs",
     "test:combat-loop": "node tests/regression/combat-loop.browser.mjs",
     "test:environment": "node tests/regression/environment.browser.mjs",
-    "test:progress-hud": "node tests/regression/progress-hud.browser.mjs"
+    "test:progress-hud": "node tests/regression/progress-hud.browser.mjs",
+    "media:readme": "node scripts/readme-media/capture.mjs",
+    "media:docs": "node scripts/docs-media/capture.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

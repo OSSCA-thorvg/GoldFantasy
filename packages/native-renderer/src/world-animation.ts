@@ -4,6 +4,7 @@ import { Town } from '../../engine/src/town';
 import { WorldRendererState } from './world-renderer-state';
 import { Flicker, flare, brightest } from './light-flicker';
 import { weather, drift } from './world-weather';
+import { paintSplashes } from './rain-splash';
 export function animate(s: WorldRendererState, town: Town, seconds: number): void {
   const elapsed = s.lastAnimate < 0 ? 0 : f32(seconds - s.lastAnimate);
   s.lastAnimate = seconds;
@@ -27,6 +28,7 @@ export function animate(s: WorldRendererState, town: Town, seconds: number): voi
   s.darkVeil?.fill(4, 6, 22, Math.trunc(f32(170 * climate.night)));
   s.lights.opacity(Math.trunc(f32(70 + f32(100 * climate.night))));
   weather(s, climate, seconds);
+  paintSplashes(s, { terrainAt: (p) => town.map().terrainAt(p), buildingAt: (p) => town.buildingAt(p) }, seconds);
   drift(s, climate, seconds);
   if (seconds - s.lastFlicker < 1 / 20) return;
   s.lastFlicker = seconds;

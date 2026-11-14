@@ -49,6 +49,7 @@ import {
   progressInspector,
   type InspectorRows,
 } from './game-progress-hud';
+import { clearRows } from './clear-order-hud';
 import { touchPlacementHeight } from './mobile-layout';
 import { combatOverlays } from './game-combat-hud';
 import { guideHud } from './game-guide-panel';
@@ -342,7 +343,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     if (building.kind === Structure.Granary) textRow('Keeps 240 more food; meals served here', t.text);
     if (building.kind === Structure.StoneStore) textRow('Keeps 240 more rough and cut stone', t.text);
     if (spec.storage) textRow(`Keeps ${spec.storage} more of wood, stone, food and water`, t.text);
-    if (isLodging(building.kind) || building.kind === Structure.Tavern || isOutfitter(building.kind))
+    if (isLodging(building.kind) || building.kind === Structure.Tavern || (isOutfitter(building.kind) && spec.jobs > 0))
       textRow(`Earned ${building.earned} gold from guests`, t.muted, 12);
     if (building.kind === Structure.Guild || building.kind === Structure.GuildHall)
       textRow(`${building.trainingCount} residents trained`, t.muted, 12);
@@ -470,6 +471,11 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
       if (growth.reason)
         for (const line of wrap(c, growth.reason, inner, 12, 2))
           textRow(line, growth.ready ? t.muted : t.danger, 12);
+    }
+    if (isPlayerBuilding(building)) {
+      const clearing: InspectorRows = { rows, left, inner, top, y };
+      clearRows(this, { kind: 'building', id: building.id }, clearing);
+      y = clearing.y;
     }
   } else {
     const site = this.town.map().dungeons()[this.selectedDungeon];

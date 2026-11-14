@@ -83,6 +83,18 @@ export function garmentOf(body: BodyType, wardrobe: Wardrobe): Garment {
   };
 }
 
+/** A bard's lyre held across the chest to play: the same instrument as the one slung on the back. */
+export function heldLyre(height: number): SceneNode {
+  const wood: Rgb = [156, 112, 66],
+    lyre = new SceneNode(),
+    top = -height + 0.6;
+  lyre.add(oval([1.3, -6.4], 2.1, 2.3, wood));
+  lyre.add(oval([1.9, -6.4], 1.2, 2.2, dusk(wood, 0.3)));
+  for (const x of [-0.2, 2.7]) lyre.add(stroke([x, -7], [x + 0.25, top], 0.75, wood));
+  lyre.add(stroke([-0.4, top], [3.2, top - 0.3], 0.8, dusk(wood, 0.3)));
+  for (const x of [0.6, 1.4, 2.2]) lyre.add(stroke([x, -5.6], [x + 0.2, top - 0.1], 0.22, [232, 222, 198]));
+  return lyre.opacity(0);
+}
 /** Worn behind the torso: capes, a quiver, a lute. */
 export function garmentBack(
   sprite: SceneNode,

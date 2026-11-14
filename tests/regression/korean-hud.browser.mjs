@@ -415,6 +415,13 @@ try {
     korean.game.paused = false;
   });
   await frames(4);
+  // Going home opens the expedition's result screen; Enter returns to Midgard.
+  await page.evaluate(() => {
+    const key = { type: 'KeyDown', text: 'return', key: 0, x: 0, y: 0, delta: 0, button: 0, shift: false, control: false, alt: false, meta: false };
+    if (!korean.game.handleResultEvent(key)) throw new Error('No result screen on the way home');
+    korean.game.paused = false;
+  });
+  await frames(2);
 
   // The settlement's newer buildings.
   for (const [name, kind] of [

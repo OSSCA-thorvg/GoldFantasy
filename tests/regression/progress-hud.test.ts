@@ -242,7 +242,7 @@ describe('quest panel', () => {
       const inspect = () => ui.draw(() => inspector.call(ui.app, new Rect(100, 60, 620, 700), true));
       inspect();
       expect(ui.words()).toEqual(
-        expect.arrayContaining(['Crafter', `${carrier.name} · Lv 1`, 'Quest', 'Wooden axe', '3 wood', 'Ready to craft', 'Nobody is working here']),
+        expect.arrayContaining(['Crafter', `${carrier.name} · Settler · Lv 1`, 'Quest', 'Wooden axe', '3 wood', 'Ready to craft', 'Nobody is working here']),
       );
       expect(ui.control('station-craft-wooden-axe')?.[3]).toBe(true);
       expect(ui.control('station-craft-wooden-pick')?.[3]).toBe(false);
@@ -410,7 +410,8 @@ describe('build menu unlocks', () => {
       ui = fixture(town);
     try {
       page(ui, 'Arms & defence');
-      for (const label of ['Guild', 'Yard', 'Tower', 'Smith', 'Armor'])
+      // The smithy moved beside the workbench and the armorer folded into it.
+      for (const label of ['Guild', 'Yard', 'Tower'])
         expect(ui.control('global/card-pick-' + label)?.[3], label).toBe(true);
       ui.click('global/card-pick-Tower');
       expect(ui.app.selectTool).not.toHaveBeenCalled();

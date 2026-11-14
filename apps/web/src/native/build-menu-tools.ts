@@ -42,8 +42,8 @@ export const toolInfo: readonly ToolInfo[] = [
   { label: 'Inn', key: 'I', hint: '' },
   { label: 'Guild', key: 'U', hint: '' },
   { label: 'Chapel', key: 'G', hint: '' },
-  { label: 'Smith', key: 'B', hint: '' },
-  { label: 'Armor', key: 'N', hint: '' },
+  { label: 'Smithy', key: 'B', hint: 'Residents make weapons, shields and armor here, one at a time.' },
+  { label: 'Armor', key: '', hint: '' },
   { label: 'Potion', key: 'O', hint: '' },
   { label: 'Altar', key: 'H', hint: '' },
   { label: 'Mage', key: 'K', hint: '' },
@@ -58,7 +58,7 @@ export const toolInfo: readonly ToolInfo[] = [
   { label: 'Tower', key: '', hint: '' },
   { label: 'Yard', key: '', hint: '' },
   { label: 'Runestone', key: '', hint: '' },
-  { label: 'Workbench', key: '', hint: 'Residents craft wooden and stone tools and weapons here, one at a time.' },
+  { label: 'Workbench', key: '', hint: 'Residents make tools here, one at a time.' },
 ];
 export interface BuildGroup {
   name: string;
@@ -67,7 +67,7 @@ export interface BuildGroup {
 }
 export const buildMenuGroups: readonly BuildGroup[] = [
   { name: 'Roads', glyph: 'roads', tools: [Tool.Road, Tool.Pave, Tool.Torch] },
-  { name: 'Housing', glyph: 'housing', tools: [Tool.Camp, Tool.Tent, Tool.Workbench] },
+  { name: 'Housing', glyph: 'housing', tools: [Tool.Camp, Tool.Tent, Tool.Workbench, Tool.Weaponsmith] },
   {
     name: 'Food & materials',
     glyph: 'materials',
@@ -83,7 +83,7 @@ export const buildMenuGroups: readonly BuildGroup[] = [
   {
     name: 'Arms & defence',
     glyph: 'attack',
-    tools: [Tool.Guild, Tool.TrainingYard, Tool.Watchtower, Tool.Weaponsmith, Tool.Armorer],
+    tools: [Tool.Guild, Tool.TrainingYard, Tool.Watchtower],
   },
   {
     name: 'Faith & arcane',

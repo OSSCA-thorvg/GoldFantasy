@@ -176,6 +176,11 @@ export const guidePhrases: Phrases = {
   'At level {0} a calling learns its second skill.': '레벨 {0}이 되면 직업의 두 번째 기술을 배웁니다.',
   'Press W with the resident selected, or set it to Auto on the skill card.':
     '주민을 선택한 채 W를 누르거나, 기술 카드에서 자동으로 두세요.',
+  'A bard plays': '음유시인의 연주',
+  'Now and then a bard takes up the lyre while idle, strolling or resting, and plays a short tune.':
+    '음유시인은 한가하거나 거닐거나 쉴 때 이따금 리라를 들고 짧은 곡을 연주합니다.',
+  'Residents who listen by the fire in the evening let go of a little stress.':
+    '저녁에 모닥불 곁에서 연주를 들은 주민은 스트레스가 조금 풀립니다.',
   // Buildings
   'One resident works here.': '주민 한 명이 이곳에서 일합니다.',
   'Up to {0} residents work here.': '주민이 {0}명까지 이곳에서 일합니다.',
@@ -185,4 +190,7 @@ export const guidePhrases: Phrases = {
     '이제 길을 낼 수 있습니다. 건설 메뉴의 길 도구로 길을 내세요.',
   'Fields open with it: stake one out with the Field tool in the build menu.':
     '이제 밭을 일굴 수 있습니다. 건설 메뉴의 밭 도구로 밭을 정하세요.',
+  "Gear is crafted from the settlement's stores, one piece at a time: tools at the workbench, weapons, shields and armor at the smithy.": "장비는 정착지의 비축물로 하나씩 만듭니다: 도구는 작업대에서, 무기와 방패와 갑옷은 대장간에서 만듭니다.",
+  "A tool works straight from the pack; a weapon, a shield or armor goes into a free slot it fits.": "도구는 짐에 있기만 해도 쓰이고, 무기와 방패와 갑옷은 맞는 빈칸에 바로 들어갑니다.",
+  "Gear works at once: a tool in the pack speeds the work it is made for, a weapon in hand hits harder, a shield turns blows aside and armor takes part of every blow.": "장비는 바로 효과를 냅니다: 짐 속 도구는 맞는 일을 빠르게 하고, 손에 든 무기는 더 세게 치며, 방패는 공격을 막아 내고 갑옷은 모든 공격의 일부를 막습니다.",
 };

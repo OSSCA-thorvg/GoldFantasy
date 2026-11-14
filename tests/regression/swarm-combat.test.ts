@@ -247,7 +247,8 @@ describe('a party falling beyond a gate', () => {
     for (const p of members.slice(0, 2)) town.strikeDown(p, 'Killed by monsters');
     for (let i = 0; i < 100; ++i) town.advance(0.1);
     town.strikeDown(members[2], 'Killed by monsters');
-    town.advance(0.1);
+    // The gate holds the fallen party for a beat before it casts them out.
+    town.advance(realmRules.castOutDelay + 0.1);
     expect(town.realmActive()).toBe(false);
     expect(town.fallen).toHaveLength(0);
     for (const p of members) expect(p).toMatchObject({ downedAt: -1, health: expect.any(Number) });

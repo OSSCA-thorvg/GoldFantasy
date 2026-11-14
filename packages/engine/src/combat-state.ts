@@ -53,6 +53,8 @@ export class CombatState {
   spoils = 0;
   /** Where the floor fell, for the brood break. */
   breakAt: Point | null = null;
+  /** Clock time the gate ends an expedition whose whole party is down or dead; -1 while someone stands. */
+  lostAt = -1;
   /** Clock time each resident on auto may next weigh their skills. */
   skillCheckAt = new Map<number, number>();
   /** Day the wound countdown last ran for. */

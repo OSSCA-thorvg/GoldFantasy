@@ -16,6 +16,7 @@ import { portraitBackdrop } from '../../../../packages/native-renderer/src/portr
 import { Cue, Sound, VoiceLine } from '../../../../packages/native-audio/src';
 import { combatSounds, CombatSoundState } from './game-combat-sound';
 import { swarmBanner, swarmFrame, waveWarning } from './swarm-hud';
+import { Beat, stagingBanner } from './expedition-staging';
 import { hudPaint } from './hud-paint';
 import type { GameAppState } from './game-app-state';
 import type { GameHudApp } from './game-hud-contract';
@@ -257,7 +258,7 @@ function nextSerial(town: Town): bigint {
   for (const e of town.combatEvents()) if (e.serial >= next) next = e.serial + 1n;
   return next;
 }
-function downedTitle(names: string[]): string {
+export function downedTitle(names: string[]): string {
   return names.length === 1
     ? `${names[0]} is down`
     : names.length === 2
@@ -284,6 +285,8 @@ export function combatFrame(app: CombatFrameApp, seconds: number): void {
     state.guardianEngaged = guardian?.angry ? guardian.id : -1;
   }
   const autoplay = town.isTitleAutoplay(),
+    // The last one standing beyond a gate gets the longer held moment instead of a pause to rescue them.
+    lost = town.realmActive() && !town.realmStanding().length,
     downed: Person[] = [],
     heard: CombatEvent[] = [];
   for (const e of town.combatEvents()) {
@@ -292,7 +295,7 @@ export function combatFrame(app: CombatFrameApp, seconds: number): void {
     if (autoplay) continue;
     heard.push(e);
     const person = e.cue === CombatCue.Downed && e.person >= 0 ? town.person(e.person) : null;
-    if (person && isPlayerResident(person)) downed.push(person);
+    if (person && isPlayerResident(person) && !(lost && town.inRealm(person.position))) downed.push(person);
   }
   combatSounds(app, heard, seconds);
   swarmFrame(app, heard);
@@ -524,8 +527,12 @@ export function combatOverlays(app: GameHudApp, width: number, height: number): 
     y = guardianBar(app, width, y);
     y = swarmBanner(app, width, y);
     y = waveWarning(app, width, height, y);
+    const { x, w } = column(width),
+      moment = app.staging.moment;
+    y = stagingBanner(app, x, w, y, downedTitle, (text, inner) => wrapText(app.context, text, inner, 11, 2));
     y = autoPauseBanner(app, width, y);
-    y = memorialBanner(app, width, y);
+    // A death's memorial is the release of its held moment, not shown during it.
+    if (!moment || moment.beat === Beat.Down) y = memorialBanner(app, width, y);
     downedAlerts(app, width, y);
   }
   for (const [slot, entry] of state.portraits)

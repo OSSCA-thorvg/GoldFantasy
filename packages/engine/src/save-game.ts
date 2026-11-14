@@ -56,6 +56,8 @@ import { point } from './geometry';
 import { defaultAppearance } from './person-look';
 import { NeutralSettlement } from './neutral-state';
 import { backpackSize, equipmentSlots, itemSpec, validInventory, type ItemStack } from './equipment';
+import { craftOrder, orderSeconds } from './craft-orders';
+import { levelVariant } from './craft-stations';
 export interface SaveTown extends TownState {
   camp(id?: number): Building | null;
   settlement(id: number): CampEconomy;
@@ -412,9 +414,9 @@ function personFields(a: SaveArchive, v: Person): void {
     v.inventory = a.value(vector(optional(inventoryItemCodec), backpackSize), v.inventory);
     for (const slot of equipmentSlots) v.equipment[slot] = a.value(i32, v.equipment[slot]);
     a.fields(v, { craftItem: optional(string), craftWorkshop: i32, craftProgress: f64 });
-    const item = v.craftItem === null ? null : itemSpec(v.craftItem);
+    const order = craftOrder(v.craftItem);
     if (!validInventory(v) || !Number.isFinite(v.craftProgress) || v.craftProgress < 0 ||
-        v.craftWorkshop < -1 || (v.craftItem !== null && (!item || item.workshop === null || v.craftWorkshop < 0 || v.craftProgress > item.seconds + .25)) ||
+        v.craftWorkshop < -1 || (v.craftItem !== null && (!order || v.craftWorkshop < 0 || v.craftProgress > orderSeconds(order, null) + .25)) ||
         (v.craftItem === null && (v.craftWorkshop !== -1 || v.craftProgress !== 0)))
       throw new Error('Invalid inventory or crafting state');
   }
@@ -807,12 +809,26 @@ function townFields(a: SaveArchive, v: SaveTown): void {
         v.world.regionAt(animal.position) !== Region.Middle
       )
         throw new Error('Invalid wildlife habitat');
+    if (a.formatVersion < 19) settleOldStations(v);
     const obstacles = v.placed.filter((b) => b.kind !== Structure.Torch).map((b) => b.footprint());
     v.grid.rebuild(v.world, v.network, obstacles);
     v.walkRevision = v.changes = 1n;
     v.roadChanges = 1n;
     v.roadOnlyChanges = 0n;
     v.recount();
+  }
+}
+/** Before station levels: a workbench is level 1; a weaponsmith or an armorer becomes a smithy of level 2, or 3 once a
+ *  floor has been cleared (iron was theirs then); nobody keeps a job at it, since a smithy has none. */
+function settleOldStations(town: SaveTown): void {
+  const floors = town.depth.reduce((sum, n) => sum + n, 0);
+  for (const b of town.placed) {
+    if (b.kind === Structure.Workbench) b.variant = levelVariant(1);
+    else if (b.kind === Structure.Weaponsmith || b.kind === Structure.Armorer) {
+      b.kind = Structure.Weaponsmith;
+      b.variant = levelVariant(floors > 0 ? 3 : 2);
+      for (const p of town.folk) if (p.job === b.id) p.job = -1;
+    }
   }
 }
 let lastEncodedSize = 1024;
@@ -888,9 +904,16 @@ export function encodeTownPayload(town: SaveTown): Uint8Array {
   const swarm =
     town.folk.some((p) => p.abilityReadyAt2 > 0 || p.abilityUntil2 > 0 || p.abilityAuto2 !== -1 || p.holding) ||
     [...town.beasts, ...town.animals].some((m) => m.rank > MonsterRank.Guardian || m.brood !== -1);
+  // Version 19 carries station levels (in a station's variant) and upgrade orders; a smithy of any level needs it,
+  // since older saves hold weaponsmiths with a random look that are read as levels by rule.
+  const stations =
+    town.placed.some((b) => b.kind === Structure.Weaponsmith || b.kind === Structure.Armorer || (b.kind === Structure.Workbench && b.variant !== 0)) ||
+    town.folk.some((p) => craftOrder(p.craftItem)?.kind === 'upgrade' || craftOrder(p.craftItem)?.kind === 'station');
   // Version 17 carries which first-time explanations the player has been given.
   // Version 18 carries Thor's visits, once the settlement has called him.
-  a.formatVersion = town.thor.present || town.thor.visits > 0 || town.thor.nextVisit >= 0
+  a.formatVersion = stations
+    ? 19
+    : town.thor.present || town.thor.visits > 0 || town.thor.nextVisit >= 0
     ? 18
     : town.told.length > 0
     ? 17
@@ -952,10 +975,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 18) climateSize = u32.read(a);
+  if (version >= 2 && version <= 19) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 18 ||
+    version > 19 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

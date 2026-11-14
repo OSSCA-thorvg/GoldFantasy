@@ -1,4 +1,5 @@
 // Native town.cpp placement, construction, staffing and land rules. No tutorial policy is added here.
+import { levelVariant, topLevel } from './craft-stations';
 import { TownState } from './town-state';
 import { Building, Field, Check, Placement } from './town-models';
 import type { WalkGrid } from './walk-paths';
@@ -13,6 +14,8 @@ import {
   describe,
 } from './building-catalog';
 import { Activity, Person, Role, TreeWorkKind } from './person';
+import type { Town } from './town';
+import { canClear, clearNow, clearTargetAt } from './town-clearing';
 import { CampEconomy } from './camp-economy';
 import { Tile, Terrain, DungeonKind, isWater, isStone } from './world-types';
 import { inArea } from './realm-layout';
@@ -121,6 +124,8 @@ export function touches(footprint: Footprint, a: Point, b: Point, margin: number
 export function placementVariant(world: TownState['world'], kind: Structure, center: Point): number {
   const variant =
     Math.trunc(f32(hash01(world.seed(), Math.trunc(center.x * 8), Math.trunc(center.y * 8), 41) * 1e6)) >>> 0;
+  // A craft station starts at level 1; its look follows its level.
+  if (topLevel(kind)) return levelVariant(1);
   return kind === Structure.Chapel ? (variant & ~3) >>> 0 : variant;
 }
 export function editPerson(this: ConstructionTown, id: number, position: Point, health: number): boolean {
@@ -364,6 +369,9 @@ export function canPlace(this: ConstructionTown, kind: Structure, center: Point,
   if (problem) return refuse(check, problem);
   for (const other of this.placed)
     if (footprint.overlaps(other.footprint())) return refuse(check, 'Occupied');
+  // A craft station is worked in the open at its doorstep: keep that ground clear.
+  for (const other of this.placed)
+    if (topLevel(other.kind) && footprint.contains(other.door(), f32(0.45))) return refuse(check, 'Blocks a door');
   for (const segment of this.network.segments())
     if (touches(footprint, segment.a, segment.b, TownState.roadHalfWidth))
       return refuse(check, 'On the road');
@@ -598,23 +606,8 @@ export function plantField(this: ConstructionTown, outline: Outline): boolean {
   return true;
 }
 export function canDemolish(this: ConstructionTown, p: Point): Check {
-  const check = new Check(),
-    id = this.buildingAt(p);
-  if (id >= 0) {
-    if (this.building(id)!.faction !== this.controlFaction) return refuse(check, 'This building belongs to a neutral settlement');
-    if (isSeat(this.building(id)!.kind)) return refuse(check, 'The seat of the settlement stays');
-    check.ok = true;
-  } else {
-    const field = this.field(this.fieldAt(p)), match = this.network.distance(p), road = this.network.road(match.id ?? -1);
-    if (field) {
-      if (field.faction !== this.controlFaction) return refuse(check, 'This field belongs to a neutral settlement');
-      check.ok = true;
-    } else if (road && match.distance < f32(TownState.roadHalfWidth + f32(0.15))) {
-      if (road.faction !== this.controlFaction) return refuse(check, 'This road belongs to a neutral settlement');
-      check.ok = true;
-    } else check.reason = 'Nothing to clear';
-  }
-  return check;
+  const target = clearTargetAt(this as unknown as Town, p);
+  return target ? canClear(this as unknown as Town, target.kind, target.id) : new Check(false, 'Nothing to clear');
 }
 export function raze(this: ConstructionTown, id: number): void {
   const lostCamp = !!this.camp(id);
@@ -644,21 +637,10 @@ export function raze(this: ConstructionTown, id: number): void {
   this.assignHomes();
   ++this.changes;
 }
+/** Clears the thing at `p` at once; residents use `markClear` instead. */
 export function demolish(this: ConstructionTown, p: Point): boolean {
-  if (!this.canDemolish(p).ok) return false;
-  const id = this.buildingAt(p),
-    field = this.fieldAt(p);
-  if (id >= 0) this.raze(id);
-  else if (field >= 0) this.farmland = this.farmland.filter((f) => f.id !== field);
-  else {
-    const road = this.network.distance(p).id ?? -1;
-    this.network.remove(road);
-    ++this.roadChanges;
-    for (const person of this.folk)
-      if (person.activity === Activity.Roadwork && person.target === road) person.activity = Activity.Idle;
-  }
-  ++this.changes;
-  return true;
+  const target = clearTargetAt(this as unknown as Town, p);
+  return !!target && clearNow(this as unknown as Town, target.kind, target.id);
 }
 export function regrow(this: ConstructionTown): void {
   const taken = new Uint8Array(f32(this.world.width() * this.world.height())),

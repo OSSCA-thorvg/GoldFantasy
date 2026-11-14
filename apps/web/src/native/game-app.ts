@@ -36,6 +36,7 @@ import { refreshHoveredTarget } from './world-targets';
 import { isPlayerResident } from '../../../../packages/engine/src/faction';
 import { openPrayer, closePrayer, handlePrayerEvent } from './game-prayer';
 import { handleExpeditionEvent } from './expedition-window';
+import { handleResultEvent } from './expedition-result';
 import * as touch from './game-touch';
 const {
   pointerDown: rawDown,
@@ -48,7 +49,7 @@ const {
 const { SpeakerState, speakerState: unusedSpeakerFactory, ...speechMethods } = speech;
 const { buildGroups: unusedBuildGroups, ...hudMethods } = hud;
 const methods = {
-  openPrayer, closePrayer, handlePrayerEvent, handleExpeditionEvent,
+  openPrayer, closePrayer, handlePrayerEvent, handleExpeditionEvent, handleResultEvent,
   ...touch,
   ...inputMethods,
   ...commands,
@@ -108,7 +109,8 @@ export class GameApp extends GameAppState implements GameRuntime {
           ? source.chosen.filter((id) => isPlayerResident(town.person(id)))
           : [...source.chosen];
       this.speed = source.speed;
-      this.paused = source.prayer?.previousPaused ?? source.expedition?.previousPaused ?? source.paused;
+      this.paused =
+        source.prayer?.previousPaused ?? source.expedition?.previousPaused ?? source.expeditionResult?.previousPaused ?? source.paused;
       this.workQueue = copyNative(source.workQueue);
       this.stoppedWork = new Map(source.stoppedWork);
       this.workSerial = source.workSerial;
@@ -246,6 +248,7 @@ export class GameApp extends GameAppState implements GameRuntime {
     this.prayer?.adapter.dispose();
     this.prayer = null;
     this.expedition = null;
+    this.expeditionResult = null;
     this.atlas?.dispose();
     this.buildings?.dispose();
     this.campResources.dispose();

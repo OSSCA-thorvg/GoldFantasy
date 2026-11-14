@@ -11,10 +11,11 @@ import { Weather } from '../../../../packages/engine/src/climate';
 import { Season } from '../../../../packages/engine/src/town-models';
 import { isPlayerBuilding, isPlayerResident } from '../../../../packages/engine/src/faction';
 import { burdenStart, carriedWeight } from '../../../../packages/engine/src/carried-resources';
-import { equipmentSlots, equippedItem } from '../../../../packages/engine/src/equipment';
+import { carriedTools, equipmentSlots, equippedItem } from '../../../../packages/engine/src/equipment';
 import { gateSealed, sealFloors, sealProgress, sealable } from '../../../../packages/engine/src/gate-seals';
 import { completedFacility, deedCount, unlockRequirements } from '../../../../packages/engine/src/settlement-progression';
 import { secondSkillLevel } from '../../../../packages/engine/src/skill-catalog';
+import { playing } from '../../../../packages/engine/src/bard-phrases';
 import type { DevotionEvent } from '../../../../packages/engine/src/town-devotion';
 import type { Building } from '../../../../packages/engine/src/town-models';
 import { serpentSighting } from '../../../../packages/native-renderer/src/serpent-ring';
@@ -178,8 +179,8 @@ const moments: GuideMoment[] = [
     key: 'craft',
     title: 'The first piece of gear',
     text: () => [
-      'Gear is crafted from the settlement\'s stores, one piece at a time, and goes straight into a free slot it fits.',
-      'Tools make their work faster; weapons hit harder.',
+      'Gear is crafted from the settlement\'s stores, one piece at a time: tools at the workbench, weapons, shields and armor at the smithy.',
+      'A tool works straight from the pack; a weapon, a shield or armor goes into a free slot it fits.',
     ],
     spot: (scan) => {
       const made = notice(scan, craftedNotice);
@@ -189,13 +190,13 @@ const moments: GuideMoment[] = [
     },
     met: (town) =>
       town.chronicle.weaponsForged > 0 ||
-      residents(town).some((p) => equipmentSlots.some((slot) => equippedItem(p, slot))),
+      residents(town).some((p) => carriedTools(p).length > 0 || equipmentSlots.some((slot) => equippedItem(p, slot))),
   },
   {
     key: 'equip',
     title: 'Gear in hand',
     text: () => [
-      'Gear in hand works at once: a tool speeds the work it is made for, a weapon hits harder and armor takes part of every blow.',
+      'Gear works at once: a tool in the pack speeds the work it is made for, a weapon in hand hits harder, a shield turns blows aside and armor takes part of every blow.',
       'A resident\'s window shows what they carry and lets you change it.',
     ],
     spot: (scan) => {
@@ -204,7 +205,7 @@ const moments: GuideMoment[] = [
       if (!held && !first) return null;
       return { at: first?.person.position ?? null, detail: held ? [held] : [], fold: held ? [held] : [] };
     },
-    met: (town) => residents(town).some((p) => equipmentSlots.some((slot) => equippedItem(p, slot))),
+    met: (town) => residents(town).some((p) => carriedTools(p).length > 0 || equipmentSlots.some((slot) => equippedItem(p, slot))),
   },
   {
     key: 'field',
@@ -586,6 +587,21 @@ const moments: GuideMoment[] = [
       return null;
     },
     met: (town) => residents(town).some((p) => !(town.skillsOf(p)[1]?.locked ?? true)),
+  },
+  {
+    key: 'bard',
+    title: 'A bard plays',
+    text: () => [
+      'Now and then a bard takes up the lyre while idle, strolling or resting, and plays a short tune.',
+      'Residents who listen by the fire in the evening let go of a little stress.',
+    ],
+    spot: (scan) => {
+      const bard = scan.town
+        .people()
+        .find((p) => p.calling === Calling.Bard && playing(p, scan.town.clock()) && scan.shows(p.position));
+      return bard ? { at: bard.position } : null;
+    },
+    met: () => false,
   },
 ];
 function playerRoad(town: Town): Point | null {

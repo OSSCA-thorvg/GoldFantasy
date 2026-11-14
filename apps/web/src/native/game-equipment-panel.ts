@@ -9,6 +9,10 @@ import {
   armorProtection,
   gearEffect,
   workItem,
+  itemSpec,
+  isShield,
+  raisedShield,
+  carriedTools,
   type ItemSpec,
 } from '../../../../packages/engine/src/equipment';
 import { Activity } from '../../../../packages/engine/src/person';
@@ -16,6 +20,7 @@ import { toolAvailable } from '../../../../packages/engine/src/settlement-progre
 import { Tool } from '../../../../packages/engine/src/game-tools';
 import { project } from '../../../../packages/engine/src/geometry';
 import { nearestStation, openStation } from './craft-station-hud';
+import { equipBlock } from '../../../../packages/engine/src/town-equipment';
 import { canControl } from '../../../../packages/engine/src/faction';
 import type { Person } from '../../../../packages/engine/src/person';
 import type { GameHudApp } from './game-hud-contract';
@@ -98,7 +103,7 @@ export function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder
     line(5, -6, 5, 4);
     line(5, 4, 2, 9);
     line(2, 9, -6, 9);
-  } else if (item.id === 'shield') {
+  } else if (isShield(item)) {
     line(-9, -8, 9, -8);
     line(9, -8, 7, 4);
     line(7, 4, 0, 10);
@@ -269,7 +274,8 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
         10,
       );
   });
-  equipmentSlots.forEach((slot, index) => {
+  // Tools work straight from the pack, so only what is held or worn has a slot here.
+  equipmentSlots.filter((slot) => slot !== 'tool1' && slot !== 'tool2').forEach((slot, index) => {
     const item = equippedItem(p, slot),
       r = new Rect(gearX + (index % 3) * cell, top + Math.floor(index / 3) * cell, cell - 3, cell - 3);
     const state = button(
@@ -279,8 +285,10 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
       '',
       () => {
         if (app.inventorySelected > 0) {
+          const chosen = itemSpec(p.inventory[app.inventorySelected - 1]?.item ?? ''),
+            blocked = chosen ? equipBlock(p, chosen, slot) : '';
           if (!app.town.equipItem(p.id, app.inventorySelected, slot))
-            app.status = 'This item does not fit that slot or requires a higher level';
+            app.status = blocked || (chosen?.category === 'tool' ? 'Tools work from the pack' : 'This item does not fit that slot or requires a higher level');
         } else app.town.unequipItem(p.id, slot);
       },
       item ? ButtonStyle.Primary : ButtonStyle.Default,
@@ -291,7 +299,7 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
       tool1: 'hammer',
       tool2: 'axe',
       head: 'helmet',
-      body: 'leather-armor',
+      body: 'wooden-armor',
       feet: 'boots',
       hands: 'gloves',
       offhand: 'shield',
@@ -397,17 +405,14 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
     } else {
       text(12, 'Equipment', t.accent, 14, true);
       text(43, `Attack ${attackDamage(p).toFixed(1)} · Armor ${Math.round(armorProtection(p) * 100)}%`);
-      text(69, `Main hand: ${equippedItem(p, 'weapon')?.name ?? 'Bare hands'}`, t.muted);
+      const shield = equippedItem(p, 'offhand');
       text(
-        95,
-        `Tools: ${
-          ['tool1', 'tool2']
-            .map((slot) => equippedItem(p, slot as 'tool1' | 'tool2')?.name)
-            .filter(Boolean)
-            .join(', ') || 'none'
-        }`,
+        69,
+        `Main hand: ${equippedItem(p, 'weapon')?.name ?? 'Bare hands'}` +
+          (shield ? ` · ${shield.name}${raisedShield(p) ? '' : ' (needs a free hand)'}` : ''),
         t.muted,
       );
+      text(95, `Tools from the pack: ${carriedTools(p).map((item) => item.name).join(', ') || 'none'}`, t.muted);
       // Live load against this resident's own limit, which a pack basket raises.
       const weight = carriedWeight(p),
         slowed = weight > burdenFrom(p),
@@ -420,13 +425,13 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
       text(157, 'Select an item, then choose a gear slot.', t.muted, 10);
     }
   }
-  const making = p.craftItem ? itemCatalog.find((item) => item.id === p.craftItem) : null;
+  const making = p.craftItem ? app.town.orderName(p) : '';
   if (making) {
     const w = 66;
     c.text(
       new Rect(panel.x + 106, panel.y, panel.w - 112 - w, 28),
       c.elideText(
-        `Crafting ${making.name} · ${Math.trunc((p.craftProgress / making.seconds) * 100)}%`,
+        `Crafting ${making} · ${Math.trunc(app.town.craftShare(p) * 100)}%`,
         panel.w - 112 - w,
         11,
       ),
@@ -439,7 +444,7 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
       new Rect(panel.x + panel.w - w, panel.y, w, 28),
       'Cancel',
       () => {
-        if (app.town.cancelCraft(p.id)) app.status = `${p.name} stopped making the ${making.name}`;
+        if (app.town.cancelCraft(p.id)) app.status = `${p.name} stopped making the ${making}`;
       },
       ButtonStyle.Default,
       enabled,

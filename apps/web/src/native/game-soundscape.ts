@@ -9,6 +9,7 @@ import { Town } from '../../../../packages/engine/src/town';
 import { AnimalKind, type Monster } from '../../../../packages/engine/src/person';
 import { updateWeatherReactions } from './weather-reactions';
 import { realmMusic, realmMusicPlaying } from './realm-music';
+import { bardLyre } from './bard-lyre';
 import { thorThunder } from './god-sounds';
 import { thunderFactor } from '../../../../packages/engine/src/thor-visit';
 import {
@@ -40,7 +41,7 @@ export function sayLine(this: GameSoundApp, id: number, line: VoiceLine): boolea
   );
 }
 export function playMoment(this: GameSoundApp, moment: Moment, seconds: number): void {
-  if (this.town.bardPlaying() || realmMusicPlaying(this)) return;
+  if (realmMusicPlaying(this)) return;
   const track = this.director.moment(moment, seconds);
   if (!track) return;
   const tune = new Sound(Cue.Music);
@@ -69,6 +70,8 @@ export function grunt(this: GameSoundApp, id: number): void {
 }
 export function soundscape(this: GameSoundApp, seconds: number): void {
   realmMusic(this);
+  // Beyond a gate the world's loop holds the music: the lyre would sit in another key.
+  bardLyre(this, realmMusicPlaying(this));
   const sky = this.town.climate(),
     dark = sky.night > f(0.5),
     roll = (salt: number) => hash01(this.town.map().seed(), Math.trunc(seconds * 10), salt, 0x4a7e);

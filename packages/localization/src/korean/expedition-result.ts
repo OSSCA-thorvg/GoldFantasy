@@ -1,0 +1,42 @@
+import type { Phrases } from '../phrases';
+
+/** The end of an expedition: the held moments when the party falls and the result screen. */
+export const expeditionResultPhrases: Phrases = {
+  '{0} and {1} have died': '{0}, {1}이(가) 세상을 떠났습니다',
+  '{0} residents have died': '주민 {0}명이 세상을 떠났습니다',
+  'No one is left standing. The gate casts the party out.':
+    '서 있는 사람이 아무도 없습니다. 관문이 파티를 밖으로 내던집니다.',
+  'No one is left alive beyond the gate.': '관문 너머에 살아남은 사람이 없습니다.',
+  'No one is left standing': '서 있는 사람이 아무도 없습니다',
+  'The party withdrew': '파티가 철수했습니다',
+  'Thrown back through the gate': '관문 밖으로 내던져졌습니다',
+  'No one came back': '아무도 돌아오지 못했습니다',
+  'The floor is cleared.': '이 층을 정리했습니다.',
+  'The gate is sealed for good.': '관문이 영원히 봉인되었습니다.',
+  'The party came home before the floor was cleared.': '층을 정리하기 전에 파티가 돌아왔습니다.',
+  'You barely made it out of the gate.': '간신히 관문을 빠져나왔습니다.',
+  'The whole party fell beyond the gate.': '파티 전원이 관문 너머에서 쓰러졌습니다.',
+  'Nothing was carried out.': '가지고 나온 것이 없습니다.',
+  'The spoils were lost.': '전리품을 잃었습니다.',
+  'Beyond the gate for less than a minute': '관문 너머에서 보낸 시간: 1분이 채 안 됨',
+  'Beyond the gate for a minute': '관문 너머에서 보낸 시간: 1분',
+  'Beyond the gate for {0} minutes': '관문 너머에서 보낸 시간: {0}분',
+  'Dens destroyed: {0} of {1}': '부순 소굴: {1}개 중 {0}개',
+  'The guardian fell': '수호자를 쓰러뜨렸습니다',
+  'The guardian still stands': '수호자가 아직 버티고 있습니다',
+  'Monsters slain: {0}': '쓰러뜨린 몬스터: {0}',
+  'Came home empty-handed': '빈손으로 돌아왔습니다',
+  'Spoils brought home: {0}': '가져온 전리품: {0}',
+  'Spoils lost: {0}': '잃은 전리품: {0}',
+  'The time, the slain and the levels gained are not known across a load.':
+    '불러온 게임에서는 걸린 시간, 쓰러뜨린 수, 오른 레벨을 알 수 없습니다.',
+  'Floor {0} of {1}': '{1}층 중 {0}층',
+  '1 level gained': '레벨 1 상승',
+  '{0} levels gained': '레벨 {0} 상승',
+  'Unhurt': '다치지 않음',
+  'Down: an ally must kneel beside them': '쓰러짐: 동료가 곁에서 일으켜야 합니다',
+  'Fallen: {0}': '전사: {0}',
+  '+{0} more': '+{0}명 더',
+  'Return to Midgard': '미드가르드로 돌아가기',
+  'Return to Midgard (Enter)': '미드가르드로 돌아가기 (엔터)',
+};

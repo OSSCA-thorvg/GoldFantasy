@@ -53,6 +53,7 @@ export const cueClips: Partial<Record<Cue, string[]>> = {
   [Cue.BroodBreak]: ['sfx/combat/brood_break_'],
   [Cue.WaveHorn]: ['sfx/combat/wave_horn_'],
   [Cue.Downed]: ['sfx/collapse_'],
+  [Cue.Lyre]: ['sfx/bard/lyre_'],
 };
 /** The loop under a large pack nearby: skitter, breath and a low growl, seamless end to start. */
 export const swarmBedPrefix = 'sfx/combat/swarm_bed_';

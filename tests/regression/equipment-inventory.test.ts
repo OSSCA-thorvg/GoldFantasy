@@ -15,9 +15,11 @@ import {
   workItem,
   workEfficiency,
   armorProtection,
+  itemSpec,
   type ItemSpec,
 } from '../../packages/engine/src/equipment';
 import { encodeTown, decodeTown } from '../../packages/engine/src/save-game';
+import { levelVariant } from '../../packages/engine/src/craft-stations';
 import { digest } from '../../packages/engine/src/save-archive';
 import * as mining from '../../packages/engine/src/mining';
 
@@ -37,6 +39,8 @@ function fixture() {
     armorer = new Building(2, Structure.Armorer, point(18, 17), 0, 0),
     bench = new Building(3, Structure.Workbench, point(8, 17), 0, 0);
   camp.village = smith.village = armorer.village = bench.village = 0;
+  // Both stations at their top level, so every recipe can be made here.
+  smith.variant = bench.variant = levelVariant(3);
   town.placed = [camp, smith, armorer, bench];
   town.nextId = 4;
   town.migrateSettlements();
@@ -54,8 +58,10 @@ function fixture() {
   return { town, person, camp, smith, armorer, bench };
 }
 function workshopFor(item: ItemSpec, places: { bench: Building; smith: Building; armorer: Building }): Building {
-  return item.workshop === Structure.Weaponsmith ? places.smith : item.workshop === Structure.Armorer ? places.armorer : places.bench;
+  return item.workshop === Structure.Weaponsmith ? places.smith : places.bench;
 }
+// Gear still made somewhere; retired pieces stay valid in saves but have no recipe.
+const made = itemCatalog.filter((item) => item.category !== 'resource' && item.workshop !== null);
 function advance(town: Town, seconds: number) {
   for (let i = 0; i < Math.ceil(seconds * 20); ++i) town.advance(0.05);
 }
@@ -98,28 +104,28 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(person.attackMultiplier()).toBeCloseTo(grown);
     expect(town.power(person)).toBeCloseTo(grown);
   });
-  it('uses only equipped weapon or strongest equipped tool and enforces required level', () => {
+  it('uses tools from the pack, a weapon only when equipped, and enforces required level', () => {
     const { town, person } = fixture();
     addInventory(person, 'hammer');
     addInventory(person, 'axe');
     addInventory(person, 'sword');
-    expect(attackDamage(person)).toBe(1);
-    expect(town.equipItem(0, 1, 'tool1')).toBe(true);
-    expect(town.equipItem(0, 2, 'tool2')).toBe(true);
+    // Tools work and fight straight from the pack; the sword waits until it is in hand.
     expect(combatItem(person)?.id).toBe('axe');
     expect(workEfficiency(person, 'construction')).toBe(1);
     expect(workEfficiency(person, 'mining')).toBe(0.4);
     expect(town.equipItem(0, 3, 'weapon')).toBe(false);
-    person.gainExperience(person.experienceToNextLevel());
+    while (person.level < 5) person.gainExperience(person.experienceToNextLevel());
+    expect(combatItem(person)?.id).toBe('axe');
     expect(town.equipItem(0, 3)).toBe(true);
     expect(combatItem(person)?.id).toBe('sword');
-    expect(attackDamage(person)).toBeCloseTo(2.2 * (1 + Person.attackPerLevel));
+    expect(attackDamage(person)).toBeCloseTo(2.2 * (1 + Person.attackPerLevel * 4));
     expect(town.unequipItem(0, 'weapon')).toBe(true);
     expect(combatItem(person)?.id).toBe('axe');
     expect(town.equipItem(0, 1, 'head')).toBe(false);
   });
   it('moves equipped inventory references without creating duplicate items', () => {
     const { town, person } = fixture();
+    // Old saves hold tools in the tool slots; the references still follow the stacks.
     addInventory(person, 'axe');
     addInventory(person, 'hammer');
     town.equipItem(0, 1, 'tool1');
@@ -132,37 +138,36 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(combatItem(person)?.id).toBe('axe');
     expect(person.inventory.filter(Boolean)).toHaveLength(2);
   });
-  it.each(['axe', 'pickaxe'])('reschedules unfinished harvesting when the equipped %s changes', (tool) => {
-    const { town, person } = fixture();
-    const map = town.map();
-    let cell = 18 * map.width() + 15;
-    if (tool === 'axe') map.at(15, 18).trees = 1;
-    else {
-      cell = -1;
-      for (let x = 20; x < 26 && cell < 0; ++x) {
-        map.at(x, 22).terrain = Terrain.Rock;
-        if (mining.deposit(map, x, 22)) cell = 22 * map.width() + x;
+  it.each(['axe', 'pickaxe'])('harvests faster with an %s in the pack, equipped or not', (tool) => {
+    const remaining = (carried: boolean, equip: boolean) => {
+      const { town, person } = fixture();
+      const map = town.map();
+      let cell = 18 * map.width() + 15;
+      if (tool === 'axe') map.at(15, 18).trees = 1;
+      else {
+        cell = -1;
+        for (let x = 20; x < 26 && cell < 0; ++x) {
+          map.at(x, 22).terrain = Terrain.Rock;
+          if (mining.deposit(map, x, 22)) cell = 22 * map.width() + x;
+        }
+        expect(cell).toBeGreaterThan(0);
       }
-      expect(cell).toBeGreaterThan(0);
-    }
-    addInventory(person, tool);
-    expect(tool === 'axe' ? town.orderChop([0], cell) : town.orderMine([0], cell)).toBe(true);
-    for (let i = 0; i < 500 && (person.moving() || person.until > town.clock() + 100); ++i)
-      town.advance(0.05);
-    expect(person.until - town.clock()).toBeLessThanOrEqual(15);
-    advance(town, 2);
-    const bareRemaining = person.until - town.clock();
-    expect(town.equipItem(0, 1, 'tool1')).toBe(true);
-    expect(person.until - town.clock()).toBeCloseTo(bareRemaining * 0.4, 5);
-    advance(town, 1);
-    const equippedRemaining = person.until - town.clock();
-    expect(town.unequipItem(0, 'tool1')).toBe(true);
-    expect(person.until - town.clock()).toBeCloseTo(equippedRemaining / 0.4, 5);
-    const finishAt = person.until;
-    while (town.clock() + 0.05 < finishAt) town.advance(0.05);
-    expect(person.carrying).toBe(0);
-    advance(town, 0.1);
-    expect(person.carrying).toBe(3);
+      if (carried) addInventory(person, tool);
+      expect(tool === 'axe' ? town.orderChop([0], cell) : town.orderMine([0], cell)).toBe(true);
+      for (let i = 0; i < 500 && (person.moving() || person.until > town.clock() + 100); ++i) town.advance(0.05);
+      const left = person.until - town.clock();
+      // Putting it in a slot or taking it out changes nothing: tools work from the pack.
+      if (equip) {
+        expect(town.equipItem(0, 1, 'tool1')).toBe(true);
+        expect(person.until - town.clock()).toBeCloseTo(left, 5);
+        expect(town.unequipItem(0, 'tool1')).toBe(true);
+        expect(person.until - town.clock()).toBeCloseTo(left, 5);
+      }
+      return left;
+    };
+    const bare = remaining(false, false),
+      packed = remaining(true, true);
+    expect(packed).toBeCloseTo(bare * 0.4, 1);
   });
   it('withdraws and deposits real finite materials and displays the live work cargo', () => {
     const { town, person } = fixture(),
@@ -200,8 +205,8 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(town.withdrawInventory(0, Product.Wood, 1)).toBe(false);
     expect(town.stock().wood).toBe(before);
   });
-  it('crafts through physical travel and work, pays exactly once, and takes new gear in hand', () => {
-    const { town, person, smith } = fixture(),
+  it('crafts through physical travel and work, pays exactly once, and puts a new tool to work from the pack', () => {
+    const { town, person, bench: smith } = fixture(),
       before = town.stock().clone();
     expect(town.orderCraft(0, smith.id, 'axe')).toBe(true);
     expect(person.path.length).toBeGreaterThan(0);
@@ -221,30 +226,31 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(town.stock().stone).toBe(before.stone - 2);
     expect(town.stock().gold).toBe(before.gold - 2);
     expect(person.autoMode).toBe(true);
-    // A free tool slot takes the new axe at once, and the notice says what it changed.
-    expect(person.equipment.tool1).toBe(1);
-    expect(combatItem(person)?.id).toBe('axe');
+    // The new axe works from the pack at once, and the notice says what it changed.
+    expect(person.equipment.tool1).toBe(-1);
+    expect(workItem(person, 'woodcutting')?.id).toBe('axe');
     expect(town.notices.slice(-2)).toEqual([
       'Craftsperson crafted Iron axe',
-      'Iron axe in hand · Fells trees faster than a stone axe',
+      'Iron axe in the pack · Fells trees faster than a stone axe',
     ]);
   });
   it('provides a recipe for every wearable and tool, with matching workshop restrictions', () => {
     const places = fixture(),
       { town, smith, armorer } = places;
-    const craftable = itemCatalog.filter((item) => item.category !== 'resource');
-    expect(craftable.length).toBeGreaterThan(15);
-    for (const item of craftable) {
+    expect(made.length).toBeGreaterThan(15);
+    for (const item of made) {
       const workshop = workshopFor(item, places);
       expect(town.craftOptions(0, workshop.id).some((option) => option.item.id === item.id)).toBe(true);
       expect(town.craftReason(0, workshop.id, item.id)).toBe('');
-      expect(town.craftReason(0, workshop.id === smith.id ? armorer.id : smith.id, item.id)).not.toBe('');
+      expect(town.craftReason(0, workshop.id === smith.id ? places.bench.id : smith.id, item.id)).not.toBe('');
+      // The old armorer makes nothing any more.
+      expect(town.craftReason(0, armorer.id, item.id)).not.toBe('');
       expect(town.craftReason(0, places.camp.id, item.id)).not.toBe('');
     }
   });
   it('finishes the same physical crafting job faster with an equipped hammer than with bare hands', () => {
     const workTime = (equipped: boolean) => {
-      const { town, person, smith } = fixture();
+      const { town, person, bench: smith } = fixture();
       if (equipped) {
         addInventory(person, 'hammer');
         expect(town.equipItem(0, 1, 'tool1')).toBe(true);
@@ -253,20 +259,20 @@ describe('owned equipment, personal inventory and crafting', () => {
       for (let i = 0; i < 300 && !person.craftProgress; ++i) town.advance(0.05);
       expect(person.craftProgress).toBeGreaterThan(0);
       const started = town.clock();
-      for (let i = 0; i < 400 && person.craftItem; ++i) town.advance(0.05);
+      for (let i = 0; i < 1000 && person.craftItem; ++i) town.advance(0.05);
       expect(person.craftItem).toBeNull();
       expect(person.inventory.some((stack) => stack?.item === 'axe')).toBe(true);
       return town.clock() - started;
     };
     const bareHands = workTime(false),
       hammer = workTime(true);
-    expect(bareHands).toBeGreaterThan(12);
-    expect(hammer).toBeLessThan(5.1);
+    expect(bareHands).toBeGreaterThan(itemSpec('axe')!.seconds / 0.4 - 0.2);
+    expect(hammer).toBeLessThan(itemSpec('axe')!.seconds + 0.1);
     expect(bareHands / hammer).toBeGreaterThan(2.4);
     expect(bareHands / hammer).toBeLessThan(2.6);
   });
   it('pauses a full-bag craft without spending and resumes after a real inventory transfer', () => {
-    const { town, person, smith } = fixture(),
+    const { town, person, bench: smith } = fixture(),
       before = town.stock().clone();
     expect(town.orderCraft(0, smith.id, 'axe')).toBe(true);
     for (let i = 0; i < 300 && person.craftProgress < 1; ++i) town.advance(0.05);
@@ -278,21 +284,21 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(town.stock()).toMatchObject(before);
     expect(town.transferInventory(0, 1, 0)).toBe(true);
     expect(person.carrying).toBe(20);
-    advance(town, 15);
+    advance(town, 35);
     expect(person.craftItem).toBeNull();
     expect(person.inventory[0]?.item).toBe('axe');
     expect(town.stock().wood).toBe(before.wood - 2);
     expect(town.stock().stone).toBe(before.stone - 2);
     expect(town.stock().gold).toBe(before.gold - 2);
   });
-  it.each(itemCatalog.filter((item) => item.category !== 'resource'))(
+  it.each(made)(
     'physically produces $name from its recipe',
     (item) => {
       const places = fixture(),
         { town, person } = places,
         workshop = workshopFor(item, places);
       expect(town.orderCraft(0, workshop.id, item.id)).toBe(true);
-      for (let i = 0; i < 1000 && person.craftItem; ++i) town.advance(0.05);
+      for (let i = 0; i < 2000 && person.craftItem; ++i) town.advance(0.05);
       expect(person.inventory.filter((stack) => stack?.item === item.id)).toHaveLength(1);
       expect(person.craftItem).toBeNull();
     },
@@ -327,7 +333,7 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(person.task).toBe(Activity.Fighting);
   });
   it('cancels crafting without payment and refuses foreign workshops', () => {
-    const { town, person, smith } = fixture(),
+    const { town, person, bench: smith } = fixture(),
       before = town.stock().clone();
     expect(town.orderCraft(0, smith.id, 'hammer')).toBe(true);
     advance(town, 5);
@@ -340,7 +346,7 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(town.orderCraft(0, smith.id, 'hammer')).toBe(false);
   });
   it('saves and resumes in-progress crafting without a second cost or losing equipment', () => {
-    const { town, person, smith } = fixture();
+    const { town, person, bench: smith } = fixture();
     addInventory(person, 'hammer');
     town.equipItem(0, 1);
     expect(town.orderCraft(0, smith.id, 'pickaxe')).toBe(true);
@@ -348,13 +354,14 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(person.craftProgress).toBeGreaterThan(0);
     const encoded = encodeTown(town),
       loaded = decodeTown(encoded, (map) => new Town(map, 32, false, true));
-    expect(encoded.startsWith('GoldFantasy-save\n0b000000')).toBe(true);
+    // A smithy stands, so the save carries station levels (version 19).
+    expect(encoded.startsWith('GoldFantasy-save\n13000000')).toBe(true);
     expect(encodeTown(loaded)).toBe(encoded);
     const p = loaded.person(0)!;
     expect(p.equipment.tool1).toBe(1);
     expect(p.craftItem).toBe('pickaxe');
     const wood = loaded.stock().wood;
-    advance(loaded, 10);
+    advance(loaded, 20);
     expect(p.inventory.some((item) => item?.item === 'pickaxe')).toBe(true);
     expect(loaded.stock().wood).toBe(wood - 2);
     expect(p.craftItem).toBeNull();

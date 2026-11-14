@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { pointerUp } from '../../apps/web/src/native/game-input';
+import { pointerUp, wheel } from '../../apps/web/src/native/game-input';
 import { issueOrder, type GameCommandApp } from '../../apps/web/src/native/game-commands';
 import { Order, PointerButton, Tool } from '../../packages/engine/src/game-tools';
 import { point } from '../../packages/engine/src/geometry';
@@ -126,6 +126,24 @@ describe('target input and group commands', () => {
     pointerUp.call(app, 50, 50, PointerButton.Secondary);
     expect(app.issueOrder).toHaveBeenCalledWith(Order.Work);
     expect(app.chosen).toEqual([0, 1]);
+  });
+  it('puts a building tool down on a right-click, and turns the building with the wheel instead of zooming', () => {
+    const { app } = fixture(),
+      zoomBy = vi.fn(),
+      selectTool = vi.fn();
+    Object.assign(app, { tool: Tool.Tent, freeAngle: 0, zoomBy, selectTool, pointerMove: vi.fn() });
+    wheel.call(app, 50, 50, 1);
+    expect(app.freeAngle).toBeCloseTo(Math.PI / 12, 5);
+    wheel.call(app, 50, 50, -1);
+    expect(app.freeAngle).toBeCloseTo(0, 5);
+    expect(zoomBy).not.toHaveBeenCalled();
+    app.pressAt = point(50, 50);
+    pointerUp.call(app, 50, 50, PointerButton.Secondary);
+    expect(selectTool).toHaveBeenCalledWith(Tool.Select);
+    expect(app.issueOrder).not.toHaveBeenCalled();
+    app.tool = Tool.Select;
+    wheel.call(app, 50, 50, 1);
+    expect(zoomBy).toHaveBeenCalledOnce();
   });
   it('contextual targeting of a neutral animal approaches without attacking', () => {
     const { app } = fixture();

@@ -21,6 +21,7 @@ import {
   settlementGoals,
 } from '../../packages/engine/src/settlement-progression';
 import { TownState } from '../../packages/engine/src/town-state';
+import { realmRules } from '../../packages/engine/src/town-realm';
 
 function settlement() {
   const town = new Town(5, 32, false),
@@ -189,7 +190,8 @@ describe('worlds beyond the gates', () => {
     members[0].position = { ...town.realmPlan()!.chambers.at(-1)!.center };
     expect(town.canLeaveRealm().ok).toBe(false);
     for (const p of members) p.health = -1;
-    town.advance(0.1);
+    // The gate closes behind the dead after a beat.
+    town.advance(realmRules.castOutDelay + 0.1);
     expect(town.realmActive()).toBe(false);
     expect(town.stock(0).gold).toBe(0);
     expect(town.depth[gate]).toBe(0);

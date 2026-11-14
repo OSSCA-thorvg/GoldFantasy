@@ -11,6 +11,7 @@ import { dayCycle } from '../../packages/engine/src/day-cycle';
 import { point } from '../../packages/engine/src/geometry';
 import { economyRules } from '../../packages/engine/src/economy-rules';
 import { itemSpec } from '../../packages/engine/src/equipment';
+import { levelVariant } from '../../packages/engine/src/craft-stations';
 
 function settlement() {
   const town = new Town(5, 32, false),
@@ -301,8 +302,10 @@ describe('wages, boons and winter', () => {
 
   it('Forge halves crafting time and forged weapons are counted', () => {
     const craft = (town: Town, item: string, seconds: number) => {
-      const smith = facility(town, Structure.Weaponsmith),
+      // Iron is made only at stations raised to their top level.
+      const smith = facility(town, itemSpec(item)!.workshop!),
         p = resident(town);
+      smith.variant = levelVariant(3);
       Object.assign(town.stock(), new Resources(100, 60, 60, 60, 20, 60, 20, 20));
       p.position = smith.door();
       p.path = [];

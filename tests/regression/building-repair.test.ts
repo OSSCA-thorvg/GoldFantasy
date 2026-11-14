@@ -50,7 +50,8 @@ function step(town: Town, seconds: number) {
 }
 describe('building repair supplies and completion', () => {
   it('charges only physical construction materials, including refined inputs', () => {
-    const fee = repairMaterialCost(Structure.Weaponsmith);
+    // The armorer, no longer built, is the one kind left that asks for wood, stone, planks and cut stone at once.
+    const fee = repairMaterialCost(Structure.Armorer);
     expect(fee.wood).toBeGreaterThan(0);
     expect(fee.stone).toBeGreaterThan(0);
     expect(fee.planks).toBeGreaterThan(0);

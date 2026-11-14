@@ -767,21 +767,21 @@
     "storage": 0
   },
   {
-    "name": "Weaponsmith",
-    "description": "Forges blades: staffed, residents and guards strike harder, and adventurers buy here.",
+    "name": "Smithy",
+    "description": "A forge and an anvil where residents make weapons, shields and armor, one at a time. Upgrade it for stone, then iron.",
     "size": 1,
     "cost": {
       "gold": 0,
-      "wood": 20,
-      "stone": 15,
+      "wood": 12,
+      "stone": 8,
       "food": 0,
       "mana": 0,
       "water": 0,
-      "planks": 8,
-      "cutStone": 4
+      "planks": 0,
+      "cutStone": 0
     },
     "residents": 0,
-    "jobs": 1,
+    "jobs": 0,
     "requiredPopulation": 0,
     "buildable": true,
     "product": 0,
@@ -803,7 +803,7 @@
   },
   {
     "name": "Armorer",
-    "description": "Mail and shields: staffed, monsters wound your people less, and adventurers buy here.",
+    "description": "An old armorer’s forge. Smithies make armor now.",
     "size": 1,
     "cost": {
       "gold": 0,
@@ -816,9 +816,9 @@
       "cutStone": 6
     },
     "residents": 0,
-    "jobs": 1,
+    "jobs": 0,
     "requiredPopulation": 0,
-    "buildable": true,
+    "buildable": false,
     "product": 0,
     "perWorker": 0,
     "next": 39,
@@ -1271,7 +1271,7 @@
   },
   {
     "name": "Workbench",
-    "description": "An open-air bench where residents craft wooden and stone tools and weapons, one at a time.",
+    "description": "An open-air bench where residents make tools and a pack basket, one at a time. Upgrade it for stone, then iron tools.",
     "size": 0.8,
     "cost": {
       "gold": 0,

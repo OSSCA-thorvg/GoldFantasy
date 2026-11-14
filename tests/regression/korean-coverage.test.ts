@@ -9,6 +9,7 @@ import { defaultLocale, hasHangul, setLocale, translate } from '../../packages/l
 import { korean } from '../../packages/localization/src/korean';
 import { combatPhrases } from '../../packages/localization/src/korean/combat';
 import { progressPhrases } from '../../packages/localization/src/korean/progress';
+import { expeditionResultPhrases } from '../../packages/localization/src/korean/expedition-result';
 import { Town } from '../../packages/engine/src/town';
 import { Activity, Calling, Monster, Person, Race, Role, callingName } from '../../packages/engine/src/person';
 import { CombatCue, MonsterRank, type Fallen } from '../../packages/engine/src/combat-events';
@@ -239,7 +240,7 @@ describe('Korean tables', () => {
       carried = new Set<string>();
     for (let lead = 0xb0; lead < 0xc9; ++lead)
       for (let trail = 0xa1; trail < 0xff; ++trail) carried.add(decoder.decode(new Uint8Array([lead, trail])));
-    const tables = [combatPhrases, progressPhrases],
+    const tables = [combatPhrases, progressPhrases, expeditionResultPhrases],
       used = new Set(tables.flatMap((t) => [...Object.values(t).join('')]).filter((c) => /[\uac00-\ud7a3]/.test(c)));
     expect([...used].filter((c) => !carried.has(c))).toEqual([]);
     const placeholders = (text: string) => [...text.matchAll(/\{(\d+)\}/g)].map((hit) => hit[1]).sort();
@@ -777,7 +778,7 @@ describe('beyond a gate in Korean, from the engine', () => {
   it('says so when the last one standing falls and the gate casts the party out', () => {
     const { town, members } = expedition(22);
     for (const p of members) town.strikeDown(p, 'Killed by monsters');
-    town.advance(0.1);
+    town.advance(2.2);
     expect(town.realmActive()).toBe(false);
     expectKorean(town.notices, namesOf(town));
   }, 120000);

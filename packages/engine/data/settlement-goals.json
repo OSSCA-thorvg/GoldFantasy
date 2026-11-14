@@ -9,7 +9,7 @@
   },
   {
     "title": "Build a workbench",
-    "description": "An open bench where residents craft wooden and stone tools and weapons, one at a time. It takes 4 wood.",
+    "description": "An open bench where residents make tools, one at a time. It takes 4 wood.",
     "kind": "Building",
     "building": "Workbench",
     "residents": 0,
@@ -17,7 +17,7 @@
   },
   {
     "title": "Craft a wooden axe",
-    "description": "A wooden axe fells trees faster than bare hands. Craft one at the workbench from 3 wood.",
+    "description": "A wooden axe fells trees faster than bare hands, straight from the pack. Craft one at the workbench from 3 wood.",
     "kind": "Craft",
     "building": "Count",
     "residents": 1,
@@ -41,8 +41,16 @@
     ]
   },
   {
-    "title": "Craft a first weapon",
-    "description": "A wooden sword, club, spear or short bow hits harder than fists. Craft one at the bench.",
+    "title": "Build a smithy",
+    "description": "Gather 12 wood and 8 stone with your new tools. The smithy makes weapons, shields and armor.",
+    "kind": "Building",
+    "building": "Weaponsmith",
+    "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Make a first weapon",
+    "description": "A wooden sword, club, spear, bow or staff hits harder than fists. Make one at the smithy.",
     "kind": "Craft",
     "building": "Count",
     "residents": 1,
@@ -51,12 +59,24 @@
       "wooden-sword",
       "wooden-club",
       "wooden-spear",
-      "short-bow"
+      "short-bow",
+      "wooden-staff"
+    ]
+  },
+  {
+    "title": "Make a shield",
+    "description": "A wooden shield in the free hand turns some blows aside. Make one at the smithy from 5 wood.",
+    "kind": "Craft",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Core",
+    "items": [
+      "shield"
     ]
   },
   {
     "title": "Equip both founders",
-    "description": "Crafted gear goes straight into a free hand. Give each founder a tool or a weapon of their own.",
+    "description": "Tools work straight from the pack; a weapon goes in the hand. Give each founder a tool or a weapon of their own.",
     "kind": "Equip",
     "building": "Count",
     "residents": 2,
@@ -103,6 +123,14 @@
     "branch": "Core"
   },
   {
+    "title": "Upgrade the workbench",
+    "description": "Pay 10 wood and 6 stone at the workbench: a resident works on it, and then it makes stone tools.",
+    "kind": "Station",
+    "building": "Workbench",
+    "residents": 2,
+    "branch": "Core"
+  },
+  {
     "title": "Lay a road",
     "description": "Draw and complete a road connected to the camp.",
     "kind": "Road",
@@ -132,6 +160,14 @@
     "kind": "Building",
     "building": "Quarry",
     "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Upgrade the smithy",
+    "description": "Needs a quarry and 4 residents. Pay 16 wood and 12 stone at the smithy: then it makes stone weapons, a reinforced shield and stone-studded armor.",
+    "kind": "Station",
+    "building": "Weaponsmith",
+    "residents": 2,
     "branch": "Core"
   },
   {
@@ -241,16 +277,16 @@
     "branch": "Arms"
   },
   {
-    "title": "Build a weaponsmith",
-    "description": "Needs a guild and 10 residents. Forges iron tools and weapons, far better than wooden ones.",
-    "kind": "Building",
+    "title": "Raise the smithy to iron",
+    "description": "Needs a floor cleared beyond a gate and 8 residents. Pay 20 gold, 8 planks and 8 cut stone at the smithy: then it forges iron.",
+    "kind": "Station",
     "building": "Weaponsmith",
-    "residents": 0,
+    "residents": 3,
     "branch": "Arms"
   },
   {
-    "title": "Forge a weapon",
-    "description": "Craft an iron weapon at the weaponsmith from a resident's equipment. Camp-made weapons do not count.",
+    "title": "Forge an iron weapon",
+    "description": "Make an iron weapon at the smithy, or upgrade a stone one there.",
     "kind": "Deed",
     "building": "Count",
     "residents": 1,
@@ -266,12 +302,17 @@
     "branch": "Arms"
   },
   {
-    "title": "Build an armorer",
-    "description": "Needs a floor cleared beyond a gate. Mail and shields keep your fighters on their feet.",
-    "kind": "Building",
-    "building": "Armorer",
-    "residents": 0,
-    "branch": "Arms"
+    "title": "Arm a fighter in iron",
+    "description": "An iron shield, mail armor or an iron helmet keeps a fighter on their feet. Make one at the smithy.",
+    "kind": "Craft",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Arms",
+    "items": [
+      "iron-shield",
+      "mail-armor",
+      "helmet"
+    ]
   },
   {
     "title": "Build an apothecary",

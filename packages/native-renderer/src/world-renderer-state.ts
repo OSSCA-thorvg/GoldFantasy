@@ -149,6 +149,8 @@ export class WorldRendererState {
   /** Combat shapes flat on the ground (telegraphs, skill areas, rings), under selection rings and figures. */
   combatGround = new SceneNode();
   prints = isoLayer();
+  /** Rain splashing on the ground and water, under every unit. */
+  splashes = isoLayer();
   overcast = new ShapeNode();
   precipitation = new ShapeNode();
   mapName = new SceneNode();
@@ -254,6 +256,7 @@ export class WorldRendererState {
       this.ornaments,
       this.roads,
       this.prints,
+      this.splashes,
       this.lights,
       // Combat marks lie under the selection and hover rings, so a ring stays readable on a skill's disc.
       this.combatGround,

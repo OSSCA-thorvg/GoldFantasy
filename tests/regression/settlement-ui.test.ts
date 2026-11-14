@@ -356,7 +356,8 @@ it('keeps Unit management open while equipping its selected resident without sel
   const ui = fixture();
   try {
     const p = ui.town.folk[0];
-    addInventory(p, 'axe');
+    // Tools work from the pack; what goes in a slot is held or worn, like a shield.
+    addInventory(p, 'shield');
     ui.app.rosterOpen = true;
     ui.app.rosterSelected = `units:${p.id}`;
     ui.app.chosen = [ui.town.folk[1].id];
@@ -370,14 +371,14 @@ it('keeps Unit management open while equipping its selected resident without sel
     expect(ui.controls.mock.calls.filter(([id]) => id.startsWith('inventory-slot-'))).toHaveLength(16);
     click('inventory-slot-1');
     draw();
-    click('equipment-slot-tool1');
-    expect(p.equipment.tool1).toBe(1);
+    click('equipment-slot-offhand');
+    expect(p.equipment.offhand).toBe(1);
     expect(ui.app.rosterOpen).toBe(true);
     click(`roster-person-units:${ui.town.folk[1].id}`);
     expect(ui.app.inventorySelected).toBe(-1);
     expect(ui.app.equipmentTab).toBe('equipment');
     expect(ui.app.rosterSelected).toBe(`units:${ui.town.folk[1].id}`);
-    expect(p.equipment.tool1).toBe(1);
+    expect(p.equipment.offhand).toBe(1);
     expect(ui.app.chosen).toEqual([ui.town.folk[1].id]);
     expect(ui.app.selectPeople).not.toHaveBeenCalled();
     // Crafting is done at a workbench in the world; the unit window only leads there.
@@ -718,8 +719,10 @@ it('equips the selected real inventory stack through the centered gear grid with
     ui.app.rosterOpen = true;
     ui.app.rosterSelected = `units:${p.id}`;
     expect(p.inventory.every((item) => item === null)).toBe(true);
+    expect(p.equipment.offhand).toBe(-1);
+    addInventory(p, 'shield');
+    // No slots for tools: they work from the pack.
     expect(p.equipment.tool1).toBe(-1);
-    addInventory(p, 'axe');
     const draw = () => ui.draw(() => rosterPanel.call(ui.app, rosterBounds.call(ui.app, 880, 600)));
     draw();
     expect(ui.controls.mock.calls.some((call) => call[0] === 'unit-auto')).toBe(false);
@@ -731,15 +734,16 @@ it('equips the selected real inventory stack through the centered gear grid with
     };
     click('inventory-slot-1');
     draw();
-    click('equipment-slot-tool1');
-    expect(p.equipment.tool1).toBe(1);
+    expect(ui.controls.mock.calls.some((call) => call[0] === 'equipment-slot-tool1')).toBe(false);
+    click('equipment-slot-offhand');
+    expect(p.equipment.offhand).toBe(1);
     expect(p.inventory.filter(Boolean)).toHaveLength(1);
-    expect(p.inventory[0]).toEqual({ item: 'axe', quantity: 1 });
+    expect(p.inventory[0]).toEqual({ item: 'shield', quantity: 1 });
     ui.app.inventorySelected = -1;
     draw();
-    click('equipment-slot-tool1');
-    expect(p.equipment.tool1).toBe(-1);
-    expect(p.inventory[0]?.item).toBe('axe');
+    click('equipment-slot-offhand');
+    expect(p.equipment.offhand).toBe(-1);
+    expect(p.inventory[0]?.item).toBe('shield');
   } finally {
     ui.dispose();
   }
@@ -796,7 +800,8 @@ it.each([
     const grid = ui.controls.mock.calls.filter(
       (call) => call[0].startsWith('inventory-slot-') || call[0].startsWith('equipment-slot-'),
     );
-    expect(grid).toHaveLength(25);
+    // Sixteen bag cells and seven gear slots: tools have none, they work from the pack.
+    expect(grid).toHaveLength(23);
     for (const [id, r] of grid) {
       expect(r.x, id).toBeGreaterThanOrEqual(panel.x);
       expect(r.x + r.w, id).toBeLessThanOrEqual(panel.x + panel.w);
@@ -869,9 +874,9 @@ it.each([
   [Structure.Weaponsmith, 'none'],
   [Structure.Weaponsmith, 'foreign'],
   [Structure.Weaponsmith, 'local'],
-  [Structure.Armorer, 'none'],
-  [Structure.Armorer, 'foreign'],
-  [Structure.Armorer, 'local'],
+  [Structure.Workbench, 'none'],
+  [Structure.Workbench, 'foreign'],
+  [Structure.Workbench, 'local'],
 ] as const)('chooses a workshop %s resident from its own camp with %s selection', (kind, selected) => {
   const ui = fixture();
   try {
@@ -906,7 +911,7 @@ it.each([
     // The station's own panel names the crafter: someone of its camp, the selected one first.
     const expected = selected === 'local' ? preferred : local;
     expect(stationCrafter(ui.app, smith)?.id).toBe(expected.id);
-    expect(ui.town.craftReason(expected.id, smith.id, kind === Structure.Weaponsmith ? 'axe' : 'cap')).toBe(
+    expect(ui.town.craftReason(expected.id, smith.id, kind === Structure.Weaponsmith ? 'wooden-sword' : 'wooden-axe')).toBe(
       '',
     );
     ui.draw(() => inspector.call(ui.app, new Rect(100, 100, 620, 420), true));

@@ -1,4 +1,4 @@
-import { Product, Resources, Structure } from './building-catalog';
+import { Product, Resources, Structure, resourceKeys } from './building-catalog';
 import { Activity, type Person } from './person';
 
 export const inventoryColumns = 4,
@@ -67,7 +67,7 @@ export interface ItemSpec {
   rate: number;
   /** What the head, blade or body is made of, for drawing; null where it means nothing (resources, cloth, leather). */
   material: ItemMaterial | null;
-  /** Where it is crafted. */
+  /** Where it is crafted; null for what is no longer made (old saves still hold it). */
   workshop: Structure | null;
   cost: Resources;
   seconds: number;
@@ -75,6 +75,14 @@ export interface ItemSpec {
   huntBonus: number;
   /** Kilograms more carried before slowing and before the pack is full. */
   carry: number;
+  /** Make within its kind: 1 wood, 2 stone, 3 iron; 0 outside the tiers. */
+  tier: number;
+  /** The level its workshop must have reached to make it. */
+  stationLevel: number;
+  /** Share of blows a shield turns aside; 0 for everything else. */
+  block: number;
+  /** Hands it takes; a shield needs the other one free. */
+  hands: 1 | 2;
 }
 export interface ItemStack {
   item: string;
@@ -92,33 +100,49 @@ export const emptyEquipment = (): Equipment => ({
   offhand: -1,
   accessory: -1,
 });
-const entry = (id: string, name: string, data: Partial<ItemSpec>): ItemSpec => ({
-  id,
-  name,
-  category: 'resource',
-  description: name,
-  maximumStack: 20,
-  minimumLevel: 1,
-  slots: [],
-  visual: null,
-  product: Product.None,
-  weight: 1,
-  attackBonus: 0,
-  defense: 0,
-  reach: 0.9,
-  work: [],
-  rate: 0,
-  material: null,
-  workshop: null,
-  cost: new Resources(),
-  seconds: 5,
-  huntBonus: 0,
-  carry: 0,
-  ...data,
-});
+const tierOf: Record<ItemMaterial, number> = { wood: 1, stone: 2, iron: 3 };
+// Long hafts, bows and staves take both hands, as the renderer poses them.
+const twoHandedVisuals: readonly (EquipmentVisual | null)[] = ['axe', 'pickaxe', 'hoe', 'shovel', 'spear', 'bow', 'staff'];
+const entry = (id: string, name: string, data: Partial<ItemSpec>): ItemSpec => {
+  const item: ItemSpec = {
+    id,
+    name,
+    category: 'resource',
+    description: name,
+    maximumStack: 20,
+    minimumLevel: 1,
+    slots: [],
+    visual: null,
+    product: Product.None,
+    weight: 1,
+    attackBonus: 0,
+    defense: 0,
+    reach: 0.9,
+    work: [],
+    rate: 0,
+    material: null,
+    workshop: null,
+    cost: new Resources(),
+    seconds: 5,
+    huntBonus: 0,
+    carry: 0,
+    tier: 0,
+    stationLevel: 1,
+    block: 0,
+    hands: 1,
+    ...data,
+  };
+  return {
+    ...item,
+    tier: data.tier ?? (item.category !== 'resource' && item.material ? tierOf[item.material] : 0),
+    hands: data.hands ?? (twoHandedVisuals.includes(item.visual) ? 2 : 1),
+  };
+};
 export const bareHandsRate = 0.4,
   woodenRate = 0.7,
   stoneRate = 0.85;
+/** An upgrade costs this share of making the better item from scratch, and takes this share of its time. */
+export const upgradeShare = 0.6;
 const tool = (
   id: string,
   name: string,
@@ -137,11 +161,13 @@ const tool = (
     rate: 1,
     material: 'iron',
     attackBonus,
-    workshop: Structure.Weaponsmith,
+    workshop: Structure.Workbench,
+    stationLevel: 3,
     cost: new Resources(2, wood, stone),
-    description: `Improves ${work.join(' and ')}; can serve as a melee weapon.`,
+    seconds: 12,
+    description: 'Made at a workbench fitted for iron. The best tool of its kind; it can serve as a weapon at a pinch.',
   });
-// Wooden gear: whittled at a workbench from wood and a little stone, no gold, weaker than the smith's.
+// Wooden tools: whittled at a first workbench from wood and a little stone, no gold.
 const woodenTool = (
   id: string,
   name: string,
@@ -150,16 +176,22 @@ const woodenTool = (
   attackBonus: number,
   wood: number,
   stone: number,
-): ItemSpec => ({
-  ...tool(id, name, visual, work, attackBonus, wood, stone),
-  rate: woodenRate,
-  material: 'wood',
-  workshop: Structure.Workbench,
-  cost: new Resources(0, wood, stone),
-  seconds: 6,
-  description: `Made at a workbench. Improves ${work.join(' and ')}, though less than the smith's tools.`,
-});
-// Stone gear: a stone head lashed to a haft at the workbench; between wood and the smith's iron.
+): ItemSpec =>
+  entry(id, name, {
+    category: 'tool',
+    maximumStack: 1,
+    slots: ['tool1', 'tool2'],
+    visual,
+    work,
+    rate: woodenRate,
+    material: 'wood',
+    attackBonus,
+    workshop: Structure.Workbench,
+    cost: new Resources(0, wood, stone),
+    seconds: 6,
+    description: 'Made at a workbench. Better than bare hands; stone and iron tools are better still.',
+  });
+// Stone tools: a stone head lashed to a haft, once the workbench has been upgraded.
 const stoneTool = (
   id: string,
   name: string,
@@ -172,42 +204,30 @@ const stoneTool = (
   ...woodenTool(id, name, visual, work, attackBonus, wood, stone),
   rate: stoneRate,
   material: 'stone',
+  tier: 2,
+  stationLevel: 2,
   seconds: 9,
-  description: `Made at a workbench with a stone head. Improves ${work.join(' and ')}: better than wood, short of the smith's iron.`,
+  description: 'Made at an upgraded workbench with a stone head: better than wood, short of iron.',
 });
 const shovelText =
     'Digs: lays and mends roads and breaks in new fields, faster than a hammer or a hoe of the same make.',
   sickleText = "Cuts the standing crop: a farmhand's field work in summer and autumn goes faster than with a hoe.",
   spearText = 'A long thrusting weapon: reaches farther than a sword and runs through one enemy behind its target.';
-const woodenWeapon = (
-  id: string,
-  name: string,
-  visual: EquipmentVisual,
-  attackBonus: number,
-  reach: number,
-  wood: number,
-): ItemSpec =>
-  entry(id, name, {
-    category: 'weapon',
-    maximumStack: 1,
-    slots: ['weapon'],
-    visual,
-    attackBonus,
-    reach,
-    material: 'wood',
-    workshop: Structure.Workbench,
-    cost: new Resources(0, wood),
-    seconds: 8,
-    description: "Made at a workbench. Hits harder than fists, though less than the smith's weapons.",
-  });
+const smithText = [
+  '',
+  'Made at the smithy. Hits harder than fists; stone and iron hit harder still.',
+  'Made at an upgraded smithy with a stone head or edge: harder than wood, short of iron.',
+  'Forged in iron at the smithy at its highest level: the hardest-hitting of its kind.',
+];
+/** A smithy weapon of `tier`; the smithy must be at that level, the wielder at `level`. */
 const weapon = (
   id: string,
   name: string,
   visual: EquipmentVisual,
   material: ItemMaterial,
+  tier: number,
   attackBonus: number,
   reach: number,
-  level: number,
   cost: Resources,
 ): ItemSpec =>
   entry(id, name, {
@@ -216,12 +236,40 @@ const weapon = (
     slots: ['weapon'],
     visual,
     material,
+    tier,
     attackBonus,
     reach,
-    minimumLevel: level,
+    minimumLevel: smithLevels[tier],
     workshop: Structure.Weaponsmith,
+    stationLevel: tier,
     cost,
-    description: 'Made by the smith: hits harder than anything from the workbench.',
+    seconds: smithSeconds[tier],
+    description: visual === 'spear' ? spearText : smithText[tier],
+  });
+/** Level a resident needs to wield or wear smithy gear of each tier. */
+const smithLevels = [1, 1, 3, 5],
+  smithSeconds = [8, 8, 12, 16];
+const shieldText = [
+  '',
+  'A round board shield for the free hand: turns some blows aside. Not with a spear, a bow or a staff.',
+  'A board shield studded with stone: turns more blows aside. Not with a spear, a bow or a staff.',
+  'An iron-rimmed shield: turns the most blows aside. Not with a spear, a bow or a staff.',
+];
+const shield = (id: string, name: string, material: ItemMaterial, tier: number, block: number, weight: number, cost: Resources) =>
+  entry(id, name, {
+    category: 'armor',
+    material,
+    tier,
+    weight,
+    maximumStack: 1,
+    slots: ['offhand'],
+    block,
+    minimumLevel: smithLevels[tier],
+    workshop: Structure.Weaponsmith,
+    stationLevel: tier,
+    cost,
+    seconds: smithSeconds[tier],
+    description: shieldText[tier],
   });
 const armor = (
   id: string,
@@ -241,10 +289,26 @@ const armor = (
     slots: [slot],
     defense,
     minimumLevel: level,
-    workshop: Structure.Armorer,
     cost,
+    // No longer made; kept so the ones residents own keep working.
+    tier: material ? undefined : 1,
     description: 'Worn armor that takes part of every blow.',
   });
+const bodyText = [
+  '',
+  'Laced wooden slats worn over the tunic: takes part of every blow.',
+  'Hide sewn with stone plates: takes more of every blow, and weighs more.',
+  'Iron rings: takes the most of every blow, and weighs the most.',
+];
+const bodyArmor = (id: string, name: string, material: ItemMaterial, tier: number, defense: number, weight: number, cost: Resources) => ({
+  ...armor(id, name, 'body', defense, smithLevels[tier], cost, material),
+  tier,
+  weight,
+  workshop: Structure.Weaponsmith,
+  stationLevel: tier,
+  seconds: smithSeconds[tier] + 2,
+  description: bodyText[tier],
+});
 export const itemCatalog: readonly ItemSpec[] = [
   entry('wood', 'Wood', { product: Product.Wood }),
   entry('stone', 'Stone', { product: Product.Stone }),
@@ -272,10 +336,11 @@ export const itemCatalog: readonly ItemSpec[] = [
     seconds: 6,
     description: 'Skins and butchers the kill: a hunt brings home more food and bones.',
   },
-  woodenWeapon('wooden-sword', 'Wooden sword', 'sword', 0.5, 0.9, 4),
-  woodenWeapon('wooden-club', 'Wooden club', 'mace', 0.45, 0.9, 4),
-  woodenWeapon('short-bow', 'Short bow', 'bow', 0.35, 2.6, 5),
-  { ...woodenWeapon('wooden-spear', 'Wooden spear', 'spear', 0.4, 1.4, 4), description: spearText },
+  weapon('wooden-sword', 'Wooden sword', 'sword', 'wood', 1, 0.5, 0.9, new Resources(0, 4)),
+  weapon('wooden-club', 'Wooden club', 'mace', 'wood', 1, 0.45, 0.9, new Resources(0, 4)),
+  weapon('short-bow', 'Short bow', 'bow', 'wood', 1, 0.35, 2.6, new Resources(0, 5)),
+  weapon('wooden-spear', 'Wooden spear', 'spear', 'wood', 1, 0.4, 1.4, new Resources(0, 4)),
+  weapon('wooden-staff', 'Wooden staff', 'staff', 'wood', 1, 0.15, 1.6, new Resources(0, 4)),
   entry('pack-basket', 'Pack basket', {
     category: 'armor',
     maximumStack: 1,
@@ -297,19 +362,35 @@ export const itemCatalog: readonly ItemSpec[] = [
   tool('saw', 'Iron saw', 'saw', ['sawing'], 0.35, 2, 2),
   { ...tool('shovel', 'Iron shovel', 'shovel', ['digging'], 0.35, 2, 2), rate: 1.3, description: shovelText },
   { ...tool('sickle', 'Iron sickle', 'sickle', ['reaping'], 0.3, 1, 2), rate: 1.3, description: sickleText },
-  weapon('sword', 'Iron sword', 'sword', 'iron', 1.2, 0.9, 2, new Resources(8, 1, 4)),
-  weapon('bow', 'Hunting bow', 'bow', 'wood', 0.8, 3, 2, new Resources(6, 5, 1)),
-  weapon('staff', 'Rune staff', 'staff', 'wood', 0.9, 2.5, 3, new Resources(8, 4, 1, 0, 2)),
-  weapon('mace', 'Stone mace', 'mace', 'stone', 1, 0.9, 2, new Resources(6, 2, 4)),
-  { ...weapon('spear', 'Iron spear', 'spear', 'iron', 1, 1.4, 2, new Resources(7, 3, 3)), description: spearText },
+  weapon('flint-sword', 'Flint sword', 'sword', 'stone', 2, 0.8, 0.9, new Resources(0, 2, 4)),
+  weapon('mace', 'Stone mace', 'mace', 'stone', 2, 0.75, 0.9, new Resources(0, 2, 4)),
+  weapon('bow', 'Hunting bow', 'bow', 'wood', 2, 0.55, 2.8, new Resources(0, 5, 2)),
+  weapon('flint-spear', 'Flint spear', 'spear', 'stone', 2, 0.65, 1.4, new Resources(0, 3, 3)),
+  weapon('staff', 'Rune staff', 'staff', 'stone', 2, 0.6, 2.5, new Resources(0, 4, 3)),
+  weapon('sword', 'Iron sword', 'sword', 'iron', 3, 1.2, 0.9, new Resources(8, 1, 4)),
+  weapon('iron-mace', 'Iron mace', 'mace', 'iron', 3, 1.1, 0.9, new Resources(7, 1, 4)),
+  weapon('longbow', 'Longbow', 'bow', 'wood', 3, 0.8, 3, new Resources(6, 6, 1)),
+  weapon('spear', 'Iron spear', 'spear', 'iron', 3, 1, 1.4, new Resources(7, 3, 3)),
+  weapon('seer-staff', "Seer's staff", 'staff', 'iron', 3, 0.9, 2.5, new Resources(8, 4, 2)),
+  shield('shield', 'Wooden shield', 'wood', 1, 0.15, 1, new Resources(0, 5)),
+  shield('reinforced-shield', 'Reinforced shield', 'stone', 2, 0.24, 1.5, new Resources(0, 3, 4)),
+  shield('iron-shield', 'Iron shield', 'iron', 3, 0.32, 2, new Resources(6, 2, 4)),
+  bodyArmor('wooden-armor', 'Wooden armor', 'wood', 1, 0.06, 2, new Resources(0, 8)),
+  bodyArmor('studded-armor', 'Stone-studded armor', 'stone', 2, 0.12, 3, new Resources(0, 4, 8)),
+  bodyArmor('mail-armor', 'Mail armor', 'iron', 3, 0.2, 4, new Resources(12, 0, 8)),
+  {
+    // Light enough for a level 3 head, as it always was.
+    ...armor('helmet', 'Iron helmet', 'head', 0.06, 3, new Resources(6, 0, 4), 'iron'),
+    workshop: Structure.Weaponsmith,
+    stationLevel: 3,
+    seconds: smithSeconds[3],
+    description: 'An iron cap for the head: takes a little of every blow.',
+  },
   armor('cap', 'Leather cap', 'head', 0.03, 1, new Resources(2, 1, 0, 2)),
-  armor('helmet', 'Iron helmet', 'head', 0.08, 3, new Resources(6, 0, 4), 'iron'),
   armor('leather-armor', 'Leather armor', 'body', 0.1, 1, new Resources(4, 2, 0, 4)),
-  armor('mail-armor', 'Mail armor', 'body', 0.2, 5, new Resources(12, 0, 8), 'iron'),
   armor('robe', 'Runic robe', 'body', 0.08, 2, new Resources(5, 1, 0, 3, 1)),
   armor('boots', 'Leather boots', 'feet', 0.04, 1, new Resources(3, 1, 0, 2)),
   armor('gloves', 'Work gloves', 'hands', 0.03, 1, new Resources(2, 1, 0, 1)),
-  armor('shield', 'Wooden shield', 'offhand', 0.1, 2, new Resources(4, 4, 1), 'wood'),
   armor('cloak', 'Travel cloak', 'accessory', 0.04, 1, new Resources(3, 1, 0, 2)),
 ];
 const items = new Map(itemCatalog.map((item) => [item.id, item]));
@@ -336,40 +417,67 @@ export function equippedItem(person: Person, slot: EquipmentSlot): ItemSpec | nu
     ? item
     : null;
 }
+/** Tools a resident carries, equipped or anywhere in the pack, that they are of a level to use. */
+export function carriedTools(person: Person): HeldItem[] {
+  const out: HeldItem[] = [];
+  for (const stack of person.inventory) {
+    const item = stack?.quantity === 1 ? itemSpec(stack.item) : null;
+    if (item?.category === 'tool' && item.minimumLevel <= person.level && isHeld(item) && !out.includes(item))
+      out.push(item);
+  }
+  return out;
+}
+/** The equipped weapon, else the hardest-hitting tool carried, else bare hands (null). */
 export function combatItem(person: Person): HeldItem | null {
   const weapon = equippedItem(person, 'weapon');
   if (weapon) return weapon;
-  const tools = [equippedItem(person, 'tool1'), equippedItem(person, 'tool2')].filter(
-    (item): item is HeldItem => !!item,
-  );
-  return tools.sort((a, b) => b.attackBonus - a.attackBonus || a.id.localeCompare(b.id))[0] ?? null;
+  return carriedTools(person).sort((a, b) => b.attackBonus - a.attackBonus || a.id.localeCompare(b.id))[0] ?? null;
 }
-/** The best equipped tool for any of `kinds`; with none, the work goes at `bareHandsRate`. */
+/** The best tool carried for any of `kinds`, equipped or in the pack; with none, the work goes at `bareHandsRate`. */
 export function toolFor(person: Person, kinds: readonly WorkKind[]): HeldItem | null {
   let best: HeldItem | null = null;
-  for (const item of [equippedItem(person, 'tool1'), equippedItem(person, 'tool2')])
-    if (item && item.work.some((kind) => kinds.includes(kind)) && (!best || item.rate > best.rate)) best = item;
+  for (const item of carriedTools(person))
+    if (item.work.some((kind) => kinds.includes(kind)) && (!best || item.rate > best.rate || (item.rate === best.rate && item.id < best.id)))
+      best = item;
   return best;
 }
 export const taskEfficiency = (person: Person, kinds: readonly WorkKind[]): number =>
   toolFor(person, kinds)?.rate ?? bareHandsRate;
 const roadKinds: readonly WorkKind[] = ['construction', 'digging'];
-/** The best equipped tool for `kind`. On a road a shovel serves as well as a hammer, so it is the one in hand. */
+/** The best tool carried for `kind`. On a road a shovel serves as well as a hammer, so it is the one in hand. */
 export function workItem(person: Person, kind: WorkKind): HeldItem | null {
   return toolFor(person, kind === 'construction' && person.activity === Activity.Roadwork ? roadKinds : [kind]);
 }
-/** The equipped item that adds most to a hunt's food and bones, or null. */
+/** The item that adds most to a hunt's food and bones: a carried tool or worn gear, or null. */
 export function huntItem(person: Person): ItemSpec | null {
   let best: ItemSpec | null = null;
-  for (const slot of equipmentSlots) {
-    const item = equippedItem(person, slot);
+  for (const item of [...carriedTools(person), ...equipmentSlots.map((slot) => equippedItem(person, slot))])
     if (item && item.huntBonus > (best?.huntBonus ?? 0)) best = item;
-  }
   return best;
 }
-/** Kilograms the equipped gear adds to what a resident carries before slowing and before the pack is full. */
+/** Kilograms the worn gear adds to what a resident carries before slowing and before the pack is full. */
 export const carryBonus = (person: Person): number =>
   equipmentSlots.reduce((total, slot) => total + (equippedItem(person, slot)?.carry ?? 0), 0);
+/** The resident carries this item, or a make of the same kind: 'held' equipped, 'owned' in the pack, 'better' a stronger make. */
+export function ownedMake(person: Person, item: ItemSpec): 'held' | 'owned' | 'better' | '' {
+  let found: 'held' | 'owned' | 'better' | '' = '';
+  person.inventory.forEach((stack, index) => {
+    const other = stack ? itemSpec(stack.item) : null;
+    if (!other) return;
+    if (other.id === item.id) {
+      const worn = equipmentSlots.some((slot) => person.equipment[slot] === index + 1);
+      if (worn && item.category !== 'tool') found = 'held';
+      else if (found !== 'held') found = 'owned';
+    } else if (!found && betterMake(other, item)) found = 'better';
+  });
+  return found;
+}
+/** True when the resident carries nothing of this item's kind, of any make. */
+export const lacksKind = (person: Person, item: ItemSpec): boolean =>
+  !person.inventory.some((stack) => {
+    const other = stack ? itemSpec(stack.item) : null;
+    return !!other && (other.id === item.id || (other.tier > 0 && item.tier > 0 && lineOf(other) === lineOf(item)));
+  });
 export const craftsAt = (item: ItemSpec, kind: Structure): boolean => item.workshop !== null && kind === item.workshop;
 /** Buildings where residents craft, one at a time, in the open at the door. */
 export const isCraftStation = (kind: Structure): boolean =>
@@ -398,20 +506,46 @@ const workVerbs: Record<WorkKind, string> = {
   digging: 'Tills and lays roads',
   reaping: 'Tends summer and autumn crops',
 };
-const materialRank = (item: ItemSpec): number => ['wood', 'stone', 'iron'].indexOf(item.material ?? '');
-/** The next weaker make of the same shape and job (stone axe for an iron one), or null. */
+/** Items of one kind in different makes share a line: a wooden, a flint and an iron sword. */
+export const lineOf = (item: ItemSpec): string =>
+  `${item.category}|${item.visual ?? item.slots.join()}|${item.work.join()}`;
+const sameLine = (a: ItemSpec, b: ItemSpec): boolean => a.tier > 0 && b.tier > 0 && lineOf(a) === lineOf(b);
+/** The next weaker make of the same kind (stone axe for an iron one), preferring what is still made, or null. */
 export function lowerTier(item: ItemSpec): ItemSpec | null {
   let best: ItemSpec | null = null;
   for (const other of itemCatalog)
     if (
-      other.visual === item.visual &&
-      other.category === item.category &&
-      other.work.join() === item.work.join() &&
-      materialRank(other) < materialRank(item) &&
-      (!best || materialRank(other) > materialRank(best))
+      sameLine(other, item) &&
+      other.tier < item.tier &&
+      (!best ||
+        other.tier > best.tier ||
+        (other.tier === best.tier && best.workshop === null && other.workshop !== null))
     )
       best = other;
   return best;
+}
+/** The next better make that is still made (a flint sword for a wooden one), or null at the top. */
+export function upperTier(item: ItemSpec): ItemSpec | null {
+  let best: ItemSpec | null = null;
+  for (const other of itemCatalog)
+    if (sameLine(other, item) && other.workshop !== null && other.tier > item.tier && (!best || other.tier < best.tier))
+      best = other;
+  return best;
+}
+/** True when `better` is a stronger make of the same kind as `item`. */
+export const betterMake = (better: ItemSpec, item: ItemSpec): boolean => sameLine(better, item) && better.tier > item.tier;
+/** What turning a weaker make into `target` costs: a share of making it new, rounded up. */
+export function upgradeCost(target: ItemSpec): Resources {
+  const out = new Resources();
+  for (const key of resourceKeys) out[key] = Math.ceil(target.cost[key] * upgradeShare - 1e-9);
+  return out;
+}
+export const upgradeSeconds = (target: ItemSpec): number => Math.round(target.seconds * upgradeShare * 10) / 10;
+export const isShield = (item: ItemSpec | null): boolean => !!item && item.block > 0 && item.slots.includes('offhand');
+/** The shield this resident can raise: one in the off hand while the item in hand leaves that hand free. */
+export function raisedShield(person: Person): ItemSpec | null {
+  const shield = equippedItem(person, 'offhand');
+  return isShield(shield) && (combatItem(person)?.hands ?? 1) === 1 ? shield : null;
 }
 /** What gear changes in plain words; tiers read apart by naming the make they beat. Empty for resources. */
 export function gearEffect(item: ItemSpec): string {
@@ -425,9 +559,12 @@ export function gearEffect(item: ItemSpec): string {
     if (!lower && item.work[0] === 'reaping') return `${verb} faster than a hoe`;
     return `${verb} faster${than}`;
   }
+  if (isShield(item)) return lower ? `Turns more blows aside${than}` : 'Turns some blows aside';
   if (item.visual === 'spear')
     return lower ? `Hits harder${than} and runs an enemy through` : 'Reaches further and runs an enemy through';
   if (item.category === 'weapon') return lower ? `Hits harder${than}` : 'Hits harder than fists';
+  if (item.category === 'armor' && item.slots.includes('body') && item.workshop !== null)
+    return lower ? `Takes less damage than ${lower.name.toLowerCase()}` : 'Takes less damage';
   if (item.category === 'armor') return item.defense >= 0.15 ? 'Takes much less damage' : 'Takes less damage';
   return '';
 }

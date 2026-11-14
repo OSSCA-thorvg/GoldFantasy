@@ -76,6 +76,8 @@ export enum Cue {
   WaveHorn,
   /** A resident struck down: the same crash as `Slam`, mixed above the crowd. */
   Downed,
+  /** A bard's lyre phrase; `take` names the phrase. */
+  Lyre,
   Count,
 }
 export enum SpeechChannel {

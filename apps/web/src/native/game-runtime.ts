@@ -11,6 +11,7 @@ import type { Key } from '../../../../packages/native-ui/src';
 export interface GameRuntime extends GameEditorsApp {
   handlePrayerEvent?(event: AppEvent): boolean;
   handleExpeditionEvent?(event: AppEvent): boolean;
+  handleResultEvent?(event: AppEvent): boolean;
   handleTouchEvent?(event: AppEvent): boolean;
   state(): Town;
   view(): Camera;

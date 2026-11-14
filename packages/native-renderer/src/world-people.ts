@@ -24,6 +24,10 @@ import * as woodcutting from '../../engine/src/woodcutting';
 import { harvestTiming, harvestDuration, hammerTiming, workElapsed } from '../../engine/src/work-timing';
 import { workItem, equippedItem, itemSpec, toolFor, type WorkKind } from '../../engine/src/equipment';
 import { ceremonySeconds } from '../../engine/src/town-devotion';
+import { playing } from '../../engine/src/bard-phrases';
+import { humanoidClips } from './humanoid-rig';
+import { clipTurn } from './rig-clip';
+import { poseArm } from './person-arm';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { registerPick } from './world-pick-registry';
 import { WorldRendererState } from './world-renderer-state';
@@ -408,19 +412,30 @@ export function moveAgents(
       // The piece shows what it is made of; the bench's own knife is flint.
       made && craftLift > 0 ? materialOf(made) : made && !pounding ? 'stone' : heldMaterial(person, tool),
     );
-    figure.parts.lute?.opacity(
-      fighting ||
+    const handsBusy =
+        fighting ||
         chopping ||
         miningNow ||
-        workContact ||
+        !!workContact ||
         hammering ||
         farming ||
         processing ||
         praying ||
-        made
-        ? 0
-        : 255,
-    );
+        !!made,
+      // A bard plays a phrase standing or strolling, whenever the hands are free.
+      strumming =
+        !s.sceneView &&
+        !!figure.parts.luteHeld &&
+        !handsBusy &&
+        !trade &&
+        !person.inside &&
+        !crossing &&
+        collecting === 0 &&
+        person.activity !== Activity.Tending &&
+        playing(person, town.clock());
+    figure.parts.lute?.opacity(handsBusy || strumming ? 0 : 255);
+    figure.parts.luteHeld?.opacity(strumming ? 255 : 0);
+    if (strumming) showEquipment(figure.parts, null);
     if (tool === 'bow') poseBow(figure.parts, 0);
     figure.parts.arrow?.opacity(0);
     if (!s.sceneView) {
@@ -494,6 +509,15 @@ export function moveAgents(
         // Ordered to hold: braced where they stand, weapon ready.
         else if (person.holding && tool) animateBrace(figure.parts, tool, town.clock() + person.id * 0.37);
       }
+    }
+    if (strumming) {
+      // Only the arms and the head play, so the walk under them goes on.
+      const clip = humanoidClips.play,
+        frame = ((town.clock() - person.phraseAt) * 30) % clip.frames,
+        turn = (bone: string) => clipTurn(clip, bone, frame);
+      poseArm(figure.parts.arms[1], turn('arm.r.1'), turn('arm.r.2'), turn('hand.r'));
+      poseArm(figure.parts.arms[0], turn('arm.l.1'), turn('arm.l.2'), turn('hand.l'));
+      figure.parts.nod = turn('head');
     }
     const job =
         person.activity === Activity.Hauling && person.carrying === 0 ? town.building(person.job) : null,

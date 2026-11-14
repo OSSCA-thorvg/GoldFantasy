@@ -54,6 +54,8 @@ function priority(cue: Cue): number {
     case Cue.Splash:
       return 3;
     case Cue.Spawn:
+    // A bard's tune gives way to anything else that needs the slot.
+    case Cue.Lyre:
       return 1;
     case Cue.Click:
     case Cue.Order:
@@ -144,6 +146,8 @@ function interval(cue: Cue): number {
       return 3;
     case Cue.WaveHorn:
       return 4;
+    case Cue.Lyre:
+      return 2;
     case Cue.Raven:
       return 4;
     case Cue.Pig:
@@ -280,6 +284,8 @@ export class EffectManager {
         sound.cue === Cue.BroodBreak ||
         sound.cue === Cue.WaveHorn ||
         sound.cue === Cue.DenFall ||
+        // One lyre at a time: two bards never sound over each other.
+        sound.cue === Cue.Lyre ||
         thunder(sound.cue)
           ? 1
           : 2;

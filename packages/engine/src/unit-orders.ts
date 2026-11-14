@@ -56,6 +56,7 @@ export interface OrderTown extends TownState {
 export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1): void {
   this.commanded();
   clearAutomaticConstruction(p);
+  p.clearing = -1;
   if (task !== Activity.Training) p.trainingCalling = -1;
   if (task !== Activity.Crafting) { p.craftItem = null; p.craftWorkshop = -1; p.craftProgress = 0; }
   p.approachingOrder = false;
@@ -78,6 +79,7 @@ export function orderStop(this: OrderTown, ids: number[]): void {
   for (const p of this.folk) {
     if (!canControl(p, this.controlFaction) || beyondOrders(p) || !ids.includes(p.id)) continue;
     p.approachingOrder = false;
+    p.clearing = -1;
     p.hunting = false; p.attackPerson = p.workField = -1;
     p.recoveringRest = p.recoveringHealth = false;
     p.autoMode = false;

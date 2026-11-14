@@ -15,6 +15,8 @@ import type { GameHudApp } from './game-hud-contract';
 import { worldTarget, landmarkDescription } from './world-targets';
 import type { GameCommandApp } from './game-commands';
 import { actionButton } from './hud-actions';
+import { clearRows, objectClearTarget } from './clear-order-hud';
+import type { InspectorRows } from './game-progress-hud';
 function fitted(context: Context, model: Paint, frame: Rect): Paint {
   const holder = new context.tvg.Scene(),
     bounds = model.bounds();
@@ -102,6 +104,12 @@ export function worldObjectPanel(this: GameHudApp, panel: Rect): void {
       false,
       this.objectPage < targets.length - 1,
     );
+    const clearing = objectClearTarget(this);
+    if (clearing) {
+      const out: InspectorRows = { rows: [], left: panel.x + 16, inner: panel.w - 32, top: panel.y, y: 84 };
+      clearRows(this, clearing, out);
+      for (const row of out.rows) row();
+    }
     if (target.kind === 'building')
       actionButton(c, 'objects-inspect', new Rect(panel.x + 96, y, 70, 28), 'build', 'Inspect building', () =>
         this.selectBuilding(target.id),

@@ -19,7 +19,14 @@ import { createEquipment, type HeldTool, type ToolMaterial } from './person-equi
 import { equippedItem } from '../../engine/src/equipment';
 import { wearableBack, wearableBody } from './person-wearables';
 import { createWorkProps } from './work-motion';
-import { garmentBack, garmentFront, garmentOf, wardrobeOf, type Wardrobe } from './calling-garments';
+import {
+  garmentBack,
+  garmentFront,
+  garmentOf,
+  heldLyre,
+  wardrobeOf,
+  type Wardrobe,
+} from './calling-garments';
 import { dusk } from './form-paint';
 import { drawHead, expressionOf, streetFinish, type FaceRig } from './likeness-head';
 import { oval as ring, pen, shapeOf } from './outline-form';
@@ -38,6 +45,8 @@ export class PersonParts {
   staff: PaintNode | null = null;
   mace: PaintNode | null = null;
   lute: PaintNode | null = null;
+  /** The bard's lyre held in front to play; hidden while it hangs on the back. */
+  luteHeld: PaintNode | null = null;
   /** Cloak hanging from the shoulders at `capeTop`; it trails the walk. */
   /** Eyes and brows, re-posed as the mood changes and the eyes blink. */
   face: FaceRig | null = null;
@@ -570,6 +579,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   }
 
   wearableBody(sprite, person, parts, height, broad);
+  if (parts.lute) sprite.add((parts.luteHeld = heldLyre(height)));
   sprite.add(head.front);
   for (const arm of parts.arms) sprite.add(arm.lower!);
   createEquipment(parts, person.calling);

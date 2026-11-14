@@ -54,6 +54,15 @@ export const townPhrases: Phrases = {
   'The seat of the settlement stays': '정착지의 본거지는 철거할 수 없습니다',
   'This field belongs to a neutral settlement': '중립 정착지의 밭입니다',
   'Nothing to clear': '철거할 것이 없습니다',
+  'Someone is working at this station': '누군가 이 작업대에서 일하고 있습니다',
+  // clear-order-hud: the Clear button in an inspector
+  'Clear it': '철거',
+  'Press again to clear': '한 번 더 누르면 철거',
+  'Residents will tear it down.': '주민들이 가서 허뭅니다.',
+  'Keep it': '그대로 두기',
+  'Marked for clearing: {0}% torn down': '철거 표시됨: {0}% 허묾',
+  'Tearing it down: {0}': '허무는 중: {0}',
+  'Waiting for free residents': '한가한 주민을 기다리는 중',
 
   // town-construction: notices
   'The chapel now follows the {0}': '예배당이 이제 따르는 신앙: {0}',
@@ -250,4 +259,18 @@ export const townPhrases: Phrases = {
   '{0} hunted (carrying {1} food)': '{0} 사냥 성공 (식량 {1} 운반 중)',
   '{0} hunted (+{1} food)': '{0} 사냥 성공 (식량 +{1})',
   '{0} fell while hunting': '{0}: 사냥 중에 쓰러졌습니다',
+  // Station levels and upgrades
+  "{0} raised the {1} to level {2}": "{0}: {1}을(를) {2}단계로 올렸습니다",
+  "{0} upgraded the {1} to the {2}": "{0}: {1}을(를) {2}(으)로 업그레이드했습니다",
+  "{0} in the pack · {1}": "{0} 짐에 넣음 · {1}",
+  "{0} level {1}": "{0} {1}단계",
+  "workbench": "작업대",
+  "smithy": "대장간",
+  "Needs a level {0} {1}": "{0}단계 {1} 필요",
+  "Build a smithy first": "먼저 대장간을 지으세요",
+  "Has nothing to upgrade": "업그레이드할 것이 없습니다",
+  "Already at the highest level": "이미 가장 높은 단계입니다",
+  "Someone is already upgrading it": "이미 누군가 업그레이드하고 있습니다",
+  "The {0} takes both hands": "{0}은(는) 두 손으로 듭니다",
+  "Blocks a door": "문을 막습니다",
 };

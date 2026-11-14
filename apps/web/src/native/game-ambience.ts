@@ -65,7 +65,8 @@ export function ambience(this: GameAmbienceApp): Ambience {
     mix.fire = Math.max(0, f(1 - f(distance(fire.center, middle) / earshot)));
     mix.firePan = this.spatial(Cue.Place, fire.center).pan;
   }
-  mix.music = this.town.bardPlaying() ? 1 : 0;
+  // The old always-on band for a bard in town is retired: bards now play their own phrases (`bard-lyre.ts`).
+  mix.music = 0;
   mix.raid = this.town.raiding() ? 1 : 0;
   mix.dark = sky.night;
   mix.winter = this.town.calendar().season === Season.Winter ? 1 : 0;

@@ -14,11 +14,13 @@ import { sealFloors, sealable } from '../../packages/engine/src/gate-seals';
 import { drillRules, towerVolley } from '../../packages/engine/src/progression-rules';
 import { BUILDING_ASSETS } from '../../packages/content/src/assets';
 import { addInventory, itemSpec } from '../../packages/engine/src/equipment';
+import { levelVariant, stationLevel } from '../../packages/engine/src/craft-stations';
 import { decodeBuildingAsset } from '../../packages/native-renderer/src/building-asset';
 import {
   GoalBranch,
   GoalKind,
   buildingUnlock,
+  completedFacility,
   currentGoal,
   deedCount,
   goalComplete,
@@ -260,20 +262,23 @@ describe('unlocks by deeds', () => {
     facility(town, Structure.Guild);
     expect(buildingUnlock(town, Structure.TrainingYard).available).toBe(true);
     expect(buildingUnlock(town, Structure.Watchtower).reason).toBe('Complete Training yard');
-    // The smith forges tools too: it follows the guild, not the drill yard.
-    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Sawmill');
+    // The smithy comes early: it follows the workbench, not the guild.
+    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Workbench');
     facility(town, Structure.TrainingYard);
     expect(buildingUnlock(town, Structure.Watchtower)).toEqual({ available: false, reason: 'Beat off a raid' });
     town.chronicle.raidsRepelled = 1;
     expect(buildingUnlock(town, Structure.Watchtower).available).toBe(true);
-    for (const kind of [Structure.Sawmill, Structure.Stoneworks]) facility(town, kind);
+    facility(town, Structure.Workbench);
     expect(buildingUnlock(town, Structure.Weaponsmith).available).toBe(true);
-    expect(buildingUnlock(town, Structure.Armorer).reason).toBe('Complete Weaponsmith');
-    facility(town, Structure.Weaponsmith);
-    expect(buildingUnlock(town, Structure.Armorer).reason).toBe('Clear a floor beyond a gate');
+    // Iron is the smithy's top level: it asks for a cleared floor, as the armorer did.
+    for (const kind of [Structure.Sawmill, Structure.Stoneworks]) facility(town, kind);
+    const smith = facility(town, Structure.Weaponsmith);
+    smith.variant = levelVariant(2);
+    expect(town.stationNeeds(smith.id).find((r) => !r.done)?.text).toBe('Clear a floor beyond a gate');
     town.depth = town.map().dungeons().map((_, i) => (i === gate ? 1 : 0));
-    expect(buildingUnlock(town, Structure.Armorer).available).toBe(true);
-    expect(toolAvailable(town, Tool.Armorer)).toBe(true);
+    expect(town.stationNeeds(smith.id).every((r) => r.done)).toBe(true);
+    // The armorer is no longer built.
+    expect(structureSpec(Structure.Armorer).buildable).toBe(false);
   });
   it('puts the runestone and the apothecary early on the faith branch', () => {
     const { town } = settlement();
@@ -325,13 +330,7 @@ describe('unlocks by deeds', () => {
       }
     };
     check();
-    expect(unlockRequirements(town, Structure.Armorer).map((r) => r.text)).toEqual([
-      'Complete Weaponsmith',
-      'Clear a floor beyond a gate',
-      'Complete Sawmill',
-      'Complete Stoneworks',
-      'Needs 12 residents',
-    ]);
+    expect(unlockRequirements(town, Structure.Weaponsmith).map((r) => r.text)).toEqual(['Complete Workbench']);
     residents(town, 12);
     facility(town, Structure.Guild);
     facility(town, Structure.TrainingYard);
@@ -382,6 +381,12 @@ describe('quests that follow the combat loop', () => {
         for (const p of town.people().slice(0, goal.count))
           if (addInventory(p, 'wooden-axe')) town.equipItem(p.id, p.inventory.findIndex((s) => s?.item === 'wooden-axe') + 1, 'tool2');
         break;
+      case GoalKind.Station: {
+        const station =
+          town.buildings().find((b) => b.kind === goal.building && b.built()) ?? facility(town, goal.building);
+        station.variant = levelVariant(goal.count);
+        break;
+      }
       case GoalKind.Deed:
         if (goal.deed === 'sworn') {
           const p = town.makePerson(Role.Resident, Calling.Warrior, town.map().camp());
@@ -417,21 +422,27 @@ describe('quests that follow the combat loop', () => {
   it('opens every founding step with the steps before it, crafting before shelter and the altar after homes and food', () => {
     const { town } = settlement(),
       chain = goals.filter((goal) => goal.branch === GoalBranch.Core && goal.building !== Structure.Camp);
-    expect(chain.map((goal) => goal.title).slice(0, 14)).toEqual([
+    expect(chain.map((goal) => goal.title).slice(0, 20)).toEqual([
       'Build a workbench',
       'Craft a wooden axe',
       'Craft wooden tools',
-      'Craft a first weapon',
+      'Build a smithy',
+      'Make a first weapon',
+      'Make a shield',
       'Equip both founders',
       'Build a tent',
       'Build a farmhouse',
       'Plant a field',
       'Build an altar',
       'Reach 4 residents',
+      'Upgrade the workbench',
       'Lay a road',
       'Build a lumberyard',
       'Build a well',
       'Build a quarry',
+      'Upgrade the smithy',
+      'Build a storehouse',
+      'Build a sawmill',
     ]);
     for (const goal of chain) {
       if (goal.kind === GoalKind.Building)
@@ -443,8 +454,21 @@ describe('quests that follow the combat loop', () => {
         expect(goalComplete(town, goals.find((g) => g.building === Structure.Shrine)!)).toBe(true);
         expect(town.housing()).toBeGreaterThanOrEqual(goal.count);
       }
+      // Tools are made at the workbench and arms at the smithy, each already standing and at the level asked.
       if (goal.kind === GoalKind.Craft)
-        for (const id of goal.items) expect(itemSpec(id)?.workshop, id).toBe(Structure.Workbench);
+        for (const id of goal.items) {
+          const item = itemSpec(id)!;
+          expect(item.workshop, id).toBe(item.category === 'tool' ? Structure.Workbench : Structure.Weaponsmith);
+          expect(completedFacility(town, item.workshop!), id).toBe(true);
+          expect(item.stationLevel, id).toBe(1);
+        }
+      // A station upgrade asks only for what the chain has already given, cost aside.
+      if (goal.kind === GoalKind.Station) {
+        const station = town.buildings().find((b) => b.kind === goal.building)!;
+        expect(stationLevel(station) + 1, goal.title).toBe(goal.count);
+        residents(town, 4);
+        expect(town.stationNeeds(station.id).filter((r) => !r.done), goal.title).toEqual([]);
+      }
       fulfil(town, goal);
     }
   });
@@ -473,10 +497,10 @@ describe('quests that follow the combat loop', () => {
       'Beat off a raid',
       'Build a watchtower',
       'Reach 10 residents',
-      'Build a weaponsmith',
-      'Forge a weapon',
+      'Raise the smithy to iron',
+      'Forge an iron weapon',
       'Reach 12 residents',
-      'Build an armorer',
+      'Arm a fighter in iron',
     ]);
     expect(titles(GoalBranch.Saga)).toEqual([
       'Lead a party of three',

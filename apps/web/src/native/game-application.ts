@@ -81,7 +81,6 @@ const shortcuts = new Map<string, Tool>([
   ['v', Tool.Portal],
   ['g', Tool.Chapel],
   ['b', Tool.Weaponsmith],
-  ['n', Tool.Armorer],
   ['o', Tool.Apothecary],
   ['x', Tool.Demolish],
 ]);
@@ -329,6 +328,7 @@ export class GameApplication implements Application {
   event(e: AppEvent): void {
     if (this.game.handlePrayerEvent?.(e)) { this.dirty = true; return; }
     if (this.game.handleExpeditionEvent?.(e)) { this.dirty = true; return; }
+    if (this.game.handleResultEvent?.(e)) { this.dirty = true; return; }
     if (this.editorAttached && this.playback !== Playback.Playing && !this.authoringTool()) {
       const openTool = e.type === 'KeyDown' && ['f2', 'f3', 'f4'].includes(e.text);
       if (!openTool) {

@@ -29,6 +29,8 @@ import { prepareBuildingRepair, restoreBuildingHealth } from './building-repair'
 import { healthCap } from './resident-wounds';
 import { Boon, boon } from './gate-boons';
 import { playerFaction } from './faction';
+import { advanceClearing } from './town-clearing';
+import { advanceBards } from './bard-phrases';
 export interface TickTown extends PeopleTown {
   updateStress(p: Person, dt: number): boolean;
   advanceNeutralSettlements(dt: number): void;
@@ -43,6 +45,7 @@ export interface TickTown extends PeopleTown {
   stir(dt: number): void;
   staffed(kind: Structure): boolean;
   settlementAt(p: Point): number;
+  inRealm(at: Point): boolean;
   stock(id?: number): Resources;
   enforceGuestLodging(p: Person): void;
   refreshShelter(p: Person): void;
@@ -116,6 +119,8 @@ export function tick(this: TickTown, dt: number): void {
     this.advanceWounds();
     this.advanceDowned();
     this.advanceAbilities(dt);
+    advanceClearing(this as unknown as Town, dt);
+    advanceBards(this);
   }
   const hearth = boon(this, Boon.Hearth);
   const sky = this.climate(),

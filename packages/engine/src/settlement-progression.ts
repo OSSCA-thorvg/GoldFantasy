@@ -8,7 +8,9 @@ import rows from '../data/settlement-goals.json';
 import { belongsToFaction } from './faction';
 import { sealProgress } from './gate-seals';
 import { Activity, Calling, Role, type Person } from './person';
-import { equipmentSlots, equippedItem, itemSpec } from './equipment';
+import { carriedTools, equippedItem, itemSpec } from './equipment';
+import { stationLevel } from './craft-stations';
+import { craftOrder, orderItem, orderSeconds } from './craft-orders';
 import type { Building } from './town-models';
 import { point, type Point } from './geometry';
 export interface Unlock {
@@ -33,8 +35,10 @@ export enum GoalKind {
   Deed,
   /** `count` different items of `items` owned by residents. */
   Craft,
-  /** `count` residents with a tool or weapon in hand. */
+  /** `count` residents carrying a tool or with a weapon in hand. */
   Equip,
+  /** A craft station of kind `building` raised to level `count`. */
+  Station,
 }
 /** Core is one ordered chain; the others advance side by side in any order. */
 export enum GoalBranch {
@@ -103,14 +107,16 @@ export function itemsOwned(town: Town, ids: readonly string[]): number {
   for (const p of ownResidents(town)) for (const stack of p.inventory) if (stack) owned.add(stack.item);
   return ids.filter((id) => owned.has(id)).length;
 }
-/** Residents holding a tool or a weapon. */
+/** Residents carrying a tool, which works from the pack, or holding a weapon. */
 export function residentsEquipped(town: Town): number {
-  return ownResidents(town).filter((p) =>
-    equipmentSlots.some((slot) => {
-      const item = equippedItem(p, slot);
-      return item?.category === 'tool' || item?.category === 'weapon';
-    }),
-  ).length;
+  return ownResidents(town).filter((p) => carriedTools(p).length > 0 || !!equippedItem(p, 'weapon')).length;
+}
+/** The highest level the player's finished stations of `kind` have reached; 0 with none. */
+export function stationLevelReached(town: Town, kind: Structure): number {
+  let best = 0;
+  for (const b of town.buildings())
+    if (b.kind === kind && b.built() && belongsToFaction(b, town.controlFaction)) best = Math.max(best, stationLevel(b));
+  return best;
 }
 /** A raw material a site still lacks that nobody can get: none stored, carried, or in sight on the map. */
 export function unsourcedMaterial(town: Town, site: Building): Product.Wood | Product.Stone | null {
@@ -216,9 +222,9 @@ function unlockRule(kind: Structure): UnlockRule {
       return set([Structure.Quarry], 6);
     case Structure.TrainingYard:
       return set([Structure.Guild]);
-    // The smith forges tools as well as weapons: it follows the guild, not the drill yard.
+    // The smithy follows the workbench: tools gather what it is built from.
     case Structure.Weaponsmith:
-      return set([Structure.Guild], 10);
+      return set([Structure.Workbench]);
     case Structure.Watchtower:
       return set([Structure.TrainingYard], 0, [raidBeaten]);
     case Structure.Armorer:
@@ -295,6 +301,8 @@ export function goalComplete(town: Town, goal: SettlementGoal): boolean {
       return itemsOwned(town, goal.items) >= goal.count || lessonPassed(town, goal);
     case GoalKind.Equip:
       return residentsEquipped(town) >= goal.count || lessonPassed(town, goal);
+    case GoalKind.Station:
+      return stationLevelReached(town, goal.building) >= goal.count;
     default:
       return false;
   }
@@ -370,7 +378,20 @@ export function goalProgress(town: Town, goal: SettlementGoal): GoalProgress {
       return craftProgress(town, goal);
     case GoalKind.Equip: {
       const have = lessonPassed(town, goal) ? Math.max(goal.count, residentsEquipped(town)) : residentsEquipped(town);
-      return { have, need: goal.count, label: `${have} / ${goal.count} residents with gear in hand` };
+      return { have, need: goal.count, label: `${have} / ${goal.count} residents with a tool or a weapon` };
+    }
+    case GoalKind.Station: {
+      const have = stationLevelReached(town, goal.building),
+        working = ownResidents(town).find(
+          (p) => p.task === Activity.Crafting && craftOrder(p.craftItem)?.kind === 'station' && town.building(p.craftWorkshop)?.kind === goal.building,
+        );
+      if (have >= goal.count) return { have: goal.count, need: goal.count, label: `Level ${have}` };
+      if (working) {
+        const order = craftOrder(working.craftItem)!,
+          share = Math.min(1, working.craftProgress / orderSeconds(order, goal.building));
+        return { have: have + share, need: goal.count, label: `Upgrading · ${Math.trunc(share * 100)}%` };
+      }
+      return { have, need: goal.count, label: have ? `Level ${have} / ${goal.count}` : 'Not built yet' };
     }
   }
   return { have: 0, need: 1, label: '' };
@@ -380,15 +401,12 @@ function craftProgress(town: Town, goal: SettlementGoal): GoalProgress {
     need = goal.count;
   if (have >= need || lessonPassed(town, goal)) return { have: Math.max(have, need), need, label: 'Crafted' };
   const crafting = ownResidents(town).find(
-    (p) => p.task === Activity.Crafting && !!p.craftItem && goal.items.includes(p.craftItem),
+    (p) => p.task === Activity.Crafting && goal.items.includes(orderItem(p.craftItem)?.id ?? ''),
   );
   if (crafting) {
-    const item = itemSpec(crafting.craftItem!)!;
-    return {
-      have: have + crafting.craftProgress / item.seconds,
-      need,
-      label: `Crafting ${item.name} · ${Math.trunc((crafting.craftProgress / item.seconds) * 100)}%`,
-    };
+    const item = orderItem(crafting.craftItem)!,
+      share = Math.min(1, crafting.craftProgress / orderSeconds(craftOrder(crafting.craftItem)!, null));
+    return { have: have + share, need, label: `Crafting ${item.name} · ${Math.trunc(share * 100)}%` };
   }
   // Point at the cheapest missing recipe and what the camp and the best-stocked resident still lack.
   const camp = town.camp(),

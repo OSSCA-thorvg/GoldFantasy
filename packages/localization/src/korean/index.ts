@@ -3,6 +3,7 @@ import { catalogPhrases } from './catalog';
 import { combatPhrases } from './combat';
 import { editorPhrases } from './editors';
 import { expeditionPhrases } from './expedition';
+import { expeditionResultPhrases } from './expedition-result';
 import { godsPhrases } from './gods';
 import { guidePhrases } from './guide';
 import { hudPhrases } from './hud';
@@ -22,6 +23,7 @@ export const koreanPhrases = [
   godsPhrases,
   offeringPhrases,
   expeditionPhrases,
+  expeditionResultPhrases,
   hudPhrases,
   settingsPhrases,
 ];

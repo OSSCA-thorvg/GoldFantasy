@@ -458,33 +458,55 @@ describe('the spear', () => {
 });
 
 describe('the station lists', () => {
-  it('groups every recipe into Tools, Weapons or Gear, each tool’s makes side by side', () => {
+  it('groups the bench into Tools and Gear and the smithy into Weapons, Shields and Armor, each kind’s makes side by side', () => {
     const bench = stationRecipes(Structure.Workbench),
       smith = stationRecipes(Structure.Weaponsmith);
-    expect([...bench.keys()]).toEqual(['Tools', 'Weapons', 'Gear']);
+    expect([...bench.keys()]).toEqual(['Tools', 'Gear']);
     expect(bench.get('Tools')!.map((i) => i.id)).toEqual([
       'wooden-axe',
       'stone-axe',
+      'axe',
       'wooden-pick',
       'stone-pick',
+      'pickaxe',
       'wooden-mallet',
       'stone-hammer',
+      'hammer',
       'wooden-hoe',
       'stone-hoe',
+      'hoe',
       'wooden-shovel',
+      'shovel',
       'flint-sickle',
-    ]);
-    expect(bench.get('Weapons')!.map((i) => i.id)).toEqual([
-      'wooden-sword',
-      'wooden-club',
-      'short-bow',
-      'wooden-spear',
+      'sickle',
+      'watering-can',
+      'saw',
     ]);
     expect(bench.get('Gear')!.map((i) => i.id)).toEqual(['hunting-knife', 'pack-basket']);
-    expect([...smith.keys()]).toEqual(['Tools', 'Weapons']);
-    expect([...stationRecipes(Structure.Armorer).keys()]).toEqual(['Gear']);
+    expect([...smith.keys()]).toEqual(['Weapons', 'Shields', 'Armor']);
+    expect(smith.get('Weapons')!.map((i) => i.id)).toEqual([
+      'wooden-sword',
+      'flint-sword',
+      'sword',
+      'wooden-club',
+      'mace',
+      'iron-mace',
+      'short-bow',
+      'bow',
+      'longbow',
+      'wooden-spear',
+      'flint-spear',
+      'spear',
+      'wooden-staff',
+      'staff',
+      'seer-staff',
+    ]);
+    expect(smith.get('Shields')!.map((i) => i.id)).toEqual(['shield', 'reinforced-shield', 'iron-shield']);
+    expect(smith.get('Armor')!.map((i) => i.id)).toEqual(['wooden-armor', 'studded-armor', 'mail-armor', 'helmet']);
+    // The armorer makes nothing now: old ones become smithies when a save loads.
+    expect([...stationRecipes(Structure.Armorer).keys()]).toEqual([]);
     for (const item of itemCatalog.filter((i) => i.workshop !== null)) {
-      expect(['Tools', 'Weapons', 'Gear']).toContain(recipeGroup(item));
+      expect(['Tools', 'Weapons', 'Shields', 'Armor', 'Gear']).toContain(recipeGroup(item));
       expect(gearEffect(item), item.id).not.toBe('');
       expect(item.seconds, item.id).toBeGreaterThan(0);
     }

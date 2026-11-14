@@ -66,8 +66,16 @@ export class Person {
   cast: AbilityId | '' = '';
   castAt = -1;
   castUntil = -1;
+  /** A bard's lyre phrase (index into the bank, -1 before the first), when it began and ends; not saved. */
+  phrase = -1;
+  phraseAt = -1;
+  playingUntil = -1;
+  /** Clock time a bard may begin the next phrase, or -1 while none is planned; not saved. */
+  phraseDue = -1;
   /** Clock time of the last ordinary blow, for presentation; not saved. */
   swingAt = -1;
+  /** Serial of the clearing job this resident is on, or -1; not saved. Any other order clears it. */
+  clearing = -1;
   /** Hold position: stand, strike whatever comes into reach, never chase. Any other order clears it. */
   holding = false;
   /** Days of a lasting wound left; while positive, health stays at or below combatRules.woundedHealth. */

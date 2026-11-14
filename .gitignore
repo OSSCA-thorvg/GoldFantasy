@@ -20,6 +20,9 @@
 !/scripts/prepare-character-references.mjs
 !/scripts/verify-audio-assets.mjs
 !/scripts/patch-webcanvas.mjs
+# The README's pictures and the presentation page's videos are rebuilt with `npm run media:readme` and `media:docs`
+!/scripts/readme-media/
+!/scripts/docs-media/
 
 # Local workspace and authoring configuration
 /.vscode/

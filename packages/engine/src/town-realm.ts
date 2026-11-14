@@ -12,6 +12,7 @@ import { choosePrey, rankMonster, rankPace, rankRules, rankWorth, slowedBy, taun
 import { huntStep, walkPath } from './monster-navigation';
 import { gateSealed, sealFloors, sealProgress, sealable } from './gate-seals';
 import { altarCap, altarCapLine } from './altar-cap';
+import { ExpeditionEnd, beginRecord, finishRecord, joinRecord, type ExpeditionRecord } from './expedition-record';
 import {
   ChamberKind,
   findRealmArea,
@@ -87,6 +88,8 @@ export const realmRules = {
   /** When the last standing member falls, the gate casts the party out: survivors rise this hurt and wounded this long. */
   wipeHealth: 0.1,
   wipeWoundDays: 4,
+  /** Seconds the fallen party lies beyond the gate before it is cast out (or, if no one lives, the gate closes). */
+  castOutDelay: 2,
   /** Going home carries a downed member only if the floor is cleared or someone stands this close. */
   carryReach: 2,
 };
@@ -190,6 +193,32 @@ function floorMonsters(floor: number, far: number): number {
     Math.round(realmRules.floorMonsters + realmRules.floorMonstersPerFloor * floor + realmRules.floorMonstersPerTile * far),
   );
 }
+/** Two dens at least; more only where a chamber of their own is free, so the heart keeps only its guardian. */
+function floorDens(plan: RealmPlan, floor: number): number {
+  const rooms = plan.chambers.filter((chamber) => chamber.kind === ChamberKind.Den).length;
+  return Math.max(realmRules.dens, Math.min(realmRules.mostDens, realmRules.dens + floor, rooms));
+}
+/** The running record; after a load it is rebuilt from the party as it stands, with what is not saved unknown. */
+function recordOf(town: RealmTown): ExpeditionRecord {
+  const record = town.realmRecord;
+  if (record && record.gate === town.realmGate && record.floor === town.realmFloor) return record;
+  return beginRecord(town, realmParty.call(town), floorDens(realmPlan.call(town)!, town.realmFloor), false);
+}
+/** Hands the finished expedition to the HUD; called before the world beyond is sunk. */
+function endRecord(town: RealmTown, end: ExpeditionEnd, kept: boolean): void {
+  const site = town.world.dungeons()[town.realmGate];
+  finishRecord(town, recordOf(town), {
+    end,
+    site: site.name,
+    world: worldName(town.world.destination(site)),
+    floors: sealFloors,
+    densLeft: realmDens.call(town).length,
+    guardianFell: town.realmCleared || !town.beasts.some((m) => m.id === town.realmGuardian && m.health > 0),
+    spoils: town.realmLoot,
+    spoilsKept: kept,
+    home: monsterEntrance(site),
+  });
+}
 function populate(town: RealmTown, plan: RealmPlan): void {
   const { health, strength } = threat(town, town.realmGate, town.realmFloor),
     floor = town.realmFloor,
@@ -217,8 +246,7 @@ function populate(town: RealmTown, plan: RealmPlan): void {
     denRooms = rooms
       .filter((r) => r.chamber.kind === ChamberKind.Den)
       .sort((a, b) => distance(b.chamber.center, entry) - distance(a.chamber.center, entry) || a.index - b.index),
-    // Two dens at least; more only where a chamber of their own is free, so the heart keeps only its guardian.
-    denCount = Math.max(realmRules.dens, Math.min(realmRules.mostDens, realmRules.dens + floor, denRooms.length)),
+    denCount = floorDens(plan, floor),
     sites: { room: (typeof rooms)[number]; den: Monster | null; weight: number }[] = [];
   for (let i = 0; i < denCount; ++i) {
     const room = denRooms.length ? denRooms[i % denRooms.length] : heart,
@@ -286,6 +314,7 @@ function enterRealm(town: RealmTown, party: Expedition, members: Person[]): void
       party.members = [];
     };
   if (town.realmGate === party.dungeon && !town.realmCleared) {
+    joinRecord(recordOf(town), members);
     arrive(town, members, realmPlan.call(town)!.entry);
     party.members = [];
     ++town.changes;
@@ -317,6 +346,7 @@ function enterRealm(town: RealmTown, party: Expedition, members: Person[]): void
   );
   forgetFloor(town);
   populate(town, plan);
+  beginRecord(town, members, realmDens.call(town).length);
   arrive(town, members, plan.entry);
   ++town.chronicle.partiesLed;
   town.chronicle.largestParty = Math.max(town.chronicle.largestParty, members.length);
@@ -333,6 +363,7 @@ function forgetFloor(town: TownState): void {
   state.struckAt.clear();
   state.spoils = 0;
   state.breakAt = null;
+  state.lostAt = -1;
 }
 function closeRealm(town: RealmTown): void {
   town.beasts = town.beasts.filter((m) => !inRealm.call(town, m.home));
@@ -356,7 +387,7 @@ export function canLeaveRealm(this: RealmTown): Check {
     party = realmParty.call(this),
     standing = realmStanding.call(this);
   if (!plan || !standing.length) {
-    check.reason = 'No party is beyond a gate';
+    check.reason = plan && party.length ? 'No one is left standing' : 'No party is beyond a gate';
     return check;
   }
   if (standing.some((p) => p.activity === Activity.Fighting)) check.reason = 'The party is fighting';
@@ -420,6 +451,7 @@ export function leaveRealm(this: RealmTown): boolean {
     cleared = this.realmCleared;
   for (const p of left)
     this.killResident(p, `Left behind beyond ${site.name}`, `${p.name} was left behind beyond ${site.name}`);
+  endRecord(this, cleared ? (gateSealed(this, this.realmGate) ? ExpeditionEnd.Sealed : ExpeditionEnd.Cleared) : ExpeditionEnd.Withdrew, true);
   closeRealm(this);
   bringHome(this, party, site);
   if (!loot.empty()) this.credit(loot, this.settlementOf(party[0]));
@@ -440,6 +472,7 @@ function castOut(town: RealmTown, party: Person[]): void {
     p.stress = Math.min(1, f(p.stress + f(0.2)));
     town.combatState.downedBy.delete(p.id);
   }
+  endRecord(town, ExpeditionEnd.CastOut, false);
   closeRealm(town);
   bringHome(town, party, site);
   town.notify(`${site.name} casts the fallen party back out, gravely wounded; the spoils are lost`);
@@ -460,6 +493,7 @@ export function realmKill(this: RealmTown, beast: Monster): void {
     world = this.world.destination(site),
     floor = this.realmFloor,
     state = this.combatState;
+  ++recordOf(this).slain;
   // Small kills add up to a share of the hoard instead of rounding away one by one.
   state.spoils += realmRules.killSpoils * rankWorth(beast);
   while (state.spoils >= realmRules.killSpoils) {
@@ -515,6 +549,7 @@ export function realmKill(this: RealmTown, beast: Monster): void {
     this.notify(`${site.name}: the guardian of floor ${floor + 1} has fallen`);
   }
   if (first) lines.push(altarCapLine(altarCap(this)));
+  recordOf(this).rewards = lines.filter(Boolean);
   this.realmLoot.add(prize);
   lines.push('Hoard: ' + describe(prize) + '.');
   lines.push('Go home from anywhere to bank the spoils.');
@@ -701,16 +736,31 @@ function breakBrood(town: RealmTown): void {
     for (const map of [state.taunts, state.slamAt, state.slamCenter, state.chilled, state.dirged, state.steering])
       map.delete(m.id);
   town.chronicle.monstersSlain += rest.length;
+  recordOf(town).slain += rest.length;
   for (const m of rest) town.emit(CombatCue.Kill, m.position, { creature: m.id });
   town.emit(CombatCue.BroodBreak, state.breakAt ?? rest[0].position, { amount: rest.length });
   town.notify(`What was left of the brood dies with it (${rest.length})`);
   ++town.changes;
 }
-/** True when the whole living party is down, after the gate has cast it out. */
-function castOutFallen(town: RealmTown): boolean {
-  const party = realmParty.call(town);
-  if (!party.length || party.some((p) => p.downedAt < 0)) return false;
-  castOut(town, party);
+/** True once the gate has ended an expedition whose whole party lay down or dead for a beat: the living are cast
+ * out, and if none lives the gate closes behind the dead. */
+function partyLost(town: RealmTown): boolean {
+  const party = realmParty.call(town),
+    state = town.combatState;
+  if (party.some((p) => p.downedAt < 0)) {
+    state.lostAt = -1;
+    return false;
+  }
+  if (state.lostAt < 0) state.lostAt = town.time + realmRules.castOutDelay;
+  // Clock steps add up in floats: a beat of whole steps must not slip by one.
+  if (town.time < state.lostAt - 1e-6) return false;
+  if (party.length) {
+    castOut(town, party);
+    return true;
+  }
+  town.notify('No one returned from ' + town.world.dungeons()[town.realmGate].name);
+  endRecord(town, ExpeditionEnd.Lost, false);
+  closeRealm(town);
   return true;
 }
 /** Admits a waiting party, drives the monsters beyond the gate and ends a lost expedition. */
@@ -725,13 +775,7 @@ export function advanceRealm(this: RealmTown, dt: number): void {
     if (members.every((p) => p.inside)) enterRealm(this, party, members);
   }
   this.parties = this.parties.filter((party) => party.members.length > 0);
-  if (this.realmGate < 0) return;
-  if (!realmParty.call(this).length) {
-    this.notify('No one returned from ' + this.world.dungeons()[this.realmGate].name);
-    closeRealm(this);
-    return;
-  }
-  if (castOutFallen(this)) return;
+  if (this.realmGate < 0 || partyLost(this)) return;
   if (this.realmCleared) breakBrood(this);
   const plan = realmPlan.call(this)!,
     guardian = this.beasts.find((beast) => beast.id === this.realmGuardian && beast.health > 0);
@@ -764,7 +808,7 @@ export function advanceRealm(this: RealmTown, dt: number): void {
   const standing = realmStanding.call(this);
   for (const beast of this.beasts)
     if (beast.health > 0 && inRealm.call(this, beast.home)) advanceFoe(this, beast, standing, dt);
-  castOutFallen(this);
+  partyLost(this);
 }
 export function gateFloors(this: TownState, dungeon: number): { cleared: number; sealed: boolean; total: number } {
   return {

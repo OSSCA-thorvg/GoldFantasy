@@ -10,6 +10,7 @@ import { treePosition } from '../../packages/engine/src/world-map';
 import { itemSpec } from '../../packages/engine/src/equipment';
 import { heldAmount } from '../../packages/engine/src/carried-resources';
 import { craftCovered } from '../../packages/engine/src/town-equipment';
+import { stationLevel, stationStep } from '../../packages/engine/src/craft-stations';
 import * as mining from '../../packages/engine/src/mining';
 import {
   GoalBranch,
@@ -30,8 +31,8 @@ import { foundingPeople } from '../../packages/engine/src/ymir-born';
 import { isPlayerBuilding } from '../../packages/engine/src/faction';
 
 // A scripted player follows the founding quests of a real new game: designed seed 5, the full map and two founders.
-// It only uses what the quest panel offers a player: place, build, gather, craft, plant, pray and hunt.
-// Raids are switched off here: their numbers belong to the combat pass and are tested there. Roaming monsters stay.
+// It only uses what the quest panel offers a player: place, build, gather, craft, upgrade, plant, pray and hunt.
+// Roaming monsters and raids stay on, as in a real game; the script does not fight them on purpose.
 function controls(town: Town): GameCommandApp {
   const app = {
     town,
@@ -71,7 +72,6 @@ function play(): Run {
   const town = new Town(5),
     app = controls(town),
     width = town.map().width();
-  town.summonRaid = () => {};
   const run: Run = { done: new Map(), shown: [], firstNewcomer: -1, scouted: 0, town };
   const day = () => town.clock() / 300;
   const residents = () => town.people().filter((p) => p.role === Role.Resident && p.health > 0);
@@ -114,7 +114,10 @@ function play(): Run {
       }
     return null;
   };
-  const craft = (goal: SettlementGoal, bench: number): void => {
+  const station = (kind: Structure) =>
+    town.buildings().find((b) => b.kind === kind && b.built() && isPlayerBuilding(b));
+  // As the quest button does: the station that makes the goal's items, the crafter chosen there.
+  const craft = (goal: SettlementGoal): void => {
     const equip = goal.kind === GoalKind.Equip,
       items = equip ? ['wooden-axe', 'wooden-hoe', 'wooden-mallet', 'wooden-sword'] : goal.items;
     for (const p of residents()) {
@@ -122,12 +125,28 @@ function play(): Run {
         continue;
       const wanted = items
         .map((id) => itemSpec(id)!)
-        .filter((item) => (equip || itemsOwned(town, [item.id]) === 0) && !item.cost.stone)
+        .filter((item) => (equip || itemsOwned(town, [item.id]) === 0) && !item.cost.stone && station(item.workshop!))
         .sort((a, b) => a.cost.wood - b.cost.wood)[0];
       if (!wanted) continue;
-      if (craftCovered(town.stock(), p, wanted.cost)) town.orderCraft(p.id, bench, wanted.id);
+      if (craftCovered(town.stock(), p, wanted.cost)) town.orderCraft(p.id, station(wanted.workshop!)!.id, wanted.id);
       else gather(p, false);
     }
+  };
+  // As the station panel's Upgrade button does; the rest gather what the step costs.
+  const upgrade = (goal: SettlementGoal): void => {
+    const site = station(goal.building);
+    if (!site) return;
+    const folk = residents();
+    if (folk.some((p) => p.task === Activity.Crafting && p.craftWorkshop === site.id)) return;
+    const free = folk.filter((p) => !busy(p));
+    const crafter = free.find((p) => !town.stationUpgradeReason(p.id, site.id));
+    if (crafter) {
+      town.orderStationUpgrade(crafter.id, site.id);
+      return;
+    }
+    const cost = stationStep(site.kind, stationLevel(site) + 1)!.cost,
+      stoneShort = town.stock().stone < cost.stone;
+    for (const p of free) gather(p, stoneShort && p.id % 2 === 0);
   };
   let tick = 0;
   const build = (kind: Structure, near: Point): void => {
@@ -213,11 +232,10 @@ function play(): Run {
     switch (goal.kind) {
       case GoalKind.Craft:
       case GoalKind.Equip:
-        {
-          // As the quest button does: the workbench's list, the crafter chosen there.
-          const bench = town.buildings().find((b) => b.kind === Structure.Workbench && b.built() && isPlayerBuilding(b));
-          if (bench) craft(goal, bench.id);
-        }
+        craft(goal);
+        break;
+      case GoalKind.Station:
+        upgrade(goal);
         break;
       case GoalKind.Building:
         build(goal.building, seat.center);
@@ -278,20 +296,26 @@ describe('the founding chain in a real new game', () => {
       ['Founding chain (game day; one day is 300 s; the first ten are the brief):', ...report].join('\n'),
     );
     console.log(`First newcomer from the altar: day ${run.firstNewcomer.toFixed(2)}; scouting trips for materials: ${run.scouted}`);
+    console.log(`Raids beaten off: ${run.town.chronicle.raidsRepelled}; residents lost: ${run.town.fallen.length}; monsters slain: ${run.town.chronicle.monstersSlain}`);
   });
   it('makes and uses items before the altar, and grows the party before the first raid night', () => {
     const at = (title: string) => run.done.get(goals.findIndex((g) => g.title === title))!;
-    expect(at('Craft a wooden axe')).toBeLessThan(at('Build a tent'));
+    expect(at('Craft a wooden axe')).toBeLessThan(at('Build a smithy'));
+    expect(at('Build a smithy')).toBeLessThan(at('Make a shield'));
+    expect(at('Make a shield')).toBeLessThan(at('Build a tent'));
+    expect(at('Upgrade the workbench')).toBeLessThan(at('Upgrade the smithy'));
     expect(at('Equip both founders')).toBeLessThan(at('Build an altar'));
     expect(at('Build a farmhouse')).toBeLessThan(at('Build an altar'));
-    // Raids start on the night of day 2.
+    // Raids start on the night of day 2; the smithy and the first arms come before it.
+    expect(at('Make a shield')).toBeLessThan(2);
     expect(run.firstNewcomer).toBeGreaterThan(0);
-    expect(run.firstNewcomer).toBeLessThan(2.75);
+    expect(run.firstNewcomer).toBeLessThan(3.5);
     expect(at('Reach 4 residents')).toBeLessThan(days);
   });
   it('counts only gear the residents really own and use', () => {
     const town = run.town;
-    expect(toolAvailable(town, Tool.Weaponsmith)).toBe(false);
+    // The smithy stands, at level 2; iron waits for a cleared floor.
+    expect(toolAvailable(town, Tool.Weaponsmith)).toBe(true);
     expect(town.chronicle.weaponsForged).toBe(0);
     const founders = town.people().filter((q) => foundingPeople.some((f) => f.name === q.name));
     expect(founders).toHaveLength(2);

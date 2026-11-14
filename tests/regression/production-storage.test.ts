@@ -11,7 +11,8 @@ import {
 import { TreeWorkKind, Person, Calling, Role, Race, Activity } from '../../packages/engine/src/person';
 import { WorldMap } from '../../packages/engine/src/world-map';
 import { Terrain } from '../../packages/engine/src/world-types';
-import { settlementGoals, buildingUnlock } from '../../packages/engine/src/settlement-progression';
+import { GoalKind, settlementGoals, buildingUnlock } from '../../packages/engine/src/settlement-progression';
+import { levelVariant } from '../../packages/engine/src/craft-stations';
 
 // Small deterministic settlements isolate economic accounting from raids and pathfinding.
 function fixture() {
@@ -35,16 +36,21 @@ describe('processing and dedicated stores', () => {
     for (let kind = 0; kind < Structure.Count; kind++)
       expect(() => validateBuildingCompatibility(buildingAsset(kind), kind)).not.toThrow();
   });
-  it('introduces processing before advanced building objectives and unlocks', () => {
-    const goals = settlementGoals().map((g) => g.building);
-    expect(goals.indexOf(Structure.Sawmill)).toBeLessThan(goals.indexOf(Structure.Weaponsmith));
-    expect(goals.indexOf(Structure.Stoneworks)).toBeLessThan(goals.indexOf(Structure.Weaponsmith));
+  it('introduces processing before the smithy forges iron', () => {
+    // The smithy itself now comes early, after the workbench; planks and cut stone are asked for by its top level.
+    const goals = settlementGoals(),
+      iron = goals.findIndex((g) => g.kind === GoalKind.Station && g.building === Structure.Weaponsmith && g.count === 3);
+    expect(iron).toBeGreaterThan(0);
+    expect(goals.findIndex((g) => g.building === Structure.Sawmill)).toBeLessThan(iron);
+    expect(goals.findIndex((g) => g.building === Structure.Stoneworks)).toBeLessThan(iron);
     const town = fixture();
-    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Guild');
-    facility(town, Structure.Guild);
-    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Sawmill');
+    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Workbench');
+    const smith = facility(town, Structure.Weaponsmith);
+    smith.variant = levelVariant(2);
+    const needs = town.stationNeeds(smith.id).map((r) => r.text);
+    expect(needs).toEqual(expect.arrayContaining(['Complete Sawmill', 'Complete Stoneworks']));
     facility(town, Structure.Sawmill);
-    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Stoneworks');
+    expect(town.stationNeeds(smith.id).find((r) => r.text === 'Complete Sawmill')?.done).toBe(true);
   });
   it('accounts for refined resources without mixing them with logs or stone', () => {
     const stock = new Resources(0, 10, 8, 0, 0, 0, 3, 4);

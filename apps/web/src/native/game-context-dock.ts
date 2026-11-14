@@ -5,6 +5,7 @@ import { DockView } from './game-app-state';
 import { reducedMotionPreferred } from './game-theme';
 import type { GameHudApp } from './game-hud-contract';
 import { actionButton } from './hud-actions';
+import { objectClearHeight, objectClearTarget } from './clear-order-hud';
 import { isSeat } from '../../../../packages/engine/src/building-catalog';
 const copy = (r: Rect) => new Rect(r.x, r.y, r.w, r.h);
 const padded = (r: Rect, amount: number) =>
@@ -108,7 +109,7 @@ export function updateContextDock(this: GameHudApp, width: number, height: numbe
     key += ':' + this.selected + ':' + this.selectedDungeon + ':' + this.residentPage;
   } else if (next === DockView.Resource) {
     target.w = Math.min(420, f(width - 24));
-    target.h = 148;
+    target.h = objectClearTarget(this) ? objectClearHeight(this.touchMode) : 148;
     key += ':' + this.selectedTree + ':' + this.selectedRock + ':' + this.selectedAnimal;
   } else if (next === DockView.Placement) {
     target = this.placementPanelBounds(width, height);

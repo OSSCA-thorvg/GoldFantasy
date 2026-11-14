@@ -13,6 +13,7 @@ import {
   harvestSeconds,
   itemCatalog,
   itemSpec,
+  lineOf,
   workEfficiency,
   workItem,
   type WorkKind,
@@ -20,10 +21,11 @@ import {
 import { harvestDuration } from '../../packages/engine/src/work-timing';
 import * as mining from '../../packages/engine/src/mining';
 import { settlementGoals } from '../../packages/engine/src/settlement-progression';
+import { levelVariant } from '../../packages/engine/src/craft-stations';
 
-// Wooden gear with an iron twin at the smith; the stone tier and the basket are in tool-variety.test.ts.
-const wooden = itemCatalog.filter((item) => item.workshop === Structure.Workbench).filter((item) => item.material === 'wood' && item.visual !== 'basket');
-const shapes = ['axe', 'pickaxe', 'hammer', 'hoe', 'shovel', 'sword', 'mace', 'bow', 'spear'];
+// Wooden gear with an iron make of the same kind; the stone tier and the basket are in tool-variety.test.ts.
+// Tools come from the workbench; weapons, the shield and armor from the smithy.
+const wooden = itemCatalog.filter((item) => item.tier === 1 && item.workshop !== null && item.visual !== 'basket');
 
 function fixture(size = 32) {
   const map = new WorldMap();
@@ -110,12 +112,12 @@ function buildTime(tool: string | null): number {
   expect(tent.built()).toBe(true);
   return town.clock() - started;
 }
-/** Seconds of crafting at the workbench for a wooden sword. */
+/** Seconds of crafting at the smithy for a wooden sword. */
 function craftTime(tool: string | null): number {
-  const { town, p, bench } = fixture();
+  const { town, p, smith } = fixture();
   Object.assign(town.stock(), new Resources(0, 40, 10));
   hold(town, p, tool);
-  expect(town.orderCraft(0, bench.id, 'wooden-sword')).toBe(true);
+  expect(town.orderCraft(0, smith.id, 'wooden-sword')).toBe(true);
   for (let i = 0; i < 2000 && !p.craftProgress; ++i) step(town);
   const started = town.clock();
   for (let i = 0; i < 2000 && p.craftItem; ++i) step(town);
@@ -155,7 +157,7 @@ const rank = (bare: number, wood: number, iron: number) => {
 };
 
 describe('wooden gear from the workbench', () => {
-  it('is cheap, gold-free and weaker than the smith’s gear of the same shape', () => {
+  it('is cheap, gold-free and weaker than the iron make of the same kind', () => {
     expect(wooden.map((item) => item.id)).toEqual([
       'wooden-axe',
       'wooden-pick',
@@ -166,6 +168,9 @@ describe('wooden gear from the workbench', () => {
       'wooden-club',
       'short-bow',
       'wooden-spear',
+      'wooden-staff',
+      'shield',
+      'wooden-armor',
     ]);
     for (const item of wooden) {
       expect(item.cost.gold, item.id).toBe(0);
@@ -173,17 +178,20 @@ describe('wooden gear from the workbench', () => {
       expect(item.cost.stone, item.id).toBeLessThanOrEqual(1);
       expect(item.cost.planks + item.cost.cutStone + item.cost.mana, item.id).toBe(0);
       expect(item.minimumLevel, item.id).toBe(1);
-      expect(shapes, item.id).toContain(item.visual);
-      const smith = itemCatalog.find(
-        (other) => other.workshop === Structure.Weaponsmith && other.visual === item.visual,
-      )!;
-      expect(smith, item.id).toBeDefined();
-      expect(item.attackBonus, item.id).toBeLessThan(smith.attackBonus);
+      expect(item.stationLevel, item.id).toBe(1);
+      expect(item.workshop, item.id).toBe(item.category === 'tool' ? Structure.Workbench : Structure.Weaponsmith);
+      const iron = itemCatalog.find((other) => other.tier === 3 && other.workshop !== null && lineOf(other) === lineOf(item))!;
+      expect(iron, item.id).toBeDefined();
+      expect(item.attackBonus, item.id).toBeLessThanOrEqual(iron.attackBonus);
       if (item.category === 'tool') {
-        expect(item.work).toEqual(smith.work);
+        expect(item.work).toEqual(iron.work);
         expect(item.rate).toBeGreaterThan(bareHandsRate);
-        expect(item.rate).toBeLessThan(smith.rate);
-      } else expect(item.reach, item.id).toBeLessThanOrEqual(smith.reach);
+        expect(item.rate).toBeLessThan(iron.rate);
+      } else if (item.category === 'weapon') {
+        expect(item.attackBonus, item.id).toBeLessThan(iron.attackBonus);
+        expect(item.reach, item.id).toBeLessThanOrEqual(iron.reach);
+      } else if (item.block) expect(item.block).toBeLessThan(iron.block);
+      else expect(item.defense).toBeLessThan(iron.defense);
     }
   });
   it('is made at a workbench and nowhere else, from the store or the crafter’s own pack', () => {
@@ -198,6 +206,7 @@ describe('wooden gear from the workbench', () => {
     expect(town.craftReason(0, smith.id, 'wooden-axe')).toBe('Build a workbench first');
     expect(town.craftReason(0, camp.id, 'wooden-axe')).toBe('Build a workbench first');
     expect(town.craftReason(0, bench.id, 'wooden-axe')).toBe('Not enough settlement materials');
+    expect(town.craftReason(0, bench.id, 'wooden-sword')).toBe('Build a smithy first');
     // Wood the resident felled and still carries is enough.
     expect(addInventory(p, 'wood', 2)).toBe(true);
     p.carriedProduct = itemSpec('wood')!.product;
@@ -212,19 +221,21 @@ describe('wooden gear from the workbench', () => {
     expect(workItem(p, 'woodcutting')?.id).toBe('wooden-axe');
     expect(town.notices.slice(-2)).toEqual([
       'Asa crafted Wooden axe',
-      'Wooden axe in hand · Fells trees faster',
+      'Wooden axe in the pack · Fells trees faster',
     ]);
   });
-  it('keeps the forge deed for the smith and takes a new weapon in hand', () => {
-    const { town, p, smith, bench } = fixture();
+  it('keeps the forge deed for iron weapons and takes a new weapon in hand', () => {
+    const { town, p, smith } = fixture();
     Object.assign(town.stock(), new Resources(50, 50, 50));
-    p.level = 3;
-    expect(town.orderCraft(0, bench.id, 'wooden-club')).toBe(true);
+    p.level = 5;
+    expect(town.orderCraft(0, smith.id, 'wooden-club')).toBe(true);
     for (let i = 0; i < 1000 && p.craftItem; ++i) step(town);
     expect(town.chronicle.weaponsForged).toBe(0);
     expect(p.equipment.weapon).toBeGreaterThan(0);
     expect(town.notices.at(-1)).toBe('Wooden club in hand · Hits harder than fists');
-    expect(town.orderCraft(0, smith.id, 'mace')).toBe(true);
+    expect(town.craftReason(0, smith.id, 'iron-mace')).toBe('Needs a level 3 smithy');
+    smith.variant = levelVariant(3);
+    expect(town.orderCraft(0, smith.id, 'iron-mace')).toBe(true);
     for (let i = 0; i < 2000 && p.craftItem; ++i) step(town);
     expect(town.chronicle.weaponsForged).toBe(1);
     // The weapon slot was taken, so the iron mace waits in the pack.
@@ -244,7 +255,11 @@ describe('wooden gear from the workbench', () => {
     expect(gearEffect(itemSpec('stone-axe')!)).toBe('Fells trees faster than a wooden axe');
     expect(gearEffect(itemSpec('axe')!)).toBe('Fells trees faster than a stone axe');
     expect(gearEffect(itemSpec('wooden-club')!)).toBe('Hits harder than fists');
-    expect(gearEffect(itemSpec('sword')!)).toBe('Hits harder than a wooden sword');
+    expect(gearEffect(itemSpec('flint-sword')!)).toBe('Hits harder than a wooden sword');
+    expect(gearEffect(itemSpec('sword')!)).toBe('Hits harder than a flint sword');
+    expect(gearEffect(itemSpec('shield')!)).toBe('Turns some blows aside');
+    expect(gearEffect(itemSpec('iron-shield')!)).toBe('Turns more blows aside than a reinforced shield');
+    expect(gearEffect(itemSpec('studded-armor')!)).toBe('Takes less damage than wooden armor');
     const { p } = fixture();
     expect(harvestDuration(p)).toBeCloseTo(harvestSeconds(bareHandsRate), 5);
     for (const item of itemCatalog.filter((i) => i.category !== 'resource')) expect(gearEffect(item), item.id).not.toBe('');

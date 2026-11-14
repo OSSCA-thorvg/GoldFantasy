@@ -3,7 +3,7 @@
 import { project, type Point } from '../../../../packages/engine/src/geometry';
 import type { Town } from '../../../../packages/engine/src/town';
 import { Activity, type Person } from '../../../../packages/engine/src/person';
-import { equipmentSlots, equippedItem } from '../../../../packages/engine/src/equipment';
+import { equipmentSlots, equippedItem, carriedTools } from '../../../../packages/engine/src/equipment';
 import { isPlayerBuilding, isPlayerResident } from '../../../../packages/engine/src/faction';
 import type { Structure } from '../../../../packages/engine/src/building-catalog';
 import type { Building } from '../../../../packages/engine/src/town-models';
@@ -96,7 +96,7 @@ function gearSignature(town: Town): Map<number, string> {
   const out = new Map<number, string>();
   for (const p of town.people())
     if (isPlayerResident(p))
-      out.set(p.id, equipmentSlots.map((slot) => equippedItem(p, slot)?.id ?? '').join('|'));
+      out.set(p.id, [...equipmentSlots.map((slot) => equippedItem(p, slot)?.id ?? ''), ...carriedTools(p).map((item) => item.id)].join('|'));
   return out;
 }
 function entryOf(town: Town, moment: GuideMoment): GuideEntry {

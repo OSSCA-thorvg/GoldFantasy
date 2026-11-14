@@ -15,6 +15,7 @@ import { canControl, controlReason } from '../../packages/engine/src/faction';
 import { rankRules } from '../../packages/engine/src/monster-ranks';
 import { animalSpec } from '../../packages/engine/src/wildlife';
 import { skillPower } from '../../packages/engine/src/skill-catalog';
+import { realmRules } from '../../packages/engine/src/town-realm';
 import { decodeTown, encodeTown } from '../../packages/engine/src/save-game';
 
 function fixture() {
@@ -608,6 +609,9 @@ describe('beyond a gate', () => {
     town.realmLoot.gold = 50;
     for (const p of members) town.strikeDown(p, 'Killed by monsters');
     town.advance(0.1);
+    // The gate holds the fallen party for a beat before it casts them out.
+    expect(town.realmActive()).toBe(true);
+    town.advance(realmRules.castOutDelay + 0.1);
     expect(town.realmActive()).toBe(false);
     for (const p of members) {
       expect(p).toMatchObject({ downedAt: -1, woundDays: 4 });
