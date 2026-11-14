@@ -597,10 +597,12 @@ try {
       row.checks.push('moving front resident exposes the rear silhouette');
 
       const tree = await reset('tree');
-      const treePoint = await find(
-        { kind: 'tree', id: tree.cell, instanceIndex: 0 },
-        { kind: 'person', id: tree.person },
-      );
+      // A resident covered by the canopy is drawn as an outline on top and wins the pick there.
+      const hiddenPoint = await find({ kind: 'person', id: tree.person });
+      assert.equal((await hover(hiddenPoint))?.id, tree.person);
+      assert.deepEqual((await click(hiddenPoint)).people, [tree.person]);
+      row.checks.push('a resident hidden behind a tree is picked through its outline');
+      const treePoint = await find({ kind: 'tree', id: tree.cell, instanceIndex: 0 });
       const treeHover = await hover(treePoint);
       assert.equal(treeHover?.kind, 'tree');
       assert.equal(treeHover.id, tree.cell);
