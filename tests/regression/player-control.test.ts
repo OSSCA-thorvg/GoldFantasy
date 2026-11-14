@@ -133,6 +133,7 @@ describe('player command ownership boundary', () => {
     const { app } = fixture();
     app.tool = Tool.Select;
     app.dismissBuildDrawer = () => {};
+    Object.assign(app, { unlockFresh: new Set(), unlockViewed: new Set() });
     selectTool.call(app, Tool.Select, true);
     expect(app.crew).toEqual([0]);
   });

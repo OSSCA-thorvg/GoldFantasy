@@ -8,7 +8,8 @@ import { Building } from '../../packages/engine/src/town-models';
 import { Town } from '../../packages/engine/src/town';
 import { Calling, Role, type Person } from '../../packages/engine/src/person';
 import { point } from '../../packages/engine/src/geometry';
-import { Tool } from '../../packages/engine/src/game-tools';
+import { Tool, toolStructure } from '../../packages/engine/src/game-tools';
+import { selectTool } from '../../apps/web/src/native/game-input';
 import { GoalBranch, settlementGoals, toolAvailable } from '../../packages/engine/src/settlement-progression';
 import { Boon, boonName, boonOfWorld } from '../../packages/engine/src/gate-boons';
 import { sealFloors, sealable } from '../../packages/engine/src/gate-seals';
@@ -462,6 +463,54 @@ describe('build menu unlocks', () => {
       trackUnlocks(ui.app);
       expect(loaded.notices).toEqual([]);
       expect(ui.app.unlockFresh.size).toBe(0);
+    } finally {
+      ui.dispose();
+    }
+  });
+});
+
+describe('new mark clearing', () => {
+  const unlocked = () => {
+    const town = settlement(),
+      ui = fixture(town);
+    town.placed[0].progress = 0.5;
+    trackUnlocks(ui.app);
+    town.placed[0].progress = 1;
+    trackUnlocks(ui.app);
+    return { town, ui };
+  };
+  it('keeps a truly new kind marked', () => {
+    const { ui } = unlocked();
+    try {
+      expect(ui.app.unlockFresh.has(Tool.Runestone)).toBe(true);
+    } finally {
+      ui.dispose();
+    }
+  });
+  it('clears the mark when a quest button picks the tool, leaving other new kinds marked', () => {
+    const { ui } = unlocked(),
+      goal = goalIndex('Craft a wooden axe');
+    try {
+      ui.app.cue = vi.fn();
+      ui.app.selectTool = selectTool;
+      ui.app.unlockFresh.add(Tool.Workbench);
+      goalPick.branch = (branch) => (branch === GoalBranch.Core ? goal : -1);
+      questPanel(ui);
+      ui.click(`quest-action/${goal}`);
+      expect(ui.app.tool).toBe(Tool.Workbench);
+      expect(ui.app.unlockFresh.has(Tool.Workbench)).toBe(false);
+      expect(ui.app.unlockFresh.has(Tool.Runestone)).toBe(true);
+    } finally {
+      goalPick.branch = () => -1;
+      ui.dispose();
+    }
+  });
+  it('clears the mark once a building of that kind exists, however it got there', () => {
+    const { town, ui } = unlocked();
+    try {
+      facility(town, Structure.Runestone);
+      trackUnlocks(ui.app);
+      expect(ui.app.unlockFresh.has(Tool.Runestone)).toBe(false);
     } finally {
       ui.dispose();
     }

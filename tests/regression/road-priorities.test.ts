@@ -28,6 +28,8 @@ function controls(town: Town): GameCommandApp {
     tool: Tool.Select,
     cue() {},
     dismissBuildDrawer() {},
+    unlockFresh: new Set(),
+    unlockViewed: new Set(),
   } as unknown as GameCommandApp;
   app.selectTool = selectTool.bind(app);
   app.dispatchWork = dispatchWork.bind(app);

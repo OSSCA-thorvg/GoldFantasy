@@ -241,6 +241,8 @@ export function selectTool(this: GameInputApp, value: Tool, useSelection = false
   }
   if (this.tool !== value) this.cue(Cue.Click);
   this.tool = value;
+  this.unlockFresh.delete(value);
+  this.unlockViewed.delete(value);
   this.dismissBuildDrawer();
   if (value !== Tool.Select)
     this.selectedTreeInstance = this.selectedTree = this.selectedRock = this.selectedAnimal = -1;

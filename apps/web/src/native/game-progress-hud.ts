@@ -84,6 +84,17 @@ export function trackUnlocks(app: GameHudApp): void {
       opened.push(toolName(tool));
     }
   if (opened.length) town.notify('Unlocked: ' + opened.join(', '));
+  // A kind the settlement already has a site or building of is no longer new, however it got there.
+  if (app.unlockFresh.size) {
+    const owned = new Set(town.buildings().filter(isPlayerBuilding).map((b) => b.kind));
+    for (const tool of [...app.unlockFresh]) {
+      const kind = toolStructure(tool);
+      if (kind !== undefined && owned.has(kind)) {
+        app.unlockFresh.delete(tool);
+        app.unlockViewed.delete(tool);
+      }
+    }
+  }
   if (app.dockView !== DockView.Build) {
     noteBuildPage(app, []);
     app.buildHint = null;
