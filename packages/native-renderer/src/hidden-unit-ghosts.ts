@@ -191,10 +191,10 @@ export function ghostEllipses(g: Ghost): { x: number; y: number; rx: number; ry:
   return g.lying
     ? [
         { x: at.x, y: at.y - h * 0.12, rx: h * 0.42, ry: h * 0.16 },
-        { x: at.x - h * 0.42, y: at.y - h * 0.16, rx: h * 0.15, ry: h * 0.15 },
+        { x: at.x - h * 0.57, y: at.y - h * 0.16, rx: h * 0.15, ry: h * 0.15 },
       ]
     : [
-        { x: at.x, y: at.y - h * 0.36, rx: h * (g.hostile ? 0.3 : 0.24), ry: h * 0.36 },
+        { x: at.x, y: at.y - h * 0.32, rx: h * (g.hostile ? 0.3 : 0.24), ry: h * 0.32 },
         { x: at.x, y: at.y - h * 0.8, rx: h * 0.16, ry: h * 0.16 },
       ];
 }
@@ -216,8 +216,11 @@ export function ghostWork(s: WorldRendererState): { units: number; tested: numbe
 export function updateHiddenUnitGhosts(s: WorldRendererState, town: Town, seconds: number): void {
   let state = states.get(s);
   if (!state || state.town !== town) {
-    const friend = new ShapeNode().fill(...tone.peach, 170),
-      foe = new ShapeNode().fill(...tone.rust, 190);
+    // Outlines only, so the tree or peak in front still reads through them.
+    const outline = (color: readonly [number, number, number]) =>
+        new ShapeNode().strokeWidth(1.6).strokeJoin('round').strokeFill(...color, 235),
+      friend = outline(tone.peach),
+      foe = outline(tone.rust);
     s.ghosts.remove();
     s.ghosts.add(foe).add(friend);
     state = {

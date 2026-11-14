@@ -135,8 +135,8 @@ describe('units hidden behind trees and peaks', () => {
       const drawn = v.shapes().filter((s) => s.commands.length > 0);
       expect(drawn).toHaveLength(1);
       // Translucent, so the tree still reads through it.
-      expect(drawn[0].color[3]).toBeGreaterThan(100);
-      expect(drawn[0].color[3]).toBeLessThan(220);
+      expect(drawn[0].color).toBeUndefined();
+      expect(drawn[0].strokeColor![3]).toBeGreaterThan(100);
       // In front of the trunk, three tiles out in the open, and behind the row but beside the canopy.
       for (const place of [at(0.3, 0.3), at(2.5, -2.5), at(-0.35 + 0.65, -0.35 - 0.65)]) {
         resident.position = place;
@@ -176,7 +176,8 @@ describe('units hidden behind trees and peaks', () => {
       const [foeShape, friendShape] = v.shapes();
       expect(foeShape.commands.length).toBeGreaterThan(0);
       expect(friendShape.commands.length).toBeGreaterThan(0);
-      expect(foeShape.color.slice(0, 3)).not.toEqual(friendShape.color.slice(0, 3));
+      expect(foeShape.color).toBeUndefined();
+      expect(foeShape.strokeColor!.slice(0, 3)).not.toEqual(friendShape.strokeColor!.slice(0, 3));
       // Alone behind the canopy, a click on the ghost's chest picks the unit, not the tree in front.
       town.beasts = [];
       resident.position = at(-0.35, -0.35);
