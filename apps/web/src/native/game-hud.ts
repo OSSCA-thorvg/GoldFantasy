@@ -15,7 +15,6 @@ import {
   Faith,
   structureSpec,
   isSeat,
-  isHome,
   isLodging,
   isOutfitter,
   rentOf,
@@ -23,7 +22,6 @@ import {
   faithName,
   describe,
 } from '../../../../packages/engine/src/building-catalog';
-import { Activity } from '../../../../packages/engine/src/person';
 import { DungeonKind } from '../../../../packages/engine/src/world-types';
 import { worldName } from '../../../../packages/engine/src/world-map';
 import { point, project, sub, distance } from '../../../../packages/engine/src/geometry';
@@ -33,8 +31,9 @@ import { structureIcon } from '../../../../packages/native-renderer/src/building
 import { constructionIcon } from '../../../../packages/native-renderer/src/construction-icon';
 import { buildingAppearanceRevision } from '../../../../packages/native-renderer/src/building-assets';
 import type { GameHudApp } from './game-hud-contract';
-import { canControl, isPlayerBuilding } from '../../../../packages/engine/src/faction';
+import { isPlayerBuilding } from '../../../../packages/engine/src/faction';
 import { civicInspector } from './game-civic-panel';
+import { drawProfiles, hasProfiles, profileRows, profilesHeight } from './home-profiles-hud';
 import { hudPaint } from './hud-paint';
 import { winterOutlookLine, winterLineHeight, type CampMarker } from './camp-resource-hud';
 import { actionButton } from './hud-actions';
@@ -190,7 +189,10 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     building = this.selected >= 0 ? this.town.building(this.selected) : null;
   if (!building && this.selectedDungeon < 0) return 0;
   if (this.touchMode && building?.built() && isSeat(building.kind)) {
-    const stores = 180 + (winterOutlookLine(this.town, building.id) ? winterLineHeight : 0);
+    const stores = 180 + (winterOutlookLine(this.town, building.id) ? winterLineHeight : 0),
+      width = f32(panel.w - 16),
+      profiles = profilesHeight(this, building, width);
+    if (draw) drawProfiles(this, building, f32(panel.x + 8), f32(panel.y + stores + 12), width);
     if (draw)
       this.campResources.drawStores(
         c,
@@ -199,7 +201,7 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
         building.id,
         new Rect(panel.x + 8, panel.y + 8, panel.w - 16, stores),
       );
-    return stores + 16;
+    return stores + profiles + 20;
   }
   if (building?.built() && [Structure.Shrine, Structure.Guild, Structure.GuildHall].includes(building.kind))
     return civicInspector.call(this, building, panel, draw);
@@ -250,94 +252,11 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
       );
     }
     if (spec.beds) textRow(`Beds for ${spec.beds} guests`, t.text);
-    if (building.built() && (isHome(building.kind) || isLodging(building.kind))) {
-      const residents = this.town.occupants(building.id),
-        pageSize = 6,
-        pages = Math.max(1, Math.trunc(f32(f32(f32(residents.length + pageSize) - 1) / pageSize)));
-      this.residentPage = Math.min(this.residentPage, f32(pages - 1));
-      textRow(
-        `${isLodging(building.kind) ? 'Guests ' : 'Residents '}${residents.length}${isLodging(building.kind) ? '  -  click a name to inspect' : '  -  click a name to inspect'}`,
-        t.accent,
-        12,
-        true,
-      );
-      const last = Math.min(residents.length, f32(f32(this.residentPage + 1) * pageSize));
-      for (let i = f32(this.residentPage * pageSize); i < last; i++) {
-        const id = residents[i],
-          at = y;
-        rows.push(() => {
-          const p = this.town.person(id);
-          if (!p) return;
-          const resting = p.task === Activity.Sleeping && p.taskSite === building.id,
-            present = this.town.shelterOf(p) === building.id,
-            state = present
-              ? p.inside
-                ? p.activity === Activity.Sleeping
-                  ? 'Resting'
-                  : 'Inside'
-                : 'Leaving'
-              : resting
-                ? 'On the way'
-                : 'Away';
-          button(
-            c,
-            'resident-' + id,
-            new Rect(left, f32(top + at), f32(inner - 174), 28),
-            p.name,
-            () => this.selectPeople([id]),
-            ButtonStyle.Quiet,
-          );
-          c.text(
-            new Rect(f32(f32(left + inner) - 168), f32(top + at), 88, 28),
-            state,
-            present ? t.success : t.muted,
-            11,
-          );
-          button(
-            c,
-            'resident-leave-' + id,
-            new Rect(f32(f32(left + inner) - 74), f32(top + at), 74, 28),
-            'Leave',
-            () => {
-              this.selectPeople([id]);
-              this.leaveSelected();
-            },
-            ButtonStyle.Default,
-            canControl(p) && (present || resting),
-          );
-        });
-        y = f32(y + 32);
-      }
-      if (pages > 1) {
-        const at = y,
-          page = this.residentPage;
-        rows.push(() => {
-          button(
-            c,
-            'residents-prev',
-            new Rect(left, f32(top + at), 80, 26),
-            'Previous',
-            () => {
-              this.residentPage--;
-            },
-            ButtonStyle.Quiet,
-            page > 0,
-          );
-          c.text(new Rect(f32(left + 88), f32(top + at), 80, 26), `${f32(page + 1)} / ${pages}`, t.muted, 12);
-          button(
-            c,
-            'residents-next',
-            new Rect(f32(left + 174), f32(top + at), 80, 26),
-            'Next',
-            () => {
-              this.residentPage++;
-            },
-            ButtonStyle.Quiet,
-            f32(page + 1) < pages,
-          );
-        });
-        y = f32(y + 30);
-      }
+    if (hasProfiles(building)) {
+      y = f32(y + 4);
+      const profiles: InspectorRows = { rows, left, inner, top, y };
+      profileRows(this, building, profiles);
+      y = profiles.y;
     }
     if (building.kind === Structure.WoodStore) textRow('Keeps 240 more logs and planks', t.text);
     if (building.kind === Structure.Granary) textRow('Keeps 240 more food; meals served here', t.text);

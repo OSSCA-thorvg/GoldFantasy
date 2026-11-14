@@ -190,7 +190,7 @@ function tick(c: Context, x: number, y: number, color: Color): void {
   c.line(x, f32(y + 4), f32(x + 3), f32(y + 7), color, 2);
   c.line(f32(x + 3), f32(y + 7), f32(x + 9), y, color, 2);
 }
-function portrait(app: GameAppState, p: Person, r: Rect): void {
+export function portrait(app: GameAppState, p: Person, r: Rect): void {
   const c = app.context;
   c.rect(r, app.theme.raised, 3);
   c.paint(JSON.stringify(['expedition-face', p.id, p.look, p.race, String(p.lookRevision), p.calling, moodOf(p), r]), () => {

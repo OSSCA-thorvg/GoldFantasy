@@ -197,7 +197,7 @@ it('shows village supplies in the bottom Camp inspector without requiring hover 
     ui.app.selected = camp.id;
     ui.app.touchMode = true;
     const height = inspector.call(ui.app, new Rect(0, 0, 366, 0), false);
-    expect(height).toBe(196);
+    expect(height).toBe(364); // stores, then who lives there
     const panel = new Rect(12, 844 - 12 - height, 366, height);
     ui.draw(() => inspector.call(ui.app, panel));
     const words = ui.labels.mock.calls.map(([, text]) => text);
