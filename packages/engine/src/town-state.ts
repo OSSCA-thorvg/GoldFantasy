@@ -15,6 +15,7 @@ import type { RealmArea, RealmPlan } from './realm-layout';
 import type { RealmReward } from './town-realm';
 import { Chronicle, type CombatCue, type CombatEvent, type Fallen } from './combat-events';
 import { CombatState } from './combat-state';
+import { ThorVisit } from './thor-visit';
 export class TownState {
   /** Scoped settlement planners execute the same rules for their own faction. */
   controlFaction = 0;
@@ -39,6 +40,8 @@ export class TownState {
   wardUntil = 0;
   /** Transient fight bookkeeping (taunts, pending bursts, slam timers); not saved. */
   combatState = new CombatState();
+  /** Thor's visits: whether he is here, when he came and when he comes again. */
+  thor = new ThorVisit();
   static readonly secondsPerDay = 300; static readonly daysPerMonth = 5; static readonly maxRoadLength = 24; static readonly maxBridgeSpan = 7; static readonly roadHalfWidth = f32(.3); static readonly maxFieldAcres = 48; static readonly farmReach = 6; static readonly joinReach = f32(.8); static readonly campReach = 12; static readonly paidWorkSeconds = f32(300 * f32(.12)); static readonly maxRaiders = 64;
   titleAutoplay = false; /** Daylight a save's title preview stays at, so Continue reveals the sky already on screen. */ titleSky: { year: number; day: number } | null = null; titleBuilder = -1; titleFoodUntil = -1; titlePlanTimer = 0; titleWeatherTimer = 0; titleAnchors: Point[] = [];
   network = new RoadNetwork(); placed: Building[] = []; farmland: Field[] = []; folk: Person[] = []; grid = new WalkGrid(); sky: Sky;

@@ -1,3 +1,4 @@
+import { serpentSights } from './world-serpent';
 import { project, point, distance } from '../../engine/src/geometry';
 import { f32 } from '../../engine/src/numeric';
 import { belongsToFaction, isPlayerBuilding } from '../../engine/src/faction';
@@ -84,6 +85,8 @@ export function updateVision(s: WorldRendererState, town: Town): void {
   for (const p of town.people())
     if (belongsToFaction(p) && p.visibility() > 0)
       s.vision.push({ center: { ...p.position }, radius: blend(f32(8.5), 5) });
+  // Thor sees what he hunts by night, so his throws never land in the dark.
+  if (town.thor.present) s.vision.push({ center: { ...town.thor.position }, radius: blend(f32(8.5), 7) });
   for (const b of town.buildings()) {
     if (!isPlayerBuilding(b) || !b.built()) continue;
     if (b.kind === Structure.Torch) {
@@ -109,6 +112,7 @@ export function updateVision(s: WorldRendererState, town: Town): void {
     )
   )
     s.vision.push(...volcano.sights());
+  s.vision.push(...serpentSights(s, town));
   const currentChanged = s.currentVisibility.assign(s.vision, changed);
   if (first || currentChanged)
     for (const source of s.vision) {

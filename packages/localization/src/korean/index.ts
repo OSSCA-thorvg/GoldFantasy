@@ -2,6 +2,7 @@ import { PhraseBook } from '../phrase-book';
 import { catalogPhrases } from './catalog';
 import { combatPhrases } from './combat';
 import { editorPhrases } from './editors';
+import { godsPhrases } from './gods';
 import { guidePhrases } from './guide';
 import { hudPhrases } from './hud';
 import { progressPhrases } from './progress';
@@ -16,6 +17,7 @@ export const koreanPhrases = [
   guidePhrases,
   combatPhrases,
   progressPhrases,
+  godsPhrases,
   hudPhrases,
   settingsPhrases,
 ];

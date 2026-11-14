@@ -29,6 +29,8 @@ import { syncVisuals, buildObjects, buildRoadLights } from './world-objects';
 import { buildDarkness, updateVision } from './world-vision';
 import { cullTrees, swayTrees, updateFelling, updateGrowth } from './world-trees';
 import { moveAgents, tread, markDamage } from './world-people';
+import { updateThor } from './world-thor';
+import { updateSerpent } from './world-serpent';
 import { updateHiddenUnitGhosts } from './hidden-unit-ghosts';
 import { updateCombatPresentation, worldShake } from './combat-presentation';
 import { animate } from './world-animation';
@@ -324,6 +326,7 @@ export class WorldRenderer extends WorldRendererState {
       camera.zoom,
     );
     updateLava(this, seconds, climate, this.reducedMotion, camera.zoom);
+    updateSerpent(this, town, seconds, camera.zoom);
     cullTrees(this);
     swayTrees(this, climate.wind, seconds);
     if (this.editorView) {
@@ -358,6 +361,7 @@ export class WorldRenderer extends WorldRendererState {
       tread(this, town, seconds);
       markDamage(this, town);
       moveAgents(this, town, traffic, seconds, selected);
+      updateThor(this, town);
       updateHiddenUnitGhosts(this, town, seconds);
       updateCombatPresentation(this, town, selected);
       updateFelling(this, town);

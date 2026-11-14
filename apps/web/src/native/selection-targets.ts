@@ -57,7 +57,7 @@ export function selectionReferences(app: SelectionTargetApp): WorldObjectRef[] {
       if (ref.kind === 'road') return !!app.town.roads().road(ref.id);
       if (ref.kind === 'field') return !!app.town.field(ref.id);
       if (ref.kind === 'landmark')
-        return ref.id === 0 ? !!map.giant() : ref.id === 1 ? !!map.volcano() : true;
+        return ref.id === 0 ? !!map.giant() : ref.id === 1 ? !!map.volcano() : ref.id === 3 ? app.town.thor.present : true;
       return false;
     })
     .slice(0, 1);

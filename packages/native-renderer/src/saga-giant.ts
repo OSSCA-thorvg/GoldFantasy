@@ -280,38 +280,41 @@ export function frostGiant(breadth = 1): Giant {
         .curve([288 * b, 12], [176 * b, -18], [0, -26], [-176 * b, -18], [-288 * b, 12])
         .close(),
     ],
-    fringe: Form = [];
+    // Every lock of the mantle hangs from its own root, so the rime on his shoulders stirs.
+    locks: Strand[] = [],
+    hung = new SceneNode();
   for (let i = 0; i < 10; i++) {
-    const x = (-300 + i * 66.5) * b;
+    const x = (-300 + i * 66.5) * b,
+      y = -6 - 35 * Math.sin((i / 9) * Math.PI);
     if (Math.abs(x) < 88) continue;
-    mantle.push(
-      lock(
-        x,
-        -6 - 35 * Math.sin((i / 9) * Math.PI),
-        x + (i - 4.5) * 4.7,
-        53 + 35 * scatter(i, 25),
-        49 * b,
-        i % 2 ? 0.1 : -0.1,
-      ),
-    );
+    const shape = lock(x, y, x + (i - 4.5) * 4.7, 53 + 35 * scatter(i, 25), 49 * b, i % 2 ? 0.1 : -0.1),
+      node = new SceneNode().add(flat([shape], deepShade).translate(0, 15));
+    paintForm(node, [shape], rime, { ink: 0, rim: 6 });
+    hung.add(node);
+    locks.push({ node, x, y, reach: 0.05, phase: i * 0.9 });
   }
+  const fringe = new SceneNode();
   for (let i = 0; i < 14; i++) {
     const x = (-294 + i * 45.9) * b;
     if (Math.abs(x) < 100) continue;
-    fringe.push(
-      lock(
-        x,
-        -29 - 29 * Math.sin((i / 13) * Math.PI),
-        x + (i - 6.5) * 3,
-        12 + 18 * scatter(i, 27),
-        27 * b,
-        i % 2 ? 0.1 : -0.1,
-      ),
-    );
+    const y = -29 - 29 * Math.sin((i / 13) * Math.PI),
+      node = new SceneNode().add(
+        flat([lock(x, y, x + (i - 6.5) * 3, 12 + 18 * scatter(i, 27), 27 * b, i % 2 ? 0.1 : -0.1)], iceGlint),
+      );
+    fringe.add(node);
+    locks.push({ node, x, y, reach: 0.07, phase: 1.3 + i * 0.6 });
   }
-  body.add(flat(mantle, deepShade).translate(0, 15));
+  body.add(flat(mantle, deepShade).translate(0, 15)).add(hung);
   paintForm(body, mantle, rime, { ink: 0, rim: 6 });
-  body.add(flat(fringe, iceGlint));
+  body.add(fringe);
   scene.add(body).add(head.scene);
-  return { scene, head, body, sway: (seconds, amount) => head.sway(seconds, amount) };
+  return {
+    scene,
+    head,
+    body,
+    sway(seconds, amount = 1) {
+      head.sway(seconds, amount);
+      for (const s of locks) turn(s.node, s.x, s.y, s.reach * amount * Math.sin(seconds * 1.1 + s.phase));
+    },
+  };
 }

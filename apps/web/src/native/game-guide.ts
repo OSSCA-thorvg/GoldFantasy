@@ -157,6 +157,7 @@ function scanOf(app: GuideApp, told: ReadonlySet<string>): GuideScan {
     built,
     sees: (at) => app.renderer.visible(at),
     shows: (at) => app.renderer.visible(at) && inView(app.camera, at, app.viewWidth, app.viewHeight, 0.12),
+    frames: (at) => inView(app.camera, at, app.viewWidth, app.viewHeight, 0.12),
   };
 }
 function settle(app: GuideApp, scan: GuideScan): void {

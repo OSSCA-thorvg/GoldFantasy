@@ -678,6 +678,18 @@ function townFields(a: SaveArchive, v: SaveTown): void {
       if (a.reading && (v.told.length > 512 || v.told.some((key) => !key || key.length > 64)))
         throw new Error('Invalid guide record');
     }
+    // Version 18: Thor's visits. What he is doing is chosen again after a load.
+    if (a.formatVersion >= 18) {
+      a.fields(v.thor, { present: boolean, arrivedDay: i32, nextVisit: i32, visits: i32 });
+      a.fields(v.thor.position, { x: f64, y: f64 });
+      if (
+        a.reading &&
+        (v.thor.visits < 0 ||
+          v.thor.nextVisit < -1 ||
+          (v.thor.present && (v.thor.arrivedDay < 0 || !v.world.inside(Math.floor(v.thor.position.x), Math.floor(v.thor.position.y)))))
+      )
+        throw new Error('Invalid visit');
+    }
     const extent = a.cursor - start,
       stored = a.value(u32, extent);
     if (a.reading) {
@@ -877,7 +889,10 @@ export function encodeTownPayload(town: SaveTown): Uint8Array {
     town.folk.some((p) => p.abilityReadyAt2 > 0 || p.abilityUntil2 > 0 || p.abilityAuto2 !== -1 || p.holding) ||
     [...town.beasts, ...town.animals].some((m) => m.rank > MonsterRank.Guardian || m.brood !== -1);
   // Version 17 carries which first-time explanations the player has been given.
-  a.formatVersion = town.told.length > 0
+  // Version 18 carries Thor's visits, once the settlement has called him.
+  a.formatVersion = town.thor.present || town.thor.visits > 0 || town.thor.nextVisit >= 0
+    ? 18
+    : town.told.length > 0
     ? 17
     : swarm
     ? 16
@@ -937,10 +952,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 17) climateSize = u32.read(a);
+  if (version >= 2 && version <= 18) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 17 ||
+    version > 18 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

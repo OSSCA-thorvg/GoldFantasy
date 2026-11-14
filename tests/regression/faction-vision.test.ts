@@ -25,6 +25,7 @@ it('neutral residents, camps and torches do not reveal player fog, while player 
     people: () => [player, neutral],
     buildings: () => [camp, torch],
     climate: () => ({ night: 1 }),
+    thor: { present: false },
   } as unknown as Town;
   updateVision(state, town);
   expect(state.vision).toHaveLength(1);

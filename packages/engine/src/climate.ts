@@ -69,6 +69,8 @@ export class Sky {
   private peak = 0;
   private span = 0;
   private breeze = 0;
+  /** Chance new rain is a thunderstorm in any season, or -1 for the plain summer rule; set each tick, not saved. */
+  stormChance = -1;
   constructor(seed: number) {
     this.state = (Math.imul(seed, 747796405) + 2891336453) >>> 0;
   }
@@ -90,7 +92,7 @@ export class Sky {
     this.peak = 0;
     if (pick < wet) {
       const hard = this.random(),
-        stormy = summer && this.random() < f(0.3);
+        stormy = (summer || this.stormChance >= 0) && this.random() < (this.stormChance >= 0 ? this.stormChance : f(0.3));
       this.climate.weather = winter ? Weather.Snow : stormy ? Weather.Storm : Weather.Rain;
       this.peak = stormy
         ? f(f(0.75) + f(f(0.25) * hard))

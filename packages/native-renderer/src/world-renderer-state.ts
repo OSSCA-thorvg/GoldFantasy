@@ -121,6 +121,8 @@ export class WorldRendererState {
   root = new SceneNode();
   world = new SceneNode();
   ground = isoLayer();
+  /** Jormungandr's coils in the sea: over the water, under the coast and all that stands on land. */
+  serpent = new SceneNode();
   farmland = isoLayer();
   fog = isoLayer();
   roads = isoLayer();
@@ -244,6 +246,7 @@ export class WorldRendererState {
     this.root.add(this.background).add(this.world).add(this.overcast).add(this.vignette);
     for (const layer of [
       this.ground,
+      this.serpent,
       this.farmland,
       this.ornaments,
       this.roads,

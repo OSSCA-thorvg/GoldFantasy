@@ -57,7 +57,8 @@ export class Thunderstorm {
       return undefined;
     }
     intensity = clamp(intensity, 0, 1);
-    activity = Number.isFinite(activity) ? clamp(activity, f(0.5), f(3.5)) : 1;
+    // Thor's presence may triple a stormy day's activity.
+    activity = Number.isFinite(activity) ? clamp(activity, f(0.5), f(10.5)) : 1;
     const wetness = f(f(intensity * intensity) * f(3 - f(2 * intensity)));
     const meanGap = storm ? lerp(18, 11, wetness) : lerp(f(72.5), 19, wetness);
     const gap = () => f(f(0.55) + f(f(0.9) * this.roll()));

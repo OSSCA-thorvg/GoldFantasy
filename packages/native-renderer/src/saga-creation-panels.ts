@@ -273,20 +273,29 @@ export function slayingPanel(): SagaPanel {
     ],
     [255, 255, 255],
   ).translate(-70, 40);
+  // Broken ice: a hard-edged splinter about the origin, one face lit and one in shade.
+  const splinter = (r: number, salt: number): SceneNode => {
+    const at = (turn: number, reach: number): [number, number] => [
+        Math.cos(turn) * r * reach,
+        Math.sin(turn) * r * reach,
+      ],
+      corners = [0, 1, 2, 3, 4].map((j) =>
+        at(j * 1.257 + 0.5 * scatter(j, salt), j === 0 ? 1.5 : 0.55 + 0.5 * scatter(j, salt + 1)),
+      ),
+      edge = (points: [number, number][]) => {
+        const outline = pen(points[0][0], points[0][1]);
+        for (const [x, y] of points.slice(1)) outline.line(x, y);
+        return [outline.close()];
+      };
+    return new SceneNode()
+      .add(flat(edge(corners), rime))
+      .add(flat(edge([corners[0], corners[1], [0, 0], corners[4]]), iceGlint))
+      .add(flat(edge([corners[2], corners[3], [0, 0]]), dusk(frost, 0.12)));
+  };
   // Six great pieces break from him as he goes over.
-  const lumps: ShapeNode[] = [];
+  const lumps: SceneNode[] = [];
   for (let i = 0; i < 6; i++) {
-    const r = 34 + 30 * scatter(i, 63),
-      lump = flat(
-        [
-          pen(-r, r * 0.2)
-            .curve([-r * 0.5, -r * 0.8], [r * 0.4, -r * 0.9])
-            .curve([r, -r * 0.2], [r * 0.6, r * 0.7])
-            .curve([-r * 0.3, r * 0.9], [-r, r * 0.2])
-            .close(),
-        ],
-        i % 2 ? rime : dusk(frost, 0.1),
-      );
+    const lump = splinter(30 + 26 * scatter(i, 63), 70 + i);
     lumps.push(lump);
     shards.add(lump);
   }
@@ -298,10 +307,9 @@ export function slayingPanel(): SagaPanel {
       [250, 228, 176],
     ),
   );
-  const chips: ShapeNode[] = [];
+  const chips: SceneNode[] = [];
   for (let i = 0; i < 8; i++) {
-    const r = 26 + 26 * scatter(i, 21),
-      chip = flat([lock(-r * 0.4, r * 0.6, r * 0.3, -r * 1.4, r * 1.3, 0.1)], rime);
+    const chip = splinter(14 + 16 * scatter(i, 21), 40 + i);
     chips.push(chip);
     shards.add(chip);
   }
@@ -381,9 +389,15 @@ export function slayingPanel(): SagaPanel {
       );
       lumps.forEach((lump, i) => {
         const drop = (beat - 0.5 - i * 0.03) / 0.36;
-        lump
-          .translate(900 + i * 90 + 60 * drop * (i % 2 ? 1 : -1), 640 + 24 * i + 420 * drop * drop)
-          .opacity(drop > 0 && drop < 1 ? 255 : 0);
+        turn(
+          lump,
+          0,
+          0,
+          i + drop * (i % 2 ? 2.2 : -1.8),
+          900 + i * 90 + 60 * drop * (i % 2 ? 1 : -1),
+          640 + 24 * i + 420 * drop * drop,
+        );
+        lump.opacity(drop > 0 && drop < 1 ? 255 : 0);
       });
       sparks.forEach((spark, i) => {
         const life = (seconds * (0.05 + 0.04 * scatter(i, 62)) + scatter(i, 64)) % 1;
@@ -402,9 +416,16 @@ export function slayingPanel(): SagaPanel {
       chips.forEach((chip, i) => {
         const angle = -2.6 + 1.9 * scatter(i, 22),
           reach = (220 + 420 * scatter(i, 23)) * ease(flight);
-        chip
-          .translate(1030 + Math.cos(angle) * reach, 640 + Math.sin(angle) * reach + 160 * flight * flight)
-          .opacity(flight <= 0 ? 0 : alphaOf(1.2 - flight));
+        // They tumble, stay solid while they fly and are gone as they come down.
+        turn(
+          chip,
+          0,
+          0,
+          i * 1.7 + flight * (i % 2 ? 7 : -6),
+          1030 + Math.cos(angle) * reach,
+          640 + Math.sin(angle) * reach + 520 * flight * flight,
+        );
+        chip.opacity(flight <= 0 ? 0 : alphaOf((0.9 - flight) * 5));
       });
       birds.forEach((bird, i) =>
         bird.translate(

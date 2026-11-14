@@ -17,6 +17,7 @@ import { completedFacility, deedCount, unlockRequirements } from '../../../../pa
 import { secondSkillLevel } from '../../../../packages/engine/src/skill-catalog';
 import type { DevotionEvent } from '../../../../packages/engine/src/town-devotion';
 import type { Building } from '../../../../packages/engine/src/town-models';
+import { serpentSighting } from '../../../../packages/native-renderer/src/serpent-ring';
 
 /** A sentence for the phrase tables: `text` is the key, `values` fill its `{0}`, `{1}`... */
 export type Line = string | { readonly text: string; readonly values: readonly (string | number)[] };
@@ -47,6 +48,8 @@ export interface GuideScan {
   sees(at: Point): boolean;
   /** In sight and well inside the screen, so the player is actually looking at it. */
   shows(at: Point): boolean;
+  /** Well inside the screen, seen or not: for what lies out at sea, beyond anyone's sight. */
+  frames?(at: Point): boolean;
 }
 export interface GuideMoment {
   key: string;
@@ -269,6 +272,32 @@ const moments: GuideMoment[] = [
     },
     met: (town) => !!statue(town),
     where: statue,
+  },
+  {
+    key: 'thor',
+    title: 'Thor comes to Midgard',
+    text: () => [
+      'Thor, the god of thunder, has come to stay a while. He is a guest: he takes no orders, and no monster can harm him.',
+      'By day he enjoys the settlement. By night he hunts the monsters that come near it. While he stays, rain brings storms and far more lightning.',
+    ],
+    spot: (scan) => {
+      const thor = scan.town.thor;
+      return thor.present && scan.shows(thor.position) ? { at: { ...thor.position } } : null;
+    },
+    met: (town) => town.thor.visits > 0,
+  },
+  {
+    key: 'serpent',
+    title: 'Jormungandr',
+    text: () => [
+      'The world serpent lies in the sea around Midgard, so long that it holds its own tail in its jaws.',
+      'It rises only in foul weather and sinks again when the sky clears. It does no harm to the land or its people.',
+    ],
+    spot: (scan) => {
+      const at = serpentSighting(scan.town, (p) => scan.frames?.(p) ?? scan.shows(p));
+      return at ? { at } : null;
+    },
+    met: () => false,
   },
   {
     key: 'volcano',

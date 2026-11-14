@@ -59,6 +59,7 @@ export const landmarkDescription = (id: number): string =>
     'Odin, the Allfather. An ancient stone statue beside the founding shore.',
     'Fire Mountain. A volcanic landmark with lava flows and a smoking crater.',
     'Hvergelmir. The deep northern spring from which the rivers flow.',
+    'Thor, god of thunder. A guest who hunts monsters by night.',
   ][id] ?? '';
 
 export function worldTarget(app: GameCommandApp, ref: WorldObjectRef): WorldTarget | null {
@@ -103,7 +104,7 @@ export function worldTarget(app: GameCommandApp, ref: WorldObjectRef): WorldTarg
       if (town.field(ref.id)) name = 'Field';
       break;
     case 'landmark':
-      name = ['Odin', 'Fire Mountain', 'Hvergelmir'][ref.id];
+      name = ['Odin', 'Fire Mountain', 'Hvergelmir', 'Thor'][ref.id];
       break;
   }
   return name ? { ...ref, key: targetKey(ref), name, bounds: geometry.bounds, geometry } : null;

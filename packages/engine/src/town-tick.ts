@@ -71,6 +71,7 @@ export interface TickTown extends PeopleTown {
   advanceDowned(): void;
   advanceAbilities(dt: number): void;
   rallied(p: Person): boolean;
+  advanceThor(dt: number): void;
   tend(p: Person): void;
 }
 /** Sounds are emitted by productive ticks, never an unrelated ambience timer. */
@@ -110,6 +111,7 @@ export function tick(this: TickTown, dt: number): void {
   this.admitGuests(dt);
   this.processDevotion();
   if (!this.titleAutoplay) this.stir(dt);
+  if (!this.titleAutoplay && this.controlFaction === playerFaction) this.advanceThor(dt);
   if (this.controlFaction === playerFaction) {
     this.advanceWounds();
     this.advanceDowned();

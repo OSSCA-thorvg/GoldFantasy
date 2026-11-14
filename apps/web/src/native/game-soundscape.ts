@@ -8,6 +8,8 @@ import { Thunderstorm, type Strike } from '../../../../packages/engine/src/thund
 import { Town } from '../../../../packages/engine/src/town';
 import { AnimalKind, type Monster } from '../../../../packages/engine/src/person';
 import { updateWeatherReactions } from './weather-reactions';
+import { thorThunder } from './god-sounds';
+import { thunderFactor } from '../../../../packages/engine/src/thor-visit';
 import {
   Cue,
   Sound,
@@ -151,7 +153,7 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
   let emittedStrike: Strike | undefined;
   if (this.gameSpeed() > 0) {
     const day = BigInt(Math.trunc(this.town.clock() / Town.secondsPerDay)),
-      activity = Thunderstorm.activity(this.town.map().seed(), day),
+      activity = f(Thunderstorm.activity(this.town.map().seed(), day) * thunderFactor(this.town)),
       strike = this.storm.update(seconds, sky.weather, sky.intensity, activity);
     if (strike) {
       emittedStrike = strike;
@@ -165,6 +167,7 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
       thunder.delay = strike.delay;
       this.cues.push(thunder);
     }
+    this.cues.push(...thorThunder(this.town, (at) => this.renderer.visible(at), (cue, at) => this.spatial(cue, at)));
   }
   updateWeatherReactions(this, seconds, emittedStrike);
   this.soundscaping = true;
