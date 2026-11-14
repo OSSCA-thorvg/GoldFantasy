@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midgard: How It Is Made</title>
+<meta name="description" content="Midgard, a Norse settlement and army game drawn with ThorVG WebCanvas: the game, how ThorVG is used, its algorithms and how AI helped make it.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "DejaVu"; src: url("assets/native-fonts/DejaVuSans.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "DejaVu"; src: url("assets/native-fonts/DejaVuSans-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("assets/native-fonts/Cinzel-Black.ttf") format("truetype"); font-display: swap; }
+:root {
+  --bg: rgb(17, 20, 18);
+  --surface: rgb(25, 29, 25);
+  --raised: rgb(35, 39, 32);
+  --border: rgba(115, 98, 65, 0.82);
+  --text: rgb(225, 216, 189);
+  --muted: rgb(157, 151, 128);
+  --accent: rgb(191, 161, 99);
+  --bright: rgb(232, 190, 110);
+  --gutter: clamp(16px, 4vw, 64px);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 clamp(16px, 1.2vw, 20px)/1.5 "DejaVu", Verdana, sans-serif; }
+section { min-height: 100vh; padding: clamp(40px, 7vh, 84px) var(--gutter); display: flex; flex-direction: column; justify-content: center; scroll-snap-align: start; border-bottom: 1px solid rgba(115, 98, 65, 0.25); }
+.wrap { width: 100%; max-width: 1360px; margin: 0 auto; }
+h1, h2 { font-family: "Cinzel", Georgia, serif; font-weight: 900; letter-spacing: 0.04em; color: var(--bright); margin: 0 0 0.3em; line-height: 1.1; }
+h2 { font-size: clamp(28px, 3.3vw, 54px); }
+.sub { color: var(--muted); margin: -0.2em 0 0.8em; font-size: 0.95em; }
+.kicker { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72em; color: var(--muted); margin-bottom: 0.6em; }
+.lead { font-size: clamp(18px, 1.5vw, 25px); max-width: 62ch; margin: 0 0 1em; }
+ul.points { list-style: none; padding: 0; margin: 0; }
+ul.points li { padding: 0.35em 0 0.35em 1.1em; position: relative; border-bottom: 1px solid rgba(115, 98, 65, 0.22); }
+ul.points li::before { content: ""; position: absolute; left: 0; top: 0.95em; width: 0.45em; height: 0.45em; background: var(--accent); transform: rotate(45deg); }
+.src { display: block; font-size: 0.68em; color: var(--muted); font-family: ui-monospace, "DejaVu Sans Mono", monospace; margin-top: 0.15em; }
+code { font-family: ui-monospace, "DejaVu Sans Mono", monospace; font-size: 0.92em; color: var(--bright); }
+.split { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); align-items: center; }
+.split.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.split.list { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); align-items: start; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+figure { margin: 0; position: relative; }
+figure video, figure img { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); background: #0b0e0c; }
+figcaption { font-size: 0.72em; color: var(--muted); margin-top: 0.45em; }
+figure.sound::after { content: "♪ sound"; position: absolute; top: 8px; left: 8px; font-size: 12px; padding: 2px 8px; border-radius: 10px; background: rgba(20, 24, 22, 0.85); color: var(--bright); border: 1px solid var(--border); pointer-events: none; }
+.title { text-align: center; align-items: center; }
+.title .wordmark { width: min(700px, 86vw); height: auto; display: block; margin: 0 auto 0.6em; }
+.title .lead { margin: 0 auto 1.2em; text-align: center; }
+.title figure { max-width: 1060px; margin: 0 auto; }
+.hint { font-size: 0.7em; color: var(--muted); margin-top: 1.2em; }
+kbd { border: 1px solid var(--border); border-radius: 4px; padding: 0 0.35em; font-size: 0.9em; background: var(--raised); }
+svg.diagram { width: 100%; height: auto; display: block; }
+svg text { font-family: "DejaVu", Verdana, sans-serif; }
+.callouts { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* One interaction for the loop nodes and the explained lists: hover or focus previews, click or Enter pins. */
+.picks { list-style: none; padding: 0; margin: 0; }
+.picks button { all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer; padding: 0.45em 0.6em 0.45em 1.6em; position: relative; border-bottom: 1px solid rgba(115, 98, 65, 0.25); border-radius: 4px; }
+.picks button::before { content: "▸"; position: absolute; left: 0.45em; color: var(--accent); transition: transform 0.15s; }
+.picks button:hover, .picks button:focus-visible { background: var(--raised); }
+.picks button:focus-visible { outline: 2px solid var(--bright); outline-offset: 1px; }
+.picks li.on > button { background: var(--raised); color: var(--bright); }
+.picks li.on > button::before { transform: rotate(90deg); }
+.picks .more { display: none; padding: 0.2em 0.6em 0.7em 1.6em; font-size: 0.86em; }
+.picks li.on .more { display: block; }
+.picks .more p { margin: 0.25em 0; }
+.stage { display: grid; gap: 12px; }
+.stage.two { grid-template-columns: 1fr 1fr; }
+.loop-panel .static ul { margin-top: 0.4em; }
+.loop-panel .detail { display: none; }
+.loop-panel.active .static { display: none; }
+.loop-panel.active .detail { display: block; }
+.node { cursor: pointer; outline: none; }
+.node rect { transition: fill 0.15s; }
+.node:hover rect, .node:focus-visible rect, .node.on rect { fill: rgb(58, 66, 49); }
+.node:focus-visible rect { stroke: rgb(232, 190, 110); stroke-width: 3; }
+.arrow { stroke: rgb(115, 98, 65); transition: stroke 0.15s, stroke-width 0.15s; }
+.arrow.lit { stroke: rgb(232, 190, 110); stroke-width: 4; }
+.algo { display: inline-block; font-size: 0.82em; font-weight: 700; letter-spacing: 0.02em; color: rgb(24, 26, 21); background: var(--accent); border-radius: 3px; padding: 0 0.4em; line-height: 1.45; white-space: nowrap; }
+table.prov { width: 100%; border-collapse: collapse; font-size: 0.78em; margin: 0.8em 0; }
+table.prov th, table.prov td { text-align: left; padding: 0.35em 0.6em; border-bottom: 1px solid rgba(115, 98, 65, 0.3); vertical-align: top; }
+table.prov th { color: var(--bright); font-weight: 700; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.grid figure video { cursor: pointer; }
+.devlog-link { font-size: 0.75em; margin-top: 0.6em; display: inline-block; }
+.steps { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); gap: 14px; overflow-x: auto; padding-bottom: 8px; }
+.step { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+.steps.lead { grid-auto-columns: minmax(300px, 1fr); }
+.step .pair { grid-template-columns: 1fr 1fr; gap: 6px; }
+.step-n { font-family: "Cinzel", Georgia, serif; font-weight: 900; font-size: 1.6em; color: var(--bright); line-height: 1; }
+.step p { margin: 0.4em 0 0.6em; font-size: 0.9em; }
+.samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 1.2em; }
+.sample { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+.sample span { display: block; font-size: 0.78em; color: var(--muted); margin-bottom: 6px; }
+.sample audio { width: 100%; height: 34px; }
+nav.index { position: fixed; right: 14px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 9px; z-index: 5; }
+nav.index a { display: block; width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--accent); position: relative; }
+nav.index a.on { background: var(--accent); }
+nav.index a span { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); white-space: nowrap; font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; opacity: 0; pointer-events: none; transition: opacity .15s; }
+nav.index a:hover span, nav.index a:focus-visible span { opacity: 1; }
+a { color: var(--bright); }
+.end { text-align: center; }
+@media (max-width: 900px) {
+  .split, .split.even, .split.list, .pair, .stage.two, .grid { grid-template-columns: 1fr; }
+  nav.index { display: none; }
+  section { min-height: auto; }
+  html { scroll-snap-type: none; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav class="index" aria-label="Sections"></nav>
+
+<section id="title" class="title" data-title="Midgard">
+  <div class="wrap">
+    <img class="wordmark" src="docs/wordmark.svg" alt="Midgard">
+    <p class="lead">A Norse settlement and army game, drawn entirely with ThorVG WebCanvas in the browser.</p>
+    <figure class="sound">
+      <video src="docs/opening.mp4" poster="docs/opening.jpg" muted autoplay loop playsinline controls preload="metadata"></video>
+      <figcaption>The opening saga, with its narration and music, captured from the game.</figcaption>
+    </figure>
+    <p class="hint">Step through with <kbd>Space</kbd> or the arrow keys. Every clip loops silently while it is on screen; clips marked ♪ carry the game's own sound: unmute them with their speaker button.</p>
+  </div>
+</section>
+
+<!-- story:saga -->
+<section id="story-saga" data-title="How the opening saga was made">
+  <div class="wrap">
+    <div class="kicker">How it was made</div>
+    <h2>How the opening saga was made</h2>
+    <p class="sub">Six narrated panels on a 1600 × 900 board, drawn as vector shapes. The fighters were traced from design sheets and have no rig.</p>
+    <h3 style="color:var(--bright);margin:.6em 0 .4em">From sheet to screen: the saga’s fighters</h3>
+    <div class="steps lead">
+      <figure class="step"><div class="step-n">1</div><p>A design sheet: Odin in three poses, coiled, the thrust, the thrust held.</p><img src="docs/story/saga/sheet-thrust.webp" alt="Design sheet: Odin in three poses with his spear" loading="lazy"><figcaption>Design sheet, generated with Codex 6.1.</figcaption><img src="docs/story/saga/sheet-warriors.webp" alt="Design sheet: Odin with his spear between two kneeling brothers with shields" loading="lazy"><figcaption>The second sheet, generated with Codex 6.1: Odin between his brothers.</figcaption></figure>
+      <figure class="step"><div class="step-n">2</div><p>Vectorised: the sheet traced into flat filled paths by a vectorizer tool, numbered back to front.</p><div class="pair"><img src="docs/story/saga/sheet-pose-1.webp" alt="The first pose on the sheet" loading="lazy"><img src="docs/story/saga/02-traced-paths.webp" alt="The same pose traced into numbered paths" loading="lazy"></div><figcaption>The same pose: sheet, then traced paths.</figcaption><span class="src">packages/native-renderer/src/saga-fighter-parts.ts (generated path data)</span></figure>
+      <figure class="step"><div class="step-n">3</div><p>No rig: the fighters have no bones; the blow is three traced drawings shown in turn over the same planted boots.</p><img src="docs/story/saga/03-odin-three-poses.webp" alt="Odin’s three traced poses" loading="lazy"><figcaption>Coiled, thrust, held: lean, crouch and wind differ, the boots stay.</figcaption><span class="src">saga-fighters.ts (allfatherStriking)</span></figure>
+      <figure class="step"><div class="step-n">4</div><p>Motion without joints: cloak and hair outline points ride a travelling wave that dies away at a guard line.</p><img src="docs/story/saga/05-cloth-on-planted-feet.webp" alt="Cape and hair change shape between moments while the boots stay still" loading="lazy"><span class="src">saga-fighters.ts (Streamer, Flowing) · tests/regression/saga-fighters.test.ts</span></figure>
+      <figure class="step sound"><div class="step-n">5</div><p>The finished panel in the game: the slaying, at its real pace with its sound.</p><video src="docs/story/saga/slaying-panel.mp4" muted autoplay loop playsinline controls preload="metadata"></video><span class="src">saga-creation-panels.ts (slayingPanel) · intro-saga.ts</span></figure>
+    </div>
+    <h3 style="color:var(--bright);margin:1em 0 .4em">The rest of the saga</h3>
+    <div class="steps">
+      <figure class="step"><div class="step-n">1</div><p>Six panels tell the story: the void, the slaying, the shaping of Midgard, what festers below, the gate, the waking.</p><img src="docs/story/saga/01-six-panels.webp" alt="each row is one panel at its start, middle and end." loading="lazy"><figcaption>each row is one panel at its start, middle and end.</figcaption><span class="src">apps/web/src/native/intro-saga.ts (order, captions, narration lengths), saga-creation-panels.ts, saga-descent-panels.ts, saga-waking-panel.ts, saga-panel.ts (shared drawing kit).</span></figure>
+      <figure class="step"><div class="step-n">4</div><p>The brothers stand guard; only their cloaks move.</p><img src="docs/story/saga/04-brothers-cloak.webp" alt="each brother calm and in rising wind." loading="lazy"><figcaption>each brother calm and in rising wind.</figcaption><span class="src">saga-fighters.ts (brotherOnGuard).</span></figure>
+      <figure class="step"><div class="step-n">6</div><p>The slaying panel is timed in fractions of its own length: the camera closes on Odin, the spear lands at 0.4, the giant topples.</p><img src="docs/story/saga/06-slaying-keyframes.webp" alt="wide, closing in, the glint, the lunge, the flash, the cracks, pulling back, the fall." loading="lazy"><figcaption>wide, closing in, the glint, the lunge, the flash, the cracks, pulling back, the fall.</figcaption><span class="src">saga-creation-panels.ts (slayingPanel).</span></figure>
+      <figure class="step"><div class="step-n">7</div><p>The giant is one head and one body for every panel; mane, beard and shoulder locks each swing about their own root.</p><img src="docs/story/saga/08-giant-wakes.webp" alt="asleep, lids parting, glaring down." loading="lazy"><figcaption>asleep, lids parting, glaring down.</figcaption><span class="src">saga-giant.ts.</span></figure>
+      <figure class="step"><div class="step-n">8</div><p>When he is struck, cracks open, hard-edged splinters tumble away, and snow rises as he goes down.</p><img src="docs/story/saga/09-fall-and-ice.webp" alt="four moments after the blow." loading="lazy"><figcaption>four moments after the blow.</figcaption><span class="src">saga-creation-panels.ts, assets/saga/giant-blow.json (hit burst, a Lottie made with the project's FX tool).</span></figure>
+      <figure class="step"><div class="step-n">9</div><p>Narration and sound follow the panel: one take per panel starts 0.7 s in, captions are split by phrase length, cues fire at fixed fractions.</p><span class="src">intro-saga.ts, public/assets/audio/NOTICE.md.</span></figure>
+    </div>
+  </div>
+</section>
+<!-- /story:saga -->
+
+<section id="loop" data-title="The game loop">
+  <div class="wrap">
+    <div class="kicker">The game</div>
+    <h2>The game loop</h2>
+    <div class="split even" data-explorer="loop">
+      <svg class="diagram" viewBox="0 0 600 540" role="group" aria-label="The game loop: gathering, settlement, Odin's altar, crafting, expeditions, and back">
+        <defs>
+          <marker id="arrow-dim" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="rgb(115,98,65)"/></marker>
+          <marker id="arrow-lit" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="rgb(232,190,110)"/></marker>
+        </defs>
+        <g fill="none" stroke-width="2.5">
+          <path class="arrow" data-from="gathering" d="M128 168 Q170 92 210 76" marker-end="url(#arrow-dim)"/>
+          <path class="arrow" data-from="settlement" d="M390 76 Q448 92 484 166" marker-end="url(#arrow-dim)"/>
+          <path class="arrow" data-from="altar" d="M520 268 Q520 348 470 410" marker-end="url(#arrow-dim)"/>
+          <path class="arrow" data-from="crafting" d="M362 470 Q300 494 240 470" marker-end="url(#arrow-dim)"/>
+          <path class="arrow" data-from="expeditions" d="M110 410 Q76 340 86 268" marker-end="url(#arrow-dim)"/>
+        </g>
+        <text x="36" y="350" font-size="14" fill="rgb(157,151,128)">spoils</text>
+        <g font-size="19" text-anchor="middle">
+          <g class="node" tabindex="0" role="button" data-pick="gathering" aria-label="Gathering"><rect x="10" y="172" width="170" height="92" rx="9" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="95" y="212" fill="rgb(225,216,189)">Gathering</text><text x="95" y="238" font-size="13" fill="rgb(157,151,128)">wood, stone, food</text></g>
+          <g class="node" tabindex="0" role="button" data-pick="settlement" aria-label="Settlement"><rect x="215" y="24" width="170" height="92" rx="9" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="300" y="64" fill="rgb(225,216,189)">Settlement</text><text x="300" y="90" font-size="13" fill="rgb(157,151,128)">build and connect</text></g>
+          <g class="node" tabindex="0" role="button" data-pick="altar" aria-label="Odin's altar"><rect x="420" y="172" width="170" height="92" rx="9" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="505" y="212" fill="rgb(225,216,189)">Odin's altar</text><text x="505" y="238" font-size="13" fill="rgb(157,151,128)">new residents</text></g>
+          <g class="node" tabindex="0" role="button" data-pick="crafting" aria-label="Crafting"><rect x="365" y="414" width="170" height="92" rx="9" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="450" y="454" fill="rgb(225,216,189)">Crafting</text><text x="450" y="480" font-size="13" fill="rgb(157,151,128)">bench and smithy</text></g>
+          <g class="node" tabindex="0" role="button" data-pick="expeditions" aria-label="Expeditions"><rect x="65" y="414" width="170" height="92" rx="9" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="150" y="454" fill="rgb(225,216,189)">Expeditions</text><text x="150" y="480" font-size="13" fill="rgb(157,151,128)">beyond the gates</text></g>
+          <text x="300" y="282" fill="rgb(232,190,110)" font-size="22" font-weight="700">Seal every gate</text>
+          <text x="300" y="308" fill="rgb(157,151,128)" font-size="14">hover or tap a step</text>
+        </g>
+      </svg>
+      <div class="loop-panel">
+        <div class="static">
+          <ul class="points">
+            <li>Gathering: wood, stone and food are gathered by hand and carried home in packs.</li>
+            <li>Settlement: build homes, workshops and roads; residents work on Auto.</li>
+            <li>Odin's altar: new residents come from offerings.</li>
+            <li>Crafting: tools and weapons are made at a bench, in the open.</li>
+            <li>Expeditions: a few lead through a gate against many; the spoils come home.</li>
+          </ul>
+        </div>
+        <div class="detail" aria-live="polite">
+          <h3 data-detail-title style="color:var(--bright);margin:0 0 .3em"></h3>
+          <p data-detail-text style="margin:0 0 .8em"></p>
+          <p data-detail-link style="margin:-.4em 0 .8em;font-size:.8em"></p>
+          <figure class="sound"><video data-detail-video muted loop playsinline controls preload="none"></video></figure>
+        </div>
+      </div>
+      <template data-node="gathering" data-video="docs/felling.mp4">Wood, stone and food are gathered by hand and carried in packs; a pack goes to storage when it is full. A tool makes the work faster.</template>
+      <template data-node="settlement" data-video="docs/town-life.mp4" data-link="#buildings">Homes, workshops, farms, markets and halls, joined by roads; every building is a small 3D model drawn as vector shapes. Residents have homes, work, hunger and rest; on Auto they choose useful work.</template>
+      <template data-node="altar" data-video="docs/altar.mp4">An offering of water, bones, gold, food and stone calls a new resident. A richer offering brings a stronger one; a small one can be refused.</template>
+      <template data-node="crafting" data-video="docs/workbench.mp4">A resident walks to the workbench, weaponsmith or armorer and makes the item in the open. Nothing is paid until it is done.</template>
+      <template data-node="expeditions" data-video="docs/dungeon-arc.mp4">Choose a party and a floor at a gate, fight the swarm and its dens, fell the guardian, and bring the spoils home.</template>
+    </div>
+  </div>
+</section>
+
+<section id="dungeons" data-title="Dungeons">
+  <div class="wrap split">
+    <figure class="sound">
+      <video src="docs/dungeon-arc.mp4" poster="docs/dungeon-arc.jpg" muted autoplay loop playsinline controls preload="metadata"></video>
+      <figcaption>One expedition, start to finish, with the game's sound. The party is staged; the second den is finished by script and the guardian comes to the party half spent, to keep it short.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker">The game</div>
+      <h2>Dungeons</h2>
+      <ul class="points">
+        <li>1 · Gather the party: tick residents in the gate's expedition window, pick a floor.</li>
+        <li>2 · Through the gate: they walk to it and step in.</li>
+        <li>3 · The world beyond: a real island of that world rises from the sea.</li>
+        <li>4 · Fight the swarm: dens breed until destroyed.</li>
+        <li>5 · The guardian: its fall clears the floor; the brood breaks.</li>
+        <li>6 · Home with the spoils: banked only when the party is back; a result screen tells the slain, the dens, each member's state and the rewards.</li>
+      </ul>
+      <span class="src">packages/engine/src/realm-layout.ts · town-realm.ts · gate-seals.ts · apps/web/src/native/expedition-window.ts</span>
+      <a class="devlog-link" href="docs/devlog/expedition.html">See the working gallery: the expedition window and results</a>
+    </div>
+  </div>
+</section>
+
+<section id="monsters" data-title="Monsters">
+  <div class="wrap split">
+    <figure class="sound">
+      <video src="docs/army-fight.mp4" poster="docs/army-fight.jpg" muted autoplay loop playsinline controls preload="metadata"></video>
+      <figcaption>Six residents attack-move on a den; skills fire on auto until it falls. Real time.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker">The game</div>
+      <h2>Monsters</h2>
+      <ul class="points">
+        <li>Monsters win by numbers: a floor holds dozens of them.</li>
+        <li>Swarmers are small and quick and die to a blow or two.</li>
+        <li>Dens never move: they breed swarmers until destroyed.</li>
+        <li>Spitters shoot from range; grunts lead packs; brutes and stalkers are the tougher ranks.</li>
+        <li>A guardian holds every floor and telegraphs its slams.</li>
+        <li>A pack hunts by a <span class="algo">Dijkstra flow field</span> from its prey, shared by every monster and cached for 0.4 s.</li>
+        <li>Each kind of gate has its own creature: goblins, draugr, imps, jotnar, wargs.</li>
+      </ul>
+      <span class="src">packages/engine/src/combat-events.ts (MonsterRank) · monster-ranks.ts · town-realm.ts · monster-navigation.ts (flowTo) · native-renderer/src/monster-figures.ts</span>
+    </div>
+  </div>
+</section>
+
+<section id="control" data-title="Control">
+  <div class="wrap split">
+    <figure class="sound">
+      <video src="docs/formation.mp4" poster="docs/formation.jpg" muted autoplay loop playsinline controls preload="metadata"></video>
+      <figcaption>A move order for the party: the marks show the formation, then Hold.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker">The game</div>
+      <h2>A few against many</h2>
+      <ul class="points">
+        <li>Move ignores the enemy; attack-move fights on the way.</li>
+        <li>A group move arrives in formation: blades in front, bows and staves behind.</li>
+        <li>Hold stands its ground and never chases.</li>
+        <li>Control groups on the digit keys; both skills on <kbd>Q</kbd> and <kbd>W</kbd>.</li>
+        <li>The player's order always comes first.</li>
+      </ul>
+      <span class="src">apps/web/src/native/army-keys.ts · army-orders.ts · control-groups.ts · skill-commands.ts</span>
+    </div>
+  </div>
+</section>
+
+<section id="weapons" data-title="Weapons and tools">
+  <div class="wrap">
+    <div class="kicker">The game</div>
+    <h2>Weapons and tools</h2>
+    <div class="split even">
+      <div class="pair">
+        <figure class="sound"><video src="docs/workbench.mp4" poster="docs/workbench.jpg" muted autoplay loop playsinline controls preload="metadata"></video><figcaption>A wooden axe made at the workbench.</figcaption></figure>
+        <figure class="sound"><video src="docs/felling.mp4" poster="docs/felling.jpg" muted autoplay loop playsinline controls preload="metadata"></video><figcaption>The axe against bare hands.</figcaption></figure>
+      </div>
+      <div>
+        <ul class="points">
+          <li>Items are made in the world at the workbench and the smithy, each raised from level 1 to 3.</li>
+          <li>Nothing is paid until the item is done; an order can be cancelled freely.</li>
+          <li>Tools speed one kind of work, in tiers: hands, wood, stone, iron; a tool works from the pack, no slot needed.</li>
+          <li>Shields block some blows (with a one-handed weapon); armour and helmets soak some damage.</li>
+          <li>A blow takes the shape of its weapon: a sword cleaves, a mace crushes, a bow pierces, a staff splashes.</li>
+        </ul>
+        <span class="src">packages/engine/src/equipment.ts · craft-stations.ts · town-equipment.ts · skill-catalog.ts (strikeOf)</span>
+      <a class="devlog-link" href="docs/devlog/smithy-and-tools.html">See the working gallery: the smithy and tools</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="characters" data-title="Characters">
+  <div class="wrap">
+    <div class="kicker">The game</div>
+    <h2>Characters</h2>
+    <div class="split even">
+      <div class="pair">
+        <figure class="sound"><video src="docs/altar.mp4" poster="docs/altar.jpg" muted autoplay loop playsinline controls preload="metadata"></video><figcaption>A kingly offering at Odin's altar.</figcaption></figure>
+        <figure class="sound"><video src="docs/revive.mp4" poster="docs/revive.jpg" muted autoplay loop playsinline controls preload="metadata"></video><figcaption>A fallen warrior raised by an ally.</figcaption></figure>
+      </div>
+      <div>
+        <ul class="points">
+          <li>Five fighting callings: warrior, ranger, mage, cleric, bard.</li>
+          <li>Two skills each, the second from level 4; on auto or fired by hand.</li>
+          <li>A resident at the end of their strength falls and bleeds out unless an ally kneels beside them.</li>
+          <li>New residents come from offerings at Odin's altar, graded humble to kingly.</li>
+          <li>A small offering can be refused; the gifts are gone either way.</li>
+          <li>Odin sends only so many: the cap rises as floors are cleared.</li>
+        </ul>
+        <span class="src">packages/engine/src/skill-catalog.ts · town-downed.ts · prayer-offering.ts · altar-cap.ts</span>
+      <a class="devlog-link" href="docs/devlog/altar.html">See the working gallery: the altar</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="paint-tree" data-title="ThorVG: the paint tree">
+  <div class="wrap split even">
+    <div>
+      <div class="kicker">How ThorVG is used</div>
+      <h2>A retained paint tree</h2>
+      <p class="lead">The game builds its own tree of nodes and syncs only what changed into ThorVG each frame.</p>
+      <ul class="points">
+        <li>Each node becomes a ThorVG Shape, Scene, Text or Picture once and is kept.</li>
+        <li>A path is re-sent only when its path version moves; style only when its style version moves.</li>
+        <li>A move or a fade sends a transform or an opacity, nothing else.</li>
+        <li>A child at alpha 0 is detached and not even visited.</li>
+        <li>A scene whose child list changes is cleared and refilled.</li>
+        <li>Pictures share pixels through ThorVG duplicates; unreachable objects are disposed.</li>
+      </ul>
+      <span class="src">packages/native-renderer/src/paint.ts · webcanvas-adapter.ts (sync, collect)</span>
+    </div>
+    <svg class="diagram" viewBox="0 0 600 460" role="img" aria-label="Diagram: game nodes with version counters synced by the adapter into ThorVG objects">
+      <g font-size="15">
+        <text x="20" y="28" fill="rgb(232,190,110)" font-weight="700">Game nodes (paint.ts)</text>
+        <text x="350" y="28" fill="rgb(232,190,110)" font-weight="700">ThorVG (WebCanvas)</text>
+        <g stroke="rgb(191,161,99)" fill="rgb(35,39,32)">
+          <rect x="20" y="50" width="220" height="44" rx="6"/><rect x="50" y="118" width="190" height="44" rx="6"/>
+          <rect x="80" y="186" width="160" height="58" rx="6"/><rect x="80" y="268" width="160" height="44" rx="6"/>
+          <rect x="50" y="336" width="190" height="44" rx="6" stroke-dasharray="4 4"/>
+          <rect x="350" y="50" width="220" height="44" rx="6"/><rect x="380" y="118" width="190" height="44" rx="6"/>
+          <rect x="410" y="186" width="160" height="58" rx="6"/><rect x="410" y="268" width="160" height="44" rx="6"/>
+        </g>
+        <g fill="rgb(225,216,189)">
+          <text x="34" y="78">SceneNode  world</text><text x="64" y="146">SceneNode  row 41</text>
+          <text x="94" y="210">ShapeNode  tree</text><text x="94" y="232" font-size="12" fill="rgb(157,151,128)">pathVersion 3 · styleVersion 1</text>
+          <text x="94" y="296">ShapeNode  shadow</text><text x="64" y="364" fill="rgb(157,151,128)">ShapeNode  alpha 0</text>
+          <text x="364" y="78">tvg.Scene</text><text x="394" y="146">tvg.Scene</text>
+          <text x="424" y="210">tvg.Shape</text><text x="424" y="232" font-size="12" fill="rgb(157,151,128)">created once, kept</text>
+          <text x="424" y="296">tvg.Shape</text>
+        </g>
+        <g stroke="rgb(232,190,110)" stroke-width="1.5" fill="none" stroke-dasharray="5 5">
+          <path d="M240 72H350"/><path d="M240 140H380"/><path d="M240 215H410"/><path d="M240 290H410"/>
+        </g>
+        <path d="M240 358H330" stroke="rgb(202,112,83)" stroke-width="1.5"/><text x="300" y="398" fill="rgb(202,112,83)" font-size="13">not attached, not visited</text>
+        <text x="20" y="436" fill="rgb(157,151,128)" font-size="13">sync(root): only nodes whose version moved are sent again</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section id="buildings" data-title="ThorVG: buildings">
+  <div class="wrap">
+    <div class="kicker">How ThorVG is used</div>
+    <h2>Buildings: 3D models drawn as 2D vector shapes</h2>
+    <p class="lead">Each building is a few blocks of data. The game projects them, keeps only the faces the camera can see, orders the pieces and bakes one vector animation that ThorVG plays.</p>
+    <div class="split">
+      <figure><video src="docs/buildings.mp4" poster="docs/buildings.jpg" muted autoplay loop playsinline></video><figcaption>A smithy at level 3 (12 blocks, 1 yard patch): its boxes, its 59 faces and their tones, 181 depth-ordered batches, the ThorVG frame, then its construction.</figcaption></figure>
+      <div>
+        <ul class="points">
+          <li>An asset is variants of up to 64 blocks: bounds in tiles, wall, roof and base heights, a roof shape (flat, gable either way, pyramid), lit and shade colours, windows, a door, trim.<span class="src">packages/content/assets/buildings/*.json · building-asset.ts</span></li>
+          <li><span class="algo">Isometric projection</span> (2:1): x = (x − y)·32, y = (x + y)·16 − height.<span class="src">building-model.ts BuildingProjection</span></li>
+          <li>Only the two front walls are made, front-left in the lit colour and front-right in the shade colour; back roof slopes are kept for the gables.<span class="src">building-faces.ts wallFaces · roofFaces</span></li>
+          <li>Hidden surfaces: faces cut into convex pieces (<span class="algo">Ear clipping</span>), a <span class="algo">BSP tree</span> in screen x, y and depth, walked back to front (<span class="algo">Painter's algorithm</span>).<span class="src">building-depth.ts depthOrder · partition · depthBatches</span></li>
+          <li>Baked once into one Lottie animation: hold-keyed paths per depth slot, a vertical gradient fill and a soft stroke; ThorVG loads it as an Animation and each frame only picks a frame number.<span class="src">building-animation.ts · webcanvas-adapter.ts · world-animation.ts</span></li>
+          <li>Rebuilt only when the building, its angle or its asset changes; a raised workshop sinks its old model while the new one rises.<span class="src">world-objects.ts syncVisuals · town-equipment.ts raiseStation</span></li>
+          <li>The catalogue: 39 buildings, 105 variants, 480 blocks.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pair" style="margin-top:14px">
+      <figure><video src="docs/buildings-turn.mp4" poster="docs/buildings-turn.jpg" muted autoplay loop playsinline></video><figcaption>Placement angles: quarter turns rewrite the model, the rest turns it; the faces are made and ordered again.</figcaption></figure>
+      <figure><video src="docs/buildings-studio.mp4" poster="docs/buildings-studio.jpg" muted autoplay loop playsinline></video><figcaption>The Building Studio (F4): a block made taller, its roof turned to a pyramid, windows added.</figcaption></figure>
+    </div>
+    <p class="sub" style="margin-top:.6em">At night each home, market, tavern or workshop adds one warm pool of light to the night mask at its door.<span class="src">world-objects.ts · world-vision.ts</span></p>
+  </div>
+</section>
+
+<section id="optimisation" data-title="ThorVG: optimisation">
+  <div class="wrap">
+    <div class="kicker">How ThorVG is used</div>
+    <h2>Optimisation</h2>
+    <p class="sub">Pick a technique: its clip is drawn from the live renderer's own state.</p>
+    <div class="split list" data-explorer="list">
+      <ul class="picks">
+        <li><button data-pick="cull" data-video="docs/opt-culling.mp4"><span class="algo">Frustum (view) culling</span> and fog</button>
+          <div class="more"><p>Each frame <code>sortWorldObjects()</code> tests every paint's box against <code>viewRect()</code>: the view widened by 64 px. A paint outside is not attached, so ThorVG never sees it.</p><p>A box wholly under unexplored fog is dropped too; that test (<code>underVeil</code>, nine samples) is cached per fog revision.</p><p>The map holds thousands of trees, buildings and figures; a few hundred are on screen.</p><span class="src">packages/native-renderer/src/world-depth.ts</span></div></li>
+        <li><button data-pick="depth" data-video="docs/opt-depth.mp4"><span class="algo">Sweep and prune</span> + <span class="algo">Topological sort</span> (Kahn), cached</button>
+          <div class="more"><p>A 1-D sweep on box x (sort and sweep) finds boxes that overlap; <code>compareBaselines()</code> orders each pair by where their ground baselines meet, so a tall roof never decides it; Kahn's topological sort respects every pair.</p><p><code>orderCache</code> keeps the result: the world's object list is replaced only when the order really changes, so ThorVG's scene is not refilled every frame.</p><span class="src">world-depth.ts (orderedPaints, compareBaselines)</span></div></li>
+        <li><button data-pick="rows" data-video="docs/opt-rows.mp4">One scene per diagonal row of trees</button>
+          <div class="more"><p><code>buildTreeRow()</code> puts each tree of a diagonal row (six fixed shapes each) in one SceneNode; peaks the same way (twelve shapes each).</p><p><code>cullTrees()</code> sets a row out of view to opacity 0: the adapter neither attaches nor visits it.</p><p>Sway is sent at most 24 times a second and only at zoom 0.45 or closer.</p><span class="src">world-trees.ts · tree-painter.ts · mountain-peaks.ts</span></div></li>
+        <li><button data-pick="bank" data-video="docs/opt-bank.mp4"><span class="algo">Pose caching</span>: solved poses shared</button>
+          <div class="more"><p><code>PoseBank.pose()</code> keeps the bone matrices of each clip frame for a creature kind; a pack in step reads the same array.</p><p>A figure whose matrices have not changed is not posed again.</p><p>Fights of 60 to 150 monsters are normal; each solve is forward kinematics plus foot locking.</p><span class="src">rig-pose-bank.ts · monster-figures.ts</span></div></li>
+        <li><button data-pick="paths" data-video="docs/opt-paths.mp4">Outline paths cached per pose</button>
+          <div class="more"><p><code>SkinnedPath.commands()</code> keeps the command list per bone-matrix array; <code>RigSkin.pose()</code> hands that same list to every figure in that pose.</p><p>The adapter re-sends a path only when its path version moves.</p><span class="src">rig-skinned-path.ts · rig-skin.ts</span></div></li>
+        <li><button data-pick="rates" data-video="docs/opt-rates.mp4"><span class="algo">Update-rate LOD</span> for water and lava</button>
+          <div class="more"><p><code>moveWater()</code> moves the sea bands 12 times a second, <code>updateLava()</code> the lava 6; both halve below zoom 0.5.</p><p>Water only translates its bands; nothing is re-contoured. Lava out of view, or unseen, is left alone.</p><span class="src">water-motion.ts · lava-motion.ts</span></div></li>
+        <li><button data-pick="budgets" data-video="docs/opt-budgets.mp4">Budgets held by the tests</button>
+          <div class="more"><p>The combat layer's JS update with 150 monsters and 60 blows a second must stay under 4 ms a frame; the clip shows the value that test prints when run.</p><p>A swarmer's body must stay within 12 shapes, its child list never changing.</p><p>Both run with <code>npm test</code>, the project's gate.</p><span class="src">tests/regression/combat-effects.test.ts · tests/regression/rig-system.test.ts</span></div></li>
+        <li><button data-pick="cost" data-video="docs/opt-cost.mp4">Measured frame cost</button>
+          <div class="more"><p>Timed: <code>game.render()</code> plus <code>canvas.update().render()</code>, the median of 7 rounds of 30 frames, with no screenshot or simulation step inside the span.</p><p id="cost-numbers">Measured headless on an RTX 3060 Ti while other work loaded the machine (load average about 12 on 12 cores): a camp with 10 residents and 62 monsters, about 9 ms a frame close up and 10 ms zoomed out; the forest fight of 20 residents against 150 monsters, about 31 ms close and 44 ms with the whole fight in view. An earlier figure of 45 and 61 ms had screenshot readback between the timed frames and is withdrawn.</p><span class="src">scripts/docs-media/optimisation-videos.mjs · perf-video.mjs</span></div></li>
+      </ul>
+      <div class="stage"><figure><video data-stage muted loop playsinline preload="none"></video></figure></div>
+    </div>
+  </div>
+</section>
+
+<!-- story:characters -->
+<section id="story-characters" data-title="How residents are animated">
+  <div class="wrap">
+    <div class="kicker">How it was made</div>
+    <h2>How residents are animated</h2>
+    <p class="sub">What this documents: clips of joint angles, blows chosen by weapon, crafting, the bard, worn equipment. Not shown here: reference images and first studies, how a likeness became vector shapes, part layering and garments.</p>
+    <p class="sub"><a href="#story-saga">The design-sheet to traced-path pipeline shown with the opening saga was used for the saga’s fighters, not for the small in-game residents.</a></p>
+    <div class="steps">
+      <figure class="step"><div class="step-n">1</div><p>A blow is one shared clip of joint angles; the weapon decides which: a spear thrusts level with both hands, a sword cuts.</p><img src="docs/story/characters/01-spear-and-sword.webp" alt="top row a spear thrust, bottom row a sword cut, same figure, same timing." loading="lazy"><figcaption>top row a spear thrust, bottom row a sword cut, same figure, same timing.</figcaption><span class="src">packages/native-renderer/src/action-motion.ts (blowOf, poseFromClip), assets/rig/humanoid-thrust.json, humanoid-slash.json.</span></figure>
+      <figure class="step"><div class="step-n">2</div><p>Clips are authored as keys of joint angles and written out as Lottie files that any figure can read.</p><span class="src">rig-clip.ts, humanoid-rig.ts.</span></figure>
+      <figure class="step"><div class="step-n">3</div><p>Making an item has its own motions: paring wood with a knife, hammering stone and iron, working bare-handed, then holding the finished piece up.</p><img src="docs/story/characters/02-craft-poses.webp" alt="rows: paring, hammering, bare hands, lifting a wooden sword, lifting a stone axe, a basket (no lift)." loading="lazy"><figcaption>rows: paring, hammering, bare hands, lifting a wooden sword, lifting a stone axe, a basket (no lift).</figcaption><span class="src">work-motion.ts (animateCraft), world-people.ts, assets/rig/humanoid-whittle.json, humanoid-admire.json, tests/regression/craft-motion.test.ts.</span></figure>
+      <figure class="step"><div class="step-n">4</div><p>The same motion in the game: at the workbench, facing it, then the piece taken up and looked over.</p><img src="docs/story/characters/03-craft-in-game.webp" alt="twelve frames captured from the real app (at night, so dark)." loading="lazy"><figcaption>twelve frames captured from the real app (at night, so dark).</figcaption><span class="src">world-people.ts.</span></figure>
+      <figure class="step"><div class="step-n">5</div><p>A bard plays while standing or walking: only the arms and head take the playing clip, the walk goes on underneath.</p><img src="docs/story/characters/04-bard-playing.webp" alt="rows: idle with the lyre on the back, playing, playing while walking." loading="lazy"><figcaption>rows: idle with the lyre on the back, playing, playing while walking.</figcaption><span class="src">world-people.ts, calling-garments.ts (heldLyre), assets/rig/humanoid-play.json.</span></figure>
+      <figure class="step"><div class="step-n">6</div><p>Equipment is drawn from what is really worn: a pack basket shows on the back from either facing.</p><img src="docs/story/characters/05-pack-basket.webp" alt="four residents: without, with, and facing the other way." loading="lazy"><figcaption>four residents: without, with, and facing the other way.</figcaption><span class="src">person-wearables.ts (wearableBack).</span></figure>
+    </div>
+    <p class="sub" style="margin-top:.8em"><a href="#animation">Next: the shared skeleton of the rigged figures, and inverse kinematics.</a></p>
+  </div>
+</section>
+<!-- /story:characters -->
+
+<section id="animation" data-title="ThorVG: animation">
+  <div class="wrap">
+    <div class="kicker">How ThorVG is used</div>
+    <h2>A shared skeleton and clip set</h2>
+    <p class="lead">Every figure is art bound to bones; every motion is a clip of joint angles that any body of the same skeleton can play.</p>
+    <div class="split">
+      <figure>
+        <video src="docs/rigging.mp4" poster="docs/rigging.jpg" muted autoplay loop playsinline></video>
+        <figcaption>The same clip on Thor and five monsters (the warg plays the four-legged version), each body's solved skeleton drawn over its art. <a href="docs/devlog/rigging.html">See the working gallery</a></figcaption>
+      </figure>
+      <div>
+        <ul class="points">
+          <li>Skeleton: a bone hierarchy with rest joints and joint limits: hips, spine, chest, head, two-bone arms and legs.<span class="src">rig-skeleton.ts · humanoid-rig.ts · quadruped-rig.ts</span></li>
+          <li><span class="algo">Forward kinematics</span> clips: keyframed joint rotations, one Lottie layer per bone, sampled per frame (forward kinematics).<span class="src">rig-clip.ts · assets/rig/*.json</span></li>
+          <li>29 clips: 19 humanoid, 7 four-legged, 3 bird, at 30 frames a second.</li>
+          <li>Clips cross-fade over a short smoothstep blend.<span class="src">rig-figure.ts (play)</span></li>
+          <li>On the rigged figures an <span class="algo">Inverse kinematics</span> pass runs after the clip: <span class="algo">Foot locking</span> for planted clips.<span class="src">rig-figure.ts (plant)</span></li>
+          <li>Rigged figures (monsters, animals, Thor, the outlines of hidden units): <span class="algo">Rigid skinning</span> (one bone per vertex): art pieces ride one bone; outline points each ride theirs, joined by a closed <span class="algo">Catmull-Rom spline</span> written as cubic Béziers.<span class="src">rig-skin.ts · rig-skinned-path.ts</span></li>
+          <li>One skeleton topology and clip set, played on each body's own bone lengths by monsters, Thor and the outlines.<span class="src">monster-figures.ts · thor-figure.ts · ghost-figures.ts</span></li>
+          <li>Residents are not skinned: they read the same clips' joint angles for their arms, drawn as one curved sleeve, lean over planted feet and keep a rigid head.<span class="src">action-motion.ts poseFromClip · person-arm.ts · world-sprites.ts</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ik" data-title="ThorVG: inverse kinematics">
+  <div class="wrap split even">
+    <svg class="diagram" viewBox="0 0 560 420" role="img" aria-label="Diagram: analytic two-bone IK; hip is the root, knee the mid joint, foot the end effector, with a pole hint for the bend direction">
+      <g font-size="15">
+        <line x1="40" y1="360" x2="520" y2="360" stroke="rgba(115,98,65,.7)"/>
+        <text x="44" y="388" fill="rgb(157,151,128)" font-size="13">ground: foot locking holds the foot's spot</text>
+        <path d="M200 90 L300 220 L250 352" fill="none" stroke="rgb(232,190,110)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M200 90 L160 220 L250 352" fill="none" stroke="rgba(202,112,83,.7)" stroke-width="3" stroke-dasharray="6 6"/>
+        <circle cx="200" cy="90" r="9" fill="rgb(255,236,190)"/><circle cx="300" cy="220" r="9" fill="rgb(255,236,190)"/><circle cx="250" cy="352" r="9" fill="rgb(255,236,190)"/>
+        <line x1="200" y1="90" x2="250" y2="352" stroke="rgba(225,216,189,.5)" stroke-dasharray="3 5"/>
+        <circle cx="372" cy="214" r="6" fill="none" stroke="rgb(232,190,110)" stroke-width="2"/><path d="M308 219 L364 215" stroke="rgb(232,190,110)" stroke-dasharray="3 4"/>
+        <text x="214" y="82" fill="rgb(225,216,189)">hip = root</text><text x="382" y="208" fill="rgb(232,190,110)">pole hint</text>
+        <text x="256" y="250" fill="rgb(225,216,189)">knee = mid joint</text>
+        <text x="264" y="350" fill="rgb(225,216,189)">foot = end effector</text>
+        <text x="40" y="226" fill="rgb(202,112,83)">other bend side:</text><text x="40" y="246" fill="rgb(202,112,83)">never taken</text>
+        <text x="330" y="112" fill="rgb(232,190,110)">a = thigh, b = shin</text>
+        <text x="330" y="138" fill="rgb(232,190,110)">d = |target - hip|, clamped</text>
+        <text x="330" y="164" fill="rgb(232,190,110)">to [ |a - b|, a + b ]</text>
+        <text x="330" y="292" fill="rgb(232,190,110)">cos k = (a² + b² - d²) / 2ab</text>
+      </g>
+    </svg>
+    <div>
+      <div class="kicker">How ThorVG is used</div>
+      <h2>Inverse kinematics: two-bone IK and foot locking</h2>
+      <p class="sub">Planted feet, knees that bend the right way.</p>
+      <ul class="points">
+        <li><span class="algo">Analytic two-bone IK</span> (<span class="algo">Law of cosines</span>), with reach clamping.<span class="src">rig-skeleton.ts (reachTurns)</span></li>
+        <li>Bend direction (pole) hint: knees forward for people, a warg's hind hocks back.<span class="src">humanoid-rig.ts · quadruped-rig.ts</span></li>
+        <li><span class="algo">Foot locking</span> (foot planting) on the rigged figures: planted clips keep each foot on its ground spot.<span class="src">rig-figure.ts (plant)</span></li>
+        <li>End-effector (foot) orientation correction keeps the sole flat.<span class="src">rig-figure.ts (plant)</span></li>
+        <li>Residents' arms: two-bone IK with a pole target where a hanging elbow sits; out of reach the arm straightens, and close to the shoulder the upper arm is foreshortened instead of folding back.<span class="src">person-arm.ts (reachArm)</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="environment" data-title="ThorVG: environment">
+  <div class="wrap">
+    <div class="kicker">How ThorVG is used</div>
+    <h2>Weather, day and night</h2>
+    <p class="sub">Pick an effect: the game's clip with its sound, and how it is built in ThorVG, layer by layer. <a href="docs/devlog/trees-and-mountains.html">Working galleries: trees and mountains</a> · <a href="docs/devlog/lava.html">lava</a> · <a href="docs/devlog/rain.html">rain</a></p>
+    <div class="split list" data-explorer="list">
+      <ul class="picks">
+        <li><button data-pick="night" data-video="docs/day-night.mp4" data-build="docs/env-night.mp4">Night: one sheet, an <span class="algo">Inverse-alpha mask</span></button>
+          <div class="more"><p>One dark rect, <code>darkVeil</code>, filled (4, 6, 22) at alpha 170 × night, covers the world.</p><p>It is masked by <code>lit</code>, a scene of <code>softDisc</code> radial-gradient discs at every fire, lamp, window and lava cell (and Thor's bolts), with <code>mask(lit, 'inverseAlpha')</code>: the sheet is cut away where the discs are opaque.</p><p>A second layer, <code>warmth</code>, adds tinted discs with blend <code>screen</code>; the flicker moves, scales and fades the discs at most 20 times a second.</p><span class="src">world-vision.ts buildDarkness · vector-paint.ts softDisc · world-animation.ts · world-objects.ts</span></div></li>
+        <li><button data-pick="clouds" data-video="docs/clouds.mp4" data-build="docs/env-clouds.mp4">Clouds: radial-gradient puffs, a duplicated <span class="algo">Value-noise fBm</span> picture</button>
+          <div class="more"><p>What is drawn is the cloud's shadow on the ground: 30 clusters of 20 dark puffs, each a circle with a radial-gradient fill fading to 0, squashed to half height.</p><p>The clusters are built once and placed over 1150-px tiles by an integer hash; wind moves them by transform.</p><p>One 1024 × 512 raw ARGB picture of tileable value noise (4 octaves of fBm over a hash lattice, smoothstep thresholded), shown at 2048 × 1024 and tiled with 44 <code>duplicate()</code>s, mottles the shade: opacity only, no clip, mask or blend.</p><span class="src">world-weather.ts drift · cloud-mottle.ts</span></div></li>
+        <li><button data-pick="rain" data-video="docs/rain.mp4" data-build="docs/env-rain.mp4">Rain and snow: one shape rebuilt each frame</button>
+          <div class="more"><p><code>precipitation</code> is a single ShapeNode whose path is rebuilt every frame: stroked segments for rain (up to 420 in a storm), filled circles for snow (up to 900).</p><p>An <code>overcast</code> rect greys the view; splashes (filled circles and stroked rings, a pool of 160) sit in their own layer under the units.</p><span class="src">world-weather.ts weather · rain-splash.ts</span></div></li>
+        <li><button data-pick="lightning" data-video="docs/thunderstorm.mp4" data-build="docs/env-lightning.mp4">Lightning: filled strips, a glow, a flash</button>
+          <div class="more"><p>The bolt is filled strips (<code>appendStrip</code>), a pale outer and a white core, with two forks; it shows for the first 0.26 s.</p><p>A radial-gradient glow and a flash rect over the view follow a pulse of 1, 0.3, 0.9 and a fade; the layer is rebuilt each frame for 0.9 s.</p><p>Normal blend over everything: the weather's bolt does not touch the night mask (Thor's bolts do).</p><span class="src">world-weather.ts paintStorm · vector-paint.ts appendStrip · world-thor.ts</span></div></li>
+        <li><button data-pick="water" data-video="docs/water-lava.mp4" data-build="docs/env-water-lava.mp4">Water and lava: contour bands that drift</button>
+          <div class="more"><p><span class="algo">Marching squares</span> (linear interpolation) turn the depth field into closed polygons; each of the five sea bands is one ShapeNode with a solid fill, no gradient.</p><p>The water moves by translating each band, 12 times a second; lava has three bands and breathing spots inside a glow clipped to the molten band, 6 times a second.</p><p>At night each lava cell adds its outline and a soft disc to the night mask, and a tint to warmth.</p><span class="src">contours.ts region · terrain-painter.ts paintSea · water-motion.ts · lava-motion.ts (paintLava, lightLava)</span></div></li>
+      </ul>
+      <div class="stage two">
+        <figure class="sound"><video data-stage muted loop playsinline controls preload="none"></video><figcaption>In the game, with its sound.</figcaption></figure>
+        <figure><video data-stage-build muted loop playsinline preload="none"></video><figcaption>Built layer by layer on the live renderer.</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="combat-fx" data-title="ThorVG: combat effects">
+  <div class="wrap">
+    <div class="kicker">How ThorVG is used</div>
+    <h2>Combat effects in four tiers</h2>
+    <div class="grid" data-hoverplay>
+      <figure class="sound"><video src="docs/fx-strikes.mp4" poster="docs/fx-strikes.jpg" muted loop playsinline controls preload="none"></video><figcaption>Weapon strikes by shape: cleave, crush, pierce, splash.</figcaption></figure>
+      <figure class="sound"><video src="docs/fx-skills.mp4" poster="docs/fx-skills.jpg" muted loop playsinline controls preload="none"></video><figcaption>Each calling's two skills, fired in turn.</figcaption></figure>
+      <figure class="sound"><video src="docs/fx-den.mp4" poster="docs/fx-den.jpg" muted loop playsinline controls preload="none"></video><figcaption>A den destroyed; its brood breaks.</figcaption></figure>
+      <figure class="sound"><video src="docs/fx-numbers.mp4" poster="docs/fx-numbers.jpg" muted loop playsinline controls preload="none"></video><figcaption>Floating numbers: merged per target, crits larger.</figcaption></figure>
+      <figure class="sound"><video src="docs/fx-thor.mp4" poster="docs/fx-thor.jpg" muted loop playsinline controls preload="none"></video><figcaption>Thor's bolt and hammer at night.</figcaption></figure>
+      <figure><video src="docs/fx-timeline.mp4" poster="docs/fx-timeline.jpg" muted loop playsinline controls preload="none"></video><figcaption>One blow at a quarter speed, its phases named.</figcaption></figure>
+    </div>
+    <p class="sub" style="margin-top:.6em">Hover or tap a clip to play it.</p>
+    <div class="split">
+      <div class="pair">
+        <figure>
+          <img src="docs/combat-tiers.jpg" alt="A frame of the fight with overhead numbers and bars and standing pieces marked" loading="lazy">
+          <svg class="callouts" viewBox="0 0 1280 720" preserveAspectRatio="none" aria-hidden="true"><path d="M505 378L330 242" stroke="rgb(232,190,110)" stroke-width="3" fill="none"/><circle cx="505" cy="378" r="7" fill="none" stroke="rgb(232,190,110)" stroke-width="3"/><rect x="20" y="194" width="310" height="54" rx="6" fill="rgba(20,24,22,.9)" stroke="rgb(191,161,99)"/><text x="36" y="231" font-size="30" fill="rgb(232,190,110)">Overhead</text><path d="M345 430L300 600" stroke="rgb(232,190,110)" stroke-width="3" fill="none"/><circle cx="345" cy="430" r="7" fill="none" stroke="rgb(232,190,110)" stroke-width="3"/><rect x="20" y="600" width="310" height="54" rx="6" fill="rgba(20,24,22,.9)" stroke="rgb(191,161,99)"/><text x="36" y="637" font-size="30" fill="rgb(232,190,110)">Standing</text><path d="M818 360L960 460" stroke="rgb(232,190,110)" stroke-width="3" fill="none"/><circle cx="818" cy="360" r="7" fill="none" stroke="rgb(232,190,110)" stroke-width="3"/><rect x="940" y="460" width="320" height="54" rx="6" fill="rgba(20,24,22,.9)" stroke="rgb(191,161,99)"/><text x="956" y="497" font-size="30" fill="rgb(232,190,110)">Standing</text></svg>
+          <figcaption>One frame, two tiers marked: overhead numbers and bars; the whirl and the volley sorted with the world.</figcaption>
+        </figure>
+        <svg class="diagram" viewBox="0 0 400 300" role="img" aria-label="The four draw tiers from bottom to top: ground, standing, body, overhead">
+          <g font-size="18" fill="rgb(225,216,189)">
+            <rect x="20" y="226" width="360" height="54" rx="6" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="36" y="259">Ground · under units (combatGround)</text>
+            <rect x="20" y="160" width="360" height="54" rx="6" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="36" y="193">Standing · depth-sorted slot</text>
+            <rect x="20" y="94" width="360" height="54" rx="6" fill="rgb(35,39,32)" stroke="rgb(191,161,99)"/><text x="36" y="127">Body · 0.03 tile in front</text>
+            <rect x="20" y="28" width="360" height="54" rx="6" fill="rgb(35,39,32)" stroke="rgb(232,190,110)"/><text x="36" y="61">Overhead · words and bars</text>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <ul class="points">
+          <li>Ground: marks under the units, like a frost ring.</li>
+          <li>Standing: pieces depth-sorted with the world, like a whirl or a volley.</li>
+          <li>Body: effects on a figure, just in front of it, like a slash.</li>
+          <li>Overhead: numbers and bars, always on top.</li>
+          <li>A blow takes its weapon's shape: cleave, crush, pierce, splash.<span class="src">strike-effects.ts</span></li>
+          <li>Flat two-tone shapes, no glow; at most 40 effects and 480 pieces live.<span class="src">combat-effects.ts</span></li>
+          <li>Numbers on one target merge within 0.15 s; at most 28 float at once.<span class="src">combat-text.ts</span></li>
+        </ul>
+        <span class="src">combat-depth.ts (Tier) · combat-effects.ts (tierOf) · skill-fields.ts · ground-telegraphs.ts</span>
+      <a class="devlog-link" href="docs/devlog/combat-effects.html">See the working gallery: the combat effects</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="outlines" data-title="ThorVG: hidden units">
+  <div class="wrap split">
+    <figure class="sound">
+      <video src="docs/forest-outlines.mp4" poster="docs/forest-outlines.jpg" muted autoplay loop playsinline controls preload="metadata"></video>
+      <figcaption>A fight deep in a forest: whoever is behind a tree is outlined.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker">How ThorVG is used</div>
+      <h2>Units behind trees</h2>
+      <ul class="points">
+        <li>Ten times a second each unit is tested against the trees and peaks in front of it (<span class="algo">Point in polygon</span>, ray casting).</li>
+        <li>Occluders come from the tree rows' own path commands, indexed by row and position.</li>
+        <li>A hidden unit is traced from its posed figure into one stroke-only shape for friends and one for foes.</li>
+        <li>An outline is uploaded only when it changed.</li>
+      </ul>
+      <span class="src">packages/native-renderer/src/hidden-unit-ghosts.ts · ghost-figures.ts · ghost-trace.ts</span>
+      <a class="devlog-link" href="docs/devlog/hidden-units.html">See the working gallery: the outlines</a>
+    </div>
+  </div>
+</section>
+
+<section id="placement" data-title="Algorithm: placement">
+  <div class="wrap split">
+    <figure>
+      <video src="docs/placement.mp4" poster="docs/placement.jpg" muted autoplay loop playsinline></video>
+      <figcaption>A storehouse carried across the ground; footprint, door, door path and verdict are the game's own answers each frame.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker">Algorithms</div>
+      <h2>Where a building may stand</h2>
+      <ul class="points">
+        <li>A footprint is a rotated square; its door sits just outside the walls.</li>
+        <li>Near a road the building slides beside it and turns its door to the road.</li>
+        <li>The ground is sampled on a quarter-tile grid: water, mountains, ice, lava, rock, fog.</li>
+        <li>Overlap with other footprints: vertex-in-polygon and edge-crossing tests.</li>
+        <li>Not on a road, not over fields, not on another building.</li>
+        <li>Some need forest or rocky ground close by.</li>
+        <li>Builders must be able to walk from the camp to its door: an <span class="algo">A*</span> path on the walk grid, cached per grid.</li>
+      </ul>
+      <span class="src">packages/engine/src/town-construction.ts (fit, canPlace) · geometry.ts (Footprint) · town-models.ts (door)</span>
+    </div>
+  </div>
+</section>
+
+<section id="roads" data-title="Algorithm: roads">
+  <div class="wrap split">
+    <figure>
+      <video src="docs/roads.mp4" poster="docs/roads.jpg" muted autoplay loop playsinline></video>
+      <figcaption>A hand-drawn stroke: its samples, the fitted anchors and handles, the curve, then the road laid.</figcaption>
+    </figure>
+    <div>
+      <div class="kicker">Algorithms</div>
+      <h2>A stroke becomes a road</h2>
+      <ul class="points">
+        <li>The stroke is sampled in screen pixels so a hand may waver a little.</li>
+        <li>A start inside a building is cut back to its edge.</li>
+        <li>An end meeting a road blends between joining at the nearest point and carrying straight in.</li>
+        <li><span class="algo">Ramer-Douglas-Peucker</span> keeps the few points that matter (a point where the stroke doubles back may split too); each becomes a <span class="algo">Cubic Bézier</span> anchor with smooth handles; sharp turns stay sharp.</li>
+        <li>Laid roads join a graph: crossings split, near ends snap, routes by <span class="algo">Dijkstra</span> on a binary heap.</li>
+        <li>Workers find their way by <span class="algo">A*</span> on an 8-connected grid (octile heuristic), switching to the road graph where a road is clear; faster on roads, faster still on paving.</li>
+      </ul>
+      <span class="src">apps/web/src/native/road-stroke.ts (draftRoad) · packages/engine/src/road-network.ts (freehandRoad) · road-graph.ts · walk-paths.ts</span>
+    </div>
+  </div>
+</section>
+
+<section id="ai" data-title="How AI was used">
+  <div class="wrap">
+    <div class="kicker">How AI was used</div>
+    <h2>Sound, voices, effects and code</h2>
+    <div class="split even" style="align-items:start">
+      <div>
+        <h3 style="color:var(--bright);margin:.2em 0">Loach: the audio engine</h3>
+        <ul class="points">
+          <li>A local audio production engine in Python 3.11, driven through a CLI (JSON out), a Python API or an MCP server; GPL-3.0-or-later.</li>
+          <li>Built on NumPy, SciPy, soundfile and pydantic; FFmpeg, Rubber Band and FluidSynth optional, outside the engine.</li>
+          <li>Synthesis it implements: band-limited oscillators, FM, <span class="algo">Additive synthesis</span> partials, <span class="algo">Karplus-Strong</span> plucked strings, <span class="algo">Modal synthesis</span> and filtered noise, a glottal source through a <span class="algo">Formant synthesis</span> vowel tract, envelopes.</li>
+          <li>Effects: <span class="algo">Convolution reverb</span> with a seeded noise impulse, EQ, compression, limiting, delay; loops fold their tail into the start with a crossfade.</li>
+          <li>Physical models it cites: Minnaert bubble resonance (van den Doel 2005) for water, N-wave shocks (Ribner and Roy 1982, Few 1969) for thunder.</li>
+          <li>Loudness by <span class="algo">ITU-R BS.1770</span> (LUFS, true peak); every file gets a sidecar of recipe, seed, input hashes, library versions and analysis.</li>
+          <li>Draws on Earshot (MIT, an optional procedural bank) and reviewed Audio Studio MCP (MIT) for design only; an optional FluidR3 GM SoundFont (MIT, Frank Wen) is not bundled and not used for the game's packs.</li>
+          <li>Voices: Qwen3-TTS 1.7B (code and weights Apache-2.0; VoiceDesign designs a voice from a text description, Base speaks each line in it); some reference voices came from Dia 1.6B (Nari Labs, Apache-2.0). Both run as separate tools; the engine never imports model code.</li>
+        </ul>
+        <h3 style="color:var(--bright);margin:.8em 0 .2em">How it was driven for this game</h3>
+        <ul class="points">
+          <li>An agent writes a deterministic Python score per family: fixed seeds, a mode, tempo and motif per world, floors adding layers, phrase banks for the bard.</li>
+          <li>It renders offline, levels to a target loudness, measures peak, RMS, spectral centroid and the loop seam, and registers each file with a SHA-256 checksum.</li>
+          <li>Nothing in the repository records who listened; Loach states that numeric checks do not replace listening.</li>
+        </ul>
+        <span class="src">scripts/audio/*.py (realm_music, combat_audio, bard_phrases, import_loach_audio, render_cat_call) · packages/native-audio/src/data/audio-sources.json</span>
+      </div>
+      <div>
+        <h3 style="color:var(--bright);margin:.2em 0">Where each sound and the saga art come from</h3>
+        <table class="prov">
+          <tr><th>Family</th><th>How it was made</th><th>Licence (as the notice states)</th></tr>
+          <tr><td>Moment music (dawn, dusk, build, battle)</td><td>Procedural; dawn includes an arrangement of Grieg's public-domain Morning Mood</td><td>CC0 1.0</td></tr>
+          <tr><td>Realm loops (8 worlds × 3 floors)</td><td>Procedural folk instruments, seeded scores</td><td>Project licence (GPL-3.0)</td></tr>
+          <tr><td>Weather, tree fall, collapse, raven</td><td>Procedural</td><td>CC0 1.0</td></tr>
+          <tr><td>UI and most effects</td><td>Loach's own procedural Norse pack</td><td>Project licence</td></tr>
+          <tr><td>Combat effects</td><td>Loach recipe layers mixed with Norse pack slices</td><td>Project licence</td></tr>
+          <tr><td>Wildlife calls</td><td>Procedural; the cat computed separately</td><td>Cat CC0; others not recorded per call</td></tr>
+          <tr><td>Bard phrases</td><td>Karplus-Strong lyre, D dorian</td><td>Project licence</td></tr>
+          <tr><td>Villager and combat voices</td><td>Qwen3-TTS, trimmed and levelled by Loach</td><td>Project licence (model Apache-2.0)</td></tr>
+          <tr><td>Opening narration</td><td>One designed storyteller voice, Qwen3-TTS, hall echo and levelling</td><td>Project licence; exact model revision not recorded</td></tr>
+          <tr><td>The giant's fall (opening)</td><td>Four procedural cues, slowed and layered</td><td>Project licence</td></tr>
+          <tr><td>Reference art for the saga fighters</td><td>Design sheets generated with Codex 6.1, traced into vector paths</td><td>As stated by the project author; no separate licence recorded</td></tr>
+        </table>
+        <p class="src">Legal text: <a href="assets/audio/NOTICE.md">audio notice</a> · <a href="THIRD_PARTY_NOTICES.md">third-party notices</a> · <a href="assets/native-fonts/DejaVuSans.LICENSE">DejaVu</a> · <a href="assets/native-fonts/NotoSansKR.LICENSE">Noto Sans KR</a> · <a href="licenses/Cinzel-OFL.txt">Cinzel</a> · <a href="licenses/ThorVG-WebCanvas-1.1.3.txt">ThorVG WebCanvas</a></p>
+        <h3 style="color:var(--bright);margin:.8em 0 .2em">Logperch: the effects look</h3>
+        <ul class="points">
+          <li>Logperch holds Aurum, a C++ vector editor for game characters drawn with ThorVG, and Aurum FX, an effects tool with 16 recipes (slash, hit spark, shockwave, lightning and more); GPL-3.0.</li>
+          <li>Its handbook gathers timing and readability rules from 201 cited sources (talks, articles, accessibility guidance), weak ones marked low confidence.</li>
+          <li>The game took its flat look guide: one solid colour per piece at full opacity, no gradients, outlines, glow, additive blend or blur.</li>
+          <li>Two tones: a main mass and a lighter companion offset toward the trailing side, with a few warm shards.</li>
+          <li>Timing: anticipation, a bold peak in the first quarter of the life held one extra drawing, then leaving by thinning and breaking apart, never by fading.</li>
+          <li>The game's own effects are drawn in code to these rules.</li>
+        </ul>
+        <figure style="margin-top:.6em"><video src="docs/fx-timeline.mp4" poster="docs/fx-timeline.jpg" muted loop playsinline controls preload="none"></video><figcaption>One blow at a quarter speed: strike, hold and leave, labelled.</figcaption></figure>
+        <h3 style="color:var(--bright);margin:.8em 0 .2em">Character art</h3>
+        <ul class="points">
+          <li>Character design sheets for the opening saga: generated with Codex 6.1, then traced into vector paths by a vectorizer tool (Aurum's); all motion is hand-authored code.</li>
+        </ul>
+        <h3 style="color:var(--bright);margin:.8em 0 .2em">The code</h3>
+        <ul class="points">
+          <li>The repository carries an AGENTS.md of rules for AI coding agents; every change is gated by the regression suite (<code>npm test</code>). Which person or agent wrote which part is not recorded in the repository.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="samples">
+      <div class="sample"><span>Effect · sword clash</span><audio controls preload="none" src="docs/audio/clash.m4a"></audio></div>
+      <div class="sample"><span>Effect · frost skill</span><audio controls preload="none" src="docs/audio/frost.m4a"></audio></div>
+      <div class="sample"><span>Effect · coins</span><audio controls preload="none" src="docs/audio/coins.m4a"></audio></div>
+      <div class="sample"><span>Effect · the giant's fall (opening)</span><audio controls preload="none" src="docs/audio/giant-fall.m4a"></audio></div>
+      <div class="sample"><span>Music · a moment track: the world tree</span><audio controls preload="none" src="docs/audio/world-tree.m4a"></audio></div>
+      <div class="sample"><span>Music · realm loop: Niflheim, floor 1</span><audio controls preload="none" src="docs/audio/niflheim-1.m4a"></audio></div>
+      <div class="sample"><span>Voice · shield maiden</span><audio controls preload="none" src="docs/audio/maiden.m4a"></audio></div>
+      <div class="sample"><span>Voice · huntress</span><audio controls preload="none" src="docs/audio/huntress.m4a"></audio></div>
+      <div class="sample"><span>Voice · veteran</span><audio controls preload="none" src="docs/audio/veteran.m4a"></audio></div>
+      <div class="sample"><span>Narration · the opening's first line</span><audio controls preload="none" src="docs/audio/narration.m4a"></audio></div>
+    </div>
+  </div>
+</section>
+
+<section id="algorithms" data-title="Algorithms used">
+  <div class="wrap">
+    <div class="kicker">Index</div>
+    <h2>Algorithms used</h2>
+    <table class="prov" style="font-size:.85em">
+      <tr><th>Algorithm or technique</th><th>Used for</th><th>Where</th></tr>
+      <tr><td><span class="algo">A*</span></td><td>Walking paths on an 8-connected grid, octile heuristic, no corner cutting</td><td class="src">engine/src/walk-paths.ts WalkGrid.path</td></tr>
+      <tr><td><span class="algo">Dijkstra</span></td><td>Routes along the road graph, binary min-heap</td><td class="src">engine/src/road-graph.ts route · priority-queue.ts</td></tr>
+      <tr><td><span class="algo">Dijkstra flow field</span></td><td>Monster packs hunting their prey</td><td class="src">engine/src/monster-navigation.ts flowTo</td></tr>
+      <tr><td><span class="algo">Flood fill</span></td><td>Connected regions of the walk grid</td><td class="src">engine/src/walk-paths.ts</td></tr>
+      <tr><td><span class="algo">Ramer-Douglas-Peucker</span></td><td>Simplifying a freehand road stroke</td><td class="src">engine/src/road-network.ts freehandRoad</td></tr>
+      <tr><td><span class="algo">Cubic Bézier</span></td><td>Road curves and skinned outlines</td><td class="src">road-network.ts · geometry.ts cubic</td></tr>
+      <tr><td><span class="algo">Catmull-Rom spline</span></td><td>Closed outlines through bone-carried points</td><td class="src">native-renderer/src/rig-skinned-path.ts</td></tr>
+      <tr><td><span class="algo">Marching squares</span></td><td>Water, land and lava contours from height fields</td><td class="src">native-renderer/src/contours.ts</td></tr>
+      <tr><td><span class="algo">Sweep and prune</span> + <span class="algo">Topological sort (Kahn)</span></td><td>Depth order of the world's objects</td><td class="src">native-renderer/src/world-depth.ts orderedPaints</td></tr>
+      <tr><td><span class="algo">Frustum (view) culling</span></td><td>Skipping what the camera cannot see</td><td class="src">world-depth.ts sortWorldObjects · world-trees.ts cullTrees</td></tr>
+      <tr><td><span class="algo">Forward kinematics</span> · <span class="algo">Analytic two-bone IK</span></td><td>Clips, then two-bone legs by the law of cosines; arms with a pole target</td><td class="src">rig-clip.ts · rig-skeleton.ts reachTurns · person-arm.ts reachArm</td></tr>
+      <tr><td><span class="algo">Pose caching</span></td><td>One solve shared by a pack in step</td><td class="src">rig-pose-bank.ts</td></tr>
+      <tr><td><span class="algo">Point in polygon (ray casting)</span></td><td>Hidden units, placement tests</td><td class="src">engine/src/geometry.ts contains · hidden-unit-ghosts.ts</td></tr>
+      <tr><td><span class="algo">Separating axis test</span></td><td>A foot box against walls</td><td class="src">engine/src/person-collision.ts</td></tr>
+      <tr><td><span class="algo">Value-noise fBm</span></td><td>The cloud mottle picture</td><td class="src">native-renderer/src/cloud-mottle.ts</td></tr>
+      <tr><td><span class="algo">Integer hash (lowbias32)</span></td><td>Deterministic randomness from the world seed</td><td class="src">engine/src/numeric.ts hash01</td></tr>
+      <tr><td><span class="algo">Inverse-alpha masking</span></td><td>Night: lights cut from one dark sheet</td><td class="src">native-renderer/src/world-vision.ts buildDarkness</td></tr>
+      <tr><td><span class="algo">Isometric projection</span> · <span class="algo">Ear clipping</span> · <span class="algo">BSP tree</span> · <span class="algo">Painter's algorithm</span></td><td>Buildings: block models to ordered vector faces</td><td class="src">building-model.ts · building-depth.ts</td></tr>
+      <tr><td><span class="algo">Uniform grid spatial hash</span></td><td>Picking what is under the pointer</td><td class="src">native-renderer/src/world-picking.ts</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="devlog" data-title="The development log">
+  <div class="wrap">
+    <div class="kicker">How it was made</div>
+    <h2>The development log</h2>
+    <p class="lead">Working galleries from development, curated: before and after pictures, rejected attempts and the reasons for each change, for characters and rigging, the environment, combat, the gods, the interface and the audio.</p>
+    <p><a href="docs/devlog/index.html">Open the development log</a> · <a href="docs/devlog/gods.html">Thor and Jormungandr</a> · <a href="docs/devlog/audio.html">audio</a></p>
+  </div>
+</section>
+
+<section id="end" class="end" data-title="Play">
+  <div class="wrap">
+    <img class="wordmark" src="docs/wordmark.svg" alt="Midgard" style="width:min(520px,80vw);margin:0 auto 1em;display:block">
+    <p class="lead" style="margin:0 auto 1em;text-align:center">Rendered with ThorVG WebCanvas. Written in TypeScript. Plays in the browser.</p>
+    <p><a href="./">Play Midgard</a> · <a href="https://github.com/thorvg/thorvg.web">ThorVG WebCanvas</a></p>
+  </div>
+</section>
+
+<script>
+(() => {
+  const sections = [...document.querySelectorAll('section')],
+    nav = document.querySelector('nav.index');
+  for (const s of sections) {
+    const a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.setAttribute('aria-label', s.dataset.title);
+    const tip = document.createElement('span');
+    tip.textContent = s.dataset.title;
+    a.append(tip);
+    nav.append(a);
+  }
+  const links = [...nav.children];
+  let current = 0;
+  const seen = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const i = sections.indexOf(e.target);
+        if (e.isIntersecting && e.intersectionRatio > 0.5) {
+          current = i;
+          links.forEach((l, k) => l.classList.toggle('on', k === i));
+        }
+        // Clips loop only while their section is on screen.
+        for (const v of e.target.querySelectorAll('video'))
+          if (e.isIntersecting && v.getAttribute('src') && (v.autoplay || v.matches('[data-stage],[data-stage-build],[data-detail-video]'))) v.play().catch(() => {});
+          else if (!e.isIntersecting) v.pause();
+        if (!e.isIntersecting) for (const a of e.target.querySelectorAll('audio')) a.pause();
+      }
+    },
+    { threshold: [0, 0.5, 1] },
+  );
+  sections.forEach((s) => seen.observe(s));
+  const go = (i) => {
+    current = Math.max(0, Math.min(sections.length - 1, i));
+    sections[current].scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
+  // A clip in a stage loads only when its item is chosen; the one it replaces stops.
+  const load = (video, src) => {
+    if (!video || !src || video.getAttribute('src') === src) return;
+    video.pause();
+    video.src = src;
+    video.play().catch(() => {});
+  };
+  // One pattern everywhere: hover or focus previews, click, tap, Enter or Space pins, Escape clears.
+  for (const box of document.querySelectorAll('[data-explorer]')) {
+    const loop = box.dataset.explorer === 'loop',
+      items = [...box.querySelectorAll('[data-pick]')],
+      panel = box.querySelector('.loop-panel');
+    let pinned = null;
+    const show = (item) => {
+      const key = item?.dataset.pick ?? null;
+      if (loop) {
+        items.forEach((n) => n.classList.toggle('on', n === item));
+        box.querySelectorAll('.arrow').forEach((a) => {
+          const lit = !!key && a.dataset.from === key;
+          a.classList.toggle('lit', lit);
+          a.setAttribute('marker-end', lit ? 'url(#arrow-lit)' : 'url(#arrow-dim)');
+        });
+        panel.classList.toggle('active', !!item);
+        const video = panel.querySelector('[data-detail-video]');
+        if (!item) return video.pause();
+        const t = box.querySelector(`template[data-node="${key}"]`);
+        panel.querySelector('[data-detail-title]').textContent = item.getAttribute('aria-label');
+        panel.querySelector('[data-detail-text]').textContent = t.textContent;
+        const link = panel.querySelector('[data-detail-link]');
+        link.innerHTML = t.dataset.link ? `<a href="${t.dataset.link}">How the buildings are drawn</a>` : '';
+        load(video, t.dataset.video);
+      } else {
+        items.forEach((b) => b.parentElement.classList.toggle('on', b === item));
+        if (!item) return;
+        load(box.querySelector('[data-stage]'), item.dataset.video);
+        load(box.querySelector('[data-stage-build]'), item.dataset.build);
+      }
+    };
+    const pin = (item) => {
+      pinned = loop && pinned === item ? null : item;
+      show(pinned);
+    };
+    for (const item of items) {
+      if (loop) {
+        item.addEventListener('mouseenter', () => show(item));
+        item.addEventListener('mouseleave', () => show(pinned));
+        item.addEventListener('focus', () => show(item));
+        item.addEventListener('blur', () => show(pinned));
+      }
+      item.addEventListener('click', () => pin(item));
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') pin(item);
+        else if (e.key === 'Escape') {
+          pinned = null;
+          show(loop ? null : items[0]);
+          item.blur();
+        } else if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'].includes(e.key)) {
+          const k = items.indexOf(item) + (e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1);
+          items[(k + items.length) % items.length].focus();
+        } else return;
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
+    // The explained lists open on their first item; the loop starts as a plain diagram.
+    if (!loop) pin(items[0]);
+  }
+  addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName) || e.target.closest?.('[data-explorer]')) return;
+    if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) go(current + 1);
+    else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) go(current - 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(sections.length - 1);
+    else return;
+    e.preventDefault();
+  });
+  // The effect grid plays a clip while it is hovered or after a tap.
+  for (const v of document.querySelectorAll('[data-hoverplay] video')) {
+    v.addEventListener('mouseenter', () => v.play().catch(() => {}));
+    v.addEventListener('mouseleave', () => v.pause());
+  }
+  window.docsDeck = { go, get current() { return current; }, count: sections.length };
+})();
+</script>
+</body>
+</html>

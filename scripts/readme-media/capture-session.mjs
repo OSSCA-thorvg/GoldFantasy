@@ -299,7 +299,7 @@ export async function recordGif(page, name, { count, step, arg, clip, keep, last
       done = result === true || result?.done === true,
       area = result?.clip ?? clip;
     await page.screenshot({ path: resolve(raw, `${String(i).padStart(4, '0')}.png`), ...(area ? { clip: area } : {}) });
-    times.push(await page.evaluate(() => media.now));
+    times.push(await page.evaluate(() => (typeof media === 'undefined' ? 0 : media.now)));
     recorded = i + 1;
     if (i % 30 === 0) process.stdout.write(`  ${name}: frame ${i}/${Math.round(count * rate)}\n`);
     if (done === true) break;

@@ -109,7 +109,7 @@ async function buildUp(page, name, insetAfter = -1) {
 }
 
 /** A sample of the effect with the game's own sound: the game runs its world, its sounds and background mixed offline. */
-async function sample(page, name, seconds, frame) {
+export async function sample(page, name, seconds, frame, { silent = false } = {}) {
   const folder = resolve(docsWork, 'frames', name);
   await rm(folder, { recursive: true, force: true });
   await mkdir(folder, { recursive: true });
@@ -142,7 +142,7 @@ async function sample(page, name, seconds, frame) {
   header.writeUInt32LE(pcm.length, 40);
   const wav = resolve(folder, 'sound.wav');
   await writeFile(wav, Buffer.concat([header, pcm]));
-  return { ...(await encodeVideo(name, { fps, crf: 25, audio: mixed.peak > 0.002 ? wav : undefined })), cues: mixed.cues, peak: +mixed.peak.toFixed(3) };
+  return { ...(await encodeVideo(name, { fps, crf: 25, audio: !silent && mixed.peak > 0.002 ? wav : undefined })), cues: mixed.cues, peak: +mixed.peak.toFixed(3) };
 }
 
 export async function captureEnvironmentVideos(session) {
@@ -338,10 +338,10 @@ export async function captureEnvironmentVideos(session) {
         t = game.town,
         r = game.renderer;
       t.weather().force(E.Weather.Rain, 1);
-      media.look(media.view, 1.8);
+      media.look(media.view, 1.05);
       for (let i = 0; i < 40; ++i) media.frame(0.05, true);
       const run = () => {
-        media.look(media.view, 1.8);
+        media.look(media.view, 1.05);
         media.frame(1 / 30, true);
       };
       media.steps = [
@@ -424,13 +424,13 @@ export async function captureEnvironmentVideos(session) {
         p.autoMode = false;
       });
       t.scout(heart.x, heart.y, 20);
-      media.lavaView = { x: heart.x + 7, y: heart.y + 8 };
-      media.look(media.lavaView, 1);
+      media.lavaView = { x: heart.x + 6, y: heart.y + 13 };
+      media.look(media.lavaView, 0.7);
       for (let i = 0; i < 20; ++i) media.frame(0.05, true);
       const tints = r.groundTints.map((d) => d.shape),
         patches = () => lavaPatches(r.ground),
         still = () => {
-          media.look(media.lavaView, 1);
+          media.look(media.lavaView, 0.7);
           media.frame(0.001);
         };
       const lavaParts = (bands, glow) => {
@@ -470,7 +470,7 @@ export async function captureEnvironmentVideos(session) {
           lines: ['water bands move by translate only, 12× a second (6 when zoomed out)', 'lava bands 6× a second, only while seen; at night lava also cuts the dark sheet'],
           source: 'water-motion.ts moveWater · lava-motion.ts updateLava · lightLava',
           frame() {
-            media.look(media.lavaView, 1);
+            media.look(media.lavaView, 0.7);
             media.frame(1 / 30, true);
           },
         },
@@ -480,7 +480,7 @@ export async function captureEnvironmentVideos(session) {
     if (lava) {
       out.waterLava = await buildUp(page, 'env-water-lava');
       out.waterLavaSample = await sample(page, 'water-lava', 5, () => {
-        media.look(media.lavaView, 1);
+        media.look(media.lavaView, 0.7);
         media.frame(1 / 30, true);
         return media.now;
       });

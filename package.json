@@ -36,7 +36,9 @@
     "test:environment": "node tests/regression/environment.browser.mjs",
     "test:progress-hud": "node tests/regression/progress-hud.browser.mjs",
     "media:readme": "node scripts/readme-media/capture.mjs",
-    "media:docs": "node scripts/docs-media/capture.mjs"
+    "media:docs": "node scripts/docs-media/capture.mjs",
+    "docs:devlog": "node scripts/docs-media/build-devlog.mjs",
+    "docs:story": "node scripts/docs-media/build-story-sections.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

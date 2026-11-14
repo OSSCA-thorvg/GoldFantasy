@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Combat effects | Midgard development log</title>
+<meta name="description" content="Flat painted blows, skills and swarm deaths, and where each effect is drawn in depth.">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "DejaVu"; src: url("../../assets/native-fonts/DejaVuSans.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "DejaVu"; src: url("../../assets/native-fonts/DejaVuSans-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../assets/native-fonts/Cinzel-Black.ttf") format("truetype"); font-display: swap; }
+:root {
+  --bg: rgb(17, 20, 18);
+  --surface: rgb(25, 29, 25);
+  --raised: rgb(35, 39, 32);
+  --border: rgba(115, 98, 65, 0.82);
+  --rule: rgba(115, 98, 65, 0.25);
+  --text: rgb(225, 216, 189);
+  --muted: rgb(157, 151, 128);
+  --accent: rgb(191, 161, 99);
+  --bright: rgb(232, 190, 110);
+  --gutter: clamp(16px, 4vw, 64px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 clamp(15px, 1.05vw, 18px)/1.55 "DejaVu", Verdana, sans-serif; }
+.wrap { width: 100%; max-width: 1360px; margin: 0 auto; padding: 0 var(--gutter); }
+nav.top { display: flex; flex-wrap: wrap; gap: 6px 22px; padding: 18px 0; font-size: 0.85em; border-bottom: 1px solid var(--rule); }
+a { color: var(--bright); }
+a:focus-visible { outline: 2px solid var(--bright); outline-offset: 2px; }
+header.page { padding: clamp(28px, 6vh, 64px) 0 clamp(12px, 3vh, 28px); }
+h1, h2 { font-family: "Cinzel", Georgia, serif; font-weight: 900; letter-spacing: 0.04em; color: var(--bright); line-height: 1.12; margin: 0 0 0.35em; }
+h1 { font-size: clamp(28px, 3.6vw, 50px); }
+h2 { font-size: clamp(22px, 2.3vw, 34px); }
+.kicker { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72em; color: var(--muted); margin-bottom: 0.7em; }
+.lead { font-size: clamp(16px, 1.3vw, 21px); max-width: 66ch; margin: 0 0 0.6em; }
+.plain { color: var(--muted); margin: 0; }
+section.part { padding: clamp(24px, 4vh, 44px) 0; border-top: 1px solid var(--rule); }
+section.part > p { max-width: 70ch; margin: 0 0 1.1em; color: var(--text); }
+.grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 16px; align-items: start; }
+figure { margin: 0; }
+figure img, figure video { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); background: #0b0e0c; }
+figure.rejected img, figure.rejected video { border-style: dashed; border-color: var(--muted); }
+figure a { display: block; border-radius: 6px; }
+figcaption { font-size: 0.82em; color: var(--muted); margin-top: 0.5em; }
+.tag { display: inline-block; font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 0.55em; margin-right: 0.45em; border-radius: 4px; border: 1px solid var(--border); color: var(--bright); background: var(--raised); }
+.tag.rejected { color: var(--text); border-style: dashed; border-color: var(--muted); background: transparent; }
+.sound { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+.sound span { display: block; font-size: 0.85em; color: var(--muted); margin-bottom: 8px; }
+.sound audio { width: 100%; height: 34px; }
+.groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(24px, 4vh, 40px) 16px; padding: 8px 0 clamp(24px, 4vh, 40px); }
+.group { grid-column: span var(--n); min-width: 0; }
+.group h2 { font-size: clamp(18px, 1.6vw, 24px); padding-bottom: 0.35em; border-bottom: 1px solid var(--rule); }
+.cards { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.grid.narrow { max-width: 1000px; }
+a.card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; color: var(--text); text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+a.card:hover, a.card:focus-visible { background: var(--raised); border-color: var(--accent); }
+a.card img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; border-bottom: 1px solid var(--rule); background: #0b0e0c; }
+a.card .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+a.card strong { color: var(--bright); font-weight: 700; }
+a.card .what { font-size: 0.86em; color: var(--text); }
+a.card .count { margin-top: auto; font-size: 0.75em; color: var(--muted); }
+footer.pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 26px 0 48px; border-top: 1px solid var(--rule); font-size: 0.9em; }
+@media (max-width: 1000px) {
+  .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .group.wide { grid-column: span 2; }
+  .group.wide .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .grid, .groups, .cards { grid-template-columns: minmax(0, 1fr); }
+  .group, .group.wide { grid-column: auto; }
+  .group.wide .cards { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top" aria-label="Development log"><a href="index.html">&larr; Development log</a><a href="../../docs.html">Back to the presentation</a></nav>
+<header class="page">
+<div class="kicker">Combat and effects</div>
+<h1>Combat effects</h1>
+<p class="lead">Every blow and skill is a flat, two-tone painted shape instead of a glow. Effects are drawn in tiers: marks on the ground go under the units, standing pieces are sorted by depth with them, and only numbers and bars sit on top. The loops below play at game speed.</p>
+</header>
+<section class="part">
+<h2>Weapon blows</h2>
+<div class="grid" style="--cols: 3">
+<figure><video src="combat-effects/strike-single.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A single melee blow: slash and impact."></video><figcaption>A single melee blow: slash and impact.</figcaption></figure>
+<figure><video src="combat-effects/strike-cleave.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Cleave: one swing across two neighbouring monsters."></video><figcaption>Cleave: one swing across two neighbouring monsters.</figcaption></figure>
+<figure><video src="combat-effects/strike-crush.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Crush: a heavy overhead blow that staggers."></video><figcaption>Crush: a heavy overhead blow that staggers.</figcaption></figure>
+<figure><video src="combat-effects/strike-pierce.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Pierce: a shot through two monsters in a line."></video><figcaption>Pierce: a shot through two monsters in a line.</figcaption></figure>
+<figure><video src="combat-effects/strike-splash.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Splash: a burst that spills onto neighbours."></video><figcaption>Splash: a burst that spills onto neighbours.</figcaption></figure>
+<figure><video src="combat-effects/crit-and-block.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Damage numbers, a critical hit, a block, a heal and contact shards."></video><figcaption>Damage numbers, a critical hit, a block, a heal and contact shards.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Skills</h2>
+<div class="grid" style="--cols: 3">
+<figure><video src="combat-effects/skill-challenge.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Challenge (warrior): a taunt ring that draws monsters in."></video><figcaption>Challenge (warrior): a taunt ring that draws monsters in.</figcaption></figure>
+<figure><video src="combat-effects/skill-whirl.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Whirl (warrior): a spin that hits everything around."></video><figcaption>Whirl (warrior): a spin that hits everything around.</figcaption></figure>
+<figure><video src="combat-effects/skill-volley.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Volley (ranger): a ground mark, then arrows rain down on it."></video><figcaption>Volley (ranger): a ground mark, then arrows rain down on it.</figcaption></figure>
+<figure><video src="combat-effects/skill-burst.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Rune burst (mage): a rune circle charges, then detonates."></video><figcaption>Rune burst (mage): a rune circle charges, then detonates.</figcaption></figure>
+<figure><video src="combat-effects/skill-frost.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Frost ring (mage): ice crystals rise, hold and melt."></video><figcaption>Frost ring (mage): ice crystals rise, hold and melt.</figcaption></figure>
+<figure><video src="combat-effects/skill-mend.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Mend (cleric): a healing pulse on a wounded ally."></video><figcaption>Mend (cleric): a healing pulse on a wounded ally.</figcaption></figure>
+<figure><video src="combat-effects/skill-sanctuary.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Sanctuary (cleric): a protective ground area."></video><figcaption>Sanctuary (cleric): a protective ground area.</figcaption></figure>
+<figure><video src="combat-effects/skill-rally.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Rallying verse (bard): an aura around the bard."></video><figcaption>Rallying verse (bard): an aura around the bard.</figcaption></figure>
+<figure><video src="combat-effects/skill-dirge.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Dirge (bard): a weakening song around the bard."></video><figcaption>Dirge (bard): a weakening song around the bard.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Swarms and dens</h2>
+<div class="grid" style="--cols: 3">
+<figure><video src="combat-effects/swarm-kill.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A swarmer dies: it breaks into pieces and dust."></video><figcaption>A swarmer dies: it breaks into pieces and dust.</figcaption></figure>
+<figure><video src="combat-effects/swarm-spawn.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A den spawns a new swarmer."></video><figcaption>A den spawns a new swarmer.</figcaption></figure>
+<figure><video src="combat-effects/den-collapse.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A den collapses and the stones scatter."></video><figcaption>A den collapses and the stones scatter.</figcaption></figure>
+<figure><video src="combat-effects/brood-break.mp4" width="720" height="450" muted autoplay loop playsinline preload="metadata" aria-label="The brood breaks: every swarmer around the den falls apart at once."></video><figcaption>The brood breaks: every swarmer around the den falls apart at once.</figcaption></figure>
+<figure><video src="combat-effects/crowd.mp4" width="720" height="450" muted autoplay loop playsinline preload="metadata" aria-label="A party of five against 120 monsters, blows landing every frame."></video><figcaption>A party of five against 120 monsters, blows landing every frame.</figcaption></figure>
+<figure><video src="combat-effects/guardian-slam.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A guardian winds up behind a red warning, then slams the ground."></video><figcaption>A guardian winds up behind a red warning, then slams the ground.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Draw order</h2>
+<p>The same effect checked with units in front of it and behind it, so nothing paints over a body that stands nearer the camera.</p>
+<div class="grid" style="--cols: 3">
+<figure><video src="combat-effects/order-body-front.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A slash on a monster with a resident standing in front."></video><figcaption>A slash on a monster with a resident standing in front.</figcaption></figure>
+<figure><video src="combat-effects/order-body-behind.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="The same slash with the resident behind the monster."></video><figcaption>The same slash with the resident behind the monster.</figcaption></figure>
+<figure><video src="combat-effects/order-standing-frost.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Frost crystals with units inside and outside the ring."></video><figcaption>Frost crystals with units inside and outside the ring.</figcaption></figure>
+<figure><video src="combat-effects/order-ground-rune.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A rune circle on the ground under the units standing on it."></video><figcaption>A rune circle on the ground under the units standing on it.</figcaption></figure>
+<figure><video src="combat-effects/order-den-tree.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A den collapsing behind a tree."></video><figcaption>A den collapsing behind a tree.</figcaption></figure>
+<figure><video src="combat-effects/order-night.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="Frost, sanctuary and a cleave at night."></video><figcaption>Frost, sanctuary and a cleave at night.</figcaption></figure>
+<figure><video src="combat-effects/downed-and-death.mp4" width="480" height="336" muted autoplay loop playsinline preload="metadata" aria-label="A downed resident (ring and word) next to a fallen one (death wisp)."></video><figcaption>A downed resident (ring and word) next to a fallen one (death wisp).</figcaption></figure>
+</div>
+</section>
+<footer class="pager">
+<span><a href="rain.html">&larr; Rain on the ground</a></span>
+<span><a href="gods.html">Thor and Jormungandr &rarr;</a></span>
+</footer>
+</div>
+</body>
+</html>

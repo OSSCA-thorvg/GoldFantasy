@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One rig for every body | Midgard development log</title>
+<meta name="description" content="Whether monsters, residents and animals could all move on one shared skeleton and clip set.">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "DejaVu"; src: url("../../assets/native-fonts/DejaVuSans.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "DejaVu"; src: url("../../assets/native-fonts/DejaVuSans-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../assets/native-fonts/Cinzel-Black.ttf") format("truetype"); font-display: swap; }
+:root {
+  --bg: rgb(17, 20, 18);
+  --surface: rgb(25, 29, 25);
+  --raised: rgb(35, 39, 32);
+  --border: rgba(115, 98, 65, 0.82);
+  --rule: rgba(115, 98, 65, 0.25);
+  --text: rgb(225, 216, 189);
+  --muted: rgb(157, 151, 128);
+  --accent: rgb(191, 161, 99);
+  --bright: rgb(232, 190, 110);
+  --gutter: clamp(16px, 4vw, 64px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 clamp(15px, 1.05vw, 18px)/1.55 "DejaVu", Verdana, sans-serif; }
+.wrap { width: 100%; max-width: 1360px; margin: 0 auto; padding: 0 var(--gutter); }
+nav.top { display: flex; flex-wrap: wrap; gap: 6px 22px; padding: 18px 0; font-size: 0.85em; border-bottom: 1px solid var(--rule); }
+a { color: var(--bright); }
+a:focus-visible { outline: 2px solid var(--bright); outline-offset: 2px; }
+header.page { padding: clamp(28px, 6vh, 64px) 0 clamp(12px, 3vh, 28px); }
+h1, h2 { font-family: "Cinzel", Georgia, serif; font-weight: 900; letter-spacing: 0.04em; color: var(--bright); line-height: 1.12; margin: 0 0 0.35em; }
+h1 { font-size: clamp(28px, 3.6vw, 50px); }
+h2 { font-size: clamp(22px, 2.3vw, 34px); }
+.kicker { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72em; color: var(--muted); margin-bottom: 0.7em; }
+.lead { font-size: clamp(16px, 1.3vw, 21px); max-width: 66ch; margin: 0 0 0.6em; }
+.plain { color: var(--muted); margin: 0; }
+section.part { padding: clamp(24px, 4vh, 44px) 0; border-top: 1px solid var(--rule); }
+section.part > p { max-width: 70ch; margin: 0 0 1.1em; color: var(--text); }
+.grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 16px; align-items: start; }
+figure { margin: 0; }
+figure img, figure video { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); background: #0b0e0c; }
+figure.rejected img, figure.rejected video { border-style: dashed; border-color: var(--muted); }
+figure a { display: block; border-radius: 6px; }
+figcaption { font-size: 0.82em; color: var(--muted); margin-top: 0.5em; }
+.tag { display: inline-block; font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 0.55em; margin-right: 0.45em; border-radius: 4px; border: 1px solid var(--border); color: var(--bright); background: var(--raised); }
+.tag.rejected { color: var(--text); border-style: dashed; border-color: var(--muted); background: transparent; }
+.sound { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+.sound span { display: block; font-size: 0.85em; color: var(--muted); margin-bottom: 8px; }
+.sound audio { width: 100%; height: 34px; }
+.groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(24px, 4vh, 40px) 16px; padding: 8px 0 clamp(24px, 4vh, 40px); }
+.group { grid-column: span var(--n); min-width: 0; }
+.group h2 { font-size: clamp(18px, 1.6vw, 24px); padding-bottom: 0.35em; border-bottom: 1px solid var(--rule); }
+.cards { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.grid.narrow { max-width: 1000px; }
+a.card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; color: var(--text); text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+a.card:hover, a.card:focus-visible { background: var(--raised); border-color: var(--accent); }
+a.card img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; border-bottom: 1px solid var(--rule); background: #0b0e0c; }
+a.card .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+a.card strong { color: var(--bright); font-weight: 700; }
+a.card .what { font-size: 0.86em; color: var(--text); }
+a.card .count { margin-top: auto; font-size: 0.75em; color: var(--muted); }
+footer.pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 26px 0 48px; border-top: 1px solid var(--rule); font-size: 0.9em; }
+@media (max-width: 1000px) {
+  .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .group.wide { grid-column: span 2; }
+  .group.wide .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .grid, .groups, .cards { grid-template-columns: minmax(0, 1fr); }
+  .group, .group.wide { grid-column: auto; }
+  .group.wide .cards { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top" aria-label="Development log"><a href="index.html">&larr; Development log</a><a href="../../docs.html">Back to the presentation</a></nav>
+<header class="page">
+<div class="kicker">Characters and rigging</div>
+<h1>One rig for every body</h1>
+<p class="lead">Monsters, residents and animals are posed by one shared skeleton and one set of animation clips; each kind brings only its own outline. These loops are the preview sheets that were checked before the rig went into the game.</p>
+</header>
+<section class="part">
+<h2>Monsters</h2>
+<div class="grid" style="--cols: 1">
+<figure><video src="rigging/monsters.mp4" width="960" height="518" muted autoplay loop playsinline preload="metadata" aria-label="Rows: goblin, draugr, imp, warg and jotunn, each idle, walking and attacking. Last row: swarm runners, a spitter, dens, a fall, and a newcomer climbing out."></video><figcaption>Rows: goblin, draugr, imp, warg and jotunn, each idle, walking and attacking. Last row: swarm runners, a spitter, dens, a fall, and a newcomer climbing out.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Residents</h2>
+<div class="grid" style="--cols: 1">
+<figure><video src="rigging/residents.mp4" width="960" height="270" muted autoplay loop playsinline preload="metadata" aria-label="Top row: sword, mace, bare hands, two-handed axe, three walks, eating. Bottom row: wave, hair tuck, thinking, shrug, stretch, prayer, counter work, lookout."></video><figcaption>Top row: sword, mace, bare hands, two-handed axe, three walks, eating. Bottom row: wave, hair tuck, thinking, shrug, stretch, prayer, counter work, lookout.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Animals</h2>
+<div class="grid" style="--cols: 1">
+<figure><video src="rigging/animals.mp4" width="960" height="580" muted autoplay loop playsinline preload="metadata" aria-label="One outline each on the shared rig. Columns: standing, grazing or pecking, three moments of the walk, asleep, asleep facing left. Rows: cow, pig, hen, wolf, dog, cat."></video><figcaption>One outline each on the shared rig. Columns: standing, grazing or pecking, three moments of the walk, asleep, asleep facing left. Rows: cow, pig, hen, wolf, dog, cat.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>In the game</h2>
+<div class="grid" style="--cols: 1">
+<figure><a href="rigging/in-game.webp" aria-label="Open full size"><img src="rigging/in-game.webp" width="1280" height="800" alt="Rigged residents and monsters fighting at a den." loading="lazy" decoding="async"></a><figcaption>Rigged residents and monsters fighting at a den.</figcaption></figure>
+</div>
+</section>
+<footer class="pager">
+<span><a href="index.html">&larr; Development log</a></span>
+<span><a href="portraits.html">Faces and portraits &rarr;</a></span>
+</footer>
+</div>
+</body>
+</html>

@@ -18,6 +18,7 @@ const scenes = {
   outlines: ['./forest-outlines.mjs', 'captureForestOutlines'],
   creative: ['./creative-scenes.mjs', 'captureCreativeTools'],
   interface: ['./interface-stills.mjs', 'captureInterface'],
+  buildings: ['./buildings-scene.mjs', 'captureBuildings'],
 };
 const wanted = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 for (const name of wanted) if (!scenes[name]) throw new Error(`Unknown scene ${name}; known: ${Object.keys(scenes).join(', ')}`);

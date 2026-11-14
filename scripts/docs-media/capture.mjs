@@ -16,6 +16,8 @@ const parts = {
   arc: ['./dungeon-arc.mjs', 'captureDungeonArc'],
   optimisation: ['./optimisation-videos.mjs', 'captureOptimisationVideos'],
   environment: ['./environment-videos.mjs', 'captureEnvironmentVideos'],
+  effects: ['./effects-showcase.mjs', 'captureEffectsShowcase'],
+  buildings: ['./buildings-videos.mjs', 'captureBuildingVideos'],
 };
 const wanted = process.argv.slice(2).filter((a) => !a.startsWith('-')),
   wants = (name) => !wanted.length || wanted.includes(name),
@@ -88,6 +90,11 @@ if (wants('assets')) {
       resolve(docsFolder, 'audio', `${to}.m4a`),
     ]);
   report.parts.assets = 'copied and transcoded';
+  // Media the page no longer uses is not shipped.
+  const { readdir, unlink } = await import('node:fs/promises'),
+    page = await (await import('node:fs/promises')).readFile(resolve(root, 'public/docs.html'), 'utf8');
+  for (const f of await readdir(docsFolder, { withFileTypes: true }))
+    if (f.isFile() && !page.includes(`docs/${f.name}`)) await unlink(resolve(docsFolder, f.name));
 }
 await mkdir(docsWork, { recursive: true });
 await writeFile(resolve(docsWork, `report${wanted.length ? '-' + wanted.join('-') : ''}.json`), JSON.stringify(report, null, 2) + '\n');

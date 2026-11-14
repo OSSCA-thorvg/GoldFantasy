@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trees, mountains and land colours | Midgard development log</title>
+<meta name="description" content="Taller trees, peaks that grow with their range, and a return to the earlier land colours.">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "DejaVu"; src: url("../../assets/native-fonts/DejaVuSans.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "DejaVu"; src: url("../../assets/native-fonts/DejaVuSans-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Cinzel"; src: url("../../assets/native-fonts/Cinzel-Black.ttf") format("truetype"); font-display: swap; }
+:root {
+  --bg: rgb(17, 20, 18);
+  --surface: rgb(25, 29, 25);
+  --raised: rgb(35, 39, 32);
+  --border: rgba(115, 98, 65, 0.82);
+  --rule: rgba(115, 98, 65, 0.25);
+  --text: rgb(225, 216, 189);
+  --muted: rgb(157, 151, 128);
+  --accent: rgb(191, 161, 99);
+  --bright: rgb(232, 190, 110);
+  --gutter: clamp(16px, 4vw, 64px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 clamp(15px, 1.05vw, 18px)/1.55 "DejaVu", Verdana, sans-serif; }
+.wrap { width: 100%; max-width: 1360px; margin: 0 auto; padding: 0 var(--gutter); }
+nav.top { display: flex; flex-wrap: wrap; gap: 6px 22px; padding: 18px 0; font-size: 0.85em; border-bottom: 1px solid var(--rule); }
+a { color: var(--bright); }
+a:focus-visible { outline: 2px solid var(--bright); outline-offset: 2px; }
+header.page { padding: clamp(28px, 6vh, 64px) 0 clamp(12px, 3vh, 28px); }
+h1, h2 { font-family: "Cinzel", Georgia, serif; font-weight: 900; letter-spacing: 0.04em; color: var(--bright); line-height: 1.12; margin: 0 0 0.35em; }
+h1 { font-size: clamp(28px, 3.6vw, 50px); }
+h2 { font-size: clamp(22px, 2.3vw, 34px); }
+.kicker { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.72em; color: var(--muted); margin-bottom: 0.7em; }
+.lead { font-size: clamp(16px, 1.3vw, 21px); max-width: 66ch; margin: 0 0 0.6em; }
+.plain { color: var(--muted); margin: 0; }
+section.part { padding: clamp(24px, 4vh, 44px) 0; border-top: 1px solid var(--rule); }
+section.part > p { max-width: 70ch; margin: 0 0 1.1em; color: var(--text); }
+.grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 16px; align-items: start; }
+figure { margin: 0; }
+figure img, figure video { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); background: #0b0e0c; }
+figure.rejected img, figure.rejected video { border-style: dashed; border-color: var(--muted); }
+figure a { display: block; border-radius: 6px; }
+figcaption { font-size: 0.82em; color: var(--muted); margin-top: 0.5em; }
+.tag { display: inline-block; font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 0.55em; margin-right: 0.45em; border-radius: 4px; border: 1px solid var(--border); color: var(--bright); background: var(--raised); }
+.tag.rejected { color: var(--text); border-style: dashed; border-color: var(--muted); background: transparent; }
+.sound { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+.sound span { display: block; font-size: 0.85em; color: var(--muted); margin-bottom: 8px; }
+.sound audio { width: 100%; height: 34px; }
+.groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(24px, 4vh, 40px) 16px; padding: 8px 0 clamp(24px, 4vh, 40px); }
+.group { grid-column: span var(--n); min-width: 0; }
+.group h2 { font-size: clamp(18px, 1.6vw, 24px); padding-bottom: 0.35em; border-bottom: 1px solid var(--rule); }
+.cards { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.grid.narrow { max-width: 1000px; }
+a.card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; color: var(--text); text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+a.card:hover, a.card:focus-visible { background: var(--raised); border-color: var(--accent); }
+a.card img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; border-bottom: 1px solid var(--rule); background: #0b0e0c; }
+a.card .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+a.card strong { color: var(--bright); font-weight: 700; }
+a.card .what { font-size: 0.86em; color: var(--text); }
+a.card .count { margin-top: auto; font-size: 0.75em; color: var(--muted); }
+footer.pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 26px 0 48px; border-top: 1px solid var(--rule); font-size: 0.9em; }
+@media (max-width: 1000px) {
+  .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .group.wide { grid-column: span 2; }
+  .group.wide .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .grid, .groups, .cards { grid-template-columns: minmax(0, 1fr); }
+  .group, .group.wide { grid-column: auto; }
+  .group.wide .cards { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top" aria-label="Development log"><a href="index.html">&larr; Development log</a><a href="../../docs.html">Back to the presentation</a></nav>
+<header class="page">
+<div class="kicker">Environment</div>
+<h1>Trees, mountains and land colours</h1>
+<p class="lead">A resident stands 24 pixels tall at zoom 1. Next to them a grown fir was only 33 pixels, so forests read as lawns. Trees were raised first, then the mountains had to grow to stay above them, and a colour redesign along the way was undone.</p>
+</header>
+<section class="part">
+<h2>Trees</h2>
+<p>Same cameras, same map. A grown fir went from 33 to 78 pixels at zoom 1.</p>
+<div class="grid" style="--cols: 2">
+<figure><a href="trees-and-mountains/trees-before-forest-edge.webp" aria-label="Open full size"><img src="trees-and-mountains/trees-before-forest-edge.webp" width="960" height="600" alt="Residents beside a forest edge." loading="lazy" decoding="async"></a><figcaption><span class="tag">Before</span>Residents beside a forest edge.</figcaption></figure>
+<figure><a href="trees-and-mountains/trees-after-forest-edge.webp" aria-label="Open full size"><img src="trees-and-mountains/trees-after-forest-edge.webp" width="960" height="600" alt="The same edge with the taller trees." loading="lazy" decoding="async"></a><figcaption><span class="tag">After</span>The same edge with the taller trees.</figcaption></figure>
+<figure><a href="trees-and-mountains/trees-before-snowy-forest.webp" aria-label="Open full size"><img src="trees-and-mountains/trees-before-snowy-forest.webp" width="960" height="600" alt="A snowy forest." loading="lazy" decoding="async"></a><figcaption><span class="tag">Before</span>A snowy forest.</figcaption></figure>
+<figure><a href="trees-and-mountains/trees-after-snowy-forest.webp" aria-label="Open full size"><img src="trees-and-mountains/trees-after-snowy-forest.webp" width="960" height="600" alt="The same forest." loading="lazy" decoding="async"></a><figcaption><span class="tag">After</span>The same forest.</figcaption></figure>
+<figure><a href="trees-and-mountains/trees-before-felling.webp" aria-label="Open full size"><img src="trees-and-mountains/trees-before-felling.webp" width="960" height="600" alt="Felling: the first blow." loading="lazy" decoding="async"></a><figcaption><span class="tag">Before</span>Felling: the first blow.</figcaption></figure>
+<figure><a href="trees-and-mountains/trees-after-felling.webp" aria-label="Open full size"><img src="trees-and-mountains/trees-after-felling.webp" width="960" height="600" alt="The same blow among taller trees." loading="lazy" decoding="async"></a><figcaption><span class="tag">After</span>The same blow among taller trees.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Mountains</h2>
+<p>The first attempt stretched each one-tile pyramid up to 225 pixels and read as a field of needles. Now a peak’s height follows how deep it stands in its range: foothills on the edge, a few big summits with shoulders and snow caps deep inside, and no peak over the forest taller than its base is wide.</p>
+<div class="grid" style="--cols: 3">
+<figure><a href="trees-and-mountains/mountains-before-settlement.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-before-settlement.webp" width="960" height="600" alt="The old low pyramids beside the settlement." loading="lazy" decoding="async"></a><figcaption><span class="tag">Before</span>The old low pyramids beside the settlement.</figcaption></figure>
+<figure class="rejected"><a href="trees-and-mountains/mountains-first-settlement.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-first-settlement.webp" width="960" height="600" alt="Stretched pyramids: a field of needles." loading="lazy" decoding="async"></a><figcaption><span class="tag rejected">Rejected attempt</span>Stretched pyramids: a field of needles.</figcaption></figure>
+<figure><a href="trees-and-mountains/mountains-after-settlement.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-after-settlement.webp" width="960" height="600" alt="Height and width grow together." loading="lazy" decoding="async"></a><figcaption><span class="tag">Now</span>Height and width grow together.</figcaption></figure>
+<figure><a href="trees-and-mountains/mountains-before-ridge-and-forest.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-before-ridge-and-forest.webp" width="960" height="600" alt="A ridge with forest in front, beside the statue." loading="lazy" decoding="async"></a><figcaption><span class="tag">Before</span>A ridge with forest in front, beside the statue.</figcaption></figure>
+<figure class="rejected"><a href="trees-and-mountains/mountains-first-ridge-and-forest.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-first-ridge-and-forest.webp" width="960" height="600" alt="Needles." loading="lazy" decoding="async"></a><figcaption><span class="tag rejected">Rejected attempt</span>Needles.</figcaption></figure>
+<figure><a href="trees-and-mountains/mountains-after-ridge-and-forest.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-after-ridge-and-forest.webp" width="960" height="600" alt="The gate and the statue stay clear." loading="lazy" decoding="async"></a><figcaption><span class="tag">Now</span>The gate and the statue stay clear.</figcaption></figure>
+<figure><a href="trees-and-mountains/mountains-before-zoomed-out.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-before-zoomed-out.webp" width="960" height="600" alt="Midgard zoomed out." loading="lazy" decoding="async"></a><figcaption><span class="tag">Before</span>Midgard zoomed out.</figcaption></figure>
+<figure class="rejected"><a href="trees-and-mountains/mountains-first-zoomed-out.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-first-zoomed-out.webp" width="960" height="600" alt="Needles everywhere." loading="lazy" decoding="async"></a><figcaption><span class="tag rejected">Rejected attempt</span>Needles everywhere.</figcaption></figure>
+<figure><a href="trees-and-mountains/mountains-after-zoomed-out.webp" aria-label="Open full size"><img src="trees-and-mountains/mountains-after-zoomed-out.webp" width="960" height="600" alt="Fewer, larger peaks, and fewer shapes to draw." loading="lazy" decoding="async"></a><figcaption><span class="tag">Now</span>Fewer, larger peaks, and fewer shapes to draw.</figcaption></figure>
+</div>
+</section>
+<section class="part">
+<h2>Land colours</h2>
+<p>A redesign darkened the trees to a teal close to the ground colour and turned the worlds beyond the gates into pale islands. It was rejected: trees, grass, ground, rocks and peaks went back to the earlier colours, keeping only the drifting water and the gate sprites.</p>
+<div class="grid" style="--cols: 3">
+<figure><a href="trees-and-mountains/restored-midgard-day.webp" aria-label="Open full size"><img src="trees-and-mountains/restored-midgard-day.webp" width="960" height="600" alt="Midgard by day with the restored colours." loading="lazy" decoding="async"></a><figcaption><span class="tag">Now</span>Midgard by day with the restored colours.</figcaption></figure>
+<figure class="rejected"><a href="trees-and-mountains/NW-unselected.webp" aria-label="Open full size"><img src="trees-and-mountains/NW-unselected.webp" width="960" height="600" alt="Dark teal trees close to the ground colour." loading="lazy" decoding="async"></a><figcaption><span class="tag rejected">Rejected attempt</span>Dark teal trees close to the ground colour.</figcaption></figure>
+<figure><a href="trees-and-mountains/home.webp" aria-label="Open full size"><img src="trees-and-mountains/home.webp" width="960" height="600" alt="The look before the redesign, used as the reference." loading="lazy" decoding="async"></a><figcaption><span class="tag">Earlier</span>The look before the redesign, used as the reference.</figcaption></figure>
+<figure><a href="trees-and-mountains/restored-world-muspelheim-island.webp" aria-label="Open full size"><img src="trees-and-mountains/restored-world-muspelheim-island.webp" width="960" height="600" alt="Muspelheim: peak walls and lava lanes." loading="lazy" decoding="async"></a><figcaption><span class="tag">Now</span>Muspelheim: peak walls and lava lanes.</figcaption></figure>
+<figure><a href="trees-and-mountains/restored-world-jotunheim-island.webp" aria-label="Open full size"><img src="trees-and-mountains/restored-world-jotunheim-island.webp" width="960" height="600" alt="Jotunheim: a snowy floor between peak walls." loading="lazy" decoding="async"></a><figcaption><span class="tag">Now</span>Jotunheim: a snowy floor between peak walls.</figcaption></figure>
+<figure><a href="trees-and-mountains/whole-realm.webp" aria-label="Open full size"><img src="trees-and-mountains/whole-realm.webp" width="960" height="600" alt="A world beyond a gate before the redesign, under the fog veil." loading="lazy" decoding="async"></a><figcaption><span class="tag">Earlier</span>A world beyond a gate before the redesign, under the fog veil.</figcaption></figure>
+</div>
+</section>
+<footer class="pager">
+<span><a href="hidden-units.html">&larr; Units behind trees and peaks</a></span>
+<span><a href="lava.html">Lava &rarr;</a></span>
+</footer>
+</div>
+</body>
+</html>
