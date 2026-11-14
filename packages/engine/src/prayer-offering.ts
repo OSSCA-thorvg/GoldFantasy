@@ -3,7 +3,8 @@ import { Calling, Person } from './person';
 
 export const offeringKeys = ['water', 'bones', 'gold', 'food', 'stone'] as const;
 export type OfferingKey = (typeof offeringKeys)[number];
-export const defaultOffering = (): Resources => new Resources(0, 0, 0, 4);
+/** The altar starts bare; the player lays what they choose. */
+export const defaultOffering = (): Resources => new Resources();
 export const offeringLimit = 9999;
 
 export function offeringReason(offering: Resources): string {
