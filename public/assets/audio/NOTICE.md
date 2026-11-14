@@ -35,3 +35,12 @@ provenance sidecar are reproducibly written under `.temp/wildlife-audio-source/`
 mixed with slices of the Norse packs above (`sfx_weapon_swing`, `sfx_shield_block`, `sfx_war_horn`, `wx_rockfall`,
 `wx_thunder_rolling`, `wx_ice_boom`, `acc_troll_grumble`, `acc_draugr_breath`), then trimmed, levelled and encoded
 like the other one-shots. The script writes each recipe beside its WAV in its work directory.
+
+`music/realm/` is the exception to the `music/` line above: one loop for every world beyond a gate and each of its
+three floors, composed and rendered by `scripts/audio/realm_music.py` from Loach's procedural folk instruments
+(`folk_instruments`: bowed lyre drone and line, solo string, willow flute, gut-string lyre, frame drum, low choir
+and humming voice; `norse_foley.horn_tone`; `procedural_dsp.Canvas`; `models.Reverb`), with no recordings,
+SoundFonts or models. Like the `sfx/combat/` cues they are original works made for this project with Loach and are
+distributed under the project license. Seeds are fixed per world and floor (`Realm.seed * 10 + floor`), so with the
+same Loach, NumPy and ffmpeg the script rebuilds every track bit for bit; it writes each track's float WAV and a JSON
+of its seed, mode, tempo and score counts to its work directory.

@@ -153,9 +153,9 @@ try {
   assert.deepEqual(await read('probe.asked'), [{ track: expected, loop: true }]);
   await until(`probe.posted.includes(${JSON.stringify(expected)})`);
   assert.deepEqual(realmRequests(), [`/assets/audio/${expected}.ogg`]);
-  // The loop fades in over a few seconds; take the loudest of several reads.
+  // The loop fades in over a few seconds; take the loudest of ten seconds of reads.
   let heard = 0;
-  for (let i = 0; i < 60 && heard < 0.004; ++i) {
+  for (let i = 0; i < 50; ++i) {
     await new Promise((r) => setTimeout(r, 200));
     heard = Math.max(heard, await read('probe.level()'));
   }

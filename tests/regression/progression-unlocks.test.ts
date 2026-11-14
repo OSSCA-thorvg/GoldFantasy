@@ -192,9 +192,10 @@ describe('training yard', () => {
     a.stress = 0.5;
     yard.attendance = 1;
     town.runDrills();
-    // The first level costs exactly one full day of drilling.
-    expect(a.level).toBe(2);
-    expect(a.experience).toBe(drillRules.experience - 30);
+    // One day of drilling is most of the way to the first level, not all of it.
+    expect(a.level).toBe(1);
+    expect(a.experience).toBe(drillRules.experience);
+    expect(a.experience).toBeLessThan(a.experienceToNextLevel());
     expect(a.stress).toBeCloseTo(0.5 - drillRules.stressRelief, 5);
     expect(b.level).toBe(drillRules.levelCap);
     expect(b.experience).toBe(0);

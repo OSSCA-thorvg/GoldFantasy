@@ -110,7 +110,7 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(workEfficiency(person, 'construction')).toBe(1);
     expect(workEfficiency(person, 'mining')).toBe(0.4);
     expect(town.equipItem(0, 3, 'weapon')).toBe(false);
-    person.gainExperience(30);
+    person.gainExperience(person.experienceToNextLevel());
     expect(town.equipItem(0, 3)).toBe(true);
     expect(combatItem(person)?.id).toBe('sword');
     expect(attackDamage(person)).toBeCloseTo(2.2 * (1 + Person.attackPerLevel));
