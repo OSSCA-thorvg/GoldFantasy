@@ -1,11 +1,11 @@
 import type { TownState } from './town-state';
 import { sealFloors, sealable } from './gate-seals';
 
-/** Residents Odin sends before any floor beyond a gate is cleared: enough for the founding chain's first goals. */
-export const altarBaseCap = 4;
+/** Residents Odin sends before any floor beyond a gate is cleared: a working settlement with a first party to spare. */
+export const altarBaseCap = 8;
 /** Added for each floor cleared for the first time, and again for each gate sealed. */
-export const altarFloorBonus = 2;
-export const altarSealBonus = 2;
+export const altarFloorBonus = 4;
+export const altarSealBonus = 4;
 
 /** Floors first cleared and gates sealed, read from the depth record the realm already saves. */
 export function altarProgress(town: TownState): { floors: number; seals: number } {

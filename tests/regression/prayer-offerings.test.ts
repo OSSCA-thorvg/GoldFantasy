@@ -367,8 +367,8 @@ describe('the altar cap', () => {
     return town;
   };
   it('starts at four and rises by two a floor and two more for a seal', () => {
-    expect(altarBaseCap).toBe(4);
-    expect([[], [0], [1], [2], [3]].map((d) => altarCap(withDepth(d)))).toEqual([4, 4, 6, 8, 12]);
+    expect(altarBaseCap).toBe(8);
+    expect([[], [0], [1], [2], [3]].map((d) => altarCap(withDepth(d)))).toEqual([8, 8, 12, 16, 24]);
   });
   it('refuses at the cap and spends nothing', () => {
     const town = fixture();
@@ -388,7 +388,8 @@ describe('the altar cap', () => {
     expect(rolls).not.toHaveBeenCalled();
     expect(altarCapReason).toBe('Odin sends no more until another floor beyond a gate is cleared.');
     town.depth = [1];
-    fillBeds(town, 1);
+    // Leave one bed free: the fixture's homes hold fewer than the base cap.
+    while (town.population() > town.housing() - 1) town.folk.pop();
     expect(town.altarOfferingReason(1, gift(0, 0, 0, 8))).toBe('');
   });
   it('shows the raise in the reward lines text', () => {

@@ -108,9 +108,10 @@ function altarReason(town: DevotionTown, id: number, personId = -1, checkFood = 
     )
   )
     return 'A resident is already preparing this altar.';
+  // The cap first: a new home would not help while it holds.
+  if (town.population() >= altarCap(town)) return altarCapReason;
   if (localResidents(town, place) + reservedHomes(town, place, personId) >= localHousing(town, place))
     return 'No free resident bed. Complete a home in this settlement.';
-  if (town.population() >= altarCap(town)) return altarCapReason;
   if (checkFood && town.stock(camp.id).food < 4) return 'Need 4 food for the altar offering.';
   return '';
 }
