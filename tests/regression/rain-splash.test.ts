@@ -47,7 +47,7 @@ describe('rain splashes', () => {
     huge.viewHeight = 5000;
     expect(splashCount(huge)).toBe(splashPool);
   });
-  it('rings on water, crowns on land, none on buildings, all inside the view', () => {
+  it('rings on water, wet marks on land, none on buildings, all inside the view', () => {
     const s = state(Weather.Storm, 1);
     const seen: { x: number; y: number }[] = [];
     const probe: SplashGround = {
@@ -67,6 +67,11 @@ describe('rain splashes', () => {
       expect(p.y).toBeGreaterThanOrEqual(lo('y'));
       expect(p.y).toBeLessThanOrEqual(hi('y'));
     }
+    // Land only: wet marks and nothing thrown up.
+    const field = state(Weather.Rain, 1);
+    paintSplashes(field, { terrainAt: () => Terrain.Grass, buildingAt: () => -1 }, 3);
+    expect(shapes(field)[0].commands.length).toBeGreaterThan(0);
+    expect(shapes(field)[1].commands.length).toBe(0);
     // Water only: rings and no wet spots.
     const lake = state(Weather.Rain, 1);
     paintSplashes(lake, { terrainAt: () => Terrain.Sea, buildingAt: () => -1 }, 3);

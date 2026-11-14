@@ -19,8 +19,7 @@ export enum SplashKind {
 /** Most splashes ever alive. */
 export const splashPool = 160;
 export const splashRate = 15;
-const life = f(0.42),
-  tau = f(6.2831853);
+const life = f(0.42);
 interface Slot {
   cycle: number;
   x: number;
@@ -112,19 +111,10 @@ export function paintSplashes(s: WorldRendererState, ground: SplashGround, secon
       if (age < f(0.85)) rim.appendCircle(slot.x, slot.y, r, r);
       continue;
     }
-    // A dark wet spot with a crown of three ticks thrown out from it.
-    const spot = f(f(size * f(0.055)) * f(1 - f(f(0.4) * age)));
+    // On land only the wet mark: it spreads as the drop lands, then dries back.
+    const spread = age < f(0.25) ? f(age / f(0.25)) : f(1 - f(f(age - f(0.25)) / f(0.75))),
+      spot = f(f(size * f(0.085)) * f(f(0.35) + f(f(0.65) * spread)));
     wet.appendCircle(slot.x, slot.y, spot, spot);
-    if (age > f(0.6)) continue;
-    const turn = f(hash01(53, i, cycle, 4) * tau),
-      from = f(size * f(f(0.05) + f(f(0.1) * age))),
-      to = f(from + f(f(size * f(0.08)) * f(1 - f(age / f(0.6)))));
-    for (let k = 0; k < 3; ++k) {
-      const a = f(turn + f(f(k * tau) / 3)),
-        c = f(Math.cos(a)),
-        n = f(Math.sin(a));
-      rim.moveTo(f(slot.x + f(c * from)), f(slot.y + f(n * from))).lineTo(f(slot.x + f(c * to)), f(slot.y + f(n * to)));
-    }
   }
   wet.fill(30, 40, 52, 70);
   rim
