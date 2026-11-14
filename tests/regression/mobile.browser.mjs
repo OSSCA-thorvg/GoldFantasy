@@ -69,6 +69,8 @@ try {
     try {
       await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/mobile-probe`);
       await page.evaluate(async (renderer) => {
+        // Guide cards are covered by guide.browser.mjs; here they would sit under the gestures.
+        (await import('/apps/web/src/native/guide-preferences.ts')).setGuidePreference('cards', false);
         const [{ startNativeGame }, { Tool }, { Terrain, Layer }, { Town }, { project, Camera }] =
           await Promise.all([
             import('/apps/web/src/native/bootstrap.ts'),

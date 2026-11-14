@@ -107,7 +107,13 @@ try {
     );
     if (mode !== 'missing-animation') {
       await until('document.querySelector("#startup")?.dataset.ready === "true"');
-      const before = await page.screenshot();
+      // Ready is posted when the worker has drawn; its frame reaches the page a little later.
+      const blank = await page.screenshot();
+      let before = blank;
+      for (let i = 0; i < 30 && before.equals(blank); ++i) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        before = await page.screenshot();
+      }
       await new Promise((resolve) => setTimeout(resolve, 600));
       const after = await page.screenshot();
       if (mode === 'reduced-motion')
