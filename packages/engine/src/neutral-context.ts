@@ -59,7 +59,7 @@ export function neutralContext(root: Town, state: NeutralSettlement): Town {
       for (const b of root.placed) {
         if (b.faction === state.faction) continue;
         if (kind === Structure.Camp && isSeat(b.kind) && distance(at, b.center) < 50)
-          return new Check(false, 'Camps must be at least 50 tiles apart');
+          return new Check(false, 'Camps must stand far apart');
         if (footprint.overlaps(b.footprint())) return new Check(false, 'Occupied');
       }
       for (const field of root.farmland)

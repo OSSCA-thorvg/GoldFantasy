@@ -123,7 +123,7 @@ export function hud(this: GameHudApp, width: number, height: number): void {
       way = ways[lround(f32((angle < 0 ? f32(angle + 360) : angle) / 45)) % 8],
       hintX = 16,
       hintWidth = Math.max(1, f32(f32(width - hintX) - 316)),
-      hint = `Found a camp (C) within 12 paces of ${this.town.map().dungeons()[0].name} (${way}).`;
+      hint = `Found a camp (C) near ${this.town.map().dungeons()[0].name} (${way}).`;
     let y = f32(f32(this.skyBounds.y + this.skyBounds.h) + 8);
     for (const row of wrap(c, hint, hintWidth, 11, 2)) {
       c.text(new Rect(hintX, y, hintWidth, 17), row, t.accent, 11);

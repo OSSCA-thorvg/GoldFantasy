@@ -1,5 +1,5 @@
 import { Resources, resourceKeys } from './building-catalog';
-import { Calling } from './person';
+import { Calling, Person } from './person';
 
 export const offeringKeys = ['water', 'bones', 'gold', 'food', 'stone'] as const;
 export type OfferingKey = (typeof offeringKeys)[number];
@@ -41,8 +41,8 @@ export function offeringProfile(offering: Resources) {
     levelMin,
     levelMax,
     specialistChance,
-    vitalityMin: 1 + (levelMin - 1) * 0.1,
-    vitalityMax: 1 + (levelMax - 1) * 0.1,
+    vitalityMin: 1 + (levelMin - 1) * Person.vitalityPerLevel,
+    vitalityMax: 1 + (levelMax - 1) * Person.vitalityPerLevel,
     classes: weights.map((row) => ({
       calling: row.calling,
       chance: (specialistChance * row.weight) / total,

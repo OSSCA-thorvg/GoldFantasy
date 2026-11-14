@@ -21,7 +21,7 @@ export interface HallowedGround {
 export interface FlowField {
   cell: number;
   at: number;
-  distance: Float32Array;
+  distance: Float64Array;
 }
 /** Short-lived fight bookkeeping; never saved, safely empty after a load. */
 export class CombatState {

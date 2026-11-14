@@ -13,7 +13,7 @@ import {
 } from '../../engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../engine/src/numeric';
 import { Activity, TreeWorkKind, type TreeWorkEvent } from '../../engine/src/person';
-import { farmWorkPhase } from '../../engine/src/farm-work';
+import { farmWorkPhase, fieldWork } from '../../engine/src/farm-work';
 import { breedOf } from '../../engine/src/town-monsters';
 import { injuryOf, Injury } from '../../engine/src/person-look';
 import { Product, Structure, structureSpec } from '../../engine/src/building-catalog';
@@ -22,7 +22,7 @@ import { treePosition } from '../../engine/src/world-map';
 import * as mining from '../../engine/src/mining';
 import * as woodcutting from '../../engine/src/woodcutting';
 import { harvestTiming, harvestDuration, hammerTiming, workElapsed } from '../../engine/src/work-timing';
-import { workItem, equippedItem, type WorkKind } from '../../engine/src/equipment';
+import { workItem, equippedItem, itemSpec, toolFor, type WorkKind } from '../../engine/src/equipment';
 import { ceremonySeconds } from '../../engine/src/town-devotion';
 import { SceneNode, ShapeNode, TextNode, type Rgb } from './paint';
 import { registerPick } from './world-pick-registry';
@@ -48,12 +48,20 @@ import { line, opaque } from './vector-paint';
 import { updateBuildingDamage } from './building-damage';
 import {
   clearWorkProps,
+  animateCraft,
   animateFieldWork,
   animateProcessingWork,
   animateTrade,
   tradeOf,
 } from './work-motion';
-import { combatEquipment, heldMaterial, showEquipment, poseBow } from './person-equipment';
+import {
+  combatEquipment,
+  heldMaterial,
+  materialOf,
+  showEquipment,
+  poseBow,
+  type HeldTool,
+} from './person-equipment';
 import {
   animateAction,
   animateBrace,
@@ -69,6 +77,8 @@ import { animatePrayer, updateDevotionEffects } from './devotion-effects';
 import { releaseBeast } from './combat-effects';
 import { poseRank, windupOf } from './monster-rank-look';
 const inSight = (s: WorldRendererState, p: { x: number; y: number }) => s.currentVisibility.sample(p) >= 119;
+/** The last of an item's making, in its own seconds, is spent holding the finished piece up. */
+const craftLiftSeconds = 1.3;
 function finalHarvestContact(town: Town, person: number): TreeWorkEvent | undefined {
   const events = town.treeEvents();
   for (let i = events.length - 1; i >= 0; --i) {
@@ -168,6 +178,12 @@ export function moveAgents(
     // A helper turns to the one they kneel beside.
     const patient = person.activity === Activity.Tending ? town.person(person.target) : null;
     if (patient && !person.moving()) ahead = sub(patient.position, person.position);
+    // A crafter, and anyone waiting a turn beside the station, faces it.
+    const station =
+      person.task === Activity.Crafting && !person.moving() && !crossing
+        ? town.building(person.craftWorkshop)
+        : null;
+    if (station) ahead = sub(station.center, person.position);
     const chopping =
         person.activity === Activity.Felling && !person.moving() && !crossing && person.tree >= 0,
       miningNow = person.activity === Activity.Mining && !person.moving() && !crossing && person.tree >= 0;
@@ -332,6 +348,26 @@ export function moveAgents(
         working && workplace && !fighting && !farming && !processing && !forging
           ? tradeOf(workplace.kind)
           : null;
+    // At a craft station stone and iron are beaten into shape with the crafter's own hammer and wood
+    // is pared with the bench's knife; the last of the work is spent holding the finished piece up.
+    const made =
+        !s.sceneView && station && person.activity === Activity.Crafting && !person.inside && person.craftItem
+          ? itemSpec(person.craftItem)
+          : null,
+      craftHammer = made ? (workItem(person, 'crafting')?.visual ?? null) : null,
+      pounding = !!made && made.material !== 'wood' && craftHammer !== null,
+      // Only a piece that goes in the hand can be held up.
+      finished = made?.visual && made.visual !== 'basket' ? made.visual : null,
+      craftLift =
+        made && finished
+          ? clamp(
+              (person.craftProgress - made.seconds) / Math.min(craftLiftSeconds, made.seconds * 0.35) + 1,
+              0,
+              1,
+            )
+          : 0,
+      craftTool: HeldTool | null =
+        craftLift > 0 ? finished : pounding ? craftHammer : made?.material === 'wood' ? 'knife' : null;
     clearWorkProps(figure.parts);
     const workKind: WorkKind | undefined =
       chopping || workContact?.kind === TreeWorkKind.Chop
@@ -355,14 +391,33 @@ export function moveAgents(
       ? null
       : fighting
         ? combatEquipment(person)
-        : workKind
-          ? (workItem(person, workKind)?.visual ?? null)
-          : trade
-            ? null
-            : (equippedItem(person, 'weapon')?.visual ?? null);
-    showEquipment(figure.parts, tool, heldMaterial(person, tool));
+        : made
+          ? craftTool
+          : workKind
+            ? // Field work goes to whichever fitting tool is fastest: a shovel breaks new ground, a sickle reaps.
+              ((workKind === 'farming'
+                ? toolFor(person, fieldWork(town, person))
+                : workItem(person, workKind)
+              )?.visual ?? null)
+            : trade
+              ? null
+              : (equippedItem(person, 'weapon')?.visual ?? null);
+    showEquipment(
+      figure.parts,
+      tool,
+      // The piece shows what it is made of; the bench's own knife is flint.
+      made && craftLift > 0 ? materialOf(made) : made && !pounding ? 'stone' : heldMaterial(person, tool),
+    );
     figure.parts.lute?.opacity(
-      fighting || chopping || miningNow || workContact || hammering || farming || processing || praying
+      fighting ||
+        chopping ||
+        miningNow ||
+        workContact ||
+        hammering ||
+        farming ||
+        processing ||
+        praying ||
+        made
         ? 0
         : 255,
     );
@@ -388,14 +443,16 @@ export function moveAgents(
             : town.clock() - person.ready + 1 + strikePhase,
           pause,
         );
-      }
-      else if (praying)
+      } else if (praying)
         animatePrayer(
           figure.parts,
           Math.max(0, ceremonySeconds - (person.until - town.clock())),
           ceremonySeconds,
         );
-      else if (farming && tool) animateFieldWork(figure.parts, watering, town.clock() + person.id * 0.31);
+      else if (made)
+        animateCraft(figure.parts, tool, pounding, workElapsed(town.clock(), person.id), craftLift);
+      else if (farming && tool)
+        animateFieldWork(figure.parts, watering, town.clock() + person.id * 0.31, tool);
       else if (processing && tool)
         animateProcessingWork(
           figure.parts,
@@ -570,7 +627,9 @@ export function moveAgents(
         lying = asleep ? f(1 + 0.03 * Math.sin(town.clock() * 1.6 + beast.id)) : 1;
       poseAnimal(sprite.paint, asleep, walking, town.clock(), beast.id, facing);
       // Rank size, a blow's recoil and a wind-up's rear, over the pose above.
-      const rank = s.sceneView ? { sx: 1, sy: 1, dx: 0, dy: 0 } : poseRank(town, beast, sprite.paint, rig?.body);
+      const rank = s.sceneView
+        ? { sx: 1, sy: 1, dx: 0, dy: 0 }
+        : poseRank(town, beast, sprite.paint, rig?.body);
       sprite.paint.transform([
         facing * rank.sx,
         0,

@@ -92,7 +92,7 @@ describe('owned equipment, personal inventory and crafting', () => {
     expect(person.level).toBe(Person.maximumLevel);
     expect(person.vitalityMultiplier()).toBeGreaterThan(1);
     town.strike(person, foe);
-    const grown = 1 + 0.05 * (Person.maximumLevel - 1);
+    const grown = 1 + Person.attackPerLevel * (Person.maximumLevel - 1);
     expect(first).toBe(1);
     expect(100 - first - foe.health).toBeCloseTo(grown);
     expect(person.attackMultiplier()).toBeCloseTo(grown);
@@ -113,7 +113,7 @@ describe('owned equipment, personal inventory and crafting', () => {
     person.gainExperience(30);
     expect(town.equipItem(0, 3)).toBe(true);
     expect(combatItem(person)?.id).toBe('sword');
-    expect(attackDamage(person)).toBeCloseTo(2.2 * 1.05);
+    expect(attackDamage(person)).toBeCloseTo(2.2 * (1 + Person.attackPerLevel));
     expect(town.unequipItem(0, 'weapon')).toBe(true);
     expect(combatItem(person)?.id).toBe('axe');
     expect(town.equipItem(0, 1, 'head')).toBe(false);

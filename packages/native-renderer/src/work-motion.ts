@@ -2,8 +2,11 @@ import { point, type Point } from '../../engine/src/geometry';
 import { SceneNode, type Matrix } from './paint';
 import { poly, oval, stroke } from './sprite-primitives';
 import { poseArm, reachArm } from './person-arm';
-import { animateGather, stand, swing, type ActionPose } from './action-motion';
+import { animateGather, animateWork, poseFromClip, stand, swing, type ActionPose } from './action-motion';
 import { Structure } from '../../engine/src/building-catalog';
+import { hammerTiming } from '../../engine/src/work-timing';
+import { humanoidClips } from './humanoid-rig';
+import type { HeldTool } from './person-equipment';
 import type { PersonParts } from './world-sprites';
 
 export function createWorkProps(root: SceneNode, parts: PersonParts): void {
@@ -91,7 +94,12 @@ function tillPose(phase: number): ActionPose {
     lift: 0,
   };
 }
-export function animateFieldWork(parts: PersonParts, watering: boolean, seconds: number): void {
+export function animateFieldWork(
+  parts: PersonParts,
+  watering: boolean,
+  seconds: number,
+  tool: HeldTool = 'hoe',
+): void {
   const phase = (seconds % 1.25) / 1.25;
   if (watering) {
     // The can is carried along the row at a steady tilt, the gardener watching it fall.
@@ -126,7 +134,7 @@ export function animateFieldWork(parts: PersonParts, watering: boolean, seconds:
     return;
   }
   const pose = tillPose(phase);
-  swing(parts, 'hoe', pose, null);
+  swing(parts, tool, pose, null);
   stand(parts, pose, 0.55);
   parts.soilDust?.opacity(phase > 0.48 && phase < 0.83 ? 255 : 0);
   parts.soilDust?.children.forEach((dust, i) => {
@@ -185,6 +193,23 @@ export function animateProcessingWork(parts: PersonParts, sawing: boolean, secon
   );
   parts.workStone?.opacity(255);
   parts.chisel?.opacity(255);
+}
+
+/**
+ * Making an item at a craft station. With `pounding` the crafter's own hammer beats the piece into
+ * shape; otherwise a blade, or the bare hand, is drawn along it. `lift` (0..1) takes the finished
+ * piece up from the bench and holds it to the light.
+ */
+export function animateCraft(
+  parts: PersonParts,
+  tool: HeldTool | null,
+  pounding: boolean,
+  seconds: number,
+  lift: number,
+): void {
+  if (lift > 0) poseFromClip(parts, humanoidClips.admire, lift * humanoidClips.admire.frames, tool);
+  else if (pounding) animateWork(parts, tool, seconds, hammerTiming.period, hammerTiming.impact);
+  else poseFromClip(parts, humanoidClips.whittle, seconds * 30, tool);
 }
 
 /** What a worker's hands do while standing at a workplace that has no tool of its own. */

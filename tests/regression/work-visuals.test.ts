@@ -24,7 +24,7 @@ import { animateAction, workPose } from '../../packages/native-renderer/src/acti
 import { Person, Role, Race, Calling, Activity, TreeWorkKind } from '../../packages/engine/src/person';
 import { Structure, Product, structureSpec } from '../../packages/engine/src/building-catalog';
 import { Tool, toolStructure } from '../../packages/engine/src/game-tools';
-import { Building } from '../../packages/engine/src/town-models';
+import { Building, Season } from '../../packages/engine/src/town-models';
 import { point } from '../../packages/engine/src/geometry';
 import { Traffic } from '../../packages/engine/src/traffic';
 import { harvestTiming, hammerTiming, workElapsed } from '../../packages/engine/src/work-timing';
@@ -211,6 +211,12 @@ it('shows work equipment only while actually outdoors at the field or productive
       monsters: () => [],
       wildlife: () => [],
       fields: () => [{ id: 0, tilled: 1 }],
+      // The engine reads these directly when it picks the tool for the field's work.
+      farmland: [{ id: 0, tilled: 1 }],
+      get time() {
+        return time;
+      },
+      calendar: () => ({ season: Season.Spring }),
       hits: () => [],
       clock: () => time,
       map: () => ({ giant: () => null, volcano: () => null }),

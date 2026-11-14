@@ -135,12 +135,13 @@ export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
   this.staff();
   ++this.changes;
 }
-/** Formation rows: blades and maces in front, bards and clerics behind them, bows and staves at the back. */
+/** Formation rows: blades, maces and spears in front, bards and clerics behind them, bows and staves at the back. */
 function formationRow(p: Person): number {
-  const kind = strikeOf(combatItem(p)?.visual).kind;
-  if (kind === StrikeKind.Pierce || kind === StrikeKind.Splash) return 2;
+  const shape = combatItem(p)?.visual,
+    kind = strikeOf(shape).kind;
+  if (shape === 'bow' || shape === 'staff') return 2;
   if (p.calling === Calling.Cleric || p.calling === Calling.Bard) return 1;
-  if (kind === StrikeKind.Cleave || kind === StrikeKind.Crush || p.calling === Calling.Warrior) return 0;
+  if (kind !== StrikeKind.Single || p.calling === Calling.Warrior) return 0;
   return p.calling === Calling.Ranger || p.calling === Calling.Mage ? 2 : 1;
 }
 const formationSpacing = 0.7;

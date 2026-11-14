@@ -14,14 +14,14 @@ export const townPhrases: Phrases = {
   'Grows from an earlier stage': '이전 단계에서 성장합니다',
   'Needs {0} people in this village': '이 마을에 주민 {0}명이 필요합니다',
   'Found the camp first': '먼저 캠프를 세우세요',
-  'Camps must be at least 50 tiles apart': '캠프는 서로 50칸 이상 떨어져야 합니다',
-  'Must be within 12 paces of a dungeon': '던전에서 12걸음 이내여야 합니다',
+  'Camps must stand far apart': '캠프는 서로 멀리 떨어져야 합니다',
+  'Must be closer to a dungeon': '던전에 더 가까워야 합니다',
   'Torches need a completed road': '횃불은 완성된 길에만 세울 수 있습니다',
   Occupied: '이미 사용 중',
   'On the road': '길 위',
   'Fields in the way': '밭이 가로막고 있습니다',
-  'Needs forest within 4 paces': '4걸음 이내에 숲이 필요합니다',
-  'Needs rocky ground within 3 paces': '3걸음 이내에 암석 지대가 필요합니다',
+  'Needs forest close by': '가까이에 숲이 필요합니다',
+  'Needs rocky ground close by': '가까이에 암석 지대가 필요합니다',
 
   // town-construction: roads
   'Hold and draw a road': '누른 채로 길을 그리세요',
@@ -29,7 +29,7 @@ export const townPhrases: Phrases = {
   'Too long': '너무 깁니다',
   'Cannot bridge the sea': '바다에는 다리를 놓을 수 없습니다',
   'A bridge needs dry banks': '다리 양 끝은 마른 땅이어야 합니다',
-  'Bridge too long (7 paces at most)': '다리가 너무 깁니다 (최대 7걸음)',
+  'Bridge too long': '다리가 너무 깁니다',
   'Building in the way': '건물이 가로막고 있습니다',
   'Must connect to the settlement': '정착지와 이어져야 합니다',
   'Must connect to a camp or its roads': '캠프 또는 캠프의 길과 이어져야 합니다',
@@ -49,7 +49,7 @@ export const townPhrases: Phrases = {
   'Too dry for crops': '작물을 기르기에 너무 건조합니다',
   'Too cold for crops': '작물을 기르기에 너무 춥습니다',
   'Road in the way': '길이 가로막고 있습니다',
-  'Needs a farmhouse within 6 paces': '6걸음 이내에 농가가 필요합니다',
+  'Needs a farmhouse close by': '가까이에 농가가 필요합니다',
   'This building belongs to a neutral settlement': '중립 정착지의 건물입니다',
   'The seat of the settlement stays': '정착지의 본거지는 철거할 수 없습니다',
   'This field belongs to a neutral settlement': '중립 정착지의 밭입니다',
@@ -109,7 +109,7 @@ export const townPhrases: Phrases = {
     '저장고가 가득 찼습니다. 알맞은 보관소나 창고를 지으세요',
   '{0} bought their {1} for {2} gold': '{0}: 살던 {1} 구입 ({2} 골드)',
   'Needs food in store': '비축된 식량이 필요합니다',
-  'Needs a market within 8 paces': '8걸음 이내에 시장이 필요합니다',
+  'Needs a market close by': '가까이에 시장이 필요합니다',
   'Needs {0} workers': '일꾼 {0}명이 필요합니다',
   'Needs {0} people': '주민 {0}명이 필요합니다',
   'In a town of {0}, merges with 3 mature townhouses huddled beside it':
@@ -130,7 +130,7 @@ export const townPhrases: Phrases = {
   // town-equipment
   'Select a controllable resident': '조작할 수 있는 주민을 선택하세요',
   'A completed home camp is required': '완성된 소속 캠프가 필요합니다',
-  'Move within 2.5 paces of your settlement storage': '정착지 저장 시설에서 2.5걸음 이내로 이동하세요',
+  'Move closer to your settlement storage': '정착지 저장 시설에 더 가까이 이동하세요',
   'This item cannot be crafted': '제작할 수 없는 아이템입니다',
   'A completed matching workshop is required': '완성된 알맞은 작업장이 필요합니다',
   'Use a workshop in this resident’s settlement': '이 주민이 속한 정착지의 작업장을 이용하세요',
@@ -138,22 +138,23 @@ export const townPhrases: Phrases = {
   'The inventory is full': '소지품이 가득 찼습니다',
   'Not enough settlement materials': '정착지의 재료가 부족합니다',
   '{0} crafted {1}': '{0}: {1} 제작 완료',
+  '{0} stopped making the {1}': '{0}: {1} 만들기를 그만두었습니다',
   '{0} in hand': '{0}을(를) 손에 들었습니다',
   'Build a workbench first': '먼저 작업대를 지으세요',
 
   // town-hiring
   'Guests are temporary visitors. New residents arrive through an altar prayer.':
     '손님은 잠시 머무는 방문객입니다. 새 주민은 제단의 기도로 찾아옵니다.',
-  'A close-combat profession that strikes 30% harder. Equip a crafted weapon for stronger attacks.':
-    '30% 더 강하게 공격하는 근접 전투 직업입니다. 제작한 무기를 장비하면 공격이 더 강해집니다.',
-  'A ranged-combat profession that strikes 15% harder. Equip a crafted bow to attack from a distance.':
-    '15% 더 강하게 공격하는 원거리 전투 직업입니다. 제작한 활을 장비하면 멀리서 공격합니다.',
-  'A rune-casting profession that strikes 15% harder. Equip a crafted staff to attack from a distance.':
-    '15% 더 강하게 공격하는 룬 마법 직업입니다. 제작한 지팡이를 장비하면 멀리서 공격합니다.',
-  'A sworn guardian who fights at close range. Monsters hit the cleric and allies within 5 paces 20% softer.':
-    '근거리에서 싸우는 서약의 수호자입니다. 몬스터가 성직자와 5걸음 이내 아군에게 주는 피해가 20% 줄어듭니다.',
-  'A keeper of songs who fights at close range. Other allies within 5 paces strike 15% harder.':
-    '근거리에서 싸우는 노래의 전승자입니다. 5걸음 이내의 다른 아군이 15% 더 강하게 공격합니다.',
+  'A close-combat profession that strikes hardest. Equip a crafted weapon for stronger attacks.':
+    '가장 강하게 공격하는 근접 전투 직업입니다. 제작한 무기를 장비하면 공격이 더 강해집니다.',
+  'A ranged-combat profession that strikes harder. Equip a crafted bow to attack from a distance.':
+    '더 강하게 공격하는 원거리 전투 직업입니다. 제작한 활을 장비하면 멀리서 공격합니다.',
+  'A rune-casting profession that strikes harder. Equip a crafted staff to attack from a distance.':
+    '더 강하게 공격하는 룬 마법 직업입니다. 제작한 지팡이를 장비하면 멀리서 공격합니다.',
+  'A sworn guardian who fights at close range. Monsters hit the cleric and nearby allies softer.':
+    '근거리에서 싸우는 서약의 수호자입니다. 몬스터가 성직자와 가까운 아군에게 주는 피해가 줄어듭니다.',
+  'A keeper of songs who fights at close range. Nearby allies strike harder.':
+    '근거리에서 싸우는 노래의 전승자입니다. 가까운 아군이 더 강하게 공격합니다.',
   'Complete a guild first.': '먼저 길드를 완성하세요.',
   'This guild belongs to another settlement.': '다른 정착지의 길드입니다.',
   'Guests cannot train or become residents.': '손님은 훈련을 받거나 주민이 될 수 없습니다.',
@@ -208,9 +209,9 @@ export const townPhrases: Phrases = {
     '파티가 {0} 너머로 건너갑니다: {1} ({3}층 중 {2}층)',
   'The portal pulls the party home for {0}': '포털이 파티를 불러들였습니다 (소모: {0})',
   'The party returns from {0} empty-handed': '파티가 {0}에서 빈손으로 귀환했습니다',
-  'The party returns from {0} with {1}': '파티가 {0}에서 귀환했습니다 (획득: {1})',
+  'The party returns from {0} with {1}': '파티가 {0}에서 귀환했습니다. 획득: {1}',
   'The party withdraws from {0} empty-handed': '파티가 {0}에서 빈손으로 철수했습니다',
-  'The party withdraws from {0} with {1}': '파티가 {0}에서 철수했습니다 (획득: {1})',
+  'The party withdraws from {0} with {1}': '파티가 {0}에서 철수했습니다. 획득: {1}',
   'No one returned from {0}': '{0}에서 아무도 돌아오지 못했습니다',
   '{0} is sealed. Every gate is closed: Midgard is safe!':
     '{0} 봉인 완료. 모든 관문이 닫혔습니다. 미드가르드는 안전합니다!',

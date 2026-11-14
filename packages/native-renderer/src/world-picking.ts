@@ -5,6 +5,7 @@ import { SceneNode, type PaintNode } from './paint';
 import type { WorldRendererState } from './world-renderer-state';
 import { pickSource, type PickSource } from './world-pick-registry';
 import { wornCourse, stretch } from './road-painter';
+import { ghostEllipses, ghostTouches, hiddenUnitGhosts, type Ghost } from './hidden-unit-ghosts';
 import {
   worldObjectKey,
   type PickBounds,
@@ -21,6 +22,7 @@ interface Candidate {
   rank: number;
   body?: readonly PaintNode[];
   road?: { line: Point[]; halfWidth: number };
+  ghost?: Ghost;
 }
 const bucketSize = 96;
 const overlap = (a: PickBounds, b: PickBounds) =>
@@ -165,6 +167,7 @@ export class WorldPicker {
     rank = this.addRoads(town, rank);
     // This is the exact painter order, including the baseline-overlap tie breaking.
     layer(s.objects);
+    this.addGhosts(town, rank);
     this.ready = true;
   }
   selectionGeometry(ref: WorldObjectRef): SelectionGeometry | null {
@@ -321,6 +324,33 @@ export class WorldPicker {
     if (hit) this.geometries.set(hit.key, hit);
     this.add({ hit, bounds: screen, rank, body });
   }
+  /** A unit hidden behind a tree or peak is picked by its ghost, above everything it stands behind. */
+  private addGhosts(town: Town, rank: number): void {
+    const zoom = this.view.zoom;
+    for (const ghost of hiddenUnitGhosts(this.state)) {
+      if (!this.eligible(town, { ref: ghost.ref, body: [], foot: ghost.foot }, 255)) continue;
+      const parts = ghostEllipses(ghost).map((e) => {
+          const c = this.view.toScreen(point(e.x, e.y), this.width, this.height);
+          return { x: c.x - e.rx * zoom, y: c.y - e.ry * zoom, w: 2 * e.rx * zoom, h: 2 * e.ry * zoom };
+        }),
+        bounds = combine(parts)!,
+        key = worldObjectKey(ghost.ref),
+        hit = this.geometries.get(key) ?? {
+          ...ghost.ref,
+          key,
+          drawRank: rank,
+          frameId: this.frame,
+          geometry: {
+            foot: this.project(ghost.foot),
+            bounds,
+            labelAnchor: point(bounds.x + bounds.w / 2, bounds.y),
+            opacity: 255,
+          },
+        };
+      this.geometries.set(key, hit);
+      this.add({ hit, bounds, rank: rank++, ghost });
+    }
+  }
   private add(candidate: Candidate): void {
     const bounds = candidate.bounds;
     const left = Math.max(0, Math.floor(bounds.x / bucketSize)),
@@ -362,6 +392,16 @@ export class WorldPicker {
       .sort((a, b) => b.rank - a.rank);
   }
   private intersects(candidate: Candidate, region: PickBounds): boolean {
+    if (candidate.ghost) {
+      const corner = this.view.toWorld(point(region.x, region.y), this.width, this.height),
+        zoom = this.view.zoom;
+      // A couple of screen pixels of slack, so a small ghost is easy to tap.
+      return ghostTouches(
+        candidate.ghost,
+        { x: corner.x, y: corner.y, w: region.w / zoom, h: region.h / zoom },
+        2 / zoom,
+      );
+    }
     if (candidate.road) {
       const world = (x: number, y: number) => {
         const p = this.view.toWorld(point(x, y), this.width, this.height);

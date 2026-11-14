@@ -47,7 +47,7 @@ export function objectSelectionOverlay(app: GameCommandApp): void {
     occupied.push(r);
     paintWorldNameplate(
       app.context,
-      app.context.elideText(target.name, r.w - 15, 10, true),
+      app.context.elideText(target.name, r.w - 14, 10, true),
       r,
       hover ? rgba(143, 205, 225) : undefined,
     );

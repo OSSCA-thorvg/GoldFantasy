@@ -29,6 +29,7 @@ import { syncVisuals, buildObjects, buildRoadLights } from './world-objects';
 import { buildDarkness, updateVision } from './world-vision';
 import { cullTrees, swayTrees, updateFelling, updateGrowth } from './world-trees';
 import { moveAgents, tread, markDamage } from './world-people';
+import { updateHiddenUnitGhosts } from './hidden-unit-ghosts';
 import { updateCombatPresentation, worldShake } from './combat-presentation';
 import { animate } from './world-animation';
 import { paintStorm } from './world-weather';
@@ -357,6 +358,7 @@ export class WorldRenderer extends WorldRendererState {
       tread(this, town, seconds);
       markDamage(this, town);
       moveAgents(this, town, traffic, seconds, selected);
+      updateHiddenUnitGhosts(this, town, seconds);
       updateCombatPresentation(this, town, selected);
       updateFelling(this, town);
       updateGrowth(this, town, seconds);

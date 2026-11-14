@@ -14,6 +14,7 @@ import { RaidKind } from '../../packages/engine/src/raid-progression';
 import { canControl, controlReason } from '../../packages/engine/src/faction';
 import { rankRules } from '../../packages/engine/src/monster-ranks';
 import { animalSpec } from '../../packages/engine/src/wildlife';
+import { skillPower } from '../../packages/engine/src/skill-catalog';
 import { decodeTown, encodeTown } from '../../packages/engine/src/save-game';
 
 function fixture() {
@@ -379,13 +380,13 @@ describe('calling abilities', () => {
     expect(1 - w.health).toBeCloseTo(plain / 2, 5);
     expect(town.useAbility([w.id])).toBe(0);
   });
-  it('Aimed Shot hits three times as hard', () => {
+  it('Aimed Shot hits several times as hard', () => {
     const { town } = fixture(),
       r = resident(town, point(15, 15), Calling.Ranger),
       foe = monster(town, point(19, 15));
     const blow = town.blowStrength(r);
     expect(town.useAbility([r.id])).toBe(1);
-    expect(foe.health).toBeCloseTo(100 - 3 * blow, 4);
+    expect(foe.health).toBeCloseTo(100 - skillPower.aimed * blow, 4);
     expect(town.abilityOf(r)!.remaining).toBe(12);
   });
   it('Rune Burst lands after a moment on every monster in the circle', () => {
@@ -399,7 +400,7 @@ describe('calling abilities', () => {
     expect(town.useAbility([m.id], point(20.5, 15))).toBe(1);
     expect(inside[0].health).toBe(100);
     step(town, 0.9);
-    for (const foe of inside) expect(foe.health).toBeCloseTo(100 - 2.5 * blow, 3);
+    for (const foe of inside) expect(foe.health).toBeCloseTo(100 - skillPower.burst * blow, 3);
     expect(outside.health).toBe(100);
     expect(town.useAbility([m.id], point(20.5, 15))).toBe(0);
   });

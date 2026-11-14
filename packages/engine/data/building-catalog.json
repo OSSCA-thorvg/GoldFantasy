@@ -1271,7 +1271,7 @@
   },
   {
     "name": "Workbench",
-    "description": "An open-air bench with a chopping block where residents craft wooden tools and weapons, one at a time.",
+    "description": "An open-air bench where residents craft wooden and stone tools and weapons, one at a time.",
     "size": 0.8,
     "cost": {
       "gold": 0,

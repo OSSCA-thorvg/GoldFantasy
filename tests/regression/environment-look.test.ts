@@ -6,7 +6,8 @@ import { Camera, point, project, unproject } from '../../packages/engine/src/geo
 import { Traffic } from '../../packages/engine/src/traffic';
 import { Preview } from '../../packages/engine/src/game-tools';
 import { WorldMap } from '../../packages/engine/src/world-map';
-import { DungeonKind, Terrain, World } from '../../packages/engine/src/world-types';
+import { hash01 } from '../../packages/engine/src/numeric';
+import { DungeonKind, Layer, Terrain, World } from '../../packages/engine/src/world-types';
 import {
   findRealmArea,
   inArea,
@@ -40,7 +41,18 @@ import {
   updateLava,
   type LavaPatch,
 } from '../../packages/native-renderer/src/lava-motion';
-import { PeakBatch } from '../../packages/native-renderer/src/mountain-peaks';
+import {
+  PeakBatch,
+  baseSlack,
+  grownFir,
+  lowPeak,
+  mountainDepth,
+  peakAt,
+  settlePeaks,
+  slopeLimit,
+  type Peak,
+} from '../../packages/native-renderer/src/mountain-peaks';
+import { volcanoHeight } from '../../packages/native-renderer/src/volcano-painter';
 
 class PixelBuffer {
   constructor(
@@ -487,6 +499,153 @@ describe('tree stature', () => {
   }, 120000);
 });
 
+describe('mountains with mass', () => {
+  const town = new Town(5),
+    map = town.map(),
+    w = map.width(),
+    depth = mountainDepth(map),
+    peaks: { x: number; y: number; p: Peak }[] = [];
+  for (let y = 0; y < map.height(); ++y)
+    for (let x = 0; x < w; ++x) {
+      const p = peakAt(map, x, y);
+      if (p) peaks.push({ x, y, p });
+    }
+  const summits = peaks.filter((q) => q.p.summit),
+    near = (a: { x: number; y: number }, b: { x: number; y: number }, r: number) =>
+      Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) <= r,
+    drawn = (p: Peak) => {
+      const batch = new PeakBatch(calm);
+      batch.add(p);
+      return batch.finish(project(p.foot.x, p.foot.y).y);
+    };
+  // The median grown fir, drawn by the tree painter.
+  const fir = (() => {
+    const heights: number[] = [];
+    for (let y = 0; y < map.height(); ++y)
+      for (let x = 0; x < w; ++x)
+        for (let i = 0; i < map.at(x, y).trees; ++i) {
+          const tree = treeAt(map, x, y, i);
+          if (tree.kind !== TreeKind.Fir) continue;
+          const batch = new TreeBatch(calm);
+          batch.add(tree);
+          const box = extent(batch.finish(project(tree.foot.x, tree.foot.y).y));
+          heights.push(box.bottom - box.top);
+        }
+    return heights.sort((a, b) => a - b)[Math.floor(heights.length / 2)];
+  })();
+  it('stands no needle: a peak over the forest is no taller than its base is wide', () => {
+    expect(fir).toBeGreaterThan(70);
+    expect(Math.abs(fir - grownFir)).toBeLessThan(10);
+    expect(peaks.length).toBeGreaterThan(300);
+    for (const { p } of peaks) {
+      expect(p.height).toBeLessThanOrEqual(slopeLimit(2 * p.half) + 1e-3);
+      if (p.height > fir) expect(p.height / (2 * p.half)).toBeLessThanOrEqual(1.001);
+      else expect(p.height / (2 * p.half)).toBeLessThanOrEqual(1.301);
+      const box = extent(drawn(p));
+      expect(box.right - box.left).toBeGreaterThanOrEqual(2 * p.half - 1);
+    }
+  });
+  it('raises even a thin ridge over the forest and the broadest range to twice a grown fir', () => {
+    const marks = map.dungeons().map((d) => ({ x: d.origin.x + 1, y: d.origin.y + 1 })),
+      giant = map.giant()!.center();
+    marks.push({ x: giant.x, y: giant.y });
+    // Edge peaks with no deeper ground near them, away from the gates and the statue they must not hide.
+    const thin = peaks.filter(
+      (q) =>
+        q.p.depth === 1 &&
+        !q.p.volcanic &&
+        marks.every((m) => !near(q, { x: Math.floor(m.x), y: Math.floor(m.y) }, 8)) &&
+        [...Array(49).keys()].every((i) => {
+          const x = q.x + (i % 7) - 3,
+            y = q.y + Math.floor(i / 7) - 3;
+          return !map.inside(x, y) || depth[y * w + x] < 2;
+        }),
+    );
+    expect(thin.length).toBeGreaterThan(20);
+    for (const { p } of thin) expect(p.height).toBeGreaterThan(fir);
+    expect(Math.max(...summits.map((q) => q.p.height))).toBeGreaterThanOrEqual(2 * fir);
+    expect(summits.length).toBeGreaterThan(10);
+    expect(summits.length).toBeLessThan(peaks.length / 6);
+  });
+  it('stands the peaks in front of a summit lower than the summit behind them', () => {
+    let pairs = 0;
+    for (const s of summits)
+      for (const q of peaks) {
+        if (q.p.summit || !near(q, s, 3) || q.p.foot.x + q.p.foot.y <= s.p.foot.x + s.p.foot.y) continue;
+        ++pairs;
+        expect(q.p.height).toBeLessThan(s.p.height);
+      }
+    expect(pairs).toBeGreaterThan(20);
+    const edge = peaks.filter((q) => q.p.depth === 1).map((q) => q.p.height),
+      tops = summits.map((q) => q.p.height),
+      median = (l: number[]) => [...l].sort((a, b) => a - b)[Math.floor(l.length / 2)];
+    expect(median(tops)).toBeGreaterThan(median(edge) * 1.25);
+  });
+  it('keeps every base on mountain ground, give or take a quarter of a tile', () => {
+    const rock = (sx: number, sy: number) =>
+      [0, -baseSlack, baseSlack].some((dx) => {
+        const t = unproject(sx + dx, sy);
+        const x = Math.floor(t.x),
+          y = Math.floor(t.y);
+        return map.inside(x, y) && map.at(x, y).terrain === Terrain.Mountain;
+      });
+    for (const { p } of peaks) {
+      const b = project(p.foot.x, p.foot.y);
+      for (let i = 0; i <= 8; ++i) expect(rock(b.x - p.half + (2 * p.half * i) / 8, b.y)).toBe(true);
+      expect(rock(b.x + p.half * 0.12, b.y + p.drop)).toBe(true);
+    }
+  });
+  it('keeps the volcano at least twice as tall as the highest peak', () => {
+    expect(2 * Math.max(...peaks.map((q) => q.p.height))).toBeLessThanOrEqual(volcanoHeight);
+    // The ring of basalt round the cone stays low.
+    const basalt = peaks.filter((q) => q.p.volcanic).map((q) => q.p.height);
+    expect(basalt.length).toBeGreaterThan(5);
+    expect(Math.max(...basalt)).toBeLessThan(volcanoHeight / 2);
+  });
+  it('paints a summit with shoulders and a ragged snow cap, and a low foothill bare in a mild climate', () => {
+    const summit = summits.find((q) => !q.p.volcanic && q.p.height > 150)!.p,
+      parts = drawn(summit);
+    // Shoulder faces behind the body, the body's two faces and the cap's two.
+    expect(parts.length).toBeGreaterThanOrEqual(6);
+    const cap = parts.find((shape) => !shape.gradient && shape.color[0] === 208 && shape.color[1] === 214)!;
+    expect(cap.commands.filter((c) => c[0] === 'L').length).toBeGreaterThanOrEqual(5);
+    const low = peaks.find((q) => !q.p.volcanic && !q.p.summit && q.p.height < 120)!.p;
+    expect(drawn(low)).toHaveLength(2);
+  });
+  it('draws no more peaks or path points than the old one-per-tile pyramids in the same view', () => {
+    const deepest = depth.indexOf(Math.max(...depth)),
+      c = project((deepest % w) + 0.5, Math.floor(deepest / w) + 0.5),
+      zoom = 0.45,
+      half = { x: 640 / zoom, y: 400 / zoom },
+      inView = (foot: { x: number; y: number }, top: number) => {
+        const b = project(foot.x, foot.y);
+        return Math.abs(b.x - c.x) < half.x + 80 && b.y > c.y - half.y && b.y - top < c.y + half.y;
+      };
+    let before = 0,
+      beforePoints = 0,
+      after = 0,
+      afterPoints = 0;
+    for (let y = 0; y < map.height(); ++y)
+      for (let x = 0; x < w; ++x) {
+        const middle = { x: x + 0.5, y: y + 0.5 };
+        if (map.at(x, y).terrain !== Terrain.Mountain) continue;
+        if (map.giant()?.covers(middle) || map.volcano()?.covers(middle)) continue;
+        if (hash01(map.seed(), x, y, 62) >= 0.55 || !inView(middle, 110)) continue;
+        // Lit and shaded triangles, and two four-point caps on a high one.
+        ++before;
+        beforePoints += 8 + (Math.min(1, map.value(Layer.Ridge, middle) * 7) > 0.35 ? 10 : 0);
+      }
+    for (const { p } of peaks) {
+      if (!inView(p.foot, p.height)) continue;
+      ++after;
+      afterPoints += drawn(p).reduce((sum, shape) => sum + shape.commands.length, 0);
+    }
+    expect(after).toBeGreaterThan(20);
+    expect(after).toBeLessThanOrEqual(before);
+    expect(afterPoints).toBeLessThanOrEqual(beforePoints);
+  });
+});
+
 describe('the land of Midgard', () => {
   const lit = (shape: ShapeNode): Rgb => {
     const top = shape.gradient!.stops[0].color;
@@ -546,6 +705,9 @@ describe('the worlds beyond the gates', () => {
       stampRealm(map, plan, world);
       const renderer = new WorldRenderer(tvg),
         c = project(area.x + area.size / 2, area.y + area.size / 2);
+      // A party is in the world, as in play: its walls are laid out by the old rule.
+      town.realmArea = area;
+      town.realmGate = 0;
       try {
         renderer.update(town, new Traffic(5), new Camera(c.x, c.y, 0.5), 1280, 800, 1, new Preview(), []);
         let walls = 0,
@@ -558,10 +720,26 @@ describe('the worlds beyond the gates', () => {
             ++walls;
             if (realmGap(map.seed(), plan, foot) < -1.5) ++onFloor;
           }
+        // The walls keep their old, low proportions so a party in a lane stays in view; Midgard's peaks grew.
+        settlePeaks(map, area);
+        let settled = 0;
+        for (let y = area.y; y < area.y + area.size; ++y)
+          for (let x = area.x; x < area.x + area.size; ++x) {
+            const peak = peakAt(map, x, y);
+            if (!peak) continue;
+            ++settled;
+            expect(peak.height).toBeCloseTo(lowPeak(peak.rise), 3);
+            expect(peak.half).toBeCloseTo(20 + 20 * peak.rise, 3);
+            expect(peak.summit).toBe(false);
+          }
+        expect(settled, World[world]).toBeGreaterThan(0);
+        settlePeaks(map, null);
         // Dense walls round the chambers and corridors, and nothing standing in a lane.
         expect(walls, World[world]).toBeGreaterThan(area.size * 6);
         expect(onFloor, World[world]).toBe(0);
       } finally {
+        town.realmArea = null;
+        town.realmGate = -1;
         renderer.dispose();
         sinkRealm(map, area);
       }

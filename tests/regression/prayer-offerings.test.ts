@@ -101,7 +101,7 @@ describe('offerings shape an unarmed resident', () => {
     expect(born.calling).toBe(Calling.Warrior);
     expect(born.level).toBe(profile.levelMin);
     expect(born.trained).toBe(true);
-    expect(born.attackMultiplier()).toBeCloseTo(1.3 * (1 + 0.05 * (profile.levelMin - 1)));
+    expect(born.attackMultiplier()).toBeCloseTo(1.3 * (1 + Person.attackPerLevel * (profile.levelMin - 1)));
     expect(born.vitalityMultiplier()).toBeCloseTo(profile.vitalityMin);
     expect(born.inventory.every((item) => item === null)).toBe(true);
   });

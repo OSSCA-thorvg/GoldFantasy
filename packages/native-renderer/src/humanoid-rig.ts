@@ -16,6 +16,8 @@ import kneel from './assets/rig/humanoid-kneel.json';
 import play from './assets/rig/humanoid-play.json';
 import brace from './assets/rig/humanoid-brace.json';
 import slam from './assets/rig/humanoid-slam.json';
+import whittle from './assets/rig/humanoid-whittle.json';
+import admire from './assets/rig/humanoid-admire.json';
 import { readRigClip } from './rig-clip';
 import { RigFigure } from './rig-figure';
 import { Skeleton, type BoneSpec, type RigPose } from './rig-skeleton';
@@ -118,6 +120,8 @@ export const humanoidClips = {
   play: readRigClip(play),
   brace: readRigClip(brace),
   slam: readRigClip(slam),
+  whittle: readRigClip(whittle),
+  admire: readRigClip(admire),
 };
 /** Leans a figure's trunk for good and keeps its arms and head where the clip put them. */
 export function hunch(figure: RigFigure, pose: RigPose, spine: number, chest: number): void {

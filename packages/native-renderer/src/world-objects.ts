@@ -28,6 +28,7 @@ import { gateSealed } from '../../engine/src/gate-seals';
 import { registerPick } from './world-pick-registry';
 import { paintOrnaments } from './world-ground';
 import { sprout, buildTreeRow } from './world-trees';
+import { settlePeaks } from './mountain-peaks';
 import { Rect } from '../../native-ui/src/types';
 import { damagePaint } from './building-damage';
 const arcaneWisp: Rgb = [130, 240, 220],
@@ -103,6 +104,7 @@ export function syncVisuals(s: WorldRendererState, town: Town, seconds: number):
   }
 }
 export function buildObjects(s: WorldRendererState, town: Town, climate: Readonly<Climate>): void {
+  settlePeaks(town.map(), town.realmGate >= 0 ? town.realmArea : null);
   s.lights.remove();
   s.effects.remove();
   s.pools = [];

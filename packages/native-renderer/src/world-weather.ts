@@ -237,24 +237,49 @@ export function drift(s: WorldRendererState, climate: Climate, seconds: number):
   if (!s.cloudShapes.length) {
     const cluster = (seed: number) => {
       const shadow = new SceneNode();
-      let x = 0,
-        y = 0;
-      for (let blob = 0; blob < 12; ++blob) {
-        const r = f(70 + f(hash01(31, seed, blob, 1) * 150)),
-          stretch = f(f(1.3) + f(hash01(31, seed, blob, 4) * f(1.1)));
-        const puff = new ShapeNode().appendCircle(0, 0, r, r).fillGradient({
-          type: 'radial',
-          coordinates: [0, 0, r, 0, 0, 0],
-          stops: [
-            { offset: 0, color: [8, 14, 24, 255] },
-            { offset: f(0.6), color: [8, 14, 24, 255] },
-            { offset: 1, color: [8, 14, 24, 0] },
-          ],
-        });
-        puff.transform([stretch, 0, x, 0, 1, y, 0, 0, 1]);
-        shadow.add(puff);
-        x = f(x + f(f(hash01(31, seed, blob, 2) - f(0.3)) * 260));
-        y = f(y + f(f(hash01(31, seed, blob, 3) - f(0.5)) * 150));
+      const puff = (x: number, y: number, r: number, stretch: number) =>
+        shadow.add(
+          new ShapeNode()
+            .appendCircle(0, 0, r, r)
+            .fillGradient({
+              type: 'radial',
+              coordinates: [0, 0, r, 0, 0, 0],
+              stops: [
+                { offset: 0, color: [8, 14, 24, 255] },
+                { offset: f(0.6), color: [8, 14, 24, 255] },
+                { offset: 1, color: [8, 14, 24, 0] },
+              ],
+            })
+            .transform([stretch, 0, x, 0, 1, y, 0, 0, 1]),
+        );
+      // Each body grows off a random earlier one, so the mass branches into an
+      // uneven clump; a chain of large overlapping puffs read as one plain ellipse.
+      const bodies: { x: number; y: number; r: number; stretch: number }[] = [],
+        tau = f(6.2831853);
+      for (let blob = 0; blob < 10; ++blob) {
+        const roll = (salt: number) => hash01(31, seed, blob, salt),
+          r = f(75 + f(roll(1) * 90)),
+          stretch = f(f(1.2) + f(roll(4) * f(0.5)));
+        let x = 0,
+          y = 0;
+        if (bodies.length) {
+          const from = bodies[Math.min(bodies.length - 1, Math.trunc(f(roll(5) * bodies.length)))],
+            angle = f(roll(2) * tau),
+            reach = f(f(0.56) + f(roll(3) * f(0.41)));
+          x = f(from.x + f(f(Math.cos(angle) * f(f(from.r * from.stretch) + f(r * stretch))) * reach));
+          y = f(from.y + f(f(Math.sin(angle) * f(from.r + r)) * reach));
+        }
+        bodies.push({ x, y, r, stretch });
+        puff(x, y, r, stretch);
+        // A small lobe on the rim breaks the body's outline.
+        const rim = f(roll(6) * tau),
+          lobe = f(r * f(f(0.35) + f(roll(7) * f(0.3))));
+        puff(
+          f(x + f(f(Math.cos(rim) * f(r * stretch)) * f(0.85))),
+          f(y + f(f(Math.sin(rim) * r) * f(0.85))),
+          lobe,
+          f(1.25),
+        );
       }
       shadow.opacity(105);
       const holder = new SceneNode().add(shadow);

@@ -1,5 +1,6 @@
 // Fighting, rescue and loss in the player's hands, eyes and ears.
 import type { Paint } from '@thorvg/webcanvas';
+import { translate } from '../../../../packages/localization/src/index';
 import { Rect, Align, ButtonStyle, button, type Context, type Color } from '../../../../packages/native-ui/src';
 import { Person, Role, Activity, callingName, type Monster } from '../../../../packages/engine/src/person';
 import { CombatCue, type CombatEvent, type Fallen } from '../../../../packages/engine/src/combat-events';
@@ -63,6 +64,8 @@ export const combatHints = [
 // ---------------------------------------------------------------- shared bits
 
 export function wrapText(c: Context, text: string, width: number, size: number, lines = 3, bold = false): string[] {
+  // Translate before breaking: a line of a sentence is not a phrase the tables know.
+  text = translate(text);
   const rows: string[] = [];
   let row = '';
   for (const word of text.split(' ')) {
@@ -292,7 +295,7 @@ export function combatFrame(app: CombatFrameApp, seconds: number): void {
     if (person && isPlayerResident(person)) downed.push(person);
   }
   combatSounds(app, heard, seconds);
-  swarmFrame(app, heard, seconds);
+  swarmFrame(app, heard);
   if (town.fallen.length < state.fallenSeen) state.fallenSeen = town.fallen.length;
   for (; state.fallenSeen < town.fallen.length; ++state.fallenSeen)
     if (!autoplay) state.memorials.push(town.fallen[state.fallenSeen]);
@@ -305,7 +308,7 @@ export function combatFrame(app: CombatFrameApp, seconds: number): void {
     const first = downed[0];
     state.autoPause = {
       title: downedTitle(downed.map((p) => p.name)),
-      detail: `${first.name} bleeds out in ${Math.ceil(town.bleedOutLeft(first))} s unless an ally kneels beside them.`,
+      detail: `${first.name} bleeds out unless an ally kneels beside them in time.`,
       at: { ...first.position },
       person: first.id,
       creature: -1,

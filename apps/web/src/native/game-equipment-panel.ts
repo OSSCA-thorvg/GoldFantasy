@@ -113,6 +113,16 @@ export function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder
     line(-10, 10, -4, -9);
     line(-4, -6, 0, -3);
     line(0, -3, 4, -6);
+  } else if (item.visual === 'basket') {
+    line(-8, -6, 8, -6);
+    line(8, -6, 6, 9);
+    line(6, 9, -6, 9);
+    line(-6, 9, -8, -6);
+    line(-7, -1, 7, -1, 1);
+    line(-6, 4, 6, 4, 1);
+    line(-4, -6, -2, -11, 1.5);
+    line(-2, -11, 2, -11, 1.5);
+    line(2, -11, 4, -6, 1.5);
   } else if (item.category === 'armor') {
     line(-9, -7, -3, -10);
     line(-3, -10, 3, -10);
@@ -128,6 +138,15 @@ export function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder
     line(2, 7, -5, 10);
     line(-5, -10, -5, 10, 1);
     line(-9, 0, 10, 0, 1);
+  } else if (item.visual === 'spear') {
+    line(-9, 11, 6, -6, 2);
+    line(6, -6, 4, -11, 2);
+    line(4, -11, 10, -10, 2);
+    line(10, -10, 6, -6, 2);
+  } else if (item.visual === 'knife') {
+    line(-8, 9, -3, 4, 3);
+    line(-4, 3, 2, 1, 2);
+    line(-1, 5, 8, -8, 3);
   } else if (item.visual === 'sword' || item.visual === 'staff' || item.visual === 'mace') {
     line(-7, 10, 7, -10, 3);
     line(-8, 4, -2, 9);
@@ -135,6 +154,14 @@ export function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder
   } else {
     line(-7, 10, 4, -8, 2);
     if (item.visual === 'hammer') line(-1, -10, 10, -3, 5);
+    else if (item.visual === 'shovel') {
+      line(2, -6, 9, -13, 7);
+      line(1, -5, 6, -10, 3);
+    } else if (item.visual === 'sickle') {
+      line(4, -8, 9, -9);
+      line(9, -9, 11, -4);
+      line(11, -4, 8, 1);
+    }
     else if (item.visual === 'axe') {
       line(1, -8, 10, -8, 5);
       line(10, -8, 10, 0, 3);
@@ -394,11 +421,31 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
     }
   }
   const making = p.craftItem ? itemCatalog.find((item) => item.id === p.craftItem) : null;
-  if (making)
+  if (making) {
+    const w = 66;
     c.text(
-      new Rect(panel.x + 106, panel.y, panel.w - 106, 28),
-      `Crafting ${making.name} · ${Math.trunc((p.craftProgress / making.seconds) * 100)}%`,
+      new Rect(panel.x + 106, panel.y, panel.w - 112 - w, 28),
+      c.elideText(
+        `Crafting ${making.name} · ${Math.trunc((p.craftProgress / making.seconds) * 100)}%`,
+        panel.w - 112 - w,
+        11,
+      ),
       t.accent,
       11,
     );
+    button(
+      c,
+      'unit-craft-cancel',
+      new Rect(panel.x + panel.w - w, panel.y, w, 28),
+      'Cancel',
+      () => {
+        if (app.town.cancelCraft(p.id)) app.status = `${p.name} stopped making the ${making.name}`;
+      },
+      ButtonStyle.Default,
+      enabled,
+      undefined,
+      false,
+      { fontSize: 11 },
+    );
+  }
 }

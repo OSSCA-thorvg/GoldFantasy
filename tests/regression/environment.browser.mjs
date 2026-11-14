@@ -46,14 +46,16 @@ try {
       { Town },
       { Traffic },
       { Preview },
-      { Activity, Calling, Role, TreeWorkKind },
+      { Activity, Calling, Role, TreeWorkKind, Monster },
       { Camera, project },
       { monsterEntrance },
       { Building },
       { Structure },
-      { Terrain },
+      { Terrain, Layer },
       { sharpAnchor },
       { addInventory, workItem },
+      { MonsterRank },
+      { pickSource },
     ] = await Promise.all([
       import('/apps/web/src/native/startup-canvas.ts'),
       import('/packages/native-ui/src/index.ts'),
@@ -69,6 +71,8 @@ try {
       import('/packages/engine/src/world-types.ts'),
       import('/packages/engine/src/road-network.ts'),
       import('/packages/engine/src/equipment.ts'),
+      import('/packages/engine/src/combat-events.ts'),
+      import('/packages/native-renderer/src/world-pick-registry.ts'),
     ]);
     const tvg = await initializeWebCanvas('gl'),
       element = document.createElement('canvas');
@@ -85,6 +89,7 @@ try {
         town,
         camera: new Camera(),
         fogged: false,
+        ghostsOff: false,
         render(width, height, seconds, simulate, dt) {
           if (simulate) town.advance(dt);
           if (seen !== town.realmRevision) {
@@ -94,6 +99,11 @@ try {
           const preview = new Preview();
           preview.zoom = this.camera.zoom;
           renderer.update(town, traffic, this.camera, width, height, seconds, preview, []);
+          // The "before" pictures of hidden units: the same scene without the ghost layer.
+          if (this.ghostsOff && renderer.ghosts) {
+            renderer.ghosts.opacity(0);
+            renderer.adapter.sync(renderer.root);
+          }
           // The pictures judge the land itself: the memory veil is lifted unless a shot asks for fog.
           if (!this.fogged) {
             renderer.fog.opacity(0);
@@ -245,6 +255,140 @@ try {
             }
           }
         return { edge, dense, snowy, cell: edge.y * map.width() + edge.x };
+      },
+      // Drawn heights at zoom 1 (screen pixels): a resident, the cottage, and the trees and peaks in view.
+      sizes(p) {
+        this.look(p.x, p.y, 1);
+        this.frame();
+        game.renderer.scene();
+        const a = game.renderer.adapter,
+          h = (paint) => a.renderedBounds(paint)?.h ?? 0,
+          people = [...game.renderer.figures.values()].map((f) => h(f.paint)).filter((v) => v > 0),
+          cottage = h(game.renderer.visuals.get(2)?.picture);
+        return { resident: Math.max(...people), cottage };
+      },
+      // The tallest peak near the camp, a high ridge with forest in front of it, and a snow ridge.
+      mountains() {
+        let near = null,
+          wooded = null,
+          snow = null;
+        const ridge = (x, y) => map.value(Layer.Ridge, { x: x + 0.5, y: y + 0.5 });
+        for (let y = 4; y < map.height() - 4; ++y)
+          for (let x = 4; x < map.width() - 4; ++x) {
+            if (map.at(x, y).terrain !== Terrain.Mountain || map.value(Layer.Heat, { x: x + 0.5, y: y + 0.5 }) > 0.62) continue;
+            const r = ridge(x, y),
+              d = Math.hypot(x - origin.x, y - origin.y);
+            if (d < 16 && (!near || r > near.r)) near = { x, y, r };
+            let trees = 0;
+            for (let k = 1; k <= 3; ++k) trees += map.at(x + k, y + k).trees + map.at(x + k - 1, y + k).trees;
+            if (trees >= 6 && (!wooded || r > wooded.r)) wooded = { x, y, r };
+            if (map.value(Layer.Heat, { x: x + 0.5, y: y + 0.5 }) < 0.3 && (!snow || r > snow.r)) snow = { x, y, r };
+          }
+        return { near, wooded, snow };
+      },
+      // Peaks drawn in the current view (scenes of the tree rows that pick nothing) and their path commands.
+      peakCount() {
+        const rows = new Set(game.renderer.rowTrees.flatMap((row) => row.children));
+        let scenes = 0,
+          commands = 0;
+        const walk = (p) => {
+          if (p.commands) commands += p.commands.length;
+          for (const c of p.children ?? []) walk(c);
+        };
+        for (const paint of game.renderer.objects.children)
+          if (rows.has(paint) && pickSource(paint)?.ref === null) {
+            ++scenes;
+            walk(paint);
+          }
+        return { scenes, commands };
+      },
+      // A tile on open ground with mountain right in front of it on screen: whoever stands there is behind a ridge.
+      behindRidge() {
+        let best = null;
+        for (let y = 6; y < map.height() - 6; ++y)
+          for (let x = 6; x < map.width() - 6; ++x) {
+            const t = map.at(x, y).terrain;
+            if (t === Terrain.Mountain || t === Terrain.Water || t === Terrain.Sea || t === Terrain.Lava) continue;
+            if (map.value(Layer.Heat, { x: x + 0.5, y: y + 0.5 }) > 0.55) continue;
+            let front = 0;
+            for (let k = 1; k <= 3; ++k) front += map.at(x + k, y + k).terrain === Terrain.Mountain;
+            const d = Math.hypot(x - origin.x, y - origin.y);
+            if (front === 3 && (!best || d < best.d)) best = { x: x + 0.5, y: y + 0.5, d };
+          }
+        return best;
+      },
+      // Residents of every calling at these places, level 8, standing their ground.
+      muster(points) {
+        town.folk = town.folk.filter((p) => p.role !== Role.Resident || points.length === 0);
+        const callings = [Calling.Warrior, Calling.Ranger, Calling.Mage, Calling.Cleric, Calling.Warrior, Calling.Settler];
+        const folk = points.map((q, i) => {
+          const p = town.makePerson(Role.Resident, callings[i % callings.length], { ...q });
+          p.position = { ...q };
+          p.level = 8;
+          p.food = p.rest = p.hydration = 1;
+          town.folk.push(p);
+          return p;
+        });
+        town.changes++;
+        return folk.map((p) => p.id);
+      },
+      // A swarm round a point: mostly swarmers, a few grunts and brutes, all roused.
+      swarm(centre, count, spread) {
+        town.beasts = [];
+        const lair = map.dungeons().findIndex((d) => d.kind === 1);
+        for (let i = 0; i < count; ++i) {
+          const a = i * 2.39996,
+            r = spread * Math.sqrt((i + 0.5) / count),
+            m = new Monster(town.nextMonster++, Math.max(0, lair), { x: centre.x + r * Math.cos(a), y: centre.y + r * Math.sin(a) });
+          m.rank = i % 25 === 0 ? MonsterRank.Brute : i % 6 === 0 ? MonsterRank.Grunt : MonsterRank.Swarmer;
+          // Tough enough that the crowd is still whole while frames are measured.
+          m.vigor = m.health = 400;
+          m.angry = true;
+          town.beasts.push(m);
+        }
+        town.changes++;
+      },
+      // Residents told to fell the trees next to them; live frames until most have struck a blow.
+      fell(ids, cells) {
+        town.stock().wood = 0;
+        ids.forEach((id, i) => {
+          const p = town.person(id);
+          addInventory(p, 'axe');
+          town.equipItem(p.id, p.inventory.length, 'tool1');
+          town.orderChop([id], cells[i % cells.length]);
+        });
+        for (let i = 0; i < 900; ++i) {
+          this.live(1 / 30);
+          const chopping = new Set(town.treeEvents().filter((e) => e.kind === TreeWorkKind.Chop).map((e) => e.person));
+          if (ids.filter((id) => chopping.has(id)).length >= ids.length - 1) return i;
+        }
+        return -1;
+      },
+      // Milliseconds of the ghost pass per live frame (coverage ten times a second, ghosts moved every frame).
+      async ghostCost(frames) {
+        const ghosts = await import('/packages/native-renderer/src/hidden-unit-ghosts.ts');
+        let spent = 0,
+          shown = 0,
+          tested = 0,
+          passes = 0;
+        for (let i = 0; i < frames; ++i) {
+          this.now += 1 / 60;
+          town.advance(1 / 60);
+          const t0 = performance.now();
+          ghosts.updateHiddenUnitGhosts(game.renderer, town, this.now);
+          spent += performance.now() - t0;
+          shown += ghosts.hiddenUnitGhosts(game.renderer).length;
+          const work = ghosts.ghostWork(game.renderer);
+          if (work.units) (tested += work.tested / work.units), ++passes;
+          game.render(1280, 800, this.now, false, 0, this.now);
+          canvas.update().render();
+        }
+        return {
+          msPerFrame: +(spent / frames).toFixed(3),
+          ghostsShown: +(shown / frames).toFixed(1),
+          units: town.folk.length + town.beasts.length,
+          silhouettesTestedPerUnit: +(tested / Math.max(1, passes)).toFixed(2),
+        };
       },
       // One resident with an axe told to fell a tree; live frames until the first blow, or the fall.
       chop(cell, until) {
@@ -530,6 +674,111 @@ try {
     const realm = await page.evaluate(() => envProbe.realm());
     await treeShot('world-alfheim', at(realm.entry, 1.2));
     assert(await page.evaluate(() => envProbe.leave()), 'The party leaves Alfheim');
+  }
+  if (wanted('mountains')) {
+    const prefix = process.env.MOUNTAINS_PREFIX ?? 'after',
+      m = await page.evaluate(() => envProbe.mountains()),
+      camp = places.camp,
+      between = { x: (camp.x + m.near.x) / 2, y: (camp.y + m.near.y) / 2 },
+      mountainShot = async (name, setup) => {
+        await shot(`mountains-${prefix}-${name}`, setup);
+        (report.peaks ??= {})[name] = await page.evaluate(() => envProbe.peakCount());
+      };
+    // A resident beside the cottage, between the camp and the nearest high peak.
+    await page.evaluate((p) => envProbe.stand([p, { x: p.x + 0.6, y: p.y + 0.4 }]), {
+      x: camp.x - 1.6,
+      y: camp.y + 2.6,
+    });
+    await mountainShot('settlement', at(between, 1.4));
+    report.sizes = await page.evaluate((p) => envProbe.sizes(p), camp);
+    console.log('drawn sizes at zoom 1', JSON.stringify(report.sizes));
+    await mountainShot('ridge-and-forest', at({ x: m.wooded.x + 1.5, y: m.wooded.y + 1.5 }, 1));
+    await mountainShot('volcano', at(places.volcano, 0.45));
+    await mountainShot('snow-ridge', at(m.snow, 0.9, { snow: 0.9, frost: 0.6 }));
+    await mountainShot('zoomed-out', at({ x: 88, y: 88 }, 0.3));
+    const mountainCost = {};
+    for (const zoom of [1, 0.45])
+      mountainCost[`mountains, zoom ${zoom}`] = await page.evaluate(
+        ({ p, zoom }) => {
+          envProbe.weather({});
+          envProbe.look(p.x, p.y, zoom);
+          return { frameMs: envProbe.cost(), ...envProbe.split() };
+        },
+        { p: { x: m.wooded.x, y: m.wooded.y }, zoom },
+      );
+    report.mountainCost = mountainCost;
+    console.log('mountain frame cost (ms)', JSON.stringify(mountainCost));
+    console.log('peaks on screen', JSON.stringify(report.peaks));
+  }
+  if (wanted('ghosts')) {
+    // Units hidden behind trees and peaks. GHOSTS_PREFIX names the set; "before" hides the ghost layer.
+    const prefix = process.env.GHOSTS_PREFIX ?? 'after',
+      forest = await page.evaluate(() => envProbe.forest()),
+      ridge = await page.evaluate(() => envProbe.behindRidge()),
+      ghostShot = async (name, setup, clip) => {
+        await page.evaluate(setup.fn, setup.arg);
+        await page.evaluate(() => {
+          for (let i = 0; i < 3; ++i) envProbe.frame();
+        });
+        const path = `${output}/ghosts-${prefix}-${name}.png`;
+        await page.screenshot({ path, ...(clip ? { clip } : {}) });
+        report.shots.push(path);
+      };
+    await page.evaluate((off) => (envProbe.game.ghostsOff = off), prefix === 'before');
+    const d = forest.dense,
+      ring = (c, r, n) =>
+        Array.from({ length: n }, (_, k) => ({
+          x: c.x + r * Math.cos((k * 2 * Math.PI) / n + 0.3),
+          y: c.y + r * Math.sin((k * 2 * Math.PI) / n + 0.3),
+        }));
+    await page.evaluate((c) => {
+      envProbe.weather({});
+      envProbe.game.town.scout(c.x, c.y, 14);
+    }, d);
+    // Five residents felling trees deep in the forest.
+    const fellers = await page.evaluate((points) => envProbe.muster(points), ring(d, 1.6, 5));
+    const cells = await page.evaluate((c) => {
+      const map = envProbe.game.town.map(),
+        found = [];
+      for (let r = 1; r < 5 && found.length < 5; ++r)
+        for (let y = Math.floor(c.y) - r; y <= Math.floor(c.y) + r; ++y)
+          for (let x = Math.floor(c.x) - r; x <= Math.floor(c.x) + r; ++x)
+            if (map.at(x, y).trees && !found.includes(y * map.width() + x) && found.length < 5) found.push(y * map.width() + x);
+      return found;
+    }, d);
+    report.fellingAfter = await page.evaluate(({ ids, cells }) => envProbe.fell(ids, cells), { ids: fellers, cells });
+    await ghostShot('felling', at(d, 1.6));
+    // A fight in the forest: 20 residents against a swarm of 150.
+    await page.evaluate((points) => envProbe.muster(points), [...ring(d, 0.8, 8), ...ring(d, 1.8, 12)]);
+    await page.evaluate((c) => envProbe.swarm(c, 150, 5.5), d);
+    await page.evaluate(() => {
+      for (let i = 0; i < 45; ++i) envProbe.live(1 / 30);
+    });
+    await ghostShot('forest-fight', at(d, 1));
+    await ghostShot('forest-fight-zoomed-out', at(d, 0.45));
+    // A phone held upright: a 390 x 800 slice of the screen at the scale a phone shows the world.
+    await ghostShot('phone', at(d, 1.3), { x: 445, y: 0, width: 390, height: 800 });
+    report.ghostCost = {};
+    for (const zoom of [1, 0.45])
+      report.ghostCost[`forest fight, zoom ${zoom}`] = await page.evaluate(
+        async ({ p, zoom }) => {
+          envProbe.look(p.x, p.y, zoom);
+          return { ...(await envProbe.ghostCost(240)), frameMs: envProbe.cost() };
+        },
+        { p: d, zoom },
+      );
+    console.log('ghost cost', JSON.stringify(report.ghostCost));
+    // Three residents just behind a ridge.
+    await page.evaluate(() => (envProbe.game.town.beasts = []));
+    await page.evaluate(
+      (r) => {
+        envProbe.muster([r, { x: r.x - 0.5, y: r.y + 0.1 }, { x: r.x + 0.2, y: r.y - 0.6 }]);
+        envProbe.game.town.scout(r.x, r.y, 10);
+      },
+      ridge,
+    );
+    await ghostShot('behind-ridge', at({ x: ridge.x + 1, y: ridge.y + 1 }, 1.3));
+    await page.evaluate(() => (envProbe.game.ghostsOff = false));
   }
   if (wanted('lava')) {
     const v = places.volcano,

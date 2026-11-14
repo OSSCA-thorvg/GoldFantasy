@@ -399,7 +399,7 @@ export function needMet(this: EconomyTown, item: Building, reason: Reason = { va
       reason.value = 'Needs food in store';
       return treasury.food > 0;
     case GrowthNeed.Market:
-      reason.value = 'Needs a market within 8 paces';
+      reason.value = 'Needs a market close by';
       return this.near(item.center, 8, isMarket, item.faction);
     case GrowthNeed.Workers:
       reason.value = `Needs ${spec.needAmount} workers`;

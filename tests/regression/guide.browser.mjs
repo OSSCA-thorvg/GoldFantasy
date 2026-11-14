@@ -26,6 +26,7 @@ async function boot(page, { width, height, touch }) {
         { treePosition },
         { itemSpec },
         { emptyEvent },
+        { sealable },
         guide,
         localization,
       ] = await Promise.all([
@@ -40,6 +41,7 @@ async function boot(page, { width, height, touch }) {
         import('/packages/engine/src/world-map.ts'),
         import('/packages/engine/src/equipment.ts'),
         import('/apps/web/src/native/application-contracts.ts'),
+        import('/packages/engine/src/gate-seals.ts'),
         import('/apps/web/src/native/game-guide.ts'),
         import('/packages/localization/src/index.ts'),
       ]);
@@ -113,6 +115,23 @@ async function boot(page, { width, height, touch }) {
         },
         project(at) {
           return project(at.x, at.y);
+        },
+        /** A founder stands by the first known gate for a moment, and the view is scrolled onto it as a player would. */
+        toGate() {
+          const site = town.map().dungeons().find((d) => d.discovered && sealable(d));
+          if (!site) return null;
+          const front = { x: site.origin.x + 1, y: site.origin.y + 2.3 },
+            at = project(front.x, front.y),
+            scout = town.people()[1],
+            was = { ...scout.position };
+          // Only what someone sees right now counts, so somebody has to be there.
+          Object.assign(scout.position, { x: front.x, y: front.y + 2 });
+          game.camera.x = at.x;
+          game.camera.y = at.y;
+          this.frames(4);
+          Object.assign(scout.position, was);
+          this.frames(2);
+          return { x: game.camera.x, y: game.camera.y };
         },
         /** Lets cards go until `key` is on screen, or none is left. */
         until(key) {
@@ -264,24 +283,21 @@ try {
     // 1. The opening: the founders wait, the camera stays where it woke.
     let s = await ui.state();
     assert.equal(s.card, 'opening', JSON.stringify(s));
-    assert.ok(s.log.includes('gate'), 'the gate in sight at the start is told');
-    const woke = s.camera;
     await ui.clear();
     await ui.shot('01-opening-card');
 
-    // 2. "Got it" brings the gate's card, and the camera eases to the gate (nobody has given an order yet).
+    // 2. A gate is told once the player has it on screen, and the camera stays where the player put it.
     await click('guide-card/ok');
-    s = await ui.state();
-    assert.equal(s.card, 'gate', JSON.stringify(s));
-    assert.equal(s.looked, true);
+    const view = await page.evaluate(() => probe.toGate());
+    assert.ok(view, 'the map knows a gate');
+    assert.ok(await page.evaluate(() => probe.until('gate')), 'the gate card shows');
     await ui.frames(16);
     s = await ui.state();
-    const gate = await page.evaluate((at) => probe.project(at), s.at);
-    assert.notDeepEqual(s.camera, woke, 'the camera moved');
-    assert.ok(Math.hypot(s.camera.x - gate.x, s.camera.y - gate.y) < 1, `the camera rests on the gate: ${JSON.stringify([s.camera, gate])}`);
+    assert.ok(s.told.includes('gate'), JSON.stringify(s));
+    assert.deepEqual(s.camera, view, 'the camera stays');
     await ui.clear();
     await page.mouse.move(5, 400);
-    await ui.shot('02-gate-camera-moved');
+    await ui.shot('02-gate-in-view');
 
     // 3. The first tree: the wait ends with the order, the card says where the wood goes.
     assert.ok(await page.evaluate(() => probe.fell()), 'a founder fells a tree');
@@ -364,8 +380,8 @@ try {
     assert.ok(card.x >= 12 && card.x + card.w <= width - 12, 'the card fits the phone');
     await ui.shot('09-phone-card');
     await tap('guide-card/ok');
-    s = await ui.state();
-    assert.equal(s.card, 'gate', JSON.stringify(s));
+    assert.ok(await page.evaluate(() => probe.toGate()), 'the map knows a gate');
+    assert.ok(await page.evaluate(() => probe.until('gate')), 'the gate card shows on the phone');
     await tap('guide-log-button');
     s = await ui.state();
     assert.equal(s.open, true, 'a tap opens the log');

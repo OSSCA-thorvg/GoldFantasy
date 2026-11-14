@@ -260,8 +260,28 @@ describe('quest panel', () => {
       Object.assign(near, { task: Activity.Crafting, activity: Activity.Holding, craftItem: 'wooden-hoe', craftWorkshop: bench.id });
       inspect();
       expect(ui.words()).toEqual(
-        expect.arrayContaining([`${carrier.name} is making Wooden axe · 50%`, `Waiting their turn: ${near.name}`]),
+        expect.arrayContaining([
+          `${carrier.name} is making Wooden axe · 50%`,
+          `${near.name} waits to make Wooden hoe`,
+          'Nothing is spent until the item is done.',
+        ]),
       );
+      // Each order can be called off: the worker's, each waiting one's, and on the recipe row it started from.
+      expect(ui.control(`station-cancel-${bench.id}`)?.[3]).toBe(true);
+      expect(ui.control(`station-cancel-${bench.id}-${near.id}`)?.[3]).toBe(true);
+      expect(ui.control('station-cancel-wooden-axe')?.[3]).toBe(true);
+      expect(ui.control('station-craft-wooden-axe')).toBeUndefined();
+      const cancel = vi.spyOn(town, 'cancelCraft');
+      ui.click(`station-cancel-${bench.id}-${near.id}`);
+      expect(cancel).toHaveBeenLastCalledWith(near.id);
+      inspect();
+      ui.click('station-cancel-wooden-axe');
+      expect(cancel).toHaveBeenLastCalledWith(carrier.id);
+      Object.assign(carrier, { task: Activity.Crafting, activity: Activity.Crafting, craftItem: 'wooden-axe', craftWorkshop: bench.id, craftProgress: 3 });
+      inspect();
+      ui.click(`station-cancel-${bench.id}`);
+      expect(cancel).toHaveBeenLastCalledWith(carrier.id);
+      Object.assign(carrier, { task: Activity.Crafting, activity: Activity.Crafting, craftItem: 'wooden-axe', craftWorkshop: bench.id, craftProgress: 3 });
       questPanel(ui);
       expect(ui.words()).toContain('Crafting Wooden axe · 50%');
     } finally {
@@ -539,7 +559,7 @@ describe('inspectors', () => {
         expect.arrayContaining([
           'Remembered here: 1',
           'Ulf · Warrior · level 3',
-          'Day 12 · Killed by the guardian · Muspelheim',
+          'Day 13 · Killed by the guardian · Muspelheim',
         ]),
       );
     } finally {
@@ -564,7 +584,7 @@ describe('inspectors', () => {
       yard.attendance = 0.5;
       inspect(ui, yard);
       expect(ui.words()).toEqual(
-        expect.arrayContaining(['Last day: 15 experience each (50% attendance)', `${drill.name} · level 4`]),
+        expect.arrayContaining(['Last day: 50% attendance', `${drill.name} · level 4`]),
       );
     } finally {
       ui.dispose();

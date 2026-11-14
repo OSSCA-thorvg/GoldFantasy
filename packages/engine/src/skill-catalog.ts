@@ -192,10 +192,10 @@ export const skills: readonly SkillSpec[] = [
 /** Strength of each skill; reach, radius, timing and cooldown are in `skills`. Keep the descriptions true. */
 export const skillPower = {
   /** Multiples of the resident's ordinary blow. */
-  aimed: 3,
-  burst: 2.5,
-  whirl: 2,
-  volley: 1.4,
+  aimed: 2,
+  burst: 1.6,
+  whirl: 1.3,
+  volley: 1,
   mendHealth: 0.35,
   /** Health a Sanctuary gives back each second to the allies inside it. */
   sanctuaryMend: 0.04,

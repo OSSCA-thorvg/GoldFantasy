@@ -85,8 +85,8 @@ export class Person {
   experienceToNextLevel(): number { return this.level >= Person.maximumLevel ? 0 : 30 + 20 * (this.level - 1); }
   /** Levels and a fighting calling are what turn a long brawl into a quick kill. */
   /** Growth a level brings to blows and to the health a blow takes away; strong enough that a level is felt. */
-  static attackPerLevel = 0.1;
-  static vitalityPerLevel = 0.15;
+  static attackPerLevel = 0.15;
+  static vitalityPerLevel = 0.2;
   attackMultiplier(): number { return f32((1 + f32(Person.attackPerLevel) * (this.level - 1)) * (this.calling === Calling.Warrior ? f32(1.3) : this.calling === Calling.Ranger || this.calling === Calling.Mage ? f32(1.15) : 1)); }
   vitalityMultiplier(): number { return f32(1 + f32(f32(Person.vitalityPerLevel) * (this.level - 1))); }
   gainExperience(points: number): number {

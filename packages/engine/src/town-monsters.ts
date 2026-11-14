@@ -92,6 +92,11 @@ export function steps(map: WorldMap, to: Point): boolean {
   return !!tile && !impassable(tile.terrain);
 }
 export const reachOf = (p: Person): number => f(attackReach(p));
+/** A bow or staff shoots; every other weapon, however long, strikes hand to hand. */
+export const shoots = (p: Person): boolean => {
+  const shape = combatItem(p)?.visual;
+  return shape === 'bow' || shape === 'staff';
+};
 export const blowOf = (p: Person): number => f(attackDamage(p));
 export function power(this: CombatTown, p: Person): number {
   return f(attackDamage(p));
@@ -393,7 +398,7 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
     crit = this.roll() < critChance,
     blow = this.blowAgainst(foe, f(this.blowStrength(p) * (crit ? combatRules.critDamage : 1))),
     spec = strikeOf(combatItem(p)?.visual),
-    ranged = reachOf(p) > 1,
+    ranged = shoots(p),
     others = caughtBy(this, p, foe, spec);
   p.swingAt = this.time;
   this.hurtCreature(foe, blow, p);
@@ -542,7 +547,7 @@ export function fight(this: CombatTown, p: Person, dt: number): void {
     person!.health = f(person!.health - damage);
     p.ready = this.time + 1;
     p.swingAt = this.time;
-    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:reachOf(p)>1,at:this.time,person:person!.id,attacker:p.id,strike:StrikeKind.Single,primary:true});
+    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:shoots(p),at:this.time,person:person!.id,attacker:p.id,strike:StrikeKind.Single,primary:true});
     this.hurtGuest(person!,person!.health <= 0);
     if (person!.health <= 0) this.strikeDown(person!, 'Killed by ' + p.name, person!.name + ' was killed');
   }

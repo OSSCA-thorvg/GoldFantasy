@@ -152,7 +152,7 @@ export function flowTo(town: TownState, area: RealmArea, prey: Person): FlowFiel
     return cached;
   const grid = town.grid,
     size = area.size,
-    field = cached?.distance.length === size * size ? cached.distance : new Float32Array(size * size),
+    field = cached?.distance.length === size * size ? cached.distance : new Float64Array(size * size),
     open = new PairMinHeap(),
     cost = (cx: number, cy: number) => grid.cost(cx + area.x, cy + area.y);
   field.fill(Infinity);

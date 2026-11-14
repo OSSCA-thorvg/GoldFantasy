@@ -15,7 +15,7 @@ import type { GameAppState } from './game-app-state';
 import type { GameHudApp } from './game-hud-contract';
 
 /** Level a party of six should have for each floor (realm-balance tests hold the engine to these). */
-export const recommendedLevel = [4, 6, 10];
+export const recommendedLevel = [4, 8, 12];
 const bannerSeconds = 3.5;
 const waveSeconds = 8;
 export interface SwarmCount {
@@ -47,9 +47,11 @@ export function wayTo(from: Point, to: Point): string {
   return ways[Math.round((angle < 0 ? angle + 360 : angle) / 45) % 8];
 }
 /** Hears the swarm cues the combat frame passes on: den and brood banners, and the raid wave. */
-export function swarmFrame(app: GameAppState, heard: readonly CombatEvent[], seconds: number): void {
+export function swarmFrame(app: GameAppState, heard: readonly CombatEvent[]): void {
+  // The banners are timed on the clock they are drawn by; the game's own seconds run apart from it.
   const army = app.army,
-    town = app.town;
+    town = app.town,
+    seconds = app.context.time();
   if (army.town !== town) army.banners = [];
   for (const e of heard) {
     if (e.cue === CombatCue.DenDestroyed) {
@@ -209,7 +211,7 @@ export function floorForecast(app: GameAppState, gate: number, floor: number): s
   if (chosen.length) {
     const average = Math.round(chosen.reduce((s, p) => s + p.level, 0) / chosen.length),
       verdict =
-        chosen.length < 4
+        chosen.length < 3 || (chosen.length < 4 && average < level + 4)
           ? 'too few to stand against a swarm'
           : average < level - 1
             ? 'likely to lose this floor'

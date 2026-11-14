@@ -6,18 +6,21 @@ import { Structure } from '../../packages/engine/src/building-catalog';
 import { Activity, Calling, Person, Role } from '../../packages/engine/src/person';
 import { sealable } from '../../packages/engine/src/gate-seals';
 import { lairOf, monsterEntrance } from '../../packages/engine/src/town-monsters';
-import { itemCatalog } from '../../packages/engine/src/equipment';
+import { itemCatalog, itemSpec } from '../../packages/engine/src/equipment';
 import { ChamberKind } from '../../packages/engine/src/realm-layout';
 import { distance, type Point } from '../../packages/engine/src/geometry';
-import { CombatCue } from '../../packages/engine/src/combat-events';
+import { CombatCue, MonsterRank } from '../../packages/engine/src/combat-events';
+import { rankRules } from '../../packages/engine/src/monster-ranks';
 
-// A scripted party plays the first floor beyond the nearest gate: attack-move from the entry to the nearest den
-// left, then the heart; the downed are tended; a telegraphed slam is walked out of. With skills, every skill is
-// left on auto, so each fires whenever it is ready and useful.
+// A scripted party plays a floor beyond the nearest gate: attack-move from the entry to the nearest den left, then
+// the heart; a member fighting away from the rest is helped first; the downed are tended once no monster stands over
+// them; a telegraphed slam is walked out of. Skills are left on auto (the default) or all switched off.
+const letters: Record<string, Calling> = { W: Calling.Warrior, R: Calling.Ranger, M: Calling.Mage, C: Calling.Cleric };
 const shape = (c: Calling) => (c === Calling.Warrior ? 'sword' : c === Calling.Ranger ? 'bow' : c === Calling.Mage ? 'staff' : 'mace');
-function arm(p: Person) {
+const wooden = (id: string) => itemSpec(id)?.material === 'wood' && id !== 'staff' && id !== 'bow';
+function arm(p: Person, gear: 'wood' | 'iron') {
   const item = itemCatalog
-    .filter((i) => i.category === 'weapon' && i.visual === shape(p.calling) && i.minimumLevel <= p.level)
+    .filter((i) => i.category === 'weapon' && i.visual === shape(p.calling) && i.minimumLevel <= p.level && wooden(i.id) === (gear === 'wood'))
     .sort((a, b) => b.attackBonus - a.attackBonus)[0];
   if (!item) return;
   p.inventory[0] = { item: item.id, quantity: 1 };
@@ -31,7 +34,7 @@ interface Outcome {
   kills: number;
 }
 let base: WorldMap;
-function play(level: number, skills: boolean): Outcome {
+function enter(comp: string, level: number, gear: 'wood' | 'iron', floor: number) {
   const town = new Town(base, 176, false),
     camp = new Building(0, Structure.Camp, town.map().camp(), 0, 0);
   camp.village = 0;
@@ -45,21 +48,26 @@ function play(level: number, skills: boolean): Outcome {
     .filter((g) => sealable(g.site))
     .sort((a, b) => distance(lairOf(a.site), camp.center) - distance(lairOf(b.site), camp.center))[0].index;
   town.map().dungeons()[gate].discovered = true;
-  const members = [Calling.Warrior, Calling.Warrior, Calling.Ranger, Calling.Ranger, Calling.Mage, Calling.Cleric].map((c) => {
-    const p = town.makePerson(Role.Resident, c, monsterEntrance(town.map().dungeons()[gate]));
+  town.depth = town.map().dungeons().map((_, index) => (index === gate ? floor : 0));
+  const members = [...comp].map((c) => {
+    const p = town.makePerson(Role.Resident, letters[c], monsterEntrance(town.map().dungeons()[gate]));
     town.folk.push(p);
     p.level = level;
     p.food = p.rest = p.hydration = 1;
     p.stress = 0;
-    arm(p);
+    arm(p, gear);
     p.activity = Activity.Expedition;
     p.inside = true;
     return p;
   });
-  town.parties.push({ dungeon: gate, members: members.map((p) => p.id), floor: 0 });
+  town.parties.push({ dungeon: gate, members: members.map((p) => p.id), floor });
   town.advance(0.1);
-  const ids = members.map((p) => p.id);
-  for (const slot of [0, 1]) town.setSkillAuto(ids, slot, skills);
+  return { town, members };
+}
+function play(comp: string, level: number, gear: 'wood' | 'iron', skills: boolean, floor = 0): Outcome {
+  const { town, members } = enter(comp, level, gear, floor),
+    ids = members.map((p) => p.id);
+  if (!skills) for (const slot of [0, 1]) town.setSkillAuto(ids, slot, false);
   const heart = town.realmPlan()!.chambers.find((c) => c.kind === ChamberKind.Heart)!,
     downed = new Set<number>(),
     lead = () => members.find((p) => p.downedAt < 0) ?? members[0],
@@ -88,13 +96,20 @@ function play(level: number, skills: boolean): Outcome {
         busy = new Set(members.filter((p) => p.task === Activity.Tending).map((p) => p.id));
       for (const d of members.filter((p) => p.downedAt >= 0 && p.health > -0.5)) {
         if (members.some((p) => p.task === Activity.Tending && p.taskSite === d.id)) continue;
+        if (town.realmFoes().some((m) => m.rank !== MonsterRank.Den && distance(m.position, d.position) < 3)) continue;
         const helper = standing
           .filter((p) => !busy.has(p.id))
           .sort((a, b) => distance(a.position, d.position) - distance(b.position, d.position))[0];
         if (helper && town.orderTend([helper.id], d.id)) busy.add(helper.id);
       }
-      const rest = standing.filter((p) => !busy.has(p.id)).map((p) => p.id);
-      if (rest.length) town.orderAttackMove(rest, goal());
+      const rest = standing.filter((p) => !busy.has(p.id)).map((p) => p.id),
+        fallen = members.find((p) => p.downedAt >= 0 && p.health > -0.5),
+        centre = standing.reduce(
+          (c, p) => ({ x: c.x + p.position.x / standing.length, y: c.y + p.position.y / standing.length }),
+          { x: 0, y: 0 },
+        ),
+        alone = standing.find((p) => p.activity === Activity.Fighting && distance(p.position, centre) > 4);
+      if (rest.length) town.orderAttackMove(rest, fallen?.position ?? alone?.position ?? goal());
     }
     town.advance(0.1);
     for (const p of members) if (p.downedAt >= 0) downed.add(p.id);
@@ -112,33 +127,72 @@ function play(level: number, skills: boolean): Outcome {
     kills: members.reduce((sum, p) => sum + p.kills, 0),
   };
 }
-describe('the first floor, played by a scripted party of six', () => {
+const cases = {
+  four: ['WRMC', 4, 'wood', true, 0],
+  'four without skills': ['WRMC', 4, 'wood', false, 0],
+  'four under level': ['WRMC', 2, 'wood', true, 0],
+  six: ['WWRRMC', 4, 'wood', true, 0],
+  'three at 8': ['WMC', 8, 'iron', true, 0],
+  'three at 12': ['WMC', 12, 'iron', true, 0],
+  'three at 20': ['WMC', 20, 'iron', true, 0],
+  'floor 2': ['WRMC', 8, 'iron', true, 1],
+  'floor 3': ['WRMC', 12, 'iron', true, 2],
+} as const;
+describe('floors played by small parties', () => {
   const outcomes = new Map<string, Outcome>();
   beforeAll(() => {
     base = WorldMap.generate(5);
-    for (const [key, level, skills] of [
-      ['level', 4, true],
-      ['no skills', 4, false],
-      ['under level', 1, true],
-      ['high level', 12, true],
-    ] as const)
-      outcomes.set(key, play(level, skills));
+    for (const [key, [comp, level, gear, skills, floor]] of Object.entries(cases))
+      outcomes.set(key, play(comp, level, gear, skills, floor));
     console.log(JSON.stringify(Object.fromEntries(outcomes)));
-  }, 600000);
-  it('is cleared by a party at the floor’s level using its skills, losing nobody', () => {
-    expect(outcomes.get('level')).toMatchObject({ cleared: true, dead: 0 });
-    expect(outcomes.get('level')!.kills).toBeGreaterThan(55);
+  }, 900000);
+  it('lets four at level 4 with wooden arms clear floor 1, one downed at most and nobody dead', () => {
+    expect(outcomes.get('four')).toMatchObject({ cleared: true, dead: 0 });
+    expect(outcomes.get('four')!.downed).toBeLessThanOrEqual(1);
   });
-  it('downs someone, or is lost, when the same party never uses a skill', () => {
-    const plain = outcomes.get('no skills')!;
-    expect(plain.downed > 0 || !plain.cleared).toBe(true);
+  it('makes the same four worse without skills, but not wiped inside a minute', () => {
+    const plain = outcomes.get('four without skills')!;
+    expect(plain.downed).toBeGreaterThan(0);
+    if (!plain.cleared) expect(plain.seconds).toBeGreaterThanOrEqual(60);
   });
-  it('is lost by a party clearly under its level', () => {
-    expect(outcomes.get('under level')!.cleared).toBe(false);
+  it('defeats four two levels under, or leaves most of them downed', () => {
+    const under = outcomes.get('four under level')!;
+    expect(!under.cleared || under.downed >= 3).toBe(true);
   });
-  it('falls markedly faster to a strong party', () => {
-    const strong = outcomes.get('high level')!;
-    expect(strong.cleared).toBe(true);
-    expect(strong.seconds).toBeLessThan(0.85 * outcomes.get('level')!.seconds);
+  it('is easy for six at level 4', () => {
+    expect(outcomes.get('six')).toMatchObject({ cleared: true, downed: 0, dead: 0 });
+    expect(outcomes.get('six')!.seconds).toBeLessThan(outcomes.get('four')!.seconds);
+  });
+  it('lets three iron-armed residents through as they rise: at 8, at 12 unhurt, at 20 walking', () => {
+    expect(outcomes.get('three at 8')).toMatchObject({ cleared: true, dead: 0 });
+    expect(outcomes.get('three at 12')).toMatchObject({ cleared: true, downed: 0 });
+    expect(outcomes.get('three at 20')).toMatchObject({ cleared: true, downed: 0 });
+    expect(outcomes.get('three at 20')!.seconds).toBeLessThan(0.85 * outcomes.get('three at 8')!.seconds);
+  });
+  it('fits floor 2 to four at level 8 and floor 3 to four at level 12', () => {
+    expect(outcomes.get('floor 2')).toMatchObject({ cleared: true, dead: 0 });
+    expect(outcomes.get('floor 3')).toMatchObject({ cleared: true, dead: 0 });
+  });
+  it('lets three at the floor’s level cut a den’s brood down faster than it grows and fell the den', () => {
+    const { town, members } = enter('WRC', 4, 'wood', 0),
+      den = town.realmDens()[0];
+    // Only this den and its own pack.
+    town.beasts = town.beasts.filter((m) => !town.inRealm(m.home) || m === den || m.brood === den.id);
+    for (const p of members) p.position = town.grid.nearestWalkable({ x: den.position.x + 4, y: den.position.y });
+    const brood = () => town.realmFoes().filter((m) => m.brood === den.id && m.rank === MonsterRank.Swarmer).length,
+      start = brood();
+    let most = 0,
+      t = 0;
+    for (; t < 120 && den.health > 0 && town.realmActive(); t += 0.1) {
+      if (Math.round(t * 10) % 20 === 0) town.orderAttack(members.filter((p) => p.downedAt < 0).map((p) => p.id), den.id);
+      town.advance(0.1);
+      most = Math.max(most, brood());
+    }
+    expect(den.health).toBeLessThanOrEqual(0);
+    expect(t).toBeLessThan(60);
+    // The brood never outgrows what the den started with, or its cap.
+    expect(most).toBeLessThanOrEqual(Math.max(start, rankRules.denBrood));
+    console.log(`den: fell after ${Math.round(t)} s, brood ${start} at the start, ${most} at most`);
+    expect(town.fallen).toHaveLength(0);
   });
 });

@@ -10,6 +10,9 @@ const placeholder = /\{(\d+)\}/g;
 const escape = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const worded = /[A-Za-z]{2}/,
   hangul = /[\uac00-\ud7af]/;
+/** A name, or names joined as a list: every piece is at most two words. */
+const nameLike = (text: string): boolean =>
+  text.split(/, | \u00b7 |\n/).every((piece) => piece.trim().split(/\s+/).length <= 2);
 
 /** Exact phrases, then patterns from most to least literal text, then piecewise lists. */
 export class PhraseBook {
@@ -83,8 +86,8 @@ export class PhraseBook {
       const hit = pattern.match.exec(text);
       if (!hit) continue;
       const parts = hit.slice(1).map((piece) => (worded.test(piece) ? this.resolve(piece, depth + 1) : piece));
-      // A long unknown capture is a different English sentence, not a name: leave it whole.
-      if (parts.some((piece, i) => piece === undefined && hit[i + 1].trim().split(/\s+/).length > 2)) continue;
+      // A long unknown capture is a different English sentence, not a name (or a list of names): leave it whole.
+      if (parts.some((piece, i) => piece === undefined && !nameLike(hit[i + 1]))) continue;
       return pattern.value.replace(placeholder, (_, n: string) => parts[Number(n)] ?? hit[Number(n) + 1] ?? '');
     }
     return undefined;

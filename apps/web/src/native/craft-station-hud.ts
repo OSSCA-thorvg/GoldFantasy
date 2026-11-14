@@ -50,7 +50,12 @@ export function stationRecipes(kind: Structure): Map<RecipeGroup, ItemSpec[]> {
   return out;
 }
 /** The group shown: the player's pick, else the one holding the current quest's item, else the first. */
-function shownGroup(app: object, station: Building, recipes: Map<RecipeGroup, ItemSpec[]>, wanted: readonly string[]) {
+function shownGroup(
+  app: object,
+  station: Building,
+  recipes: Map<RecipeGroup, ItemSpec[]>,
+  wanted: readonly string[],
+) {
   const picked = groups.get(app)?.get(station.id);
   if (picked && recipes.has(picked)) return picked;
   for (const [group, list] of recipes) if (list.some((item) => wanted.includes(item.id))) return group;
@@ -188,32 +193,69 @@ export function stationRows(app: GameHudApp, station: Building, out: InspectorRo
     });
     out.y = f32(out.y + 32);
   }
+  const cancelW = 66,
+    cancel = (p: Person, id: string, y: number) =>
+      button(
+        c,
+        id,
+        new Rect(f32(left + inner - cancelW), y, cancelW, 26),
+        'Cancel',
+        () => {
+          const item = itemSpec(p.craftItem ?? '');
+          if (town.cancelCraft(p.id) && item) app.status = `${p.name} stopped making the ${item.name}`;
+        },
+        ButtonStyle.Default,
+        owned,
+        undefined,
+        false,
+        { fontSize: 11 },
+      );
   if (working) {
-    const item = itemSpec(working.craftItem ?? '');
-    line(
-      `${working.name} is making ${item?.name ?? ''} · ${Math.trunc(percent(working) * 100)}%`,
-      t.accent,
-      12,
-      true,
-    );
-    const at = out.y,
+    const item = itemSpec(working.craftItem ?? ''),
+      at = out.y,
+      text = `${working.name} is making ${item?.name ?? ''} · ${Math.trunc(percent(working) * 100)}%`;
+    out.rows.push(() => {
+      const y = f32(top + at),
+        w = f32(inner - cancelW - 6);
+      c.text(new Rect(left, y, w, 26), c.elideText(text, w, 12, true), t.accent, 12, true);
+      cancel(working, `station-cancel-${station.id}`, y);
+    });
+    out.y = f32(out.y + 30);
+    const barAt = out.y,
       done = percent(working);
     out.rows.push(() => {
-      c.rect(new Rect(left, f32(top + at), inner, 6), t.raised, 3);
-      c.rect(new Rect(left, f32(top + at), Math.max(6, f32(inner * done)), 6), t.accent, 3);
+      c.rect(new Rect(left, f32(top + barAt), inner, 6), t.raised, 3);
+      c.rect(new Rect(left, f32(top + barAt), Math.max(6, f32(inner * done)), 6), t.accent, 3);
     });
     out.y = f32(out.y + 12);
     // A crafter at the bench without the materials stands still: say why.
     const stuck = item ? town.craftReason(working.id, station.id, item.id) : '';
     if (stuck) line(stuck, t.danger, 11);
   } else line('Nobody is working here', t.muted, 11);
-  if (waiting.length) line('Waiting their turn: ' + waiting.map((p) => p.name).join(', '), t.muted, 11);
+  // Each resident in line can be called off on their own; nothing is spent until an item is done.
+  for (const p of waiting) {
+    const at = out.y,
+      item = itemSpec(p.craftItem ?? ''),
+      text = `${p.name} waits to make ${item?.name ?? ''}`;
+    out.rows.push(() => {
+      const y = f32(top + at),
+        w = f32(inner - cancelW - 6);
+      c.text(new Rect(left, y, w, 26), c.elideText(text, w, 11), t.muted, 11);
+      cancel(p, `station-cancel-${station.id}-${p.id}`, y);
+    });
+    out.y = f32(out.y + 30);
+  }
+  if (working || waiting.length) line('Nothing is spent until the item is done.', t.muted, 10);
   out.y = f32(out.y + 4);
   // Recipes come in groups the player switches between; a long group still pages.
   const grouped = stationRecipes(station.kind),
     group = shownGroup(app, station, grouped, wanted),
     recipes = grouped.get(group) ?? [],
-    pageCount = Math.ceil(recipes.length / recipesPerPage),
+    // A phone-width panel stacks name, cost and effect so none is cut, and shows fewer rows a page.
+    narrow = inner < 360,
+    perPage = narrow ? 7 : recipesPerPage,
+    rowH = narrow ? 52 : 38,
+    pageCount = Math.ceil(recipes.length / perPage),
     page = Math.max(0, Math.min(pages.get(app)?.get(station.id) ?? 0, pageCount - 1));
   if (grouped.size > 1) {
     const at = out.y,
@@ -244,15 +286,28 @@ export function stationRows(app: GameHudApp, station: Building, out: InspectorRo
     );
     out.y = f32(out.y + 32);
   }
-  for (const item of recipes.slice(page * recipesPerPage, (page + 1) * recipesPerPage)) {
+  for (const item of recipes.slice(page * perPage, (page + 1) * perPage)) {
     const at = out.y,
       reason = crafter ? town.craftReason(crafter.id, station.id, item.id) : 'Select a controllable resident',
-      quest = wanted.includes(item.id);
+      quest = wanted.includes(item.id),
+      making =
+        !!crafter &&
+        crafter.task === Activity.Crafting &&
+        crafter.craftItem === item.id &&
+        crafter.craftWorkshop === station.id;
     out.rows.push(() => {
       const y = f32(top + at),
-        r = new Rect(left, y, inner, 38);
+        r = new Rect(left, y, inner, rowH),
+        // On a phone the icon and button sit beside the name and cost, leaving the effect line the whole row.
+        buttonY = f32(y + (narrow ? 4 : (rowH - 26) / 2));
       c.rect(r, t.raised, 3, quest ? t.accent : t.border);
-      itemIcon(c, new Rect(f32(left + 3), f32(y + 3), 32, 32), item);
+      itemIcon(
+        c,
+        narrow
+          ? new Rect(f32(left + 5), f32(y + 3), 28, 28)
+          : new Rect(f32(left + 3), f32(y + (rowH - 32) / 2), 32, 32),
+        item,
+      );
       let nameX = f32(left + 40);
       if (quest) {
         const w = f32(c.textWidth('Quest', 8, true) + 10),
@@ -261,54 +316,90 @@ export function stationRows(app: GameHudApp, station: Building, out: InspectorRo
         c.text(mark, 'Quest', t.accentText, 8, true, Align.Center);
         nameX = f32(nameX + w + 6);
       }
-      const textW = f32(inner * 0.5 - (nameX - left));
-      c.text(
-        new Rect(nameX, f32(y + 2), textW, 18),
-        c.elideText(item.name, textW, 12, true),
-        reason ? t.muted : t.text,
-        12,
-        true,
-      );
       const effect = gearEffect(item);
-      c.text(
-        new Rect(f32(left + 40), f32(y + 19), f32(inner * 0.5 - 40), 16),
-        c.elideText(effect, f32(inner * 0.5 - 40), 9),
-        t.muted,
-        9,
-      );
-      const rightX = f32(left + inner * 0.5),
-        rightW = f32(inner * 0.5 - 70);
-      c.text(
-        new Rect(rightX, f32(y + 2), rightW, 18),
-        c.elideText(describe(item.cost), rightW, 10),
-        t.accent,
-        10,
-        false,
-        Align.End,
-      );
-      c.text(
-        new Rect(rightX, f32(y + 19), rightW, 16),
-        c.elideText(reason || 'Ready to craft', rightW, 9),
-        reason ? t.danger : t.muted,
-        9,
-        false,
-        Align.End,
-      );
-      button(
-        c,
-        `station-craft-${item.id}`,
-        new Rect(f32(left + inner - 62), f32(y + 6), 58, 26),
-        'Craft',
-        () => {
-          const p = stationCrafter(app, station);
-          if (p && town.orderCraft(p.id, station.id, item.id))
-            app.status = `${p.name} goes to make ${item.name}`;
-        },
-        ButtonStyle.Primary,
-        owned && !reason,
-      );
+      if (narrow) {
+        const textW = f32(inner - 40 - 66),
+          paid = describe(item.cost) + (reason ? ` · ${reason}` : '');
+        c.text(
+          new Rect(nameX, f32(y + 2), f32(textW - (nameX - left - 40)), 18),
+          c.elideText(item.name, f32(textW - (nameX - left - 40)), 12, true),
+          reason ? t.muted : t.text,
+          12,
+          true,
+        );
+        c.text(
+          new Rect(f32(left + 40), f32(y + 18), textW, 16),
+          c.elideText(paid, textW, 10),
+          reason ? t.danger : t.accent,
+          10,
+        );
+        const wide = f32(inner - 16);
+        c.text(new Rect(f32(left + 8), f32(y + 33), wide, 16), c.elideText(effect, wide, 9), t.muted, 9);
+      } else {
+        const split = f32(inner * 0.62),
+          textW = f32(split - (nameX - left));
+        c.text(
+          new Rect(nameX, f32(y + 2), textW, 18),
+          c.elideText(item.name, textW, 12, true),
+          reason ? t.muted : t.text,
+          12,
+          true,
+        );
+        c.text(
+          new Rect(f32(left + 40), f32(y + 19), f32(split - 40), 16),
+          c.elideText(effect, f32(split - 40), 9),
+          t.muted,
+          9,
+        );
+        const rightX = f32(left + split),
+          rightW = f32(inner - split - 70);
+        c.text(
+          new Rect(rightX, f32(y + 2), rightW, 18),
+          c.elideText(describe(item.cost), rightW, 10),
+          t.accent,
+          10,
+          false,
+          Align.End,
+        );
+        c.text(
+          new Rect(rightX, f32(y + 19), rightW, 16),
+          c.elideText(reason || 'Ready to craft', rightW, 9),
+          reason ? t.danger : t.muted,
+          9,
+          false,
+          Align.End,
+        );
+      }
+      // The chosen crafter's own order can be stopped from the row it was started on.
+      if (making)
+        button(
+          c,
+          `station-cancel-${item.id}`,
+          new Rect(f32(left + inner - 62), buttonY, 58, 26),
+          'Cancel',
+          () => {
+            if (crafter && town.cancelCraft(crafter.id))
+              app.status = `${crafter.name} stopped making the ${item.name}`;
+          },
+          ButtonStyle.Default,
+          owned,
+        );
+      else
+        button(
+          c,
+          `station-craft-${item.id}`,
+          new Rect(f32(left + inner - 62), buttonY, 58, 26),
+          'Craft',
+          () => {
+            const p = stationCrafter(app, station);
+            if (p && town.orderCraft(p.id, station.id, item.id))
+              app.status = `${p.name} goes to make ${item.name}`;
+          },
+          ButtonStyle.Primary,
+          owned && !reason,
+        );
     });
-    out.y = f32(out.y + 42);
+    out.y = f32(out.y + rowH + 4);
   }
   if (pageCount > 1) {
     const at = out.y,

@@ -8,7 +8,6 @@ import {
   type Person,
 } from '../../../../packages/engine/src/person';
 import { canControl, controlReason } from '../../../../packages/engine/src/faction';
-import { combatRules } from '../../../../packages/engine/src/combat-events';
 import { structureSpec, describe } from '../../../../packages/engine/src/building-catalog';
 import { resourceBundle } from '../../../../packages/engine/src/construction-materials';
 import { personPortrait, moodOf } from '../../../../packages/native-renderer/src/person-portrait';
@@ -164,7 +163,7 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     const home = this.town.building(p.role === Role.Guest ? p.bed : p.home);
     const detail =
       p.woundDays > 0
-        ? `Wounded: health held below ${Math.round(combatRules.woundedHealth * 100)}% for ${Math.ceil(p.woundDays)} more ${Math.ceil(p.woundDays) === 1 ? 'day' : 'days'}`
+        ? `Wounded: health stays low for ${Math.ceil(p.woundDays)} more ${Math.ceil(p.woundDays) === 1 ? 'day' : 'days'}`
         : p.carrying
           ? 'Carrying ' + describe(resourceBundle(p.carriedProduct, p.carrying))
           : home

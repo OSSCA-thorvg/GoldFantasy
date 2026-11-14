@@ -39,14 +39,14 @@ export const boonName = (boon: Boon): string =>
   ['Valor', 'Plenty', 'Lore', 'Bulwark', 'Forge', 'Hearth', 'Ember', 'Barrow'][boon] ?? '';
 export const boonText = (boon: Boon): string =>
   [
-    'Residents strike 10% harder.',
-    'Fields and hunts yield 25% more food.',
-    'Residents gain experience 25% faster.',
-    'Buildings take half damage; seats and towers shoot 50% harder.',
-    'Crafting takes half the time.',
+    'Residents strike harder.',
+    'Fields and hunts yield more food.',
+    'Residents gain experience faster.',
+    'Buildings take less damage; seats and towers shoot harder.',
+    'Crafting goes faster.',
     'Winter no longer thins the game or chills the unsheltered.',
-    'Critical blows come 10% more often.',
-    'The downed last half again as long and rise at half health.',
+    'Critical blows come more often.',
+    'The downed hold on longer and rise stronger.',
   ][boon] ?? '';
 /** True once any gate leading to the world of this boon is sealed. */
 export function boon(town: TownState, which: Boon): boolean {

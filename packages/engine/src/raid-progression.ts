@@ -63,7 +63,7 @@ export const raidMuster = {
   leaderMight: 6,
   bruteMight: 14,
   /** A raiding swarmer bites this much softer than one beyond a gate, where the brood is at home. */
-  swarmBite: 0.4,
+  swarmBite: 0.46,
 };
 /** A raid is a wave sized to the settlement's `might`: `count` leaders (grunts, or brutes for a brute raid) with
  * the shape's `health` and `damage`, a few extra `brutes`, and a `swarm` of swarmers. The first raids on a young
@@ -93,4 +93,4 @@ export const pressureNotice = (week: number): string =>
     ? ''
     : week === threatWeeks
       ? `Week ${week}: raiders are at their full strength. Only sealing the gates ends the raids.`
-      : `Week ${week}: raiders now have ${Math.round(raidHealth(week) * 100)}% health. Seal a gate to end its raids.`;
+      : `Week ${week}: raiders grow stronger. Seal a gate to end its raids.`;

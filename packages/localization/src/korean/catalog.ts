@@ -347,6 +347,27 @@ export const catalogPhrases: Phrases = {
   'Yard': '훈련장',
   'Arms & defence': '무구와 방어',
 
+  // Skill descriptions
+  'Nearby monsters turn on the warrior for a while; the warrior takes less damage meanwhile.':
+    '가까운 몬스터들이 한동안 전사에게 달려듭니다. 그동안 전사는 피해를 덜 받습니다.',
+  'A full turn of the blade: every enemy close around takes a heavy blow.':
+    '칼날을 한 바퀴 휘둘러 바로 곁의 적 모두에게 묵직한 일격을 먹입니다.',
+  'One heavy shot at the nearest enemy in range; breaks a wind-up.':
+    '닿는 곳에서 가장 가까운 적에게 강력한 한 발을 쏩니다. 준비 동작을 끊습니다.',
+  'Arrows rain on a circle in the distance, striking every enemy inside.':
+    '먼 곳의 원 안에 화살비를 내려 안에 있는 적 모두를 맞힙니다.',
+  'A rune circle lands after a moment, hitting every monster inside for heavy damage.':
+    '잠시 뒤 룬의 원이 내려앉아 안에 있는 몬스터 모두에게 큰 피해를 줍니다.',
+  'A ring of frost in the distance: enemies caught in it move and strike slower for a while.':
+    '먼 곳에 서리의 고리를 만듭니다. 그 안에 갇힌 적은 한동안 느리게 움직이고 느리게 칩니다.',
+  'Heals the most hurt ally nearby, or gets a downed ally up at once.':
+    '가까이에서 가장 많이 다친 동료를 치료하거나, 쓰러진 동료를 곧바로 일으킵니다.',
+  'Hallows the ground around the cleric for a while: allies inside mend steadily and the downed do not bleed out.':
+    '한동안 성직자 둘레의 땅을 축복합니다. 안에 있는 동료는 꾸준히 회복하고, 쓰러진 이는 피를 흘려 숨지지 않습니다.',
+  'Nearby allies strike harder and walk faster for a while.': '가까운 동료들이 한동안 더 세게 치고 더 빨리 걷습니다.',
+  'Nearby enemies lose heart for a while: their blows land softer and they move slower.':
+    '가까운 적들이 한동안 기가 꺾여, 공격이 약해지고 움직임이 느려집니다.',
+
   // Building descriptions
   'A timber lookout. While someone keeps watch, it shoots raiders and angry monsters that come near.':
     '나무로 지은 망대입니다. 누군가 망을 보는 동안 가까이 온 습격자와 성난 몬스터를 쏩니다.',
@@ -449,7 +470,7 @@ export const catalogPhrases: Phrases = {
   'Ready to craft {0}': '{0} 만들 준비 완료',
 
   // Placement reasons
-  'Camps must be at least 50 tiles apart': '캠프는 서로 50칸 이상 떨어져야 합니다',
+  'Camps must stand far apart': '캠프는 서로 멀리 떨어져야 합니다',
   'Occupied': '이미 사용 중인 자리',
   'Fields in the way': '밭이 가로막고 있음',
   'On the road': '길 위에는 지을 수 없음',
@@ -472,8 +493,8 @@ export const catalogPhrases: Phrases = {
   'An open bench where residents craft wooden and stone tools and weapons, one at a time. It takes 4 wood.':
     '주민이 한 명씩 나무와 돌로 도구와 무기를 만드는 야외 작업대입니다. 목재 4가 듭니다.',
   'Workbench': '작업대',
-  'An open-air bench with a chopping block where residents craft wooden tools and weapons, one at a time.':
-    '도끼질 받침이 놓인 야외 작업대입니다. 주민이 한 명씩 나무 도구와 무기를 만듭니다.',
+  'An open-air bench where residents craft wooden and stone tools and weapons, one at a time.':
+    '주민이 한 명씩 나무와 돌로 도구와 무기를 만드는 야외 작업대입니다.',
   'Crafted gear goes straight into a free hand. Give each founder a tool or a weapon of their own.':
     '만든 장비는 바로 빈 손에 듭니다. 개척자마다 자기 도구나 무기를 하나씩 주세요.',
   'Needs a guild and 10 residents. Forges iron tools and weapons, far better than wooden ones.':
@@ -605,8 +626,8 @@ export const catalogPhrases: Phrases = {
     '{0}에서 새 발자국이 이어집니다. 오늘 밤 습격이 옵니다',
   'Week {0}: raiders are at their full strength. Only sealing the gates ends the raids.':
     '{0}주차: 습격자가 최대로 강해졌습니다. 관문을 봉인해야만 습격이 끝납니다.',
-  'Week {0}: raiders now have {1}% health. Seal a gate to end its raids.':
-    '{0}주차: 습격자의 체력이 {1}%로 늘었습니다. 관문을 봉인하면 그 관문의 습격이 끝납니다.',
+  'Week {0}: raiders grow stronger. Seal a gate to end its raids.':
+    '{0}주차: 습격자가 더 강해졌습니다. 관문을 봉인하면 그 관문의 습격이 끝납니다.',
 
   // Offerings
   'Offering amounts must be whole numbers between 0 and 9999.': '공물의 양은 0에서 9999 사이의 정수여야 합니다.',

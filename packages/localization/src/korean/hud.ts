@@ -87,7 +87,7 @@ export const hudPhrases: Phrases = {
   Armor: '방어구점',
   Potion: '약방',
   Altar: '제단',
-  Mage: '마법사 탑',
+  Mage: '마법사',
   Portal: '포털',
   Clear: '철거',
   Torch: '횃불',
@@ -141,7 +141,7 @@ export const hudPhrases: Phrases = {
   'Move: choose a destination': '이동: 목적지를 선택하세요',
   'Work: choose a resource, building or road': '작업: 자원, 건물 또는 길을 선택하세요',
   'Attack: choose an enemy, resource or destination': '공격: 적, 자원 또는 목적지를 선택하세요',
-  'Found a camp (C) within 12 paces of {0} ({1}).': '{0}({1})에서 12걸음 안에 캠프(C)를 세우세요.',
+  'Found a camp (C) near {0} ({1}).': '{0}({1}) 가까이에 캠프(C)를 세우세요.',
   east: '동쪽',
   'south-east': '남동쪽',
   south: '남쪽',
@@ -309,15 +309,16 @@ export const hudPhrases: Phrases = {
   'Craft at the workbench': '작업대에서 만들기',
   'No workbench yet: place one': '작업대가 아직 없습니다: 하나 세우세요',
   'The settlement has no workbench yet': '정착지에 아직 작업대가 없습니다',
-  'Residents craft wooden tools and weapons here, one at a time.':
-    '주민이 이곳에서 한 명씩 나무 도구와 무기를 만듭니다.',
+  'Residents craft wooden and stone tools and weapons here, one at a time.':
+    '주민이 이곳에서 한 명씩 나무와 돌로 도구와 무기를 만듭니다.',
   Crafter: '만드는 이',
   'Previous resident': '이전 주민',
   'Next resident': '다음 주민',
   'No resident can work here': '이곳에서 일할 주민이 없습니다',
   '{0} is making {1}': '{0}: {1} 만드는 중',
   'Nobody is working here': '일하는 사람이 없습니다',
-  'Waiting their turn: {0}': '차례를 기다리는 이: {0}',
+  '{0} waits to make {1}': '{0}: {1} 만들 차례를 기다립니다',
+  'Nothing is spent until the item is done.': '물건이 다 만들어질 때까지는 아무것도 쓰지 않습니다.',
   Craft: '만들기',
   '{0} goes to make {1}': '{0}: {1} 만들러 갑니다',
   'Ready to craft': '만들 수 있음',
@@ -548,6 +549,43 @@ export const hudPhrases: Phrases = {
   'Home: {0}': '집: {0}',
   'No home assigned': '배정된 집 없음',
   '{0} units selected': '유닛 {0}명 선택',
+  'Wounded: health stays low for {0} more day': '부상: 앞으로 {0}일 동안 체력이 낮게 머뭅니다',
+  'Wounded: health stays low for {0} more days': '부상: 앞으로 {0}일 동안 체력이 낮게 머뭅니다',
+
+  // Skills, the downed and the floor forecast
+  'Too far: out of reach of {0}': '너무 멀어 {0}이(가) 닿지 않습니다',
+  '{0}: no monster in reach': '{0}: 닿는 곳에 몬스터가 없습니다',
+  '{0}: no monsters in reach': '{0}: 닿는 곳에 몬스터가 없습니다',
+  '{0}: no enemy in reach': '{0}: 닿는 곳에 적이 없습니다',
+  '{0}: no one in reach needs healing': '{0}: 닿는 곳에 치료가 필요한 사람이 없습니다',
+  '{0} of {1} ready.': '{1}명 중 {0}명 준비됨.',
+  'Used on its own when it helps.': '도움이 될 때 스스로 씁니다.',
+  '{0} bleeds out unless an ally kneels beside them in time.':
+    '동료가 제때 곁에 무릎 꿇지 않으면 {0}이(가) 피를 흘려 숨을 거둡니다.',
+  'Floor {0} holds {1} and dens that keep breeding more until destroyed.':
+    '{0}층에 기다리는 것: {1}. 소굴은 부서질 때까지 몬스터를 계속 낳습니다.',
+  'a large pack': '큰 무리',
+  'a swarm': '몬스터 떼',
+  'a great swarm': '거대한 몬스터 떼',
+  'a horde': '대군',
+  'Recommended: a small party at level {0}, using their skills.': '권장: 레벨 {0} 정도의 작은 파티로 기술을 쓰며 싸우세요.',
+
+  // Rites, boons and drilling
+  'Monster blows against residents near the settlement land softer until dawn.':
+    '새벽까지 정착지 가까이의 주민이 몬스터에게 받는 피해가 줄어듭니다.',
+  'Every standing resident regains health, and lasting wounds heal sooner.':
+    '서 있는 주민 모두가 체력을 되찾고, 오래가는 부상이 더 빨리 낫습니다.',
+  'Residents strike harder.': '주민들이 더 강하게 공격합니다.',
+  'Fields and hunts yield more food.': '밭과 사냥에서 식량을 더 많이 얻습니다.',
+  'Residents gain experience faster.': '주민들이 경험치를 더 빨리 얻습니다.',
+  'Buildings take less damage; seats and towers shoot harder.': '건물이 받는 피해가 줄고, 거점과 망루가 더 강하게 쏩니다.',
+  'Crafting goes faster.': '제작이 더 빨라집니다.',
+  'Critical blows come more often.': '치명타가 더 자주 나옵니다.',
+  'The downed hold on longer and rise stronger.': '쓰러진 주민이 더 오래 버티고, 더 튼튼하게 일어납니다.',
+  'Bulwark: its arrows strike harder': '방벽: 화살이 더 강하게 꽂힙니다',
+  'A day of drilling eases stress and gives experience to residents below level {0}.':
+    '하루 훈련하면 스트레스가 줄고, 레벨 {0} 아래의 주민은 경험치를 얻습니다.',
+  'Last day: {0}% attendance': '지난 하루 출석: {0}%',
 
   // Sky, calendar and time controls
   'Sunset in {0}': '일몰까지 {0}',

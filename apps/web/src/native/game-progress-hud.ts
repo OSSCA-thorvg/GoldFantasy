@@ -647,7 +647,8 @@ function memorialRows(app: GameHudApp, out: InspectorRows): void {
     textLine(
       app,
       out,
-      `Day ${dead.day} · ${dead.cause}` + (dead.place && dead.place !== 'Midgard' ? ` · ${dead.place}` : ''),
+      // The record keeps the day index; the calendar and the memorial card count from day 1.
+      `Day ${dead.day + 1} · ${dead.cause}` + (dead.place && dead.place !== 'Midgard' ? ` · ${dead.place}` : ''),
       t.muted,
       11,
     );
@@ -680,7 +681,7 @@ function watchRows(app: GameHudApp, building: Building, out: InspectorRows): voi
     textLine(app, out, `${keeper.name} keeps watch`, t.success, 12, true);
   else if (keeper) textLine(app, out, `${keeper.name} cannot keep watch now`, t.danger, 12, true);
   else textLine(app, out, 'No one keeps watch: assign a worker', t.danger, 12, true);
-  if (boon(app.town, Boon.Bulwark)) textLine(app, out, 'Bulwark: its arrows strike 50% harder', t.accent, 11);
+  if (boon(app.town, Boon.Bulwark)) textLine(app, out, 'Bulwark: its arrows strike harder', t.accent, 11);
 }
 function drillRows(app: GameHudApp, building: Building, out: InspectorRows): void {
   const t = app.theme,
@@ -689,7 +690,7 @@ function drillRows(app: GameHudApp, building: Building, out: InspectorRows): voi
   wrappedLines(
     app,
     out,
-    `A full day of drilling gives each resident ${drillRules.experience} experience up to level ${drillRules.levelCap} and eases stress.`,
+    `A day of drilling eases stress and gives experience to residents below level ${drillRules.levelCap}.`,
     t.muted,
     11,
     2,
@@ -698,11 +699,10 @@ function drillRows(app: GameHudApp, building: Building, out: InspectorRows): voi
     textLine(app, out, 'No one drills here: assign workers', t.danger, 12, true);
     return;
   }
-  const points = Math.round(drillRules.experience * building.attendance);
   textLine(
     app,
     out,
-    `Last day: ${points} experience each (${Math.round(building.attendance * 100)}% attendance)`,
+    `Last day: ${Math.round(building.attendance * 100)}% attendance`,
     t.accent,
     12,
     true,

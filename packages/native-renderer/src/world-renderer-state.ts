@@ -127,6 +127,8 @@ export class WorldRendererState {
   lights = new SceneNode();
   roadLights = new SceneNode();
   objects = new SceneNode();
+  /** Silhouettes of units hidden behind trees and peaks, over every world object. */
+  ghosts = new SceneNode();
   effects = new SceneNode();
   overlay = new SceneNode();
   selection = new SceneNode();
@@ -251,6 +253,7 @@ export class WorldRendererState {
       this.combatGround,
       this.selection,
       this.objects,
+      this.ghosts,
       this.effects,
       this.sunlight,
       this.clouds,

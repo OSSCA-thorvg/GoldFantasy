@@ -337,7 +337,7 @@ export function canPlace(this: ConstructionTown, kind: Structure, center: Point,
   if (founding)
     for (const other of this.placed)
       if (isSeat(other.kind) && distance(center, other.center) < 50)
-        return refuse(check, 'Camps must be at least 50 tiles apart');
+        return refuse(check, 'Camps must stand far apart');
   const nearDungeon = (reach: number): boolean =>
     this.world
       .dungeons()
@@ -348,7 +348,7 @@ export function canPlace(this: ConstructionTown, kind: Structure, center: Point,
           distance(center, point(f32(site.origin.x + 1), f32(site.origin.y + 1))) <= reach,
       );
   if (founding && !nearDungeon(TownState.campReach))
-    return refuse(check, 'Must be within 12 paces of a dungeon');
+    return refuse(check, 'Must be closer to a dungeon');
   if (kind === Structure.Torch) {
     let onRoad = false;
     for (const segment of this.network.builtSegments())
@@ -370,9 +370,9 @@ export function canPlace(this: ConstructionTown, kind: Structure, center: Point,
   for (const item of this.farmland)
     if (overlaps(footprint.corners(), item.outline)) return refuse(check, 'Fields in the way');
   if (kind === Structure.Lumberyard && !this.nearbyTiles(center, f32(4.5), (t) => t.trees > 0))
-    return refuse(check, 'Needs forest within 4 paces');
+    return refuse(check, 'Needs forest close by');
   if (kind === Structure.Quarry && !this.nearbyTiles(center, f32(3.5), (t) => isStone(t.terrain)))
-    return refuse(check, 'Needs rocky ground within 3 paces');
+    return refuse(check, 'Needs rocky ground close by');
   // Builders work from the doorway, so a plot nobody can walk to would stand unbuilt for good.
   const seat = founding ? null : this.camp(village);
   if (seat && this.grid.costs.length) {
@@ -447,7 +447,7 @@ export function checkRoad(this: ConstructionTown, path: RoadPath, ignore: number
       const step = distance(p, line[f32(i - 1)]);
       span = f32(span + step);
       bridged = f32(bridged + step);
-      if (span > TownState.maxBridgeSpan) return refuse(check, 'Bridge too long (7 paces at most)');
+      if (span > TownState.maxBridgeSpan) return refuse(check, 'Bridge too long');
     } else span = 0;
     if (terrain === Terrain.Mountain) return refuse(check, 'Mountains');
     if (terrain === Terrain.Ice) return refuse(check, 'Ice');
@@ -581,7 +581,7 @@ export function canPlantField(this: ConstructionTown, outline: Outline): Check {
       (s) => s === Structure.Farm,
     )
   )
-    return refuse(check, 'Needs a farmhouse within 6 paces');
+    return refuse(check, 'Needs a farmhouse close by');
   check.ok = true;
   return check;
 }

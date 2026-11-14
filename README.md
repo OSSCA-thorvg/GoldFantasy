@@ -40,6 +40,14 @@ Follow the river, explore forests and coastlines, and uncover landmarks and dung
 
 _Full-world overview. Normal play reveals the map through exploration._
 
+## Arm your people
+
+Tools and weapons are made in the world, not in a menu. Build a workbench, send a resident to it and watch them work. A wooden axe fells trees faster than bare hands, a stone axe faster still, and the smith's iron beats both. Picks, hammers, hoes, shovels, sickles, a hunting knife and a pack basket each make one kind of work go better; swords, clubs, spears and bows turn a settler into a fighter.
+
+## Few against many
+
+Beyond each gate lies another world, floor below floor. Its monsters win by numbers: swarms pour out of dens until the dens are destroyed, and a guardian holds every floor. Your residents are few and precious. Split them into control groups, hold a chokepoint, pick a target, and time each calling's skills: a warrior's challenge, a ranger's volley, a mage's frost ring, a cleric's mending, a bard's verse. A resident who falls can be raised by an ally who reaches them in time. Seal every gate to win.
+
 ## Watch the sky change
 
 Morning becomes evening. Torches glow after sunset. Rain, storms and snow change the atmosphere, while the calendar brings new seasons and harvests. The sun and moon track the world clock above your settlement.
@@ -83,13 +91,13 @@ Open **Map Editor** from the title screen and paint the landscape directly. Trac
 - **Building Studio:** inspect and edit building assets, then save, export or apply your changes.
 - **Save and continue:** return to your settlement later. The title's autonomous village is a separate simulation and does not change your saved game.
 
-The opening quests guide the first steps: **Camp → Road → Lumberyard → Farmhouse → Field → Well → Tent → Hostel**.
+The opening quests guide the first steps: **Camp → Workbench → Wooden axe → Wooden tools → First weapon → Tent → Farmhouse → Field → Altar**. The first time something important happens, a guide card explains it and keeps it in a log you can reread (`F1`).
 
 ## Drawn with ThorVG WebCanvas
 
 Midgard is a playable showcase for **[ThorVG WebCanvas](https://github.com/thorvg/thorvg.web)**. Its vector artwork, animated buildings, characters, weather and in-game canvas UI are rendered in the browser through WebCanvas.
 
-The game logic is TypeScript. WebGL is the default renderer; software rendering and WebGPU can also be selected. The world fills the browser window and follows window-size and display-scale changes.
+The game logic is TypeScript. WebGL is the default renderer; WebGPU can also be selected. The world fills the browser window and follows window-size and display-scale changes.
 
 The media above is captured from the actual renderer. The settlement showcase is prepared for photography. The construction and day/night GIFs accelerate simulation time; the weather clips show the game’s own weather effects.
 
@@ -186,6 +194,8 @@ Real WebAssembly ownership checks also repeat UI reordering, clipping, masking a
 | IndexedDB                                                | Browser-local saves and creative documents                                |
 | Lua 5.4.8 in WebAssembly                                 | Optional scripted HUD extensions                                          |
 | DejaVu Sans / DejaVu Sans Bold                           | In-game text                                                              |
+| Noto Sans KR                                             | Korean in-game text                                                       |
+| Cinzel                                                   | Title lettering and combat numbers                                        |
 | Loach-generated audio                                    | Procedural music, ambience, effects and generated voice banks             |
 
 Midgard continues the GoldFantasy project and its original game artwork and rules.
@@ -199,6 +209,8 @@ Third-party components keep their own licenses:
 - **ThorVG WebCanvas:** [MIT license](public/licenses/ThorVG-WebCanvas-1.1.3.txt).
 - **Lua 5.4.8:** [MIT license](public/licenses/Lua-5.4.8.txt).
 - **DejaVu fonts:** [Bitstream Vera license and DejaVu public-domain changes](public/assets/native-fonts/DejaVuSans.LICENSE).
+- **Noto Sans KR:** [SIL Open Font License 1.1](public/assets/native-fonts/NotoSansKR.LICENSE).
+- **Cinzel:** [SIL Open Font License 1.1](public/licenses/Cinzel-OFL.txt).
 - **Audio:** [asset-specific provenance and notices](public/assets/audio/NOTICE.md).
 - **Powered by ThorVG splash:** [supplied animation source and provenance](public/assets/branding/NOTICE.md).
 

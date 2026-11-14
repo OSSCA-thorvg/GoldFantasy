@@ -3,13 +3,14 @@
 import giantBlow from './assets/saga/giant-blow.json?raw';
 import { AnimationNode, SceneNode, ShapeNode, type Rgb } from './paint';
 import { oval, pen, type Form } from './outline-form';
-import { allfatherLunging, shoreTrio, spearman, type Fighter } from './saga-fighters';
+import { allfatherStriking, brotherOnGuard, shoreTrio, type Stance } from './saga-fighters';
 import { frostGiant, giantHead } from './saga-giant';
 import { dusk, paintForm } from './form-paint';
 import {
   about,
   alphaOf,
   backdrop,
+  clamp01,
   cloud,
   ease,
   flat,
@@ -233,16 +234,19 @@ export function slayingPanel(): SagaPanel {
   }
   wound.add(flat(plates, rime, 120)).add(flat(cracks, fissure));
   giant.add(wound);
-  // A dark ridge with the three brothers on it, spears up.
+  // A dark spur: the two brothers stand guard on it, and Odin strikes from its lip.
   const ridge: Form = [
     pen(-200, 1000)
-      .curve([-200, 860], [-200, 790])
-      .curve([120, 760], [420, 770], [700, 800], [940, 880], [1100, 1000])
+      .curve([-200, 860], [-200, 786])
+      .curve([120, 766], [420, 772], [640, 777], [770, 778], [846, 800], [910, 870], [980, 1000])
       .close(),
   ];
-  const figures: Fighter[] = [spearman('slate'), allfatherLunging(), spearman('ochre')];
+  const guards = [brotherOnGuard('slate'), brotherOnGuard('ochre')],
+    odin = allfatherStriking();
   brothers.add(flat(ridge, night));
-  for (const i of [0, 2, 1]) brothers.add(figures[i].scene);
+  for (const guard of guards) brothers.add(guard.scene);
+  // Placed so that the levelled spear's point lands in the wound.
+  brothers.add(odin.scene.transform([0.6, 0, 633, 0, 0.6, 776, 0, 0, 1]));
   // Snow thrown up where he comes down.
   const mists = [
     [640, 760, 1200, 150],
@@ -286,9 +290,14 @@ export function slayingPanel(): SagaPanel {
     lumps.push(lump);
     shards.add(lump);
   }
-  // The blow: one flat pale wedge from Odin's spear to the giant's chest.
-  // The spear's path, a warm streak bending in from behind him.
-  blow.add(flat([lock(1030, 640, 620, 500, 40, -0.14)], [250, 228, 176]));
+  // The blow: one flat pale crescent along the path of the spear's point, from where he held it
+  // cocked to the giant's chest.
+  blow.add(
+    flat(
+      [pen(816, 484).curve([950, 525], [1030, 640]).curve([932, 549], [816, 484]).close()],
+      [250, 228, 176],
+    ),
+  );
   const chips: ShapeNode[] = [];
   for (let i = 0; i < 8; i++) {
     const r = 26 + 26 * scatter(i, 21),
@@ -317,34 +326,53 @@ export function slayingPanel(): SagaPanel {
           beat > struck && beat < struck + 0.1
             ? Math.sin((beat - struck) * 300) * 5 * (1 - (beat - struck) / 0.1)
             : 0;
-      about(scene, 700, 560, 1.05 - 0.05 * beat, jolt, jolt * 0.5);
+      // The camera drifts back throughout. It also closes on Odin while he coils, holds there for
+      // the blow, and pulls out again to watch the giant go down.
+      const drift = 1.05 - 0.05 * beat,
+        near = span(beat, 0.2, struck - 0.025) * (1 - span(beat, struck + 0.07, 0.78)),
+        left = 700 * (1 - 1 / drift) * (1 - near) + 400 * near,
+        top = 560 * (1 - 1 / drift) * (1 - near) + 205 * near,
+        zoom = sagaWidth / ((sagaWidth / drift) * (1 - near) + 1200 * near);
+      scene.transform([zoom, 0, jolt - left * zoom, 0, zoom, jolt * 0.5 - top * zoom, 0, 0, 1]);
       turn(giant, 1150, 1100, 0.28 * fall, 70 * fall, 30 * fall);
       ymir.sway(seconds, beat > struck ? 2.2 : 1);
-      figures.forEach((figure, i) => {
-        // They come on with spears levelled; Odin draws back once and drives home. Only when the
-        // giant is down do all three throw their spears up.
-        const lead = i === 1,
-          lunge =
-            span(beat, struck - 0.12, struck) *
-            (1 - span(beat, struck + 0.14, struck + 0.44) * (lead ? 0.3 : 0.6)),
-          k = [0.6, 0.64, 0.6][i];
-        figure.scene.transform([
-          k,
-          0,
-          [120, 570, 350][i] + (lead ? 60 : 22) * lunge,
-          0,
-          k,
-          [782, 806, 790][i] - 3 * Math.abs(Math.sin(seconds * 2.4 + i)) * (1 - lunge),
-          0,
-          0,
-          1,
-        ]);
-        const drawn = lead ? Math.sin(Math.PI * span(beat, struck - 0.2, struck - 0.02)) : 0,
-          raised = span(beat, 0.8 + i * 0.03, 0.94 + i * 0.02),
-          level = lead ? -0.08 - 0.42 * drawn + 0.32 * lunge : -0.1 + 0.04 * Math.sin(seconds * 2 + i);
-        figure.aim(level * (1 - raised) - 1.05 * raised);
-        figure.flutter(seconds + i);
-        figure.gleam(lead ? Math.sin(Math.PI * span(beat, struck - 0.2, struck - 0.04)) : 0);
+      // Odin coils with the spear cocked, and is drawn lunging a moment before the point lands;
+      // he leans into the blow, then eases off and draws the spear out as the giant topples.
+      const since = beat - struck,
+        lunge = clamp01(since / 0.012 + 1),
+        coil = span(beat, 0.14, struck - 0.03),
+        stance: Stance = since < -0.012 ? 'coiled' : since < 0.07 ? 'thrust' : 'held',
+        shudder = since > 0 && since < 0.04 ? Math.sin(since * 1500) * (1 - since / 0.04) : 0,
+        // The cape streams back in the lunge, swings forward past rest when he stops, and settles;
+        // the snow the giant throws up as he falls blows over all three.
+        whip = since < 0 ? lunge : Math.exp(-since / 0.09) * Math.cos(since * 60),
+        blast = Math.sin(Math.PI * span(beat, struck + 0.08, 0.96));
+      odin.act(
+        {
+          stance,
+          lean:
+            stance === 'coiled'
+              ? -0.03 - 0.1 * coil - 0.04 * span(since, -0.05, -0.012)
+              : since < 0
+                ? -0.3 + 0.36 * lunge * lunge
+                : 0.06 * (1 - span(since, 0.03, 0.2)) + 0.012 * shudder,
+          crouch: stance === 'coiled' ? coil : 0.8 * (1 - span(since, 0.02, 0.2)),
+          spear: stance === 'coiled' ? -0.1 * coil + 0.008 * coil * Math.sin(seconds * 38) : 0.02 * shudder,
+          gleam:
+            stance === 'coiled'
+              ? span(since, -0.16, -0.03)
+              : 0.8 * Math.sin(Math.PI * span(beat, 0.86, 0.95)),
+          gust: stance === 'coiled' ? 0.3 + 0.9 * coil : 0.4 + 2.2 * whip + 1.2 * blast,
+        },
+        seconds,
+      );
+      // The brothers stand their ground: they only brace as the blow lands.
+      guards.forEach((guard, i) => {
+        const k = [0.29, 0.31][i],
+          brace = since > 0 ? 0.04 * Math.exp(-since / 0.05) : 0,
+          breath = 1 + 0.005 * Math.sin(seconds * 1.5 + i * 2);
+        guard.scene.transform([k, brace * k, [160, 322][i], 0, k * breath, [768, 772][i], 0, 0, 1]);
+        guard.flutter(seconds + i * 1.7, 0.2 + 2.6 * blast);
       });
       const contact = (beat - struck) / 0.014;
       flash.opacity(contact >= 0 && contact < 1 ? 255 : 0);
@@ -369,9 +397,7 @@ export function slayingPanel(): SagaPanel {
       // Played at about a third of their own speed, so the blow reads at storybook pace.
       const hit = (beat - struck) / 0.11;
       spark.frame(Math.max(0, Math.min(15, hit * 15))).opacity(hit >= 0 && hit < 1 ? 255 : 0);
-      blow.opacity(
-        alphaOf(span(beat, struck - 0.02, struck) * (1 - span(beat, struck + 0.03, struck + 0.16))),
-      );
+      blow.opacity(beat < struck - 0.012 ? 0 : alphaOf(1 - span(beat, struck + 0.005, struck + 0.035)));
       const flight = (beat - struck) / 0.5;
       chips.forEach((chip, i) => {
         const angle = -2.6 + 1.9 * scatter(i, 22),

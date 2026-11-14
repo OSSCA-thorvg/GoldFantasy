@@ -21,13 +21,13 @@ export function rites(this: TownState): Rite[] {
     {
       id: 'ward',
       name: 'Ward',
-      description: 'Monster blows against residents near the settlement land 30% softer until dawn.',
+      description: 'Monster blows against residents near the settlement land softer until dawn.',
       mana: economyRules.wardMana,
     },
     {
       id: 'mending',
       name: 'Mending',
-      description: 'Every standing resident regains 40% health and a lasting wound heals a day sooner.',
+      description: 'Every standing resident regains health, and lasting wounds heal sooner.',
       mana: economyRules.mendingMana,
     },
     {

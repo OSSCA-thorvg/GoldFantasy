@@ -311,7 +311,8 @@ it('rejects the empty padded rectangle beside a real small fir and preserves exa
     v.draw();
     expect(v.picker.pick(point(100, 122))?.kind).toBe('tree');
     expect(v.picker.pick(point(104, 111))?.kind).toBe('building');
-    expect(v.picker.querySelection({ x: 103, y: 109, w: 2, h: 3 }).map((h) => h.kind)).toEqual(['building']);
+    // Inside the fir's box but beside its canopy (taller and wider since the trees grew).
+    expect(v.picker.querySelection({ x: 104.5, y: 110.5, w: 1.5, h: 2 }).map((h) => h.kind)).toEqual(['building']);
     v.trees(1);
     v.draw();
     expect(v.picker.selectionGeometry({ kind: 'tree', id: 2, instanceIndex: 1 })).toBeNull();

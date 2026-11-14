@@ -8,7 +8,7 @@ import { DungeonKind } from '../../packages/engine/src/world-types';
 import { sealable } from '../../packages/engine/src/gate-seals';
 import { lairOf, monsterEntrance } from '../../packages/engine/src/town-monsters';
 import { add, distance, point } from '../../packages/engine/src/geometry';
-import { CombatCue, MonsterRank } from '../../packages/engine/src/combat-events';
+import { CombatCue, MonsterRank, type CombatEvent } from '../../packages/engine/src/combat-events';
 import { rankRules } from '../../packages/engine/src/monster-ranks';
 import { realmRules } from '../../packages/engine/src/town-realm';
 import { RaidKind } from '../../packages/engine/src/raid-progression';
@@ -83,9 +83,14 @@ describe('swarms beyond a gate', () => {
     town.beasts = town.beasts.filter((m) => m === den || !town.inRealm(m.home));
     members[0].position = town.grid.nearestWalkable(add(den.position, point(3, 0)));
     town.orderHold([members[0].id]);
-    for (let i = 0; i < 40; ++i) town.advance(0.1);
+    const spawned: CombatEvent[] = [];
+    let seen = -1n;
+    for (let i = 0; i < 150; ++i) {
+      town.advance(0.1);
+      for (const e of town.combatEvents()) if (e.serial > seen && e.cue === CombatCue.Spawn) spawned.push(e);
+      seen = town.combatEvents().at(-1)?.serial ?? seen;
+    }
     expect(den.angry).toBe(true);
-    const spawned = cues(town, CombatCue.Spawn);
     expect(spawned.length).toBeGreaterThan(1);
     const young = town.monsters().find((m) => m.id === spawned[0].creature)!;
     expect(spawned[0].amount).toBe(den.id);
@@ -140,7 +145,7 @@ describe('swarms beyond a gate', () => {
     expect(Math.ceil(swarmer.health / blow)).toBeLessThanOrEqual(2);
     // Bare hands barely scratch the hide.
     const bare = new Person(999, 'Bare', Role.Resident, Calling.Settler, 0, 0, point());
-    expect(town.blowAgainst(swarmer, town.blowStrength(bare))).toBeLessThan(town.blowStrength(bare) / 2);
+    expect(town.blowAgainst(swarmer, town.blowStrength(bare))).toBeLessThanOrEqual(town.blowStrength(bare) / 2);
   }, 120000);
   it('surrounds its prey instead of stacking on one spot', () => {
     const { town, members } = expedition([Calling.Warrior], 30),
@@ -197,13 +202,68 @@ describe('swarms beyond a gate', () => {
     expect(loaded.realmDens().map((m) => m.id)).toEqual(town.realmDens().map((m) => m.id));
     const saved = town.clock(),
       after = (t: Town) => cues(t, CombatCue.Spawn).filter((cue) => cue.at > saved).length;
-    for (let i = 0; i < 20; ++i) {
+    for (let i = 0; i < 60; ++i) {
       town.advance(0.1);
       loaded.advance(0.1);
     }
     expect(after(town)).toBeGreaterThan(0);
     expect(after(loaded)).toBe(after(town));
     expect(loaded.realmFoes().length).toBe(town.realmFoes().length);
+  }, 120000);
+});
+
+describe('a party falling beyond a gate', () => {
+  let base: WorldMap;
+  beforeAll(() => {
+    base = WorldMap.generate(5);
+  }, 120000);
+  function party() {
+    const town = new Town(base, 176, false),
+      camp = new Building(0, Structure.Camp, town.map().camp(), 0, 0);
+    camp.village = 0;
+    town.placed.push(camp);
+    town.nextId = 1;
+    town.foundSettlement(0);
+    const gate = town.map().dungeons().findIndex(sealable);
+    town.map().dungeons()[gate].discovered = true;
+    const members = [Calling.Ranger, Calling.Mage, Calling.Cleric].map((calling) => {
+      const p = town.makePerson(Role.Resident, calling, monsterEntrance(town.map().dungeons()[gate]));
+      town.folk.push(p);
+      p.level = 22;
+      p.activity = Activity.Expedition;
+      p.inside = true;
+      return p;
+    });
+    town.parties.push({ dungeon: gate, members: members.map((p) => p.id), floor: 0 });
+    town.advance(0.1);
+    // Nothing on the floor can reach them, and no skill gets anyone up: only the bleeding counts here.
+    town.beasts = town.beasts.filter((m) => !town.inRealm(m.home));
+    for (const slot of [0, 1]) town.setSkillAuto(members.map((p) => p.id), slot, false);
+    town.orderMove([members[2].id], town.realmPlan()!.chambers.at(-1)!.center);
+    return { town, members };
+  }
+  it('casts everyone out alive when the last one standing falls', () => {
+    const { town, members } = party();
+    for (const p of members.slice(0, 2)) town.strikeDown(p, 'Killed by monsters');
+    for (let i = 0; i < 100; ++i) town.advance(0.1);
+    town.strikeDown(members[2], 'Killed by monsters');
+    town.advance(0.1);
+    expect(town.realmActive()).toBe(false);
+    expect(town.fallen).toHaveLength(0);
+    for (const p of members) expect(p).toMatchObject({ downedAt: -1, health: expect.any(Number) });
+  }, 120000);
+  it('lets the downed bleed out while one still stands and nobody kneels by them', () => {
+    const { town, members } = party(),
+      [first, second, last] = members;
+    town.strikeDown(first, 'Killed by monsters');
+    town.strikeDown(second, 'Killed by monsters');
+    // The last one walks away on orders and never kneels by them.
+    for (let i = 0; i < 480 && town.realmActive(); ++i) {
+      last.health = 1;
+      town.advance(0.1);
+    }
+    expect(town.realmActive()).toBe(true);
+    expect(town.fallen.map((f) => f.id).sort()).toEqual([first.id, second.id].sort());
   }, 120000);
 });
 

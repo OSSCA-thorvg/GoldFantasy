@@ -3,7 +3,8 @@ import type { Monster, Person } from './person';
 import type { TownState } from './town-state';
 import { distance } from './geometry';
 import { f32 as f } from './numeric';
-import { armorProtection, attackReach } from './equipment';
+import { armorProtection, combatItem } from './equipment';
+const shotWeapon = (p: Person): boolean => combatItem(p)?.visual === 'bow' || combatItem(p)?.visual === 'staff';
 
 export const rankRules = {
   bruteHealth: 1.8,
@@ -12,8 +13,8 @@ export const rankRules = {
   stalkerHealth: 0.6,
   stalkerPace: 1.4,
   /** A swarmer falls to a blow or two and bites often, but softly. */
-  swarmerHealth: 0.2,
-  swarmerStrength: 1.6,
+  swarmerHealth: 0.17,
+  swarmerStrength: 1.4,
   swarmerPace: 1.3,
   swarmerPause: 0.6,
   spitterHealth: 0.3,
@@ -23,10 +24,12 @@ export const rankRules = {
   /** Tiles a spitter spits from, and how close it lets a resident come before backing off. */
   spitReach: 4.5,
   spitShy: 2.4,
+  /** Farthest a spitter backs off from its home. */
+  spitRoam: 4,
   /** Monsters beyond a gate have a hide that turns aside this much of every blow: weapons and levels tell, bare
    * hands barely scratch them. A blow always keeps a fifth of its force. */
-  hide: 0.8,
-  denHealth: 7,
+  hide: 0.9,
+  denHealth: 4,
   /** Seconds between swarmers of a roused den, the first sooner; slower while it was struck in the last `denStruck`
    * seconds. Its brood alive at once is at most `denBrood`, shrinking with the den's wounds. */
   denPause: 4,
@@ -108,7 +111,7 @@ export function choosePrey(beast: Monster, candidates: readonly Person[]): Perso
       let alone = 4;
       for (const other of candidates)
         if (other !== p) alone = Math.min(alone, distance(other.position, p.position));
-      score -= alone + (attackReach(p) > 1.5 || armorProtection(p) <= 0 ? 3 : 0);
+      score -= alone + (shotWeapon(p) || armorProtection(p) <= 0 ? 3 : 0);
     }
     if (score < bestScore) {
       best = p;

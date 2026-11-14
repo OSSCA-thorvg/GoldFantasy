@@ -6,7 +6,43 @@ import type { PersonParts } from './world-sprites';
 
 /** Clothing presets remain the base; these small overlays represent real equipped items. */
 export function wearableBack(sprite: SceneNode, person: Person, height: number, width: number): void {
-  if (equippedItem(person, 'accessory')?.id !== 'cloak') return;
+  const accessory = equippedItem(person, 'accessory');
+  if (accessory?.visual === 'basket') {
+    // A wicker pack high on the back: lit weave, its outer side in shade, two bands and a pale rim.
+    const left = -width - 3.2,
+      right = -width + 1.2,
+      top = -height + 1.3,
+      bottom = -height * 0.36,
+      weave = [186, 150, 98] as const,
+      shade = [146, 112, 72] as const;
+    sprite.add(
+      poly(
+        [
+          [left - 0.5, top],
+          [right, top],
+          [right, bottom],
+          [left + 0.5, bottom],
+        ],
+        weave,
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [left - 0.5, top],
+          [left + 1.2, top],
+          [left + 1.8, bottom],
+          [left + 0.5, bottom],
+        ],
+        shade,
+      ),
+    );
+    for (const y of [top + (bottom - top) * 0.38, top + (bottom - top) * 0.7])
+      sprite.add(stroke([left + 0.1, y], [right, y], 0.45, shade));
+    sprite.add(stroke([left - 0.6, top], [right, top], 0.9, [216, 188, 138]));
+    return;
+  }
+  if (accessory?.id !== 'cloak') return;
   sprite.add(
     poly(
       [

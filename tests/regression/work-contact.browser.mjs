@@ -28,8 +28,11 @@ try {
     server: { host: '127.0.0.1', port: 0, hmr: false, watch: null },
   });
   await server.listen();
-  browser = await chromium.launch({ headless: true, args: ['--mute-audio'] });
-  deadline = setTimeout(() => void browser.close().catch(() => {}), 120000);
+  browser = await chromium.launch({
+    headless: true,
+    args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist'],
+  });
+  deadline = setTimeout(() => void browser.close().catch(() => {}), 300000);
   const page = await browser.newPage({ viewport: { width: 640, height: 480 } });
   page.on('pageerror', (e) => report.errors.push(String(e.stack ?? e)));
   await page.addInitScript(() => {

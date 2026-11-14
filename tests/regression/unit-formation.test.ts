@@ -142,6 +142,36 @@ describe('group moves arrive in formation', () => {
     );
     expect(group.map(goal)).toEqual(first);
   });
+  it('puts a spear in the front line with the blades, never among the bows', () => {
+    const town = fixture(),
+      group = [
+        resident(town, point(10, 10), Calling.Ranger, 'bow'),
+        resident(town, point(10.6, 10), Calling.Settler, 'spear'),
+        resident(town, point(11.2, 10), Calling.Warrior, 'sword'),
+      ],
+      to = point(30, 10);
+    town.orderMove(
+      group.map((p) => p.id),
+      to,
+    );
+    const [ranger, spear, blade] = group.map((p) => p.path.at(-1)!.x - to.x);
+    expect(spear).toBeCloseTo(blade, 3);
+    expect(spear).toBeGreaterThan(ranger);
+  });
+  it('makes a spear thrust hand to hand: its blow is not a shot', () => {
+    const town = fixture(),
+      p = resident(town, point(20, 20), Calling.Warrior, 'spear'),
+      foe = monster(town, point(21.2, 20)),
+      behind = monster(town, point(22.2, 20));
+    town.roll = () => 0.99;
+    town.strike(p, foe);
+    const hits = town.hits().filter((hit) => hit.attacker === p.id);
+    expect(hits.map((hit) => [hit.ranged, hit.primary])).toEqual([
+      [false, false],
+      [false, true],
+    ]);
+    expect(behind.health).toBeLessThan(100);
+  });
   it('sends a single resident to the exact point', () => {
     const town = fixture(),
       p = resident(town, point(10, 10), Calling.Warrior, 'sword');

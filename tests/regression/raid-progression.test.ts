@@ -40,7 +40,7 @@ describe('weekly dungeon pressure', () => {
     expect(dungeonThreat(700, point(), [castle]).count).toBe(12);
     expect(dungeonThreat(700, point(), [castle])).toEqual({ ...cap, week: 100 });
     expect(cap.health).toBeGreaterThan(dungeonThreat(threatWeeks * 7 - 1, point(), [castle]).health);
-    expect(pressureNotice(2)).toContain('136% health');
+    expect(pressureNotice(2)).toBe('Week 2: raiders grow stronger. Seal a gate to end its raids.');
     expect(pressureNotice(threatWeeks)).toContain('full strength');
     expect(pressureNotice(threatWeeks + 1)).toBe('');
   });

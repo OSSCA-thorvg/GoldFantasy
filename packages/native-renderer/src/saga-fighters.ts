@@ -1,30 +1,327 @@
-// Odin and his brothers, built from design sheets traced with the Aurum vectorizer (see
-// saga-fighter-parts.ts). In the fight each is hung joint by joint so legs, cloaks, hair and a
-// drawn spear arm can move; at rest they are whole traced figures with a few loose pieces.
+// Odin and his brothers, traced whole from design sheets with the Aurum vectorizer (see
+// saga-fighter-parts.ts). Nothing is jointed. In the fight, cloth and hair move because their
+// outline points ride a travelling wave, and Odin's blow is three drawn poses shown in turn over
+// planted feet; at rest a few traced pieces turn about a pivot.
 
 import { SceneNode, ShapeNode } from './paint';
-import { oval, pen, trace } from './outline-form';
-import { limbJoints, threadCurve } from './rig-limb-path';
-import { flat, lock, stroke, turn } from './saga-panel';
+import { pen, type Form } from './outline-form';
+import { alphaOf, flat, span, stroke, turn } from './saga-panel';
 import {
-  ochreRigParts,
-  odinRigParts,
+  ochreGuardParts,
+  odinCoiledParts,
+  odinHeldParts,
   odinStandingParts,
+  odinThrustParts,
   shoreTrioParts,
-  slateRigParts,
+  slateGuardParts,
   type TracedPart,
 } from './saga-fighter-parts';
 
-export interface Fighter {
-  /** Feet at the origin, facing right, in the sheet's pixels: Odin stands about 330 tall. */
-  readonly scene: SceneNode;
-  /** Turns the spear arm about the shoulder: negative raises it back, 0 is the level thrust. */
-  aim(radians: number): void;
-  /** A glint on the spear's point, 0..1. */
-  gleam(amount: number): void;
-  /** Lets cape, hair and beard stream and settle. */
-  flutter(seconds: number): void;
+/** A traced path as numbers: its commands (absolute M, L, C and Z only) and their coordinates in order. */
+interface Outline {
+  kinds: string;
+  at: number[];
 }
+function outlineOf(d: string): Outline {
+  const at: number[] = [];
+  let kinds = '';
+  for (const [, kind, body] of d.matchAll(/([MLCZ])([^MLCZ]*)/g)) {
+    kinds += kind;
+    if (body.trim()) at.push(...body.trim().split(/\s+/).map(Number));
+  }
+  return { kinds, at };
+}
+function emit(shape: ShapeNode, kinds: string, at: ArrayLike<number>): ShapeNode {
+  let i = 0;
+  for (const kind of kinds) {
+    if (kind === 'M') shape.moveTo(at[i], at[i + 1]);
+    else if (kind === 'L') shape.lineTo(at[i], at[i + 1]);
+    else if (kind === 'C') shape.cubicTo(at[i], at[i + 1], at[i + 2], at[i + 3], at[i + 4], at[i + 5]);
+    else shape.close();
+    i += kind === 'C' ? 6 : kind === 'Z' ? 0 : 2;
+  }
+  return shape;
+}
+function tracedShape(d: string): ShapeNode {
+  const outline = outlineOf(d);
+  return emit(new ShapeNode(), outline.kinds, outline.at);
+}
+function traced(part: TracedPart): SceneNode {
+  const scene = new SceneNode();
+  for (const [fill, d, evenOdd] of part) {
+    const shape = tracedShape(d).fill(fill[0], fill[1], fill[2]);
+    scene.add(evenOdd ? shape.fillRule('evenOdd') : shape);
+  }
+  return scene;
+}
+
+/**
+ * Cloth or hair pinned at one end. A point swings across `flow`, more the further along it lies,
+ * and a ripple travels out to the free end. The swing dies away at the `guard` line, so whatever
+ * the cloth lies against (the body, a planted boot) keeps still.
+ */
+interface Streamer {
+  /** Where it is pinned, and the unit direction it trails away in. */
+  pin: readonly [x: number, y: number];
+  flow: readonly [x: number, y: number];
+  /** How far along the flow the swing reaches full strength. */
+  reach: number;
+  /** A point on the guard line, its unit normal toward the free cloth, and how far out the swing is whole. */
+  guard?: readonly [x: number, y: number, nx: number, ny: number, soft: number];
+  /** Peak swing in sheet pixels, the ripple's wavelength, and its pace in radians a second. */
+  swing: number;
+  ripple: number;
+  pace: number;
+}
+/** One traced path of a flowing part: how freely each point swings on each streamer, and how late. */
+interface Sheet {
+  shape: ShapeNode;
+  outline: Outline;
+  give: Float64Array;
+  lag: Float64Array;
+  now: Float64Array;
+}
+/** A traced part whose outline points ride streamers, so it stays one piece while it moves. */
+class Flowing {
+  readonly scene = new SceneNode();
+  private readonly sheets: Sheet[] = [];
+  constructor(
+    part: TracedPart,
+    private readonly streamers: readonly Streamer[],
+  ) {
+    const n = streamers.length;
+    for (const [fill, d, evenOdd] of part) {
+      const outline = outlineOf(d),
+        shape = emit(new ShapeNode(), outline.kinds, outline.at).fill(fill[0], fill[1], fill[2]),
+        give = new Float64Array((outline.at.length / 2) * n),
+        lag = new Float64Array(give.length);
+      for (let i = 0; i < outline.at.length; i += 2)
+        streamers.forEach((s, j) => {
+          const x = outline.at[i],
+            y = outline.at[i + 1],
+            along = (x - s.pin[0]) * s.flow[0] + (y - s.pin[1]) * s.flow[1],
+            g = s.guard;
+          give[(i / 2) * n + j] =
+            span(along, 0, s.reach) * (g ? span((x - g[0]) * g[2] + (y - g[1]) * g[3], 0, g[4]) : 1);
+          lag[(i / 2) * n + j] = (along / s.ripple) * Math.PI * 2;
+        });
+      this.scene.add(evenOdd ? shape.fillRule('evenOdd') : shape);
+      // A path no streamer reaches is drawn once and left alone.
+      if (give.some((v) => v > 0))
+        this.sheets.push({ shape, outline, give, lag, now: new Float64Array(outline.at.length) });
+    }
+  }
+  /** `gust` is a steady wind from ahead, in units of each streamer's own swing. */
+  flutter(seconds: number, gust = 0): void {
+    const n = this.streamers.length;
+    for (const { shape, outline, give, lag, now } of this.sheets) {
+      for (let i = 0; i < now.length; i += 2) {
+        let x = outline.at[i],
+          y = outline.at[i + 1];
+        for (let j = 0; j < n; j++) {
+          const s = this.streamers[j],
+            at = (i / 2) * n + j,
+            push = give[at] * s.swing * (Math.sin(seconds * s.pace - lag[at]) + gust);
+          x -= s.flow[1] * push;
+          y += s.flow[0] * push;
+        }
+        now[i] = x;
+        now[i + 1] = y;
+      }
+      emit(shape.reset(), outline.kinds, now);
+    }
+  }
+}
+
+// Where the cloth of each drawing hangs from, measured on the sheets.
+const coiledCape: Streamer = {
+  pin: [-48, -271],
+  flow: [-0.708, 0.706],
+  reach: 260,
+  guard: [-20, -232, -0.799, -0.602, 80],
+  swing: 9,
+  ripple: 230,
+  pace: 3.1,
+};
+const coiledTail: Streamer = {
+  pin: [-50, -252],
+  flow: [-0.93, 0.37],
+  reach: 75,
+  swing: 4,
+  ripple: 90,
+  pace: 4.3,
+};
+const coiledBeard: Streamer = {
+  pin: [70, -282],
+  flow: [0, 1],
+  reach: 120,
+  guard: [14, -282, 1, 0, 25],
+  swing: 4,
+  ripple: 170,
+  pace: 2.7,
+};
+const thrustCape: Streamer = {
+  pin: [46, -247],
+  flow: [-0.875, 0.484],
+  reach: 290,
+  guard: [40, -233, -0.684, -0.73, 80],
+  swing: 9,
+  ripple: 250,
+  pace: 3.1,
+};
+const thrustHair: Streamer = {
+  pin: [81, -292],
+  flow: [-0.97, 0.243],
+  reach: 160,
+  swing: 7,
+  ripple: 130,
+  pace: 4.6,
+};
+const guardCloak: Streamer = {
+  pin: [0, -580],
+  flow: [0, 1],
+  reach: 470,
+  guard: [-54, -480, -0.982, -0.186, 70],
+  swing: 10,
+  ripple: 520,
+  pace: 1.9,
+};
+
+/** How far along the spear its point lies from the grip. */
+const spearReach = 372;
+/** Odin's spear, drawn rather than traced so it stays straight: the grip at the origin, the point to the right. */
+function gungnir(): SceneNode {
+  const neck = spearReach - 34;
+  return new SceneNode()
+    .add(
+      stroke(
+        [
+          [-102, 0],
+          [neck + 6, 0],
+        ],
+        12,
+        [134, 92, 60],
+      ),
+    )
+    .add(
+      flat(
+        [
+          pen(neck, 0)
+            .curve([neck + 18, -13], [neck + 66, 0])
+            .curve([neck + 18, 13], [neck, 0])
+            .close(),
+        ],
+        [246, 227, 202],
+      ),
+    );
+}
+/** A four-pointed glint about the origin: tall rays, shorter arms. */
+const sparkle = (r: number): Form => [
+  pen(0, -r)
+    .line(r * 0.12, -r * 0.12)
+    .line(r * 0.72, 0)
+    .line(r * 0.12, r * 0.12)
+    .line(0, r)
+    .line(-r * 0.12, r * 0.12)
+    .line(-r * 0.72, 0)
+    .line(-r * 0.12, -r * 0.12)
+    .close(),
+];
+
+export type Stance = 'coiled' | 'thrust' | 'held';
+/** One moment of Odin's blow. */
+export interface StrikeBeat {
+  /** Which drawing shows: spear cocked overhead, driven home, or held after the blow. */
+  stance: Stance;
+  /** Leans him over planted feet: negative back, positive into the blow. */
+  lean: number;
+  /** Sinks him into his knees, 0..1. */
+  crouch: number;
+  /** Turns the spear in his fist, radians: negative lifts the point. */
+  spear: number;
+  /** A glint on the spear's point, 0..1. */
+  gleam: number;
+  /** Wind from ahead, in units of each cloth's own swing: lifts cape, hair and beard. */
+  gust: number;
+}
+export interface Striker {
+  /**
+   * The ground midway between his boots is the origin; he faces right, about 420 tall in the
+   * sheet's pixels. Driven home and upright, the spear's point lies 660 ahead and 226 up.
+   */
+  readonly scene: SceneNode;
+  act(beat: StrikeBeat, seconds: number): void;
+}
+/** Odin striking the giant: three traced poses over the same planted boots, one spear between them. */
+export function allfatherStriking(): Striker {
+  const spear = gungnir(),
+    // Gold under white, so it shows against the night and against the ice alike.
+    glint = new SceneNode().add(flat(sparkle(58), [250, 214, 134])).add(flat(sparkle(34), [255, 252, 240])),
+    body = new SceneNode().add(spear),
+    // Each drawing's fist, and how the spear lies in it.
+    drawings = (
+      [
+        ['coiled', odinCoiledParts, [coiledCape], [coiledTail, coiledBeard], [-55, -308], -0.464],
+        ['thrust', odinThrustParts, [thrustCape], [thrustHair], [258, -226], 0],
+        ['held', odinHeldParts, [thrustCape], [thrustHair], [234, -224], 0],
+      ] as const
+    ).map(([stance, parts, cape, locks, grip, level]) => {
+      const robe = new Flowing(parts.robe, cape),
+        hair = new Flowing(parts.hair, locks),
+        scene = new SceneNode().add(robe.scene).add(hair.scene).add(traced(parts.head));
+      body.add(scene);
+      return { stance, scene, robe, hair, grip, level };
+    });
+  body.add(glint);
+  const striker: Striker = {
+    scene: new SceneNode().add(body),
+    act(beat, seconds) {
+      for (const drawing of drawings) {
+        const shown = drawing.stance === beat.stance;
+        drawing.scene.opacity(shown ? 255 : 0);
+        if (!shown) continue;
+        const angle = drawing.level + beat.spear,
+          // The glint sits on the point but keeps upright, and swells as it brightens.
+          k = (0.55 + 0.45 * beat.gleam) * (1 + 0.07 * Math.sin(seconds * 9));
+        turn(spear, 0, 0, angle, drawing.grip[0], drawing.grip[1]);
+        glint.transform([
+          k,
+          0,
+          drawing.grip[0] + Math.cos(angle) * spearReach,
+          0,
+          k,
+          drawing.grip[1] + Math.sin(angle) * spearReach,
+          0,
+          0,
+          1,
+        ]);
+        drawing.robe.flutter(seconds, beat.gust);
+        drawing.hair.flutter(seconds, beat.gust);
+      }
+      body.transform([1 + 0.02 * beat.crouch, -beat.lean, 0, 0, 1 - 0.035 * beat.crouch, 0, 0, 0, 1]);
+      glint.opacity(alphaOf(beat.gleam));
+    },
+  };
+  striker.act({ stance: 'coiled', lean: 0, crouch: 0, spear: 0, gleam: 0, gust: 0 }, 0);
+  return striker;
+}
+
+export interface Guard {
+  /** Feet at the origin, facing right, in the sheet's pixels: about 800 tall, the spear's point 940 up. */
+  readonly scene: SceneNode;
+  /** Stirs the cloak; `gust` blows it back, in units of its own swing. */
+  flutter(seconds: number, gust?: number): void;
+}
+/** A brother standing guard with spear grounded and shield at his side: he does not strike. */
+export function brotherOnGuard(kind: 'slate' | 'ochre'): Guard {
+  const parts = kind === 'slate' ? slateGuardParts : ochreGuardParts,
+    cloak = new Flowing(parts.cloak, [guardCloak]);
+  return {
+    scene: new SceneNode().add(cloak.scene).add(traced(parts.body)),
+    flutter: (seconds, gust = 0) => cloak.flutter(seconds, gust),
+  };
+}
+
 /** A part that swings about a pivot. */
 interface Flap {
   node: SceneNode;
@@ -33,268 +330,11 @@ interface Flap {
   reach: number;
   phase: number;
 }
-
-/** Builds one traced path: absolute M, L, C and Z only, as the vectorizer writes them. */
-function tracedShape(d: string): ShapeNode {
-  const shape = new ShapeNode();
-  for (const [, command, body] of d.matchAll(/([MLCZ])([^MLCZ]*)/g)) {
-    const v = body.trim() ? body.trim().split(/\s+/).map(Number) : [];
-    if (command === 'M') shape.moveTo(v[0], v[1]);
-    else if (command === 'L') shape.lineTo(v[0], v[1]);
-    else if (command === 'C') shape.cubicTo(v[0], v[1], v[2], v[3], v[4], v[5]);
-    else shape.close();
-  }
-  return shape;
-}
-function traced(part: TracedPart, x = 0, y = 0): SceneNode {
-  const scene = new SceneNode();
-  for (const [fill, d, evenOdd] of part) {
-    const shape = tracedShape(d).fill(fill[0], fill[1], fill[2]);
-    scene.add(evenOdd ? shape.fillRule('evenOdd') : shape);
-  }
-  return scene.translate(x, y);
-}
-/** Places a traced part by its joint: scaled, turned, then moved there. Turning swings what hangs below it back. */
-function hang(node: SceneNode, x: number, y: number, radians: number, scale = 1): SceneNode {
-  const c = Math.cos(radians) * scale,
-    s = Math.sin(radians) * scale;
-  return node.transform([c, -s, x, s, c, y, 0, 0, 1]);
-}
-/** A hung part that keeps swinging about its joint. */
-interface Hinge {
-  node: SceneNode;
-  x: number;
-  y: number;
-  rest: number;
-  scale: number;
-  reach: number;
-  phase: number;
-}
-/**
- * A two-bone limb as ONE path, the way the game's own figures draw theirs: a single round-capped
- * stroke threaded through shoulder, elbow and hand (or hip, knee and ankle). The bones keep
- * their length and the middle joint always bends to the same side, so it can neither stretch
- * nor flip.
- */
-interface Limb {
-  /** Lengths of the two bones. */
-  upper: number;
-  lower: number;
-  /** Which side the middle joint bends to: +1 clockwise of the line from root to end. */
-  bend: 1 | -1;
-  width: number;
-  color: readonly [number, number, number];
-}
-function drawLimb(
-  shape: ShapeNode,
-  limb: Limb,
-  rootX: number,
-  rootY: number,
-  endX: number,
-  endY: number,
-): [number, number] {
-  const dx = endX - rootX,
-    dy = endY - rootY,
-    reach = Math.max(
-      Math.abs(limb.upper - limb.lower) + 1,
-      Math.min(limb.upper + limb.lower - 1, Math.hypot(dx, dy)),
-    ),
-    toward = Math.atan2(dy, dx),
-    // Law of cosines: the angle at the root between the line to the end and the first bone.
-    open = Math.acos((limb.upper ** 2 + reach ** 2 - limb.lower ** 2) / (2 * limb.upper * reach)),
-    way = toward + limb.bend * open,
-    midX = rootX + Math.cos(way) * limb.upper,
-    midY = rootY + Math.sin(way) * limb.upper,
-    tipX = rootX + Math.cos(toward) * reach,
-    tipY = rootY + Math.sin(toward) * reach;
-  threadCurve(shape.reset(), limbJoints(rootX, rootY, midX, midY, tipX, tipY, 0.35))
-    .strokeWidth(limb.width)
-    .strokeCap('round')
-    .strokeJoin('round')
-    .strokeFill(...limb.color);
-  return [tipX, tipY];
-}
-/** A leg and its boot. The boot stands flat on the ground under the ankle. */
-function leg(
-  scene: SceneNode,
-  limb: Limb,
-  hip: readonly [number, number],
-  ankle: readonly [number, number],
-  boot: readonly [number, number, number],
-): void {
-  const shape = new ShapeNode(),
-    [ax, ay] = drawLimb(shape, limb, hip[0], hip[1], ankle[0], ankle[1]),
-    r = limb.width * 0.56;
-  scene.add(shape).add(
-    flat(
-      [
-        pen(ax - r, ay - r * 0.6)
-          .curve([ax - r * 1.1, ay * 0.5], [ax - r * 1.2, -3])
-          .curve([ax - r * 1.1, 2], [ax - r * 0.5, 3])
-          .curve([ax + r * 1.2, 4], [ax + r * 2.3, 2])
-          .curve([ax + r * 2.6, -3], [ax + r * 2.1, -r * 0.8])
-          .curve([ax + r * 1.4, -r * 1.2], [ax + r * 1.05, ay * 0.5])
-          .curve([ax + r * 1.05, ay * 0.8], [ax + r, ay - r * 0.6])
-          .curve([ax, ay - r], [ax - r, ay - r * 0.6])
-          .close(),
-      ],
-      [...boot],
-    ),
-  );
-}
-/** What the spear arm needs: where it hangs and where the fist goes between draw and thrust. */
-interface ArmSpec {
-  shoulder: readonly [number, number];
-  limb: Limb;
-  /** The fist relative to the shoulder at full draw and at the thrust. */
-  drawn: readonly [number, number];
-  thrust: readonly [number, number];
-  /** How far the shaft runs behind and ahead of the fist. */
-  behind: number;
-  ahead: number;
-}
-/** The spear arm: one limb path from shoulder to fist, and the spear turning in that fist. */
-function spearArm(spec: ArmSpec): { nodes: SceneNode; aim(radians: number): void; glint: ShapeNode } {
-  const nodes = new SceneNode(),
-    spear = new SceneNode(),
-    arm = new ShapeNode(),
-    fist = new ShapeNode(),
-    girth = spec.limb.width,
-    tip = spec.ahead + 54,
-    glint = flat(
-      [lock(tip, 26, tip, -26, 14, 0), lock(tip - 26, 0, tip + 26, 0, 14, 0)],
-      [255, 250, 232],
-    ).opacity(0);
-  spear
-    .add(
-      stroke(
-        [
-          [-spec.behind, 0],
-          [-spec.behind / 3, 0],
-          [spec.ahead / 2, 0],
-          [spec.ahead, 0],
-        ],
-        girth * 0.24,
-        [138, 104, 72],
-      ),
-    )
-    .add(flat([lock(spec.ahead - 10, 0, spec.ahead + 64, 0, girth * 0.8, 0)], [233, 209, 183]))
-    .add(glint);
-  nodes.add(spear).add(arm).add(fist);
-  return {
-    nodes,
-    glint,
-    aim(radians) {
-      // `radians` runs from about -0.5 (drawn back) to about 0.25 (driven home).
-      const t = Math.max(0, Math.min(1, (radians + 0.5) / 0.75)),
-        [sx, sy] = spec.shoulder,
-        [hx, hy] = drawLimb(
-          arm,
-          spec.limb,
-          sx,
-          sy,
-          sx + spec.drawn[0] + (spec.thrust[0] - spec.drawn[0]) * t,
-          sy + spec.drawn[1] + (spec.thrust[1] - spec.drawn[1]) * t,
-        );
-      trace(fist.reset(), [oval(hx, hy, girth * 0.44, girth * 0.42)]).fill(234, 187, 165);
-      turn(spear, 0, 0, radians, hx, hy);
-    },
-  };
-}
-function fighter(scene: SceneNode, arm: ReturnType<typeof spearArm>, hinges: readonly Hinge[]): Fighter {
-  arm.aim(0);
-  return {
-    scene,
-    aim: (radians) => arm.aim(radians),
-    gleam: (amount) => arm.glint.opacity(Math.round(255 * Math.max(0, Math.min(1, amount)))),
-    flutter: (seconds) => {
-      for (const h of hinges)
-        hang(h.node, h.x, h.y, h.rest + h.reach * Math.sin(seconds * 2.6 + h.phase), h.scale);
-    },
-  };
-}
-const hinge = (
-  hinges: Hinge[],
-  part: TracedPart,
-  x: number,
-  y: number,
-  rest: number,
-  scale: number,
-  reach: number,
-  phase: number,
-): SceneNode => {
-  const node = hang(traced(part), x, y, rest, scale);
-  hinges.push({ node, x, y, rest, scale, reach, phase });
-  return node;
-};
-
-/**
- * A brother: head, torso, cloak and shield from the traced sheet; the legs and the spear arm
- * drawn as single limb paths. Feet at the origin, facing right, about 470 tall.
- */
-export function spearman(kind: 'slate' | 'ochre'): Fighter {
-  const parts = kind === 'slate' ? slateRigParts : ochreRigParts,
-    scene = new SceneNode(),
-    upper = new SceneNode(),
-    hinges: Hinge[] = [],
-    neck: [number, number] = [40, -330],
-    legs = { upper: 70, lower: 70, bend: -1, width: 44, color: [97, 99, 112] } as const,
-    boot = [88, 80, 78] as const,
-    arm = spearArm({
-      shoulder: [30, -304],
-      limb: { upper: 58, lower: 58, bend: 1, width: 40, color: [97, 99, 112] },
-      drawn: [-30, -24],
-      thrust: [104, 14],
-      behind: 190,
-      ahead: 250,
-    });
-  scene.add(hinge(hinges, parts.cloak, neck[0] - 6, neck[1] + 4, 0.5, 1, 0.05, 0));
-  leg(scene, { ...legs, color: [71, 70, 77] }, [-4, -128], [-112, -30], boot);
-  leg(scene, legs, [24, -128], [106, -30], boot);
-  upper
-    .add(hang(traced(parts.torso), neck[0], neck[1], 0.2))
-    .add(hang(traced(parts.head), neck[0] + 10, neck[1] + 6, 0.08))
-    .add(arm.nodes)
-    // The shield rides on the leading arm, in front of everything.
-    .add(traced(parts.shield, 128, -200));
-  scene.add(upper);
-  return fighter(scene, arm, hinges);
-}
-/**
- * Odin charging: head, robe, cape, hair and beard from the traced sheet; the legs and the spear
- * arm drawn as single limb paths. Feet at the origin, facing right, about 560 tall.
- */
-export function allfatherLunging(): Fighter {
-  const parts = odinRigParts,
-    scene = new SceneNode(),
-    hinges: Hinge[] = [],
-    neck: [number, number] = [120, -362],
-    legs = { upper: 92, lower: 92, bend: -1, width: 52, color: [74, 76, 92] } as const,
-    boot = [64, 63, 76] as const,
-    arm = spearArm({
-      shoulder: [98, -330],
-      limb: { upper: 88, lower: 88, bend: 1, width: 54, color: [54, 72, 123] },
-      drawn: [-44, -40],
-      thrust: [162, 16],
-      behind: 280,
-      ahead: 500,
-    });
-  scene.add(hinge(hinges, parts.cape, neck[0] - 8, neck[1], 1.05, 0.72, 0.05, 0.6));
-  leg(scene, { ...legs, color: [58, 60, 76] }, [4, -160], [-150, -34], boot);
-  leg(scene, legs, [38, -160], [150, -34], boot);
-  scene
-    .add(hang(traced(parts.robe), neck[0], neck[1], 0.5, 0.68))
-    .add(hinge(hinges, parts.hair, neck[0] - 30, neck[1] - 72, 0.1, 1, 0.08, 0.4))
-    .add(hang(traced(parts.head), neck[0] + 8, neck[1], 0.15))
-    .add(hinge(hinges, parts.beard, neck[0] + 62, neck[1] - 44, 0.5, 0.55, 0.06, 2))
-    .add(arm.nodes);
-  return fighter(scene, arm, hinges);
-}
 /**
  * Odin at rest, traced from the reference for the last panel: feet at the origin, about 440 tall,
  * facing left, hands at his sides, hair and cape lifting behind him.
  */
-export function allfatherStanding(): Fighter {
+export function allfatherStanding(): { scene: SceneNode; flutter(seconds: number): void } {
   const scene = new SceneNode(),
     cape = traced(odinStandingParts.cape),
     hair = traced(odinStandingParts.hair),
@@ -306,9 +346,6 @@ export function allfatherStanding(): Fighter {
   scene.add(cape).add(traced(odinStandingParts.body)).add(hair).add(traced(odinStandingParts.head));
   return {
     scene,
-    // He carries no spear here.
-    aim: () => {},
-    gleam: () => {},
     flutter: (seconds) => {
       for (const f of flaps) turn(f.node, f.x, f.y, f.reach * Math.sin(seconds * 2.6 + f.phase));
     },

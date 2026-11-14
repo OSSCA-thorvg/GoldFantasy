@@ -44,7 +44,7 @@ export interface RealmReward {
 export const realmRules = {
   /** Monsters beyond a gate are a tier above the ones that raid Midgard. */
   health: 1.6,
-  strength: 2,
+  strength: 1.8,
   /** Each floor down, monsters gain this share of their health and strength. */
   healthPerFloor: 0.3,
   strengthPerFloor: 0.2,
@@ -56,12 +56,12 @@ export const realmRules = {
   guardianWavePerFloor: 4,
   /** Monsters on a floor at the start: a base, more on each deeper floor and for every tile the gate lies from
    * the seat, never more than `mostMonsters`. */
-  floorMonsters: 55,
+  floorMonsters: 48,
   floorMonstersPerFloor: 12,
   floorMonstersPerTile: 0.12,
   mostMonsters: 90,
   /** Share of a floor's monsters each den keeps around it, against 2 in the heart and 1 in a plain chamber. */
-  denPack: 5,
+  denPack: 2,
   /** Dens on the first floor, one more each floor down, never more than `mostDens`. */
   dens: 2,
   mostDens: 4,
@@ -671,7 +671,8 @@ function advanceFoe(town: RealmTown, beast: Monster, party: Person[], dt: number
       bite();
     // It keeps its distance: backs off from whoever comes close, and closes in only to spit.
     const back = add(beast.position, scale(away, 1.2));
-    if (gap < rankRules.spitShy && town.grid.walkable(back)) {
+    // It backs off only within its own ground, so it never leads the party from room to room.
+    if (gap < rankRules.spitShy && town.grid.walkable(back) && distance(back, beast.home) < rankRules.spitRoam) {
       beast.path = [back];
       walkPath(beast, step);
     } else if (gap > rankRules.spitReach * 0.9)

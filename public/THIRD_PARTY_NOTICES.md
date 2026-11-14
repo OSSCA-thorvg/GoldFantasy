@@ -14,6 +14,8 @@ The opening Powered by ThorVG animation is supplied separately. See its [source 
 
 The game loads **DejaVu Sans** and **DejaVu Sans Bold** from `assets/native-fonts/`. The fonts retain the Bitstream Vera font license; DejaVu changes are in the public domain. See the [complete font notice](assets/native-fonts/DejaVuSans.LICENSE) and the [DejaVu project](https://dejavu-fonts.github.io/).
 
+Korean text uses **Noto Sans KR** and **Noto Sans KR Bold**, and the title lettering and combat numbers use **Cinzel**. Both are licensed under the SIL Open Font License, Version 1.1: see the [Noto Sans KR notice](assets/native-fonts/NotoSansKR.LICENSE) and the [Cinzel notice](licenses/Cinzel-OFL.txt).
+
 ## Lua extension interpreter
 
 The optional original HUD scripting extension uses **Lua 5.4.8**, compiled to WebAssembly. The game logic and interpreter bridge are TypeScript. Copyright © 1994–2025 Lua.org, PUC-Rio. Lua is distributed under its [MIT license](licenses/Lua-5.4.8.txt). See [Lua's license and copyright](https://www.lua.org/license.html).

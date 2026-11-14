@@ -154,7 +154,7 @@ export function inventoryTransferReason(this: Town, personId: number): string {
         b.kind === Structure.Granary) &&
       (distance(p.position, b.door()) <= 2.5 || (p.inside && distance(p.entrance, b.door()) < 0.05)),
   );
-  return storage ? '' : 'Move within 2.5 paces of your settlement storage';
+  return storage ? '' : 'Move closer to your settlement storage';
 }
 export function withdrawInventory(this: Town, personId: number, product: Product, quantity: number): boolean {
   if (this.inventoryTransferReason(personId) || !Number.isSafeInteger(quantity) || quantity <= 0)
@@ -282,6 +282,18 @@ export function finishCraftOrder(this: Town, p: Person): void {
   p.autoMode = true;
   p.activity = Activity.Idle;
   p.until = this.time;
+}
+/** Drops a resident's craft order. Nothing is paid until the item is done, so nothing is lost; the next in line takes the station. */
+export function cancelCraft(this: Town, personId: number): boolean {
+  const p = this.person(personId);
+  if (!p || p.health <= 0 || !canControl(p, this.controlFaction) || p.task !== Activity.Crafting || !p.craftItem)
+    return false;
+  const item = itemSpec(p.craftItem);
+  this.commanded();
+  this.finishCraftOrder(p);
+  if (item) this.notify(`${p.name} stopped making the ${item.name}`);
+  ++this.changes;
+  return true;
 }
 function stationValid(town: Town, p: Person, workshop: Building | null, item: ItemSpec | null): workshop is Building {
   return (

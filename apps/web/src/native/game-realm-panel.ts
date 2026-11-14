@@ -198,7 +198,7 @@ function partyFrame(app: GameHudApp, p: Person, r: Rect): void {
       : `Health ${Math.round(p.health * 100)}%`,
   ];
   if (p.woundDays > 0)
-    lines.push(`Wounded: health held below ${Math.round(combatRules.woundedHealth * 100)}% for ${Math.ceil(p.woundDays)} more ${Math.ceil(p.woundDays) === 1 ? 'day' : 'days'}`);
+    lines.push(`Wounded: health stays low for ${Math.ceil(p.woundDays)} more ${Math.ceil(p.woundDays) === 1 ? 'day' : 'days'}`);
   if (!downed && p.holding) lines.push('Holding position');
   if (!downed)
     for (const skill of skills)

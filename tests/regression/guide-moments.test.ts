@@ -165,13 +165,13 @@ describe('first-time moments', () => {
     const { town, people, h } = newGame();
     town.notices.length = 0;
     town.notify('Askr crafted Wooden axe');
-    town.notify('Wooden axe in hand · Fells a tree in 9 s (by hand 15 s)');
+    town.notify('Wooden axe in hand · Fells trees faster');
     h.step();
     expect(town.notices).toEqual([]);
     const craft = h.game.guide.log.find((e) => e.key === 'craft');
     expect(craft?.detail).toEqual(['Askr crafted Wooden axe']);
     expect(craft?.at).toEqual(people[0].position);
-    expect(h.game.guide.log.find((e) => e.key === 'equip')?.detail).toEqual(['Wooden axe in hand · Fells a tree in 9 s (by hand 15 s)']);
+    expect(h.game.guide.log.find((e) => e.key === 'equip')?.detail).toEqual(['Wooden axe in hand · Fells trees faster']);
     town.notify('Embla crafted Wooden pick');
     h.step();
     expect(town.notices).toEqual(['Embla crafted Wooden pick']);

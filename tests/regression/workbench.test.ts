@@ -157,6 +157,61 @@ describe('crafting at the bench', () => {
   });
 });
 
+describe('calling off a craft', () => {
+  const held = (town: Town, ids: number[]) => ({
+    stock: town.stock().clone(),
+    packs: ids.map((id) => JSON.stringify([town.person(id)!.inventory, town.person(id)!.carrying])),
+  });
+  it('drops the order while walking, waiting or working, spends nothing, and lets the next in line take the bench', () => {
+    const { town, bench, a, b } = fixture();
+    const before = held(town, [a.id, b.id]);
+    // Walking there.
+    expect(town.orderCraft(a.id, bench.id, 'wooden-axe')).toBe(true);
+    step(town);
+    expect(a.moving()).toBe(true);
+    expect(town.cancelCraft(a.id)).toBe(true);
+    expect([a.craftItem, a.craftWorkshop, a.task]).toEqual([null, -1, Activity.Idle]);
+    expect(town.notices.at(-1)).toBe('Asa stopped making the Wooden axe');
+    expect(town.cancelCraft(a.id)).toBe(false);
+    // Working, half done, with another waiting beside the bench.
+    expect(town.orderCraft(a.id, bench.id, 'wooden-axe')).toBe(true);
+    for (let i = 0; i < 400 && a.activity !== Activity.Crafting; ++i) step(town);
+    expect(town.orderCraft(b.id, bench.id, 'wooden-hoe')).toBe(true);
+    for (let i = 0; i < 2000 && a.craftProgress < itemSpec('wooden-axe')!.seconds / 2; ++i) step(town);
+    for (let i = 0; i < 400 && (b.moving() || b.activity !== Activity.Holding); ++i) step(town);
+    expect(town.craftingAt(bench.id)?.id).toBe(a.id);
+    expect(town.craftQueue(bench.id).map((p) => p.id)).toEqual([b.id]);
+    expect(town.cancelCraft(a.id)).toBe(true);
+    expect(held(town, [a.id, b.id])).toEqual(before);
+    expect(a.inventory.some((s) => s?.item === 'wooden-axe')).toBe(false);
+    // The one waiting steps up and works.
+    for (let i = 0; i < 200 && town.craftingAt(bench.id)?.id !== b.id; ++i) step(town);
+    expect(town.craftingAt(bench.id)?.id).toBe(b.id);
+    expect(town.craftQueue(bench.id)).toEqual([]);
+    // Waiting: the queue empties and the bench is free once the worker is called off too.
+    expect(town.orderCraft(a.id, bench.id, 'wooden-sword')).toBe(true);
+    for (let i = 0; i < 400 && (a.moving() || a.activity !== Activity.Holding); ++i) step(town);
+    expect(town.craftQueue(bench.id).map((p) => p.id)).toEqual([a.id]);
+    expect(town.cancelCraft(a.id)).toBe(true);
+    expect(town.craftQueue(bench.id)).toEqual([]);
+    expect(town.cancelCraft(b.id)).toBe(true);
+    expect(town.craftingAt(bench.id)).toBeNull();
+    expect(held(town, [a.id, b.id])).toEqual(before);
+  });
+  it('is only for a living resident of the player’s own faction with an order', () => {
+    const { town, bench, a, b } = fixture();
+    expect(town.cancelCraft(a.id)).toBe(false);
+    expect(town.cancelCraft(99)).toBe(false);
+    expect(town.orderCraft(a.id, bench.id, 'wooden-axe')).toBe(true);
+    expect(town.orderCraft(b.id, bench.id, 'wooden-hoe')).toBe(true);
+    b.faction = 1;
+    expect(town.cancelCraft(b.id)).toBe(false);
+    expect(b.craftItem).toBe('wooden-hoe');
+    a.health = 0;
+    expect(town.cancelCraft(a.id)).toBe(false);
+  });
+});
+
 describe('what gear is made of', () => {
   it('gives every tool, weapon and shield a material, and names the smith’s tools by theirs', () => {
     for (const item of itemCatalog) {

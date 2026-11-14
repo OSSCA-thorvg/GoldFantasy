@@ -64,7 +64,8 @@ function shaft(rig: ArmRig, reach: number): Point {
   const grip = point(rig.wrist.x + 0.6 * reach, rig.wrist.y - 0.8 * reach);
   return apply(rig.forearm!.matrix, apply(rig.hand!.matrix, grip));
 }
-const twoHanded = (tool: HeldTool | null): boolean => tool === 'axe' || tool === 'pickaxe' || tool === 'hoe';
+const twoHanded = (tool: HeldTool | null): boolean =>
+  tool === 'axe' || tool === 'pickaxe' || tool === 'hoe' || tool === 'shovel';
 /** Sets the body over feet that stay where they stand, the leading foot stepping into the blow. */
 export function stand(parts: PersonParts, pose: ActionPose, spread: number, step = 0): void {
   const tall = 1 - pose.crouch;

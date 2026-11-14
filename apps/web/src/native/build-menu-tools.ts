@@ -58,7 +58,7 @@ export const toolInfo: readonly ToolInfo[] = [
   { label: 'Tower', key: '', hint: '' },
   { label: 'Yard', key: '', hint: '' },
   { label: 'Runestone', key: '', hint: '' },
-  { label: 'Workbench', key: '', hint: 'Residents craft wooden tools and weapons here, one at a time.' },
+  { label: 'Workbench', key: '', hint: 'Residents craft wooden and stone tools and weapons here, one at a time.' },
 ];
 export interface BuildGroup {
   name: string;

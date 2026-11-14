@@ -20,6 +20,7 @@ import {
   workPose,
 } from '../../packages/native-renderer/src/action-motion';
 import {
+  animateCraft,
   animateFieldWork,
   animateProcessingWork,
   animateTrade,
@@ -83,6 +84,9 @@ const poses: [string, (parts: PersonParts, t: number) => void][] = [
   ['watering', (p, t) => animateFieldWork(p, true, t * 1.25)],
   ['sawing', (p, t) => animateProcessingWork(p, true, t)],
   ['chiselling', (p, t) => animateProcessingWork(p, false, t)],
+  ['paring a piece at the bench', (p, t) => animateCraft(p, 'knife', false, t, 0)],
+  ['beating a piece at the bench', (p, t) => animateCraft(p, 'hammer', true, t * hammerTiming.period, 0)],
+  ['holding up a finished piece', (p, t) => animateCraft(p, 'sword', false, 0, Math.max(0.02, t))],
   ['gathering', (p, t) => animateGather(p, Math.sin(Math.PI * t))],
   ['tending', (p, t) => animateTend(p, t)],
   ['eating', (p, t) => animateSip(p, t * 1.9, false)],
