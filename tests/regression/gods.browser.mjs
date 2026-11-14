@@ -106,7 +106,55 @@ async function boot(page, { width, height }) {
           game.render(width, height, this.now, simulate, dt, this.now);
           canvas.update().render();
           game.worldPresented(1);
-          game.takeCues();
+          for (const sound of game.takeCues()) this.heard.push({ sound, at: this.now });
+          if (this.heard.length > 400) this.heard.splice(0, this.heard.length - 400);
+        },
+        heard: [],
+        /**
+         * Mixes what the game asked to play from `since` on, offline through the game's own mixer, and returns the
+         * cue names, the clip groups they draw from and the loudness in tenths of a second.
+         */
+        async listen(since, only) {
+          const [{ SoundBoard }, { sounds }, { cueClips }, { Cue }] = await Promise.all([
+            import('/packages/native-audio/src/sound-board.ts'),
+            import('/packages/native-audio/src/sound-library.ts'),
+            import('/packages/native-audio/src/sound-catalog.ts'),
+            import('/packages/native-audio/src/sound-types.ts'),
+          ]);
+          await sounds.loadEffects();
+          const picked = this.heard.filter((h) => h.at >= since && (!only || only.includes(Cue[h.sound.cue])));
+          if (!picked.length) return { cues: [], groups: [], rms: [], loudest: 0 };
+          const board = new SoundBoard(),
+            rate = 44100,
+            start = picked[0].at,
+            rms = [];
+          let clock = 0,
+            window = [];
+          const render = (until) => {
+            while (clock < until) {
+              const n = 441, pcm = new Float32Array(n * 2);
+              board.render(pcm, n);
+              let sum = 0;
+              for (let i = 0; i < n * 2; ++i) sum += pcm[i] * pcm[i];
+              window.push(sum / (n * 2));
+              if (window.length === 10) {
+                rms.push(Math.sqrt(window.reduce((a, b) => a + b, 0) / 10));
+                window = [];
+              }
+              clock += n / rate;
+            }
+          };
+          for (const h of picked) {
+            render(h.at - start);
+            board.play(h.sound);
+          }
+          render(picked[picked.length - 1].at - start + 3);
+          return {
+            cues: picked.map((h) => ({ cue: Cue[h.sound.cue], at: +(h.at - start).toFixed(2), delay: +h.sound.delay.toFixed(2), gain: +h.sound.gain.toFixed(2) })),
+            groups: [...new Set(picked.flatMap((h) => cueClips[h.sound.cue] ?? []))],
+            rms: rms.map((v) => +v.toFixed(4)),
+            loudest: Math.max(...rms),
+          };
         },
         frames(count, dt = 0.05, simulate = false) {
           for (let i = 0; i < count; ++i) this.frame(dt, simulate);
@@ -411,6 +459,86 @@ try {
     await page.context().close();
   }
 
+  if (wanted('small')) {
+    // A small map whose land meets the edge on one side: the ring runs on past the edge there.
+    const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 }),
+      page = await context.newPage();
+    page.on('pageerror', (error) => report.errors.push(error.stack ?? error.message));
+    await page.goto(url);
+    await page.evaluate(async () => {
+      const [{ initializeWebCanvas }, { loadNativeFonts }, { WorldRenderer }, { Town }, { Traffic }, { Preview }, { Camera, project }, { Weather }, ring] = await Promise.all([
+        import('/apps/web/src/native/startup-canvas.ts'),
+        import('/packages/native-ui/src/index.ts'),
+        import('/packages/native-renderer/src/world-renderer.ts'),
+        import('/packages/engine/src/town.ts'),
+        import('/packages/engine/src/traffic.ts'),
+        import('/packages/engine/src/game-tools.ts'),
+        import('/packages/engine/src/geometry.ts'),
+        import('/packages/engine/src/climate.ts'),
+        import('/packages/native-renderer/src/serpent-ring.ts'),
+      ]);
+      const tvg = await initializeWebCanvas('gl'),
+        element = document.createElement('canvas');
+      document.body.append(element);
+      const canvas = new tvg.Canvas(element, { width: 1280, height: 800, enableDevicePixelRatio: false }),
+        renderer = new WorldRenderer(tvg),
+        town = new Town(5, 96),
+        traffic = new Traffic(5),
+        map = town.map();
+      await loadNativeFonts(tvg);
+      canvas.add(renderer.scene());
+      town.editHour(12);
+      town.scout(map.width() / 2, map.height() / 2, map.width() * 2);
+      for (let k = 0; k < 400; ++k) {
+        const intensity = 0.8 + k * 0.0005;
+        town.weather().force(Weather.Storm, intensity);
+        if (ring.serpentEmergence(map.seed(), Weather.Storm, intensity, ring.weatherSpell(town.weather().snapshot().peak)) > 0.5) break;
+      }
+      let now = 0,
+        camera = new Camera();
+      const frame = (dt = 0.1) => {
+        now += dt;
+        town.time += dt;
+        const preview = new Preview();
+        preview.zoom = camera.zoom;
+        renderer.update(town, traffic, camera, 1280, 800, now, preview, []);
+        canvas.update().render();
+      };
+      const r = ring.serpentRing(map),
+        parts = ring.serpentParts(r, map.seed(), ring.weatherSpell(town.weather().snapshot().peak));
+      window.small = {
+        whole() {
+          const c = project(map.width() / 2, map.height() / 2);
+          camera = new Camera(c.x, c.y + 60, 0.27);
+          for (let i = 0; i < 120; ++i) frame(0.25);
+        },
+        edge() {
+          const edge = parts.filter((p) => p.edge);
+          for (let i = 0; i < 400; ++i) {
+            const up = edge.find((p) => ring.partRise(p, r, 1, town.clock()) > 0.85);
+            if (up) {
+              const m = ring.partMiddle(up, r),
+                c = project(m.x, m.y);
+              camera = new Camera(c.x, c.y - 40, 0.6);
+              for (let k = 0; k < 6; ++k) frame(0.05);
+              return { edge: edge.length, at: m };
+            }
+            town.time += 0.5;
+          }
+          return { edge: edge.length, at: null };
+        },
+        count: () => ({ parts: parts.length, edge: parts.filter((p) => p.edge).length, beyond: [...r.beyond].filter(Boolean).length }),
+      };
+    });
+    report.checks.small = await page.evaluate(() => small.count());
+    await page.evaluate(() => small.whole());
+    await shot(page, 'serpent-08-small-map-ring');
+    report.checks.smallEdge = await page.evaluate(() => small.edge());
+    assert.ok(report.checks.smallEdge.at, 'a coil at the map edge rises');
+    await shot(page, 'serpent-09-small-map-edge');
+    await context.close();
+  }
+
   if (wanted('thor')) {
     const page = await open(1280, 800);
     // Arrival: the bolt and the guide card (the settlement's other first-time cards are heard first).
@@ -467,10 +595,47 @@ try {
     await shot(page, 'thor-13-night-hammer-strike');
     await ev(page, (p) => { probe.untilThrow(p); probe.look(probe.town.thor.position, 2); }, 0.1);
     await strip(page, 'thor-night-hunt', 84, () => { probe.town.advance(1 / 24); probe.frame(1 / 24); }, { x: 200, y: 120, width: 880, height: 560 });
+    // What is heard when he strikes at night: the frames run live, as in play, so the game asks for its sounds.
+    const hunted = await ev(page, () => {
+      const t = probe.town.thor.position;
+      probe.monsters(4, { x: t.x + 4, y: t.y + 3 });
+      probe.game.paused = false;
+      probe.look(t, 2);
+      const since = probe.now;
+      for (let i = 0; i < 160; ++i) probe.frame(1 / 30, true);
+      return { since, bolts: probe.town.thor.bolts.filter((b) => b.kind === 1).length };
+    });
+    report.sound = { nightStrike: await ev(page, (since) => probe.listen(since, ['ThunderCrack', 'ThunderStrike', 'ThunderClap', 'ThunderRumble', 'Crush']), hunted.since) };
+    assert.ok(report.sound.nightStrike.cues.some((c) => c.cue.startsWith('Thunder')), `thunder is asked for at a night strike: ${JSON.stringify(report.sound.nightStrike.cues)}`);
+    assert.ok(report.sound.nightStrike.loudest > 0.005, `the night strike is heard: ${report.sound.nightStrike.loudest}`);
     // A storm with Thor present: lightning far more often.
-    await ev(page, () => { probe.hour(13); probe.weather('Storm', 0.9); probe.town.thor.doing = 2; });
+    await ev(page, () => {
+      probe.hour(13);
+      probe.weather('Storm', 0.9);
+      probe.town.thor.doing = 2;
+      probe.town.beasts = [];
+      // The fight may have paused the game for a fallen resident; the storm is heard only while time runs.
+      for (const p of probe.town.folk) {
+        p.downedAt = -1;
+        p.health = Math.max(p.health, 0.8);
+      }
+      probe.game.paused = false;
+    });
     await ev(page, ([a]) => probe.look(a, 1.4), [sites.origin]);
-    await ev(page, () => probe.live(6));
+    const stormed = await ev(page, () => {
+      const since = probe.now;
+      let strikes = 0;
+      for (let i = 0; i < 30 * 25 && strikes < 2; ++i) {
+        const before = probe.game.renderer.strike;
+        probe.frame(1 / 30, true);
+        if (probe.game.renderer.strike && probe.game.renderer.strike !== before) ++strikes;
+      }
+      return { since, strikes, seconds: +(probe.now - since).toFixed(1), paused: probe.game.paused };
+    });
+    report.sound.storm = { ...stormed, ...(await ev(page, (since) => probe.listen(since, ['ThunderCrack', 'ThunderStrike', 'ThunderClap', 'ThunderRumble']), stormed.since)) };
+    assert.ok(stormed.strikes >= 1, 'lightning strikes in the storm while he is here');
+    assert.ok(report.sound.storm.loudest > 0.005, `the storm's thunder is heard: ${report.sound.storm.loudest}`);
+    await ev(page, () => probe.live(2));
     await ev(page, () => { probe.strike(); probe.frame(0.02); });
     await shot(page, 'thor-14-storm');
     report.checks.thor = await ev(page, () => probe.thor());
@@ -534,10 +699,23 @@ try {
   await browser?.close().catch(() => {});
   await server?.close().catch(() => {});
   await writeFile(`${output}/report.json`, JSON.stringify(report, null, 2));
+  // Before-and-after rows for the fixes after the first review; `before/` holds the pictures from before them.
+  const fixes = [
+    ['2. The night strike is the brightest thing at night', ['thor-13-night-hammer-strike.png', 'thor-12-night-hammer-flight.png', 'thor-night-hunt.gif']],
+    ['3. A brushed, forked bolt instead of a geometric zigzag', ['thor-01-arrival-bolt.png', 'thor-13-night-hammer-strike.png']],
+    ['4. A near-black silhouette against the lightning flash', ['serpent-02-coils-flash.png']],
+    ['5. The ring closes: the tail tip in the jaws', ['serpent-03-head-and-tail.png']],
+    ['6. A whole ring on a small map; past the edge where land meets it (top-down: loop, coils, head; cyan = coil at the edge)', [['ring-96-before.png', 'ring-96-after.png'], ['', 'serpent-08-small-map-ring.png'], ['', 'serpent-09-small-map-edge.png']]],
+    ['7. No lit ovals round the coils under the veil', ['serpent-01-coils-storm.png', 'serpent-05-ring-zoomed-out.png']],
+  ];
+  const cell = (src) => (src ? `<figure><img src="${src}" alt="${src}"><figcaption>${src}</figcaption></figure>` : '<figure></figure>');
+  const rows = fixes
+    .map(([title, pairs]) => `<h2>${title}</h2>${pairs.map((p) => `<div class="pair">${Array.isArray(p) ? cell(p[0]) + cell(p[1]) : cell(`before/${p}`) + cell(p)}</div>`).join('')}`)
+    .join('');
   const pics = [...report.shots.map((n) => `${n}.png`), ...report.gifs.map((n) => `${n}.gif`)];
   await writeFile(
     `${output}/index.html`,
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Thor and Jormungandr</title><style>body{margin:0;padding:16px;background:#14181c;color:#ddd;font:14px sans-serif}figure{display:inline-block;margin:8px;vertical-align:top}img{max-width:620px;display:block}figcaption{padding:4px 0}</style></head><body><h1>Thor and Jormungandr</h1><p>GPU: ${report.gpu ?? '?'} · frame cost ${JSON.stringify(report.cost)}</p>${pics.map((p) => `<figure><img src="${p}" alt="${p}"><figcaption>${p}</figcaption></figure>`).join('')}</body></html>`,
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Thor and Jormungandr</title><style>body{margin:0;padding:16px;background:#14181c;color:#ddd;font:14px sans-serif}figure{display:inline-block;margin:8px;vertical-align:top;min-width:200px}img{max-width:620px;display:block}figcaption{padding:4px 0}.pair{display:flex;flex-wrap:wrap}h2{font-size:16px;margin:24px 8px 0}</style></head><body><h1>Thor and Jormungandr</h1><p>GPU: ${report.gpu ?? '?'} · frame cost ${JSON.stringify(report.cost)}</p><p>Sound: ${JSON.stringify({ night: report.sound?.nightStrike && { cues: report.sound.nightStrike.cues.map((c) => c.cue), groups: report.sound.nightStrike.groups, loudest: report.sound.nightStrike.loudest }, storm: report.sound?.storm && { strikes: report.sound.storm.strikes, seconds: report.sound.storm.seconds, groups: report.sound.storm.groups, loudest: report.sound.storm.loudest } })}</p><h1>Before and after (left before, right after)</h1>${rows}<h1>Every picture</h1>${pics.map((p) => cell(p)).join('')}</body></html>`,
   );
   console.log(JSON.stringify({ passed: report.passed, errors: report.errors, cost: report.cost, checks: report.checks }, null, 2));
 }

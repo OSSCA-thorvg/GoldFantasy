@@ -4,7 +4,8 @@ import { distance, lerp, point, project, sub, type Point } from '../../engine/sr
 import { hash01 } from '../../engine/src/numeric';
 import { BoltKind, ThorDoing, thorRules, thorSettled, type ThorBolt } from '../../engine/src/thor-visit';
 import type { Town } from '../../engine/src/town';
-import { SceneNode, ShapeNode } from './paint';
+import { SceneNode, ShapeNode, type Matrix } from './paint';
+import { appendStrip, softDisc } from './vector-paint';
 import { DepthSlot, boxAt, inFront } from './combat-depth';
 import { registerPick } from './world-pick-registry';
 import type { WorldRendererState } from './world-renderer-state';
@@ -21,6 +22,9 @@ interface BoltArt {
   slot: DepthSlot;
   node: SceneNode;
   serial: bigint;
+  /** In the night veil's mask: the bolt itself and a flash of daylight on the ground round it. */
+  cut: SceneNode;
+  flash: ShapeNode;
 }
 interface Mark {
   node: SceneNode;
@@ -34,6 +38,9 @@ interface ThorArt {
   flying: SceneNode;
   bolts: BoltArt[];
   marks: Mark[];
+  /** Cuts through the night veil, held in its mask, so the strike is the brightest thing at night. */
+  light: SceneNode;
+  hammerLight: ShapeNode;
   seenBolt: bigint;
   facing: number;
   stride: number;
@@ -41,32 +48,50 @@ interface ThorArt {
   clock: number;
 }
 const arts = new WeakMap<WorldRendererState, ThorArt>();
-/** A jagged bolt, flat and two-toned: a slate edge round a pale core, ground at the origin. */
-function boltShape(seed: number, wide: number): SceneNode {
-  const points: Point[] = [point(0, 0)];
-  // Sharp turns: each kink swings across the line the bolt falls along.
-  for (let i = 1; i <= 9; ++i) {
-    const side = i % 2 ? 1 : -1,
-      x = side * (6 + hash01(seed, i, 1, 0x7a11) * 12) + (hash01(seed, i, 2, 0x7a11) - 0.5) * 10;
-    points.push(point(i === 9 ? 0 : x, -boltHeight * (i / 9) * (0.92 + hash01(seed, i, 3, 0x7a11) * 0.08)));
+/** Copies a shape's outline as a white cut for the night veil's mask. */
+const cutOf = (shape: ShapeNode): ShapeNode => {
+  const cut = new ShapeNode().fill(255, 255, 255);
+  cut.commands = shape.commands;
+  cut.pathVersion++;
+  return cut;
+};
+/**
+ * A bolt as the weather's lightning is drawn: a tapering brushed stroke falling in uneven steps, with one or
+ * two short forks, a pale-blue edge round a white core; ground at the origin. `cut` is its outline for the
+ * night veil's mask, so it is never dimmed.
+ */
+function boltShape(seed: number): { node: SceneNode; cut: SceneNode } {
+  const path: Point[] = [point((hash01(seed, 0, 0, 0x7a11) - 0.5) * 50, -boltHeight)],
+    roll = (i: number, k: number) => hash01(seed, i, k, 0x7a11);
+  let sway = 0;
+  // Uneven steps: some long falls, some short kinks.
+  const steps = [0.07, 0.12, 0.05, 0.1, 0.14, 0.06, 0.09, 0.13, 0.05, 0.11, 0.08].map((d, i) => d * (0.7 + roll(i, 1) * 0.6)),
+    total = steps.reduce((a, b) => a + b, 0);
+  let fell = 0;
+  for (let i = 0; i < steps.length; ++i) {
+    fell += steps[i] / total;
+    sway = sway * 0.55 + (roll(i, 2) - 0.5) * 34;
+    const start = path[0].x;
+    path.push(point(i === steps.length - 1 ? 0 : start * (1 - fell) + sway, -boltHeight * (1 - fell)));
   }
-  const ribbon = (width: number, tip: number) => {
-    const shape = new ShapeNode(),
-      left: Point[] = [],
-      right: Point[] = [];
-    points.forEach((p, i) => {
-      const w = tip + (width - tip) * (i / 9);
-      left.push(point(p.x - w, p.y));
-      right.push(point(p.x + w, p.y));
-    });
-    shape.moveTo(left[0].x, left[0].y);
-    for (const p of left.slice(1)) shape.lineTo(p.x, p.y);
-    for (const p of right.reverse()) shape.lineTo(p.x, p.y);
-    return shape.close();
-  };
-  const node = new SceneNode();
-  node.add(ribbon(5 * wide, 2 * wide).fill(92, 104, 146)).add(ribbon(2.6 * wide, 1 * wide).fill(250, 246, 226));
-  return node;
+  const outer = new ShapeNode(),
+    core = new ShapeNode();
+  appendStrip(outer, path, 1.6, 4.6);
+  appendStrip(core, path, 0.6, 2);
+  for (let k = 0; k < 1 + Math.floor(roll(k + 20, 3) * 2); ++k) {
+    const from = 3 + Math.floor(roll(k, 4) * 5),
+      side = roll(k, 5) < 0.5 ? -1 : 1,
+      fork: Point[] = [path[from]];
+    for (let i = 1; i <= 4; ++i) {
+      const last = fork[fork.length - 1];
+      fork.push(point(last.x + side * (6 + roll(k * 8 + i, 6) * 9), last.y + 9 + roll(k * 8 + i, 7) * 8));
+    }
+    appendStrip(outer, fork, 2.4, 0.4);
+    appendStrip(core, fork, 0.9, 0.2);
+  }
+  outer.fill(176, 190, 238);
+  core.fill(252, 250, 240);
+  return { node: new SceneNode().add(outer).add(core), cut: new SceneNode().add(cutOf(outer)) };
 }
 /** A scorch on the earth: a dark blot with pale cracks running out of it. */
 function scorchShape(seed: number): SceneNode {
@@ -97,18 +122,29 @@ function build(): ThorArt {
     flying = flyingHammer();
   slot.node.add(parts.node);
   hammer.node.add(flying);
+  const light = new SceneNode(),
+    hammerLight = softDisc(26, [255, 255, 255], 230),
+    bolts = [0, 1, 2].map((k) => {
+      const slot = new DepthSlot(`thor:bolt:${k}`),
+        { node, cut } = boltShape(k * 7 + 3),
+        flash = softDisc(130, [255, 255, 255], 255);
+      slot.node.add(node);
+      slot.node.opacity(0);
+      cut.opacity(0);
+      flash.opacity(0);
+      light.add(cut).add(flash);
+      return { slot, node, serial: -1n, cut, flash };
+    });
+  hammerLight.opacity(0);
+  light.add(hammerLight);
   return {
     parts,
     slot,
     hammer,
     flying,
-    bolts: [0, 1, 2].map((k) => {
-      const slot = new DepthSlot(`thor:bolt:${k}`),
-        node = boltShape(k * 7 + 3, 1);
-      slot.node.add(node);
-      slot.node.opacity(0);
-      return { slot, node, serial: -1n };
-    }),
+    bolts,
+    light,
+    hammerLight,
     marks: [0, 1, 2].map((k) => ({ node: scorchShape(k * 5 + 1), at: -1e9, where: point() })),
     seenBolt: 0n,
     facing: 1,
@@ -122,6 +158,13 @@ function hideAll(art: ThorArt): void {
   art.hammer.node.opacity(0);
   for (const bolt of art.bolts) bolt.slot.node.opacity(0);
   for (const mark of art.marks) mark.node.opacity(0);
+  art.light.opacity(0);
+}
+/** Keeps the cuts in the night veil's mask; the veil is rebuilt when lamps change, so they re-enter it. */
+function holdLight(s: WorldRendererState, art: ThorArt): void {
+  const lit = s.darkVeil?.masking?.paint;
+  if (lit instanceof SceneNode && !lit.children.includes(art.light)) lit.add(art.light);
+  art.light.opacity(255);
 }
 /** The bolts: a fresh one takes the next slot; each flickers out quickly and leaves a scorch. */
 function updateBolts(s: WorldRendererState, art: ThorArt, bolts: readonly ThorBolt[], now: number, sight: (p: Point) => boolean): boolean {
@@ -140,14 +183,26 @@ function updateBolts(s: WorldRendererState, art: ThorArt, bolts: readonly ThorBo
       age = bolt ? now - bolt.at : Infinity;
     // Two quick flashes, then gone.
     const on = bolt && age >= 0 && age < boltLife && !(age > 0.1 && age < 0.16) && sight(bolt.position);
+    // Daylight on the ground and on whoever stands near, fading fast after the bolt.
+    const flash = bolt && age >= 0 && age < 0.55 && sight(bolt.position) ? Math.min(1, (0.55 - age) / 0.35) : 0;
+    b.flash.opacity(Math.round(255 * flash));
+    if (bolt && flash > 0) {
+      const at = project(bolt.position.x, bolt.position.y),
+        size = bolt.kind === BoltKind.Hammer ? 1 : 1.4;
+      b.flash.transform([size, 0, at.x, 0, size * 0.5, at.y, 0, 0, 1]);
+    }
     if (!on) {
       b.slot.node.opacity(0);
+      b.cut.opacity(0);
       continue;
     }
     live = true;
     const at = project(bolt.position.x, bolt.position.y),
-      wide = bolt.kind === BoltKind.Hammer ? 0.8 : 1.3;
-    b.node.transform([wide, 0, at.x, 0, 1, at.y - 4, 0, 0, 1]);
+      wide = bolt.kind === BoltKind.Hammer ? 1 : 1.15,
+      place: Matrix = [wide, 0, at.x, 0, 1, at.y - 2, 0, 0, 1];
+    b.node.transform(place);
+    b.cut.transform(place);
+    b.cut.opacity(255);
     b.slot.node.opacity(255);
     b.slot.place(s, inFront(bolt.position), boxAt(at.x, at.y, { x0: -40, y0: -boltHeight - 10, x1: 40, y1: 8 }));
   }
@@ -174,6 +229,7 @@ function updateHammer(s: WorldRendererState, art: ThorArt, town: Town, now: numb
     age = now - release;
   if (thor.throwAt < 0 || age < 0 || age > out + back) {
     art.hammer.node.opacity(0);
+    art.hammerLight.opacity(0);
     return false;
   }
   const going = age < out,
@@ -190,6 +246,8 @@ function updateHammer(s: WorldRendererState, art: ThorArt, town: Town, now: numb
     c = Math.cos(spin),
     sn = Math.sin(spin);
   art.flying.transform([c, -sn, x, sn, c, y, 0, 0, 1]);
+  art.hammerLight.translate(x, y);
+  art.hammerLight.opacity(230);
   art.hammer.node.opacity(255);
   art.hammer.place(s, inFront(ground, 0.06), boxAt(x, y, { x0: -12, y0: -12, x1: 12, y1: 12 }));
   return true;
@@ -234,6 +292,7 @@ export function updateThor(s: WorldRendererState, town: Town): void {
     hideAll(art);
     return;
   }
+  holdLight(s, art);
   updateBolts(s, art, thor.bolts, now, sight);
   updateHammer(s, art, town, now);
   if (!thor.present || !sight(thor.position)) {

@@ -37,10 +37,12 @@ export interface ThorBolt {
 export const thorRules = {
   /** Residents the settlement needs, with a finished altar, before he first comes. */
   residents: 4,
-  /** Days he stays, and the least and most days between two visits. */
-  stay: 7,
-  gapLeast: 10,
-  gapMost: 20,
+  /** Nights he stays: he comes one morning and goes the morning after the last. */
+  stay: 3,
+  /** Days in a month of the calendar (TownState.daysPerMonth); he is away about that long, give or take. */
+  month: 5,
+  gapLeast: 4,
+  gapMost: 7,
   /** Time of day he comes down and sets off home. */
   arriveHour: f(0.3),
   /** Night strength at which he starts and stops hunting. */
@@ -318,6 +320,8 @@ export function advanceThor(this: ThorTown, dt: number): void {
   this.sky.stormChance = thor.present ? thorRules.storm : -1;
   if (thor.bolts.length && this.time - thor.bolts[0].at > 3) thor.bolts = thor.bolts.filter((b) => this.time - b.at < 3);
   if (!thor.present) {
+    // A save from when his visits were weeks apart waits no longer than the rhythm now allows.
+    if (thor.nextVisit > this.days + thorRules.gapMost) thor.nextVisit = this.days + thorRules.gapMost;
     if (thor.nextVisit < 0) {
       if (fire && called(this)) thor.nextVisit = this.days + 1;
       return;

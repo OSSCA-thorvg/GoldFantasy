@@ -37,6 +37,10 @@ interface PartArt {
   body?: SceneNode;
   detail?: SceneNode;
   foam?: SceneNode;
+  /** A copy drawn over the veil of known sea, so a body far out is not dimmed by distance: it is too big. */
+  lit?: { node: SceneNode; body: SceneNode; foam: SceneNode };
+  /** A near-black copy over the lightning flash: the body as a silhouette against the lit sea. */
+  shade?: SceneNode;
   shown: boolean;
   /** How far it was up at the last update. */
   rise: number;
@@ -62,7 +66,8 @@ function frame(part: SerpentPart, ring: SerpentRing): Omit<PartArt, 'node' | 'sh
     mid = { x: (a0.x + b0.x) / 2, y: (a0.y + b0.y) / 2 };
   // The waterline keeps the loop's heading across the screen, widened and never steeper than the tile rows.
   let hx = (b0.x - a0.x) / 2;
-  hx = (hx < 0 ? -1 : 1) * Math.max(Math.abs(hx), leastWidth / 2);
+  // The head part also holds the tail in front of its jaws, so it needs room for both.
+  hx = (hx < 0 ? -1 : 1) * Math.max(Math.abs(hx), (part.kind === SerpentPartKind.Head ? 250 : leastWidth) / 2);
   const hy = Math.max(-Math.abs(hx) * 0.5, Math.min(Math.abs(hx) * 0.5, (b0.y - a0.y) / 2)),
     a = { x: mid.x - hx, y: mid.y - hy },
     length = Math.hypot(hx, hy) * 2,
@@ -144,94 +149,107 @@ function foamAt(cuts: readonly number[], T: number): SceneNode {
   node.add(trough).add(foam);
   return node;
 }
-/** The neck rising from the water and the head at its top, looking along the loop. */
-function headArt(art: PartArt): void {
-  const L = art.length,
-    H = art.height,
-    T = 32,
-    steps = 12,
-    reach = Math.min(L * 0.35, 70),
-    spine = Array.from({ length: steps + 1 }, (_, i) => {
-      const s = i / steps;
-      // Up out of the water, then bending forward under the head.
-      return { x: reach * s * s, y: -H * (2 * s - s * s) };
-    }),
-    normal = (i: number) => {
-      const p = spine[Math.max(0, i - 1)],
-        q = spine[Math.min(steps, i + 1)],
-        len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
-      return { x: -(q.y - p.y) / len, y: (q.x - p.x) / len };
-    },
-    side = (sign: number, width: number) =>
+/** Where the neck rises, the head looks and the tail ends, in a head part's own frame: one shape of the
+ * closed ring, so the tail tip always sits just in front of the jaws however wide the part is drawn. */
+export function headLayout(length: number, height: number) {
+  const base = { x: length * 0.08, y: 0 },
+    top = { x: base.x + Math.min(length * 0.22, 64), y: -height },
+    snout = { x: top.x + 56, y: top.y - 2 };
+  return { base, top, snout, tip: { x: snout.x + 5, y: snout.y + 3 }, tail: { x: length - 14, y: 0 } };
+}
+/** A tapering band of width `from` to `to` along `spine`. */
+function band(shape: ShapeNode, spine: readonly Point[], from: number, to: number): ShapeNode {
+  const n = spine.length - 1,
+    side = (sign: number) =>
       spine.map((p, i) => {
-        const n = normal(i),
-          w = (width / 2) * (1 - 0.25 * (i / steps));
-        return { x: p.x + n.x * w * sign, y: p.y + n.y * w * sign };
+        const q = spine[Math.min(n, i + 1)],
+          r = spine[Math.max(0, i - 1)],
+          len = Math.hypot(q.x - r.x, q.y - r.y) || 1,
+          w = (from + (to - from) * (i / n)) / 2;
+        return { x: p.x - ((q.y - r.y) / len) * w * sign, y: p.y + ((q.x - r.x) / len) * w * sign };
       });
+  return outline(shape, side(1), side(-1));
+}
+const cubic = (a: Point, b: Point, c: Point, d: Point, steps = 14): Point[] =>
+  Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps,
+      u = 1 - t;
+    return {
+      x: u * u * u * a.x + 3 * u * u * t * b.x + 3 * u * t * t * c.x + t * t * t * d.x,
+      y: u * u * u * a.y + 3 * u * u * t * b.y + 3 * u * t * t * c.y + t * t * t * d.y,
+    };
+  });
+/** The neck rising from the water, the head looking along the loop, and the tail lifting into its jaws. */
+function headArt(art: PartArt): void {
+  const T = 32,
+    { base, top, snout, tip, tail } = headLayout(art.length, art.height),
+    neck = cubic(base, { x: base.x, y: top.y * 0.7 }, { x: top.x - 30, y: top.y }, top, 12),
+    tailSpine = cubic(tail, { x: tail.x, y: top.y * 0.75 }, { x: tip.x + 46, y: tip.y - 24 }, tip, 14);
   const body = new SceneNode(),
     detail = new SceneNode(),
-    { x, y } = spine[steps],
-    head = fill(scales.body);
-  body.add(outline(fill(scales.body), side(-1, T), side(1, T)));
+    { x, y } = top;
+  body.add(band(fill(scales.body), neck, T, T * 0.75));
+  body.add(band(fill(scales.body), tailSpine, T * 0.8, 2));
+  const head = fill(scales.body);
   // A long flat head, the snout reaching ahead along the loop.
   head
     .moveTo(x - 14, y - 10)
-    .cubicTo(x + 6, y - 26, x + 40, y - 18, x + 56, y - 2)
-    .cubicTo(x + 52, y + 7, x + 22, y + 13, x - 10, y + 14)
+    .cubicTo(x + 6, y - 26, x + 40, y - 18, snout.x, snout.y)
+    .cubicTo(snout.x - 4, y + 7, x + 22, y + 13, x - 10, y + 14)
     .close();
   body.add(head);
-  detail.add(outline(fill(scales.belly), side(1, T), side(1, T * 0.4)));
+  detail.add(band(fill(scales.belly), neck.map((p) => ({ x: p.x + 6, y: p.y + 2 })), T * 0.35, T * 0.25));
   const shade = fill(scales.shade);
-  // The jaw, shut on the tail in front of it.
-  shade.moveTo(x - 6, y + 5).lineTo(x + 54, y).lineTo(x + 50, y + 6).cubicTo(x + 26, y + 12, x + 8, y + 14, x - 8, y + 14).close();
-  // Horns swept back and a fin down the neck.
+  // The jaw, shut on the tail's tip.
+  shade.moveTo(x - 6, y + 5).lineTo(snout.x - 2, snout.y + 2).lineTo(snout.x - 6, snout.y + 8).cubicTo(x + 26, y + 12, x + 8, y + 14, x - 8, y + 14).close();
+  // Horns swept back, a fin down the neck and a fin on the tail.
   shade.moveTo(x - 12, y - 9).lineTo(x - 36, y - 24).lineTo(x - 6, y - 16).close();
   shade.moveTo(x - 2, y - 16).lineTo(x - 18, y - 38).lineTo(x + 8, y - 20).close();
-  for (let i = 3; i < steps - 1; i += 2) {
-    const p = side(-1, T)[i],
-      n = normal(i);
-    shade.moveTo(p.x - n.x * 2, p.y - n.y * 2 - 4).lineTo(p.x - n.x * 12, p.y - n.y * 12).lineTo(p.x - n.x * 2, p.y - n.y * 2 + 4).close();
+  for (let i = 3; i < 11; i += 2) {
+    const p = neck[i];
+    shade.moveTo(p.x - 12, p.y - 2).lineTo(p.x - 24, p.y - 6).lineTo(p.x - 13, p.y + 6).close();
+  }
+  for (let i = 3; i < 10; i += 3) {
+    const p = tailSpine[i];
+    shade.moveTo(p.x - 4, p.y - 8).lineTo(p.x + 4, p.y - 20).lineTo(p.x + 8, p.y - 7).close();
   }
   detail.add(shade);
   detail.add(fill([16, 18, 20]).appendCircle(x + 18, y - 10, 3.2, 3.2));
   art.body = body;
   art.detail = detail;
-  art.foam = foamAt([-T * 0.5, T * 0.5], T);
+  art.foam = foamAt([base.x - T * 0.5, base.x + T * 0.5, tail.x - T * 0.4, tail.x + T * 0.4], T);
 }
-/** The tail lifting out of the water toward the head's jaws, thinning to a finned tip. */
-function tailArt(art: PartArt): void {
-  const L = art.length,
-    H = art.height * 0.8,
-    T = 24,
-    steps = 12,
-    spine = Array.from({ length: steps + 1 }, (_, i) => {
-      const s = i / steps;
-      return { x: L - L * 0.85 * s, y: -H * Math.sin(Math.PI * 0.62 * s) };
-    }),
-    side = (sign: number) =>
-      spine.map((p, i) => {
-        const q = spine[Math.min(steps, i + 1)],
-          r = spine[Math.max(0, i - 1)],
-          len = Math.hypot(q.x - r.x, q.y - r.y) || 1,
-          w = (T / 2) * (1 - 0.92 * (i / steps));
-        return { x: p.x - ((q.y - r.y) / len) * w * sign, y: p.y + ((q.x - r.x) / len) * w * sign };
-      });
-  const body = new SceneNode(),
-    detail = new SceneNode(),
-    tip = spine[steps];
-  body.add(outline(fill(scales.body), side(1), side(-1)));
-  const fin = fill(scales.shade);
-  fin.moveTo(tip.x + 6, tip.y).lineTo(tip.x - 12, tip.y - 14).lineTo(tip.x - 4, tip.y + 2).lineTo(tip.x - 14, tip.y + 12).close();
-  detail.add(fin);
-  art.body = body;
-  art.detail = detail;
-  art.foam = foamAt([L - T * 0.5, L + T * 0.5], T);
+/** Copies every shape under `from`, sharing their outlines, in `color` or, without one, in their own colours. */
+function copyShapes(from: SceneNode, color?: readonly number[]): SceneNode {
+  const out = new SceneNode();
+  for (const child of from.children) {
+    if (child instanceof SceneNode) out.add(copyShapes(child, color));
+    else if (child instanceof ShapeNode) {
+      const copy = new ShapeNode();
+      copy.commands = child.commands;
+      copy.pathVersion++;
+      if (color) copy.fill(color[0], color[1], color[2]);
+      else {
+        if (child.color) copy.fill(...child.color);
+        if (child.strokeColor) copy.strokeWidth(child.width ?? 1).strokeFill(...child.strokeColor).strokeCap(child.cap ?? 'butt');
+      }
+      out.add(copy);
+    }
+  }
+  return out;
 }
-function buildPart(art: PartArt): void {
+function buildPart(s: WorldRendererState, art: PartArt): void {
   if (art.part.kind === SerpentPartKind.Head) headArt(art);
-  else if (art.part.kind === SerpentPartKind.Tail) tailArt(art);
   else coilArt(art);
   art.node.add(art.foam!).add(art.body!).add(art.detail!);
+  const body = new SceneNode().add(copyShapes(art.body!)).add(copyShapes(art.detail!)),
+    foam = copyShapes(art.foam!),
+    lit = new SceneNode().add(foam).add(body);
+  art.lit = { node: lit, body, foam };
+  art.shade = new SceneNode().add(copyShapes(art.body!, [10, 16, 20])).add(copyShapes(art.detail!, [10, 16, 20]));
+  for (const node of [lit, art.shade]) node.opacity(0);
+  s.serpentLit.add(lit);
+  s.serpentShade.add(art.shade);
 }
 function prepare(s: WorldRendererState, town: Town, art: SerpentArt | undefined, spell: number): SerpentArt {
   const map = town.map(),
@@ -241,6 +259,8 @@ function prepare(s: WorldRendererState, town: Town, art: SerpentArt | undefined,
   const ring = serpentRing(map, realm),
     parts = ring ? serpentParts(ring, map.seed(), spell) : [];
   s.serpent.remove();
+  s.serpentLit.remove();
+  s.serpentShade.remove();
   const next: SerpentArt = {
     key,
     spell,
@@ -308,11 +328,11 @@ export function updateSerpent(s: WorldRendererState, town: Town, seconds: number
       rise = box.w > 0 && box.h > 0 ? partRise(p.part, art.ring, art.emergence, clock) : 0;
     p.rise = rise;
     if (rise < 0.03) {
-      if (p.shown) p.node.opacity(0);
+      if (p.shown) for (const node of [p.node, p.lit!.node, p.shade!]) node.opacity(0);
       p.shown = false;
       continue;
     }
-    if (!p.body) buildPart(p);
+    if (!p.body) buildPart(s, p);
     // A slow sway along the waterline with the swell.
     const sway = Math.sin(clock * 0.4 + p.part.phase * 6) * 5,
       ax = p.a.x + p.dx * sway,
@@ -320,29 +340,22 @@ export function updateSerpent(s: WorldRendererState, town: Town, seconds: number
       k = 0.45 + 0.55 * rise,
       shear: Matrix = [p.dx, 0, ax, p.dy, k, ay, 0, 0, 1],
       flat: Matrix = [p.dx, 0, ax, p.dy, 1, ay, 0, 0, 1];
+    const shown = Math.round(255 * Math.min(1, rise * 2.5)),
+      lit = p.lit!;
     p.body!.transform(shear);
     p.detail!.transform(shear);
     p.foam!.transform(flat);
-    p.detail!.opacity(Math.round(255 * (1 - flash)));
-    p.foam!.opacity(Math.round(255 * Math.min(1, rise * 1.5) * (1 - flash * 0.8)));
-    p.node.opacity(Math.round(255 * Math.min(1, rise * 2.5)));
+    p.foam!.opacity(Math.round(255 * Math.min(1, rise * 1.5)));
+    p.node.opacity(shown);
+    lit.body.transform(shear);
+    lit.foam.transform(flat);
+    lit.foam.opacity(Math.round(255 * Math.min(1, rise * 1.5)));
+    // Over known sea the copy shows it undimmed by day; by night it fades and the veiled body is what is seen.
+    const known = p.part.edge || town.map().revealed(partMiddle(p.part, art.ring));
+    lit.node.opacity(known ? Math.round(shown * (1 - 0.85 * town.climate().night)) : 0);
+    p.shade!.transform(shear);
+    // Black against the flash for as long as it lasts.
+    p.shade!.opacity(flash > 0.08 ? Math.round(Math.min(1, flash * 2) * Math.min(1, rise * 2.5) * 240) : 0);
     p.shown = true;
   }
-}
-/**
- * A part well out of the water shows through the veil over sea the player knows, as the volcano's fire does:
- * it is far too big to be hidden by distance. Only sea already explored is lit; nothing new is revealed.
- */
-export function serpentSights(s: WorldRendererState, town: Town): { center: Point; radius: number }[] {
-  const art = arts.get(s);
-  if (!art?.ring || art.emergence <= 0 || !s.serpent.alpha) return [];
-  const out: { center: Point; radius: number }[] = [];
-  for (const p of art.parts) {
-    if (!p.shown || p.rise < 0.12) continue;
-    const mid = partMiddle(p.part, art.ring);
-    if (!town.map().revealed(mid)) continue;
-    // Two steps as the part rises: each change redraws the whole veil, so it must change seldom.
-    out.push({ center: { x: mid.x - 1.2, y: mid.y - 1.2 }, radius: p.rise < 0.45 ? 2.5 : 4.5 });
-  }
-  return out;
 }

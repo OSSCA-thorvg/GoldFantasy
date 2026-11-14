@@ -26,7 +26,7 @@ import {
   SerpentPartKind,
   weatherSpell,
 } from '../../packages/native-renderer/src/serpent-ring';
-import { serpentSights, updateSerpent } from '../../packages/native-renderer/src/world-serpent';
+import { headLayout, updateSerpent } from '../../packages/native-renderer/src/world-serpent';
 import { WorldRendererState } from '../../packages/native-renderer/src/world-renderer-state';
 import { pickSource } from '../../packages/native-renderer/src/world-pick-registry';
 import { SceneNode, type PaintNode } from '../../packages/native-renderer/src/paint';
@@ -114,13 +114,36 @@ describe('Thor comes to Midgard', () => {
     expect(town.thor.nextVisit - town.days).toBeGreaterThanOrEqual(thorRules.gapLeast - 1);
     expect(town.thor.nextVisit - town.days).toBeLessThanOrEqual(thorRules.gapMost);
   });
+  it('stays three nights and is away about a month of the calendar, and an older save waits no longer', () => {
+    expect(thorRules.stay).toBe(3);
+    expect(thorRules.month).toBe(Town.daysPerMonth);
+    expect(thorRules.gapLeast).toBeLessThanOrEqual(thorRules.month);
+    expect(thorRules.gapMost).toBeGreaterThanOrEqual(thorRules.month);
+    const town = arrived(settlement()),
+      came = town.thor.arrivedDay;
+    let nights = 0,
+      dark = false;
+    run(town, day * 5, () => {
+      const night = town.thor.present && town.thor.doing === ThorDoing.Hunting;
+      if (night && !dark) ++nights;
+      dark = night;
+    });
+    expect(nights).toBe(3);
+    expect(town.notices).toContain('Thor leaves Midgard');
+    expect(town.thor.present).toBe(false);
+    expect(town.thor.nextVisit - came).toBeLessThanOrEqual(thorRules.stay + 1 + thorRules.gapMost);
+    // A version-18 save from when visits were weeks apart.
+    town.thor.nextVisit = town.days + 20;
+    run(town, 1);
+    expect(town.thor.nextVisit).toBeLessThanOrEqual(town.days + thorRules.gapMost);
+  });
   it('enjoys the settlement by day in several ways and hunts only by night', () => {
     const town = arrived(settlement());
     town.placed.push(new Building(2, Structure.Tavern, point(15, 24), 0, 0));
     town.nextId = 3;
     const byDay = new Set<ThorDoing>(),
       byNight = new Set<ThorDoing>();
-    run(town, day * 4, () => {
+    run(town, day * 2.5, () => {
       const night = town.climate().night;
       if (night < 0.05) byDay.add(town.thor.doing);
       if (night > 0.95) byNight.add(town.thor.doing);
@@ -200,7 +223,7 @@ describe('Thor comes to Midgard', () => {
     expect(strikes(Weather.Storm, 3)).toBeGreaterThan(strikes(Weather.Storm, 1) * 2);
     expect(strikes(Weather.Clear, 3)).toBe(0);
     expect(strikes(Weather.Cloudy, 3)).toBe(0);
-    run(town, day * 9);
+    run(town, day * thorRules.stay);
     expect(town.thor.present).toBe(false);
     expect(thunderFactor(town)).toBe(1);
   });
@@ -320,19 +343,47 @@ describe('Jormungandr in the sea', () => {
     expect(parts.filter((p) => p.kind === SerpentPartKind.Coil).length).toBeGreaterThan(4);
     for (const part of parts)
       for (let i = part.from; i <= part.to; ++i) {
-        const p = ring.points[((i % n) + n) % n];
-        expect(Math.min(...land.map((l) => distance(l, p)))).toBeGreaterThan(serpentRules.clearance - 1.5);
-        expect(p.x).toBeGreaterThan(serpentRules.edge - 0.5);
-        expect(p.y).toBeLessThan(map.height() - serpentRules.edge + 0.5);
+        const p = ring.points[((i % n) + n) % n],
+          onMap = p.x >= 0 && p.y >= 0 && p.x < map.width() && p.y < map.height();
+        // Past the map's edge only an edge coil runs on, out of the picture.
+        if (!onMap) {
+          expect(part.edge).toBe(true);
+          continue;
+        }
+        expect(Math.min(...land.map((l) => distance(l, p)))).toBeGreaterThan(serpentRules.least - 1);
+        if (!part.edge) expect(Math.min(p.x, p.y, map.width() - p.x, map.height() - p.y)).toBeGreaterThan(serpentRules.edge - 0.5);
         if (realm) expect(inArea({ x: realm.x - 3, y: realm.y - 3, size: realm.size + 6 }, p)).toBe(false);
         // What rises above it on screen is open sea too: the tiles behind it, up to its height.
-        for (let k = 1; k <= 3; ++k) expect(map.at(Math.floor(p.x) - k, Math.floor(p.y) - k).terrain).toBe(Terrain.Sea);
+        for (let k = 1; k <= 3; ++k) {
+          const x = Math.floor(p.x) - k,
+            y = Math.floor(p.y) - k;
+          if (map.inside(x, y)) expect(map.at(x, y).terrain).toBe(Terrain.Sea);
+        }
       }
-    // The parts go all the way round the land's middle.
+    // The body goes round the land: all four sides hold a part, an edge coil standing where land meets the edge.
     const middle = land.reduce((a, b) => ({ x: a.x + b.x / land.length, y: a.y + b.y / land.length }), { x: 0, y: 0 }),
       sides = new Set(parts.map((p) => Math.floor(((Math.atan2(partMiddle(p, ring).y - middle.y, partMiddle(p, ring).x - middle.x) + Math.PI) / (2 * Math.PI)) * 4) % 4));
-    // This small map's land runs to the edge on one side; the full-size map has sea all round.
-    expect(sides.size).toBeGreaterThanOrEqual(3);
+    expect(sides.size).toBe(4);
+    expect(parts.some((p) => p.edge)).toBe(true);
+    // Every gap where the loop leaves the map has a coil at the edge on at least one side of it.
+    for (let i = 0; i < n; ++i) {
+      if (ring.beyond[i] || !ring.beyond[(i + 1) % n]) continue;
+      expect(parts.some((p) => p.edge && Math.abs(((((p.from + p.to) >> 1) - i) % n + n) % n) < 12 || Math.abs(((i - ((p.from + p.to) >> 1)) % n + n) % n) < 12)).toBe(true);
+    }
+  });
+  it('closes the ring in one part: wherever the head rises, the tail tip is in its jaws', () => {
+    const ring = serpentRing(map)!;
+    for (const spell of [1, 2, 3, 40, 500]) {
+      const heads = serpentParts(ring, map.seed(), spell).filter((p) => p.kind === SerpentPartKind.Head);
+      expect(heads).toHaveLength(1);
+    }
+    for (const length of [250, 300, 420, 600])
+      for (const height of [84, 96]) {
+        const { snout, tip, base, tail } = headLayout(length, height);
+        expect(distance(snout, tip)).toBeLessThan(8);
+        expect(tail.x).toBeGreaterThan(tip.x + 20);
+        expect(base.x).toBeLessThan(snout.x);
+      }
   });
   it('swells along the loop: parts rise and sink in turn while it is up', () => {
     const ring = serpentRing(map)!,
@@ -381,8 +432,9 @@ describe('Jormungandr in the sea', () => {
       if (node instanceof SceneNode) node.children.forEach(walk);
     };
     walk(s.serpent);
-    // Sighted only over sea the player knows.
-    expect(serpentSights(s, { map: () => ({ revealed: () => false }) } as unknown as Town)).toEqual([]);
+    // Known sea shows it through a copy over the veil: no lit patch round it, nothing cut in the fog.
+    expect(s.fog.masking).toBeUndefined();
+    expect(s.serpentLit.children.length).toBe(s.serpent.children.filter((c) => c instanceof SceneNode && c.children.length).length);
     // Clear skies again: it sinks and the layer goes still.
     for (let t = 0; t < 80; ++t) {
       clock += 0.5;

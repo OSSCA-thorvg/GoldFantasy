@@ -8,8 +8,10 @@ import { Terrain } from '../../engine/src/world-types';
 import type { WorldMap } from '../../engine/src/world-map';
 
 export const serpentRules = {
-  /** Least tiles of open sea between the body and any land, beach or shoal. */
+  /** Tiles of open sea the loop keeps from any land, beach or shoal where the sea is wide enough, and the least
+   * it ever keeps where the sea between the land and the map's edge is narrower. */
   clearance: 7,
+  least: 4.5,
   /** Tiles kept clear of the map's edge and round the square where a world beyond a gate rises. */
   edge: 3,
   gateMargin: 5,
@@ -28,11 +30,16 @@ export interface SerpentRing {
   points: Point[];
   /** 1 where the body may break the surface. */
   open: Uint8Array;
+  /** 1 where the loop runs past the map's edge, where the land meets the edge with no sea to hold it. */
+  beyond: Uint8Array;
+  /** The map's size in tiles, to tell where the loop crosses its edge. */
+  width: number;
+  height: number;
 }
 export enum SerpentPartKind {
   Coil,
+  /** The neck and head, with the tail rising in front of its jaws: the ring closes in one part. */
   Head,
-  Tail,
 }
 export interface SerpentPart {
   kind: SerpentPartKind;
@@ -40,6 +47,8 @@ export interface SerpentPart {
   from: number;
   to: number;
   phase: number;
+  /** Runs past the map's edge: drawn cut off by the edge, as if going on beyond it. */
+  edge?: boolean;
 }
 const rings = new WeakMap<WorldMap, { key: string; ring: SerpentRing | null }>();
 /** Tiles to the nearest land, counting the gate square as open sea (a raised world beyond a gate is no coast). */
@@ -109,40 +118,40 @@ function traceRing(map: WorldMap, realm: RealmArea | null): SerpentRing | null {
   const center = point(cx / count, cy / count),
     rays = 180,
     reach: number[] = [],
-    valid: boolean[] = [];
+    past: boolean[] = [];
   for (let k = 0; k < rays; ++k) {
     const a = (k / rays) * Math.PI * 2,
       dx = Math.cos(a),
-      dy = Math.sin(a);
+      dy = Math.sin(a),
+      at = (t: number) => point(center.x + dx * t, center.y + dy * t);
     let last = 0,
-      found = NaN;
+      exit = 0;
     for (let t = 0; t < w + h; t += 0.5) {
-      const p = point(center.x + dx * t, center.y + dy * t);
+      const p = at(t);
       if (p.x < 0 || p.y < 0 || p.x >= w || p.y >= h) break;
+      exit = t;
       if (distAt(p) === 0) last = t;
     }
+    // The first point that far out to sea; else the widest sea the ray crosses; else past the edge.
+    let found = NaN,
+      best = -1,
+      bestAt = NaN;
     for (let t = last; t < w + h; t += 0.5) {
-      const p = point(center.x + dx * t, center.y + dy * t);
+      const p = at(t);
       if (!inside(p)) break;
-      if (distAt(p) >= clearance + 1) {
+      const d = distAt(p);
+      if (d >= clearance + 1) {
         found = t;
         break;
       }
+      if (d > best) {
+        best = d;
+        bestAt = t;
+      }
     }
-    valid.push(!Number.isNaN(found));
-    reach.push(found);
-  }
-  if (valid.filter(Boolean).length < rays / 3) return null;
-  // Gaps take the reach of the rays on either side, so the loop stays whole; no part surfaces there.
-  for (let k = 0; k < rays; ++k) {
-    if (valid[k]) continue;
-    let back = 1,
-      ahead = 1;
-    while (!valid[(k - back + rays) % rays]) ++back;
-    while (!valid[(k + ahead) % rays]) ++ahead;
-    const a = reach[(k - back + rays) % rays],
-      b = reach[(k + ahead) % rays];
-    reach[k] = a + ((b - a) * back) / (back + ahead);
+    if (Number.isNaN(found) && best >= serpentRules.least + 0.5) found = bestAt;
+    past.push(Number.isNaN(found));
+    reach.push(Number.isNaN(found) ? exit + 5 : found);
   }
   // Smoothed outward only, so a headland never pulls the loop in toward its shore.
   const smooth = reach.map((r, k) => {
@@ -171,31 +180,66 @@ function traceRing(map: WorldMap, realm: RealmArea | null): SerpentRing | null {
   const gate = realm
       ? { x: realm.x - gateMargin, y: realm.y - gateMargin, size: realm.size + gateMargin * 2 }
       : null,
-    open = new Uint8Array(points.length);
+    open = new Uint8Array(points.length),
+    beyond = new Uint8Array(points.length);
   points.forEach((p, i) => {
-    const k = Math.round((Math.atan2(p.y - center.y, p.x - center.x) / (Math.PI * 2)) * rays + rays) % rays;
-    open[i] = valid[k] && inside(p) && distAt(p) >= clearance && !inArea(gate, p) ? 1 : 0;
+    open[i] = inside(p) && distAt(p) >= serpentRules.least && !inArea(gate, p) ? 1 : 0;
+    const onMap = p.x >= 0 && p.y >= 0 && p.x < w && p.y < h;
+    // The strip of sea by the edge counts, but never close to land or the gate square.
+    beyond[i] = !inside(p) && (!onMap || (distAt(p) >= serpentRules.least && !inArea(gate, p))) ? 1 : 0;
   });
-  return { points, open };
+  if (past.every(Boolean)) return null;
+  return { points, open, beyond, width: w, height: h };
 }
-/** Coils every few tiles round the loop, with the head and, in front of its jaws, the tail it bites. */
+/** Coils every few tiles round the loop, and the head with the tail it bites. Where the loop leaves the map,
+ * the coil at each side of the gap runs on past the edge. */
 export function serpentParts(ring: SerpentRing, seed: number, episode: number): SerpentPart[] {
   const n = ring.points.length,
     { spacing, span } = serpentRules,
+    wrap = (i: number) => ((i % n) + n) % n,
     fits = (from: number, to: number) => {
-      for (let i = from; i <= to; ++i) if (!ring.open[((i % n) + n) % n]) return false;
+      for (let i = from; i <= to; ++i) if (!ring.open[wrap(i)]) return false;
+      return true;
+    },
+    // Across the edge: every point open sea, the sea by the edge or past it; never near land or the gate.
+    runsOff = (from: number, to: number) => {
+      for (let i = from; i <= to; ++i) if (!ring.open[wrap(i)] && !ring.beyond[wrap(i)]) return false;
       return true;
     },
     parts: SerpentPart[] = [];
   // The head lies where the loop is open, so the serpent's face is never the part that is missing.
   let head = Math.floor(hash01(seed, episode, 1, 0x5e41) * n);
-  for (let tries = 0; tries < n && !fits(head - span, head + span + 2); ++tries) head = (head + 7) % n;
-  if (fits(head - span, head)) parts.push({ kind: SerpentPartKind.Head, from: head - span, to: head, phase: 0.2 });
-  if (fits(head + 2, head + 2 + span)) parts.push({ kind: SerpentPartKind.Tail, from: head + 2, to: head + 2 + span, phase: 0.65 });
-  for (let at = head + 2 + span + spacing; at + span < head - span + n - spacing / 2; ) {
-    if (fits(at, at + span))
-      parts.push({ kind: SerpentPartKind.Coil, from: at, to: at + span, phase: hash01(seed, episode, at, 0x5e42) });
+  for (let tries = 0; tries < n && !fits(head - span, head + span); ++tries) head = (head + 7) % n;
+  if (!fits(head - span, head + span)) return parts;
+  parts.push({ kind: SerpentPartKind.Head, from: head - span, to: head + span, phase: 0.2 });
+  for (let at = head + span + spacing; at + span < head - span + n - spacing / 2; ) {
+    if (fits(at, at + span)) parts.push({ kind: SerpentPartKind.Coil, from: at, to: at + span, phase: hash01(seed, episode, at, 0x5e42) });
     at += spacing + Math.floor(hash01(seed, episode, at, 0x5e43) * 5) - 2;
+  }
+  // A coil at each side of a gap where the loop runs past the edge, so the body goes on out of sight.
+  const taken = (from: number, to: number) =>
+    parts.some((p) => {
+      const a = wrap(p.from) - 2,
+        b = a + (p.to - p.from) + 4;
+      for (let i = from; i <= to; ++i) {
+        const j = wrap(i);
+        if ((j >= a && j <= b) || (j + n >= a && j + n <= b)) return true;
+      }
+      return false;
+    });
+  // Centred where the loop crosses the edge itself, so the coil is cut by the edge and reads as going on.
+  const onMap = (i: number) => {
+    const p = ring.points[wrap(i)];
+    return p.x >= 0 && p.y >= 0 && p.x < ring.width && p.y < ring.height;
+  };
+  for (let i = 0; i < n; ++i) {
+    if (onMap(i) === onMap(i + 1)) continue;
+    for (const d of [0, -1, 1, -2, 2]) {
+      const from = i - (span >> 1) + d;
+      if (!runsOff(from, from + span) || taken(from, from + span)) continue;
+      parts.push({ kind: SerpentPartKind.Coil, from, to: from + span, phase: hash01(seed, episode, from, 0x5e42), edge: true });
+      break;
+    }
   }
   return parts;
 }

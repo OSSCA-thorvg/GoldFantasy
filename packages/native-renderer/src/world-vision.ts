@@ -1,4 +1,3 @@
-import { serpentSights } from './world-serpent';
 import { project, point, distance } from '../../engine/src/geometry';
 import { f32 } from '../../engine/src/numeric';
 import { belongsToFaction, isPlayerBuilding } from '../../engine/src/faction';
@@ -112,7 +111,6 @@ export function updateVision(s: WorldRendererState, town: Town): void {
     )
   )
     s.vision.push(...volcano.sights());
-  s.vision.push(...serpentSights(s, town));
   const currentChanged = s.currentVisibility.assign(s.vision, changed);
   if (first || currentChanged)
     for (const source of s.vision) {

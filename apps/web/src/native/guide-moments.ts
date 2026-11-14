@@ -277,7 +277,7 @@ const moments: GuideMoment[] = [
     key: 'thor',
     title: 'Thor comes to Midgard',
     text: () => [
-      'Thor, the god of thunder, has come to stay a while. He is a guest: he takes no orders, and no monster can harm him.',
+      'Thor, the god of thunder, has come to stay a few nights. He is a guest: he takes no orders, and no monster can harm him.',
       'By day he enjoys the settlement. By night he hunts the monsters that come near it. While he stays, rain brings storms and far more lightning.',
     ],
     spot: (scan) => {
