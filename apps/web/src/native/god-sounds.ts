@@ -7,7 +7,7 @@ import type { Town } from '../../../../packages/engine/src/town';
 import { Cue, type Sound } from '../../../../packages/native-audio/src';
 
 const heard = new WeakMap<Town, bigint>();
-/** New bolts in view, as thunder: a hammer strike is a closer, softer crack than his coming and going. */
+/** New bolts in view, as thunder: a hammer strike cracks close by, his coming and going right overhead. */
 export function thorThunder(town: Town, visible: (at: Point) => boolean, spatial: (cue: Cue, at: Point) => Sound): Sound[] {
   let next = heard.get(town) ?? 0n;
   const out: Sound[] = [];
@@ -16,8 +16,9 @@ export function thorThunder(town: Town, visible: (at: Point) => boolean, spatial
     next = bolt.serial + 1n;
     if (town.clock() - bolt.at > 0.5 || !visible(bolt.position)) continue;
     const hammer = bolt.kind === BoltKind.Hammer,
-      sound = spatial(Cue.ThunderCrack + (hammer ? Reach.Middle : Reach.Near), bolt.position);
-    sound.gain = f(sound.gain * (hammer ? f(0.45) : f(0.8)));
+      sound = spatial(Cue.ThunderCrack + (hammer ? Reach.Near : Reach.Overhead), bolt.position);
+    // A bolt at the player's feet: as loud as the weather's nearest strikes, never quieter than half of one.
+    sound.gain = f(Math.max(f(0.45), sound.gain) * (hammer ? f(0.85) : 1));
     out.push(sound);
   }
   heard.set(town, next);
