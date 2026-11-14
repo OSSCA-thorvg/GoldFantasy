@@ -12,7 +12,7 @@ try {
   await server.listen();
   browser = await chromium.launch({
     headless: true,
-    args: ['--mute-audio', '--autoplay-policy=document-user-activation-required'],
+    args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist', '--autoplay-policy=document-user-activation-required'],
   });
   const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
   for (const mode of ['worker', 'reduced-motion', 'fallback', 'missing-animation']) {

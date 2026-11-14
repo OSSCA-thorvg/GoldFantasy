@@ -36,7 +36,7 @@ try {
     server: { host: '127.0.0.1', port: 0, hmr: false, watch: null },
   });
   await server.listen();
-  browser = await chromium.launch({ headless: true, args: ['--mute-audio'] });
+  browser = await chromium.launch({ headless: true, args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist'] });
   deadline = setTimeout(() => void browser.close().catch(() => {}), 120000);
   const page = await browser.newPage(),
     errors = [];

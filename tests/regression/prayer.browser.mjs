@@ -29,8 +29,8 @@ try {
     ],
   });
   await server.listen();
-  browser = await chromium.launch({ headless: true, args: ['--mute-audio'] });
-  deadline = setTimeout(() => void browser.close().catch(() => {}), 240000);
+  browser = await chromium.launch({ headless: true, args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist'] });
+  deadline = setTimeout(() => void browser.close().catch(() => {}), 900000);
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   page.on('pageerror', (error) => report.errors.push(error.stack ?? error.message));

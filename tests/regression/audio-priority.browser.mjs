@@ -53,7 +53,7 @@ try {
   const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
   browser = await chromium.launch({
     headless: true,
-    args: ['--mute-audio', '--autoplay-policy=document-user-activation-required'],
+    args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist', '--autoplay-policy=document-user-activation-required'],
   });
   const page = await browser.newPage({
     viewport: { width: 400, height: 700 },

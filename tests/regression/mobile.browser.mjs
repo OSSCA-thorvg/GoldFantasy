@@ -31,7 +31,7 @@ try {
     ],
   });
   await server.listen();
-  browser = await chromium.launch({ headless: true, args: ['--mute-audio'] });
+  browser = await chromium.launch({ headless: true, args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist'] });
   for (const [width, height, renderer] of [
     [390, 844, 'gl'],
     [844, 390, 'gl'],
