@@ -65,9 +65,9 @@ function pixel(pixels: Uint8ClampedArray, x: number, y: number) {
 it('keeps a continuous gold face where the original Cinzel stem and serif contours overlap', () => {
   const pixels = renderWordmark();
   for (const [name, seam, interior] of [
-    ['I bottom serif', [1195, 900], [1250, 900]],
-    ['first D top', [1718, 270], [1770, 270]],
-    ['last D top', [4938, 270], [4990, 270]],
+    ['I bottom serif', [1162, 900], [1217, 900]],
+    ['first D top', [1685, 270], [1737, 270]],
+    ['last D top', [5015, 270], [5067, 270]],
   ] as const) {
     const actual = pixel(pixels, ...seam),
       expected = pixel(pixels, ...interior);
@@ -78,19 +78,26 @@ it('keeps a continuous gold face where the original Cinzel stem and serif contou
       ).toBeLessThanOrEqual(2);
   }
 });
-it('preserves the D, A and R counters and the title ornaments', () => {
+it('preserves the D, A and R counters and rings the G with the world serpent', () => {
   const pixels = renderWordmark();
   for (const [x, y] of [
-    [1900, 601],
-    [3510, 650],
-    [4270, 430],
-    [5120, 601],
+    [1867, 601],
+    [3587, 650],
+    [4347, 430],
+    [5197, 601],
+    // The ring stands clear of the G it encircles.
+    [2775, 1025],
   ])
     expect(pixel(pixels, x, y)[3]).toBe(0);
   for (const [x, y] of [
-    [1250, 600],
-    [2800, 1138],
-    [2800, 92],
+    [1217, 600],
+    [2775, 1070],
+    [2305, 600],
+    [3245, 600],
   ])
     expect(pixel(pixels, x, y)[3]).toBeGreaterThan(200);
+  const [r, g, b, a] = pixel(pixels, 2802, 100);
+  expect(a, 'the serpent has an eye').toBeGreaterThan(200);
+  expect(Math.max(r, g, b)).toBeLessThan(60);
+  expect(pixel(pixels, 2802, 135)[0], 'gold head around the eye').toBeGreaterThan(150);
 });
