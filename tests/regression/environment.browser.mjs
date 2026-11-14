@@ -56,6 +56,7 @@ try {
       { addInventory, workItem },
       { MonsterRank },
       { pickSource },
+      { hiddenUnitGhosts },
     ] = await Promise.all([
       import('/apps/web/src/native/startup-canvas.ts'),
       import('/packages/native-ui/src/index.ts'),
@@ -73,6 +74,7 @@ try {
       import('/packages/engine/src/equipment.ts'),
       import('/packages/engine/src/combat-events.ts'),
       import('/packages/native-renderer/src/world-pick-registry.ts'),
+      import('/packages/native-renderer/src/hidden-unit-ghosts.ts'),
     ]);
     const tvg = await initializeWebCanvas('gl'),
       element = document.createElement('canvas');
@@ -90,6 +92,8 @@ try {
         camera: new Camera(),
         fogged: false,
         ghostsOff: false,
+        ghostsEllipse: false,
+        ghostList: hiddenUnitGhosts,
         render(width, height, seconds, simulate, dt) {
           if (simulate) town.advance(dt);
           if (seen !== town.realmRevision) {
@@ -99,6 +103,24 @@ try {
           const preview = new Preview();
           preview.zoom = this.camera.zoom;
           renderer.update(town, traffic, this.camera, width, height, seconds, preview, []);
+          // The "ellipse" pictures: the same scene with the first ghosts, a body and a head ellipse each.
+          if (this.ghostsEllipse) {
+            const [foe, friend] = renderer.ghosts.children;
+            foe.reset().strokeWidth(1.6);
+            friend.reset();
+            for (const g of this.ghostList(renderer)) {
+              const q = project(g.foot.x, g.foot.y),
+                h = g.height,
+                shape = g.hostile ? foe : friend;
+              if (g.lying)
+                shape.appendCircle(q.x, q.y - h * 0.12, h * 0.42, h * 0.16).appendCircle(q.x - h * 0.57, q.y - h * 0.16, h * 0.15, h * 0.15);
+              else
+                shape
+                  .appendCircle(q.x, q.y - h * 0.32, h * (g.hostile ? 0.3 : 0.24), h * 0.32)
+                  .appendCircle(q.x, q.y - h * 0.8, h * 0.16, h * 0.16);
+            }
+            renderer.adapter.sync(renderer.root);
+          }
           // The "before" pictures of hidden units: the same scene without the ghost layer.
           if (this.ghostsOff && renderer.ghosts) {
             renderer.ghosts.opacity(0);
@@ -327,15 +349,19 @@ try {
           p.level = 8;
           p.food = p.rest = p.hydration = 1;
           town.folk.push(p);
+          // Each fighting calling with its own weapon in hand; settlers fight bare-handed.
+          const arm = ['sword', 'bow', 'staff', 'mace', 'sword', null][i % callings.length];
+          if (arm && addInventory(p, arm))
+            town.equipItem(p.id, p.inventory.findIndex((s) => s?.item === arm) + 1, 'weapon');
           return p;
         });
         town.changes++;
         return folk.map((p) => p.id);
       },
       // A swarm round a point: mostly swarmers, a few grunts and brutes, all roused.
-      swarm(centre, count, spread) {
+      swarm(centre, count, spread, kind = 1) {
         town.beasts = [];
-        const lair = map.dungeons().findIndex((d) => d.kind === 1);
+        const lair = map.dungeons().findIndex((d) => d.kind === kind);
         for (let i = 0; i < count; ++i) {
           const a = i * 2.39996,
             r = spread * Math.sqrt((i + 0.5) / count),
@@ -354,7 +380,8 @@ try {
         ids.forEach((id, i) => {
           const p = town.person(id);
           addInventory(p, 'axe');
-          town.equipItem(p.id, p.inventory.length, 'tool1');
+          // The backpack is a fixed row of slots: equip the one the axe went into.
+          town.equipItem(p.id, p.inventory.findIndex((s) => s?.item === 'axe') + 1, 'tool1');
           town.orderChop([id], cells[i % cells.length]);
         });
         for (let i = 0; i < 900; ++i) {
@@ -364,10 +391,38 @@ try {
         }
         return -1;
       },
+      project,
+      // Units drawn as outlines now, with what each is doing and holding.
+      async hiddenUnits() {
+        const [ghosts, { heldTools }] = await Promise.all([
+          import('/packages/native-renderer/src/hidden-unit-ghosts.ts'),
+          import('/packages/native-renderer/src/person-equipment.ts'),
+        ]);
+        return ghosts.hiddenUnitGhosts(game.renderer).map((g) => {
+          if (g.ref.kind === 'person') {
+            const p = town.person(g.ref.id),
+              parts = game.renderer.figures.get(g.ref.id)?.parts;
+            return {
+              kind: 'person',
+              id: p.id,
+              x: p.position.x,
+              y: p.position.y,
+              activity: p.activity,
+              moving: p.moving(),
+              downed: p.downedAt >= 0,
+              tool: heldTools.find((t) => (parts?.[t]?.alpha ?? 0) > 0) ?? null,
+            };
+          }
+          const m = town.beasts.find((b) => b.id === g.ref.id);
+          if (!m) return { kind: 'gone', id: g.ref.id };
+          return { kind: 'monster', id: m.id, x: m.position.x, y: m.position.y, rank: m.rank, lair: map.dungeons()[m.lair]?.kind, swinging: m.swingAt >= 0 && town.clock() - m.swingAt < 1 };
+        });
+      },
       // Milliseconds of the ghost pass per live frame (coverage ten times a second, ghosts moved every frame).
       async ghostCost(frames) {
         const ghosts = await import('/packages/native-renderer/src/hidden-unit-ghosts.ts');
         let spent = 0,
+          upload = 0,
           shown = 0,
           tested = 0,
           passes = 0;
@@ -376,7 +431,11 @@ try {
           town.advance(1 / 60);
           const t0 = performance.now();
           ghosts.updateHiddenUnitGhosts(game.renderer, town, this.now);
-          spent += performance.now() - t0;
+          const t1 = performance.now();
+          // Sending changed outlines to ThorVG is part of the feature's cost too.
+          game.renderer.adapter.sync(game.renderer.ghosts);
+          upload += performance.now() - t1;
+          spent += t1 - t0;
           shown += ghosts.hiddenUnitGhosts(game.renderer).length;
           const work = ghosts.ghostWork(game.renderer);
           if (work.units) (tested += work.tested / work.units), ++passes;
@@ -385,6 +444,7 @@ try {
         }
         return {
           msPerFrame: +(spent / frames).toFixed(3),
+          uploadMsPerFrame: +(upload / frames).toFixed(3),
           ghostsShown: +(shown / frames).toFixed(1),
           units: town.folk.length + town.beasts.length,
           silhouettesTestedPerUnit: +(tested / Math.max(1, passes)).toFixed(2),
@@ -724,7 +784,13 @@ try {
         await page.screenshot({ path, ...(clip ? { clip } : {}) });
         report.shots.push(path);
       };
-    await page.evaluate((off) => (envProbe.game.ghostsOff = off), prefix === 'before');
+    await page.evaluate(
+      (prefix) => {
+        envProbe.game.ghostsOff = prefix === 'before';
+        envProbe.game.ghostsEllipse = prefix === 'ellipse';
+      },
+      prefix,
+    );
     const d = forest.dense,
       ring = (c, r, n) =>
         Array.from({ length: n }, (_, k) => ({
@@ -748,17 +814,91 @@ try {
     }, d);
     report.fellingAfter = await page.evaluate(({ ids, cells }) => envProbe.fell(ids, cells), { ids: fellers, cells });
     await ghostShot('felling', at(d, 1.6));
+    // Close-ups at zoom 2 (the "after" set only): the unit's feet sit at the middle of the screen.
+    // Setting the weather sets the hour, which would turn the clock back: close-ups only move the camera.
+    const lookAt = (p, zoom) => ({ fn: ({ p, zoom }) => envProbe.look(p.x, p.y, zoom), arg: { p, zoom } }),
+      rigged = prefix === 'after',
+      closeClip = { x: 470, y: 190, width: 340, height: 260 },
+      hiddenNow = () => page.evaluate(() => envProbe.hiddenUnits()),
+      closeUp = async (name, unit) => {
+        // Framed on where the unit's feet land on screen, the body above them.
+        const foot = await page.evaluate((u) => {
+          envProbe.look(u.x, u.y, 2);
+          const q = envProbe.project(u.x, u.y);
+          return envProbe.game.camera.toScreen(q, 1280, 800);
+        }, unit);
+        await ghostShot(name, lookAt(unit, 2), { ...closeClip, x: Math.round(foot.x - 170), y: Math.round(foot.y - 190) });
+        report.closeUps ??= {};
+        report.closeUps[name] = unit;
+      },
+      live = (frames) =>
+        page.evaluate((n) => {
+          for (let i = 0; i < n; ++i) envProbe.live(1 / 30);
+        }, frames);
+    let fellerId = -1;
+    if (rigged) {
+      // A feller behind a fir, caught at three moments of the swing.
+      for (const [moment, wait] of [
+        ['a', 0],
+        ['b', 12],
+        ['c', 12],
+      ]) {
+        await live(wait);
+        const feller = (await hiddenNow()).find((u) => u.kind === 'person' && u.tool === 'axe');
+        fellerId = feller?.id;
+        assert(feller, 'A resident felling with an axe is hidden behind a tree: ' + JSON.stringify(await hiddenNow()));
+        await closeUp(`close-felling-${moment}`, feller);
+      }
+      // A walk behind the trees, eight frames a tenth of a second apart, the camera on the walker.
+      const walker = (await hiddenNow()).find((u) => u.kind === 'person' && u.id !== fellerId);
+      assert(walker, 'A resident is hidden behind a tree');
+      await page.evaluate(
+        ({ id, to }) => envProbe.game.town.orderMove([id], to),
+        // Across the screen, along a row of trees.
+        { id: walker.id, to: { x: walker.x + 2, y: walker.y - 2 } },
+      );
+      await live(8);
+      report.walk = [];
+      for (let k = 0; k < 8; ++k) {
+        await live(3);
+        const now = (await hiddenNow()).find((u) => u.id === walker.id && u.kind === 'person') ?? null,
+          spot = await page.evaluate((id) => envProbe.game.town.person(id).position, walker.id);
+        report.walk.push(!!now);
+        const foot = await page.evaluate((u) => {
+          envProbe.look(u.x, u.y, 2);
+          return envProbe.game.camera.toScreen(envProbe.project(u.x, u.y), 1280, 800);
+        }, spot);
+        await ghostShot(`walk-${k}`, lookAt(spot, 2), { x: Math.round(foot.x - 60), y: Math.round(foot.y - 85), width: 120, height: 100 });
+      }
+    }
     // A fight in the forest: 20 residents against a swarm of 150.
     await page.evaluate((points) => envProbe.muster(points), [...ring(d, 0.8, 8), ...ring(d, 1.8, 12)]);
     await page.evaluate((c) => envProbe.swarm(c, 150, 5.5), d);
-    await page.evaluate(() => {
-      for (let i = 0; i < 45; ++i) envProbe.live(1 / 30);
-    });
+    await live(45);
+    if (rigged) {
+      const units = await hiddenNow(),
+        fighter = units.find((u) => u.kind === 'person' && (u.tool === 'sword' || u.tool === 'mace') && u.activity === 14),
+        humanoid =
+          units.find((u) => u.kind === 'monster' && u.rank === 1 && u.swinging) ??
+          units.find((u) => u.kind === 'monster' && (u.rank === 0 || u.rank === 1));
+      assert(fighter, 'A fighter with a blade or mace is hidden behind a tree: ' + JSON.stringify(units.filter((u) => u.kind === 'person')));
+      assert(humanoid, 'A draugr is hidden behind a tree');
+      await closeUp('close-fighter', fighter);
+      await closeUp('close-draugr', humanoid);
+      await live(6);
+      const later = (await hiddenNow()).find((u) => u.id === fighter.id);
+      if (later) await closeUp('close-fighter-later', later);
+    }
     await ghostShot('forest-fight', at(d, 1));
     await ghostShot('forest-fight-zoomed-out', at(d, 0.45));
     // A phone held upright: a 390 x 800 slice of the screen at the scale a phone shows the world.
     await ghostShot('phone', at(d, 1.3), { x: 445, y: 0, width: 390, height: 800 });
     report.ghostCost = {};
+    report.gpu = await page.evaluate(() => {
+      const gl = document.createElement('canvas').getContext('webgl'),
+        info = gl?.getExtension('WEBGL_debug_renderer_info');
+      return info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : null;
+    });
     for (const zoom of [1, 0.45])
       report.ghostCost[`forest fight, zoom ${zoom}`] = await page.evaluate(
         async ({ p, zoom }) => {
@@ -768,6 +908,34 @@ try {
         { p: d, zoom },
       );
     console.log('ghost cost', JSON.stringify(report.ghostCost));
+    if (rigged) {
+      // A resident struck down behind a tree: the first hidden one whose lying body is still covered.
+      const candidates = (await hiddenNow()).filter((u) => u.kind === 'person');
+      let downed = null;
+      for (const c of candidates) {
+        await page.evaluate((id) => {
+          const p = envProbe.game.town.person(id);
+          p.downedAt = envProbe.game.town.clock();
+          for (let i = 0; i < 20; ++i) envProbe.frame();
+        }, c.id);
+        downed = (await hiddenNow()).find((u) => u.id === c.id && u.kind === 'person');
+        if (downed) break;
+        await page.evaluate((id) => {
+          envProbe.game.town.person(id).downedAt = -1;
+          // Up again before the next one is tried.
+          for (let i = 0; i < 20; ++i) envProbe.frame();
+        }, c.id);
+      }
+      assert(downed, 'A downed resident is hidden behind a tree');
+      await closeUp('close-downed', downed);
+      await page.evaluate((id) => (envProbe.game.town.person(id).downedAt = -1), downed.id);
+      // Wargs: the four-legged kind, from a cave.
+      await page.evaluate((c) => envProbe.swarm(c, 60, 4.5, 0), d);
+      await live(30);
+      const warg = (await hiddenNow()).find((u) => u.kind === 'monster' && u.lair === 0);
+      assert(warg, 'A warg is hidden behind a tree');
+      await closeUp('close-warg', warg);
+    }
     // Three residents just behind a ridge.
     await page.evaluate(() => (envProbe.game.town.beasts = []));
     await page.evaluate(
@@ -778,7 +946,10 @@ try {
       ridge,
     );
     await ghostShot('behind-ridge', at({ x: ridge.x + 1, y: ridge.y + 1 }, 1.3));
-    await page.evaluate(() => (envProbe.game.ghostsOff = false));
+    await page.evaluate(() => {
+      envProbe.game.ghostsOff = false;
+      envProbe.game.ghostsEllipse = false;
+    });
   }
   if (wanted('lava')) {
     const v = places.volcano,

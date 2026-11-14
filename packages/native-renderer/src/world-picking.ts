@@ -5,7 +5,7 @@ import { SceneNode, type PaintNode } from './paint';
 import type { WorldRendererState } from './world-renderer-state';
 import { pickSource, type PickSource } from './world-pick-registry';
 import { wornCourse, stretch } from './road-painter';
-import { ghostEllipses, ghostTouches, hiddenUnitGhosts, type Ghost } from './hidden-unit-ghosts';
+import { ghostAreas, ghostTouches, hiddenUnitGhosts, type Ghost } from './hidden-unit-ghosts';
 import {
   worldObjectKey,
   type PickBounds,
@@ -329,7 +329,7 @@ export class WorldPicker {
     const zoom = this.view.zoom;
     for (const ghost of hiddenUnitGhosts(this.state)) {
       if (!this.eligible(town, { ref: ghost.ref, body: [], foot: ghost.foot }, 255)) continue;
-      const parts = ghostEllipses(ghost).map((e) => {
+      const parts = ghostAreas(ghost).map((e) => {
           const c = this.view.toScreen(point(e.x, e.y), this.width, this.height);
           return { x: c.x - e.rx * zoom, y: c.y - e.ry * zoom, w: 2 * e.rx * zoom, h: 2 * e.ry * zoom };
         }),

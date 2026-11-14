@@ -1,17 +1,23 @@
-// Flat translucent silhouettes over the people and monsters that stand behind a tree canopy or a peak.
+// Posed outlines over the people and monsters that stand behind a tree canopy or a peak.
 import { project, type Point } from '../../engine/src/geometry';
+import type { Monster } from '../../engine/src/person';
 import type { Town } from '../../engine/src/town';
 import { SceneNode, ShapeNode, type PaintNode } from './paint';
 import { tone } from './combat-paint';
 import { monsterHeight } from './monster-rank-look';
 import { pickSource } from './world-pick-registry';
-import type { WorldRendererState } from './world-renderer-state';
+import type { Figure, Sprite, WorldRendererState } from './world-renderer-state';
 import type { WorldObjectRef } from './world-picking-types';
+import { monsterParts } from './world-sprites';
+import { Draft } from './ghost-trace';
+import { monsterMotion, traceMonster, traceResident, type GhostArea, type MonsterMotion } from './ghost-figures';
 
 /** A resident's drawn height; monsters use their rank's. */
 const residentHeight = 24;
-/** Seconds between coverage passes; ghosts follow their units every frame in between. */
+/** Seconds between coverage passes; outlines follow their units in between. */
 const coverageEvery = 0.1;
+/** Seconds between redraws of the outlines: thirty poses a second, whatever the frame rate. */
+const redrawEvery = 1 / 32;
 /** Tallest occluder a pass looks for, in screen pixels: the highest summit. */
 const tallest = 280;
 
@@ -39,6 +45,8 @@ export interface Ghost {
   height: number;
   hostile: boolean;
   lying: boolean;
+  /** Where a click finds it, in world pixels: the posed body's box and the head. */
+  areas: GhostArea[];
 }
 interface GhostState {
   town: Town;
@@ -46,10 +54,13 @@ interface GhostState {
   /** Units whose head or chest the last pass found covered, with their drawn height. */
   covered: Map<string, number>;
   checkedAt: number;
+  drawnAt: number;
   ghosts: Ghost[];
   friend: ShapeNode;
   foe: ShapeNode;
-  drawn: string;
+  /** This frame's outlines and the last ones drawn, per side. */
+  drafts: { friend: Draft; foe: Draft };
+  motions: Map<number, MonsterMotion>;
   /** Units and occluders the last pass looked at. */
   units: number;
   tested: number;
@@ -154,6 +165,9 @@ interface Seen {
   hostile: boolean;
   lying: boolean;
   height: () => number;
+  figure?: Figure;
+  beast?: Monster;
+  sprite?: Sprite;
 }
 /** Who is drawn now: the figure rules already decided sight, fog, buildings and the worlds beyond the gates. */
 function shown(s: WorldRendererState, town: Town): Seen[] {
@@ -168,6 +182,7 @@ function shown(s: WorldRendererState, town: Town): Seen[] {
       hostile: false,
       lying: p.downedAt >= 0,
       height: () => residentHeight,
+      figure,
     });
   }
   for (const m of town.monsters()) {
@@ -180,30 +195,22 @@ function shown(s: WorldRendererState, town: Town): Seen[] {
       hostile: true,
       lying: false,
       height: () => monsterHeight(town, m, s),
+      beast: m,
+      sprite,
     });
   }
   return list;
 }
-/** The ellipses of a ghost in world pixels, for drawing and for picking. */
-export function ghostEllipses(g: Ghost): { x: number; y: number; rx: number; ry: number }[] {
-  const at = project(g.foot.x, g.foot.y),
-    h = g.height;
-  return g.lying
-    ? [
-        { x: at.x, y: at.y - h * 0.12, rx: h * 0.42, ry: h * 0.16 },
-        { x: at.x - h * 0.57, y: at.y - h * 0.16, rx: h * 0.15, ry: h * 0.15 },
-      ]
-    : [
-        { x: at.x, y: at.y - h * 0.32, rx: h * (g.hostile ? 0.3 : 0.24), ry: h * 0.32 },
-        { x: at.x, y: at.y - h * 0.8, rx: h * 0.16, ry: h * 0.16 },
-      ];
-}
+/** A ghost's hit area in world pixels: the posed body's box and the head. */
+export const ghostAreas = (g: Ghost): readonly GhostArea[] => g.areas;
 /** Whether a ghost touches a box in world pixels, with `pad` pixels of slack for a finger. */
 export function ghostTouches(g: Ghost, box: { x: number; y: number; w: number; h: number }, pad = 0): boolean {
-  return ghostEllipses(g).some((e) => {
+  return g.areas.some((e) => {
     const nx = Math.max(box.x, Math.min(e.x, box.x + box.w)) - e.x,
       ny = Math.max(box.y, Math.min(e.y, box.y + box.h)) - e.y;
-    return (nx / (e.rx + pad)) ** 2 + (ny / (e.ry + pad)) ** 2 <= 1;
+    return e.box
+      ? Math.abs(nx) <= e.rx + pad && Math.abs(ny) <= e.ry + pad
+      : (nx / (e.rx + pad)) ** 2 + (ny / (e.ry + pad)) ** 2 <= 1;
   });
 }
 /** The ghosts drawn this frame. */
@@ -216,11 +223,12 @@ export function ghostWork(s: WorldRendererState): { units: number; tested: numbe
 export function updateHiddenUnitGhosts(s: WorldRendererState, town: Town, seconds: number): void {
   let state = states.get(s);
   if (!state || state.town !== town) {
-    // Outlines only, so the tree or peak in front still reads through them.
-    const outline = (color: readonly [number, number, number]) =>
-        new ShapeNode().strokeWidth(1.6).strokeJoin('round').strokeFill(...color, 235),
-      friend = outline(tone.peach),
-      foe = outline(tone.rust);
+    // Outlines only, so the tree or peak in front still reads through them. The foe's line is finer:
+    // its figures are smaller and many, and a heavier line would run a pack together.
+    const outline = (color: readonly [number, number, number], width: number) =>
+        new ShapeNode().strokeWidth(width).strokeJoin('round').strokeCap('round').strokeFill(...color, 235),
+      friend = outline(tone.peach, 1.6),
+      foe = outline(tone.rust, 1.25);
     s.ghosts.remove();
     s.ghosts.add(foe).add(friend);
     state = {
@@ -228,17 +236,23 @@ export function updateHiddenUnitGhosts(s: WorldRendererState, town: Town, second
       rows: new Map(),
       covered: new Map(),
       checkedAt: -Infinity,
+      drawnAt: -Infinity,
       ghosts: [],
       friend,
       foe,
-      drawn: '',
+      drafts: { friend: new Draft(), foe: new Draft() },
+      motions: new Map(),
       units: 0,
       tested: 0,
     };
     states.set(s, state);
   }
+  // The outlines follow their units at a steady pace; between redraws the last ones stand.
+  const covering = seconds - state.checkedAt >= coverageEvery || seconds < state.checkedAt;
+  if (!covering && seconds - state.drawnAt < redrawEvery && seconds >= state.drawnAt) return;
+  state.drawnAt = seconds;
   const units = shown(s, town);
-  if (seconds - state.checkedAt >= coverageEvery || seconds < state.checkedAt) {
+  if (covering) {
     state.checkedAt = seconds;
     state.covered.clear();
     state.units = units.length;
@@ -252,18 +266,25 @@ export function updateHiddenUnitGhosts(s: WorldRendererState, town: Town, second
     }
   }
   state.ghosts = [];
-  let drawn = '';
+  const { drafts } = state;
+  drafts.friend.clear();
+  drafts.foe.clear();
   for (const u of units) {
     const height = state.covered.get(u.key);
     if (height === undefined) continue;
-    state.ghosts.push({ ref: u.ref, foot: { ...u.at }, height, hostile: u.hostile, lying: u.lying });
-    drawn += `${u.key}:${u.at.x}:${u.at.y}:${u.lying};`;
+    let areas: GhostArea[] | null = null;
+    if (u.figure) areas = traceResident(drafts.friend, u.figure);
+    else if (u.beast && u.sprite) {
+      let motion = state.motions.get(u.beast.id);
+      if (!motion || motion.rank !== u.beast.rank) state.motions.set(u.beast.id, (motion = monsterMotion(town, u.beast)));
+      areas = traceMonster(drafts.foe, town, u.beast, u.sprite.paint, monsterParts(u.sprite.paint)?.body, motion);
+    }
+    if (areas) state.ghosts.push({ ref: u.ref, foot: { ...u.at }, height, hostile: u.hostile, lying: u.lying, areas });
   }
-  // Rebuilt only when someone moved, so a still scene costs no path upload.
-  if (drawn === state.drawn) return;
-  state.drawn = drawn;
-  state.friend.reset();
-  state.foe.reset();
-  for (const g of state.ghosts)
-    for (const e of ghostEllipses(g)) (g.hostile ? state.foe : state.friend).appendCircle(e.x, e.y, e.rx, e.ry);
+  // A monster's stride and blow are kept only while it stays hidden.
+  if (state.motions.size > state.ghosts.length * 2 + 16)
+    for (const id of state.motions.keys()) if (!state.covered.has(`m${id}`)) state.motions.delete(id);
+  // Each side is sent again only when its outlines changed, so a still scene costs no path upload.
+  drafts.friend.present(state.friend);
+  drafts.foe.present(state.foe);
 }
