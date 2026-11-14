@@ -1,5 +1,6 @@
 // Input and placement are translated from game_app.cpp; pixel thresholds are native values.
 import { GameAppState, Plan } from './game-app-state';
+import { openExpedition } from './expedition-window';
 import { Town } from '../../../../packages/engine/src/town';
 import {
   Tool,
@@ -568,7 +569,10 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
           -1;
       return;
     }
+    const before = [...this.chosen];
     this.select();
+    // A gate opens the expedition window, with whoever was selected already chosen.
+    if (this.selectedDungeon >= 0 && openExpedition(this, this.selectedDungeon, before)) this.chosen = [];
     return;
   }
   if (this.fieldFrom) {

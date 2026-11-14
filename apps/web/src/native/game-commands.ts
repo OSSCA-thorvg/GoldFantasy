@@ -1,4 +1,5 @@
 import { DungeonKind } from '../../../../packages/engine/src/world-types';
+import { openExpedition } from './expedition-window';
 // Direct translation of native game_commands.cpp.
 import type { GameInputApp } from './game-input';
 import { Tool, Order } from '../../../../packages/engine/src/game-tools';
@@ -248,12 +249,9 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
       if (plan) this.town.orderMove(ids, plan.entry);
       return;
     }
-    const floor = Math.min(this.gateFloor.get(hit.id) ?? Infinity, this.town.deepestOpenFloor(hit.id));
-    if (!this.town.sendExpedition(ids, hit.id, floor)) {
-      const problem = this.town.expeditionProblem(hit.id, floor);
-      if (problem) this.status = problem;
-      this.town.orderMove(ids, this.cursor);
-    }
+    // A gate is entered only through the expedition window; the selection comes in already chosen.
+    if (!openExpedition(this, hit.id, ids)) this.town.orderMove(ids, this.cursor);
+    return;
   } else if (order === Order.Work && place && isPlayerBuilding(place) && place.built() && isCraftStation(place.kind)) {
     // A crafting station opens its recipes with the first selected resident as crafter; nothing starts by itself.
     openStation(this, place, ids[0]);

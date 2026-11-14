@@ -14,6 +14,7 @@ import type { Paint, Scene, Shape, ThorVGNamespace } from '@thorvg/webcanvas';
 import { f32 as f, clamp, lround } from '../../../../packages/engine/src/numeric';
 import type { GameHudApp } from './game-hud-contract';
 import { skyMural as mural } from './hud-assets';
+import { tooltip } from './game-combat-hud';
 import { winterOutlookLine, winterLineHeight } from './camp-resource-hud';
 const revealDuration = f(0.18),
   controlStep = 34,
@@ -303,6 +304,7 @@ export function calendarDetails(this: GameHudApp, width: number): void {
     );
   }
 }
+const heldReason = 'Normal speed beyond a gate';
 export function timeControls(this: GameHudApp, width: number): void {
   const c = this.context,
     t = this.theme,
@@ -315,9 +317,10 @@ export function timeControls(this: GameHudApp, width: number): void {
     c.clip(this.timePanelBounds, () => {
       c.control('time-controls-panel', this.timePanelBounds, undefined, true, false);
       c.rect(full, t.surface, t.radius, t.border);
-      const labels = ['||', '1x', '2x', '3x', '4x', '5x'];
-      for (let i = 0; i <= 5; i++)
-        button(
+      const labels = ['||', '1x', '2x', '3x', '4x', '5x'],
+        held = this.speedHeld();
+      for (let i = 0; i <= 5; i++) {
+        const state = button(
           c,
           'speed-' + labels[i],
           new Rect(full.x + 4 + i * step, full.y + 4, this.touchMode ? 44 : controlStep - 4, this.touchMode ? 44 : 28),
@@ -326,12 +329,14 @@ export function timeControls(this: GameHudApp, width: number): void {
             if (i) this.setSpeed(i);
             else this.togglePause();
           },
-          this.gameSpeed() === i ? ButtonStyle.Primary : ButtonStyle.Default,
+          this.gameSpeed() === i ? ButtonStyle.Primary : held && i > 1 ? ButtonStyle.Quiet : ButtonStyle.Default,
           this.timeExpanded,
           Icon.None,
           false,
           { fontSize: 11 },
         );
+        if (held && i > 1) tooltip(c, 'speed-' + labels[i], state.hovered, [heldReason]);
+      }
     });
   }
   const toggle = button(

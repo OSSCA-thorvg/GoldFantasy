@@ -184,8 +184,27 @@ function edgeArrow(app: GameHudApp, at: Point, size: number, width: number, heig
     app.renderer.invalidatePresentation();
   });
 }
-/** What the floor a party is sent to holds, in words the player can weigh, and whether the selection is up to it. */
-export function floorForecast(app: GameAppState, gate: number, floor: number): string[] {
+export enum Verdict {
+  TooFew,
+  Losing,
+  Hard,
+  Ready,
+}
+/** How a party of `count` at `average` level stands against a floor that wants `level`. */
+export function partyVerdict(count: number, average: number, level: number): Verdict {
+  return count < 3 || (count < 4 && average < level + 4)
+    ? Verdict.TooFew
+    : average < level - 1
+      ? Verdict.Losing
+      : average < level
+        ? Verdict.Hard
+        : Verdict.Ready;
+}
+const verdictWords = ['too few to stand against a swarm', 'likely to lose this floor', 'a hard fight', 'ready'];
+export const floorLevel = (floor: number): number => recommendedLevel[Math.min(floor, recommendedLevel.length - 1)];
+/** What the floor a party is sent to holds, in words the player can weigh, and whether the party is up to it.
+ * Without `party` the selection is weighed, or every fighter when nobody is selected. */
+export function floorForecast(app: GameAppState, gate: number, floor: number, party?: readonly Person[]): string[] {
   const town = app.town,
     site = town.map().dungeons()[gate];
   if (!site) return [];
@@ -196,32 +215,31 @@ export function floorForecast(app: GameAppState, gate: number, floor: number): s
       Math.round(realmRules.floorMonsters + realmRules.floorMonstersPerFloor * floor + realmRules.floorMonstersPerTile * far),
     ),
     word = monsters < 45 ? 'a large pack' : monsters < 65 ? 'a swarm' : monsters < 80 ? 'a great swarm' : 'a horde',
-    level = recommendedLevel[Math.min(floor, recommendedLevel.length - 1)],
+    level = floorLevel(floor),
     lines = [
       `Floor ${floor + 1} holds ${word} and dens that keep breeding more until destroyed.`,
       `Recommended: a small party at level ${level}, using their skills.`,
     ],
-    selected = controllableIds(town, app.chosen)
-      .map((id) => town.person(id))
-      .filter((p): p is Person => !!p),
+    selected = party
+      ? []
+      : controllableIds(town, app.chosen)
+          .map((id) => town.person(id))
+          .filter((p): p is Person => !!p),
     // The dialog is open with nobody selected; then every fighter of the settlement is the party to weigh.
-    chosen = selected.length
-      ? selected
-      : town.people().filter((p) => canControl(p) && p.downedAt < 0 && !!skillOfCalling(p.calling, 0));
+    chosen = party
+      ? party
+      : selected.length
+        ? selected
+        : town.people().filter((p) => canControl(p) && p.downedAt < 0 && !!skillOfCalling(p.calling, 0));
   if (chosen.length) {
     const average = Math.round(chosen.reduce((s, p) => s + p.level, 0) / chosen.length),
-      verdict =
-        chosen.length < 3 || (chosen.length < 4 && average < level + 4)
-          ? 'too few to stand against a swarm'
-          : average < level - 1
-            ? 'likely to lose this floor'
-            : average < level
-              ? 'a hard fight'
-              : 'ready';
+      verdict = verdictWords[partyVerdict(chosen.length, average, level)];
     lines.push(
-      selected.length
-        ? `Selected: ${chosen.length} at level ${average} on average, ${verdict}.`
-        : `Your fighters: ${chosen.length} at level ${average} on average, ${verdict}.`,
+      party
+        ? `Party: ${chosen.length} at level ${average} on average, ${verdict}.`
+        : selected.length
+          ? `Selected: ${chosen.length} at level ${average} on average, ${verdict}.`
+          : `Your fighters: ${chosen.length} at level ${average} on average, ${verdict}.`,
     );
   }
   return lines;

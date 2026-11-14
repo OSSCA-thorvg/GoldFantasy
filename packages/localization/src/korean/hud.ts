@@ -6,6 +6,7 @@ export const hudPhrases: Phrases = {
   'Following {0}': '{0} 따라가는 중',
   'Building {0}': '{0} 건설 중',
   'Building a road': '길 건설 중',
+  'Normal speed beyond a gate': '관문 너머에서는 보통 속도',
   Continue: '이어하기',
   'Start New Game': '새 게임 시작',
   // Opening saga captions

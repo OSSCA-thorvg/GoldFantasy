@@ -242,7 +242,7 @@ const moments: GuideMoment[] = [
     key: 'gate',
     title: 'A gate to another world',
     text: () => [
-      'Each gate leads down, floor by floor, into a world beyond Midgard. Send a party through and destroy every den and the guardian of a floor to clear it.',
+      'Each gate leads down, floor by floor, into a world beyond Midgard. Click a gate to choose a party and a floor, then destroy every den and the guardian of a floor to clear it.',
       'Clear the last floor and the gate is sealed: its raids stop and the settlement keeps a boon of that world.',
     ],
     // A gate the map already knows of is no news until the player has it in front of them.

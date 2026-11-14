@@ -11,6 +11,7 @@ import { CombatCue, MonsterRank } from './combat-events';
 import { choosePrey, rankMonster, rankPace, rankRules, rankWorth, slowedBy, tauntedBy } from './monster-ranks';
 import { huntStep, walkPath } from './monster-navigation';
 import { gateSealed, sealFloors, sealProgress, sealable } from './gate-seals';
+import { altarCap, altarCapLine } from './altar-cap';
 import {
   ChamberKind,
   findRealmArea,
@@ -513,6 +514,7 @@ export function realmKill(this: RealmTown, beast: Monster): void {
     );
     this.notify(`${site.name}: the guardian of floor ${floor + 1} has fallen`);
   }
+  if (first) lines.push(altarCapLine(altarCap(this)));
   this.realmLoot.add(prize);
   lines.push('Hoard: ' + describe(prize) + '.');
   lines.push('Go home from anywhere to bank the spoils.');

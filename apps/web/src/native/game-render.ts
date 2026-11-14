@@ -16,6 +16,7 @@ import { Rect } from '../../../../packages/native-ui/src';
 import { queueWorkSounds } from './work-audio';
 import { objectSelectionOverlay } from './selection-overlay';
 import { renderPrayer } from './game-prayer';
+import { renderExpedition } from './expedition-window';
 import { keepTouchPlacementVisible } from './game-touch';
 import {
   type CharacterEditor,
@@ -61,6 +62,7 @@ export interface GameRenderApp extends GameCommandApp {
   closeCharacterEditor(apply: boolean): void;
   spatial(cue: Cue, world: Point): Sound;
   gameSpeed(): number;
+  speedHeld(): boolean;
   plan(): Plan;
   raiseAlarm(seconds: number): void;
   grunt(id: number): void;
@@ -170,7 +172,7 @@ export function render(
   if (resized) keepTouchPlacementVisible.call(this);
   const elapsed = !simulate || this.last < 0 ? 0 : clamp(seconds - this.last, 0, maxDelta);
   this.last = seconds;
-  if (!editing && !this.prayer && (this.pan.x !== 0 || this.pan.y !== 0)) {
+  if (!editing && !this.prayer && !this.expedition && (this.pan.x !== 0 || this.pan.y !== 0)) {
     const speed = f(f(620 / this.camera.zoom) * f(elapsed));
     this.camera.x = f(this.camera.x + f(this.pan.x * speed));
     this.camera.y = f(this.camera.y + f(this.pan.y * speed));
@@ -213,7 +215,7 @@ export function render(
   }
   this.chosen = this.chosen.filter((id) => !!this.town.person(id));
   for (const id of this.speakers.keys()) if (!this.town.person(id)) this.speakers.delete(id);
-  if (simulate && !editing && !this.prayer) guideFrame(this);
+  if (simulate && !editing && !this.prayer && !this.expedition) guideFrame(this);
   if (simulate || this.town.isTitleAutoplay()) {
     if (noticeDue(this, seconds, this.town.notices.length > 0)) {
       let text = this.town.takeNotice();
@@ -267,6 +269,11 @@ export function render(
   this.context.begin(this.theme, new Rect(0, 0, width, height), uiSeconds >= 0 ? uiSeconds : seconds);
   if (this.prayer) {
     renderPrayer.call(this, width, height);
+    this.context.end();
+    return;
+  }
+  if (this.expedition) {
+    renderExpedition.call(this, width, height);
     this.context.end();
     return;
   }
@@ -353,17 +360,23 @@ export function worldScene(this: GameRenderApp): Scene {
 export function hudScene(this: GameRenderApp): Scene {
   return this.context.scene();
 }
+/** Beyond a gate the game runs at normal speed; the chosen speed comes back on the way home. */
+export function speedHeld(this: GameRenderApp): boolean {
+  return this.town.realmActive();
+}
 export function gameSpeed(this: GameRenderApp): number {
-  return this.paused ? 0 : this.speed;
+  return this.paused ? 0 : this.speedHeld() ? 1 : this.speed;
 }
 export function togglePause(this: GameRenderApp): void {
   this.paused = !this.paused;
 }
 export function cycleSpeed(this: GameRenderApp): void {
+  if (this.speedHeld()) return;
   this.speed = this.speed >= GameAppState.maxSpeed ? 1 : this.speed + 1;
   this.paused = false;
 }
 export function setSpeed(this: GameRenderApp, value: number): void {
-  this.speed = value;
+  if (this.speedHeld() && value !== 1) return;
+  if (!this.speedHeld()) this.speed = value;
   this.paused = false;
 }

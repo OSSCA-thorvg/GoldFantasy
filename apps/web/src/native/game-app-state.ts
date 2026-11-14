@@ -16,6 +16,7 @@ import { ArmyState } from './army-state';
 import { GuideState } from './game-guide';
 import type { WorldObjectRef } from './world-targets';
 import type { PrayerDialog } from './game-prayer';
+import type { ExpeditionWindow } from './expedition-window';
 import type {
   WorldHit,
   SelectionGeometry,
@@ -98,6 +99,7 @@ export class GameAppState {
   speed = 1;
   paused = false;
   prayer: PrayerDialog | null = null;
+  expedition: ExpeditionWindow | null = null;
   card = -1;
   globalCard = -1;
   drawerOpen = false;

@@ -51,6 +51,8 @@ try {
       { copyNative },
       { Weather },
       { encodeTown },
+      { Cue },
+      { setLocale },
     ] = await Promise.all([
       import('/apps/web/src/native/startup-canvas.ts'),
       import('/packages/native-ui/src/index.ts'),
@@ -66,6 +68,8 @@ try {
       import('/packages/engine/src/native-copy.ts'),
       import('/packages/engine/src/climate.ts'),
       import('/packages/engine/src/save-game.ts'),
+      import('/packages/native-audio/src/sound-types.ts'),
+      import('/packages/localization/src/index.ts'),
     ]);
     const tvg = await initializeWebCanvas(renderer),
       element = document.createElement('canvas');
@@ -124,11 +128,22 @@ try {
       now: 0,
       width: 1024,
       height: 768,
+      heard: [],
+      setLocale,
       frame(dt = 0) {
         this.now += dt;
         game.render(this.width, this.height, this.now, true, 0.25, this.now);
         canvas.update().render();
-        game.takeCues();
+        const at = game.prayer && game.prayer.started >= 0 ? this.now - game.prayer.started : -1;
+        for (const cue of game.takeCues())
+          this.heard.push({ cue: Cue[cue.cue], gain: cue.gain, pitch: cue.pitch, at });
+      },
+      advanceTo(seconds) {
+        while (this.now - game.prayer.started < seconds) this.frame(0.05);
+      },
+      rite() {
+        const r = game.prayer.rite;
+        return r && { ...r };
       },
       reset(weather, hour, paused = false) {
         game.town = copyNative(base);
@@ -155,6 +170,7 @@ try {
           paused: game.paused,
           open: !!d,
           started: d?.started,
+          rite: d?.rite ? { ...d.rite } : null,
           committed: d?.committed,
           finished: d?.finished,
           born: d?.born
@@ -299,6 +315,96 @@ try {
     report.cases.push({ weather, before, born, after, passed: true });
     console.log(`${weather}: prayer, transformation, unarmed arrival and pause restoration PASS`);
   }
+  const gifts = {
+    Humble: { food: 4 },
+    Worthy: { food: 8, stone: 4, water: 4, gold: 4 },
+    Bountiful: { water: 8, bones: 12, gold: 10, food: 16, stone: 6 },
+    Kingly: { water: 60, bones: 60, gold: 60, food: 60, stone: 60 },
+  };
+  const open = async (weather, hour, gift) => {
+    await page.evaluate(({ weather, hour }) => prayerProbe.reset(weather, hour, false), { weather, hour });
+    await click('altar-pray');
+    for (const key of ['water', 'bones', 'gold', 'food', 'stone']) await fill(key, gift[key] ?? 0);
+  };
+  const heard = () => page.evaluate(() => prayerProbe.heard);
+  const names = (list) => list.map((h) => h.cue);
+  const expectedCues = {
+    Humble: ['Click', 'Discover', 'Mend'],
+    Worthy: ['Click', 'Discover', 'Raven', 'Mend'],
+    Bountiful: ['Click', 'Discover', 'Raven', 'Fall', 'Sanctuary'],
+    Kingly: ['Click', 'Discover', 'Raven', 'Fall', 'Sanctuary', 'Rally'],
+  };
+  const lengths = {};
+  for (const [grade, gift] of Object.entries(gifts)) {
+    await open('Clear', 12, gift);
+    const dialog = await page.evaluate(() => {
+      const d = prayerProbe.game.prayer;
+      return { offering: { ...d.offering } };
+    });
+    assert.equal(dialog.offering.food, gift.food ?? 0);
+    await page.screenshot({ path: `${output}/grade-${grade.toLowerCase()}.png` });
+    if (grade !== 'Humble' && grade !== 'Kingly') {
+      await page.keyboard.press('Escape');
+      continue;
+    }
+    await click('prayer-confirm');
+    const rite = await page.evaluate(() => prayerProbe.rite());
+    lengths[grade] = rite.end;
+    const tag = grade.toLowerCase();
+    const shots = [
+      ['laying', rite.lays[rite.lays.length - 1] + 0.1],
+      ['bowing', rite.bows[rite.bows.length - 1] + 0.7],
+      ['answer', (rite.answer + rite.release) / 2 + 0.2],
+      ['release', rite.release + 0.25],
+      ['arrival', rite.end - 0.1],
+    ];
+    await page.evaluate(() => (prayerProbe.heard.length = 0));
+    for (const [name, at] of shots) {
+      await page.evaluate((at) => prayerProbe.advanceTo(at), at);
+      await page.screenshot({ path: `${output}/rite-${tag}-${name}.png` });
+      if (name === 'bowing' && grade === 'Kingly') {
+        // The same rite in Korean, at its answer.
+      }
+    }
+    await frame(0.3);
+    const list = await heard();
+    assert.deepEqual([...new Set(names(list))].sort(), [...new Set(expectedCues[grade])].sort(), JSON.stringify(list));
+    const at = (cue) => list.filter((h) => h.cue === cue).map((h) => h.at);
+    assert(at('Click')[0] >= rite.lays[0] && at('Click')[0] < rite.lays[0] + 0.2, 'first gift is laid with a sound');
+    assert(at('Discover')[0] >= rite.answer && at('Discover')[0] < rite.answer + 0.2);
+    assert(at('Mend').concat(at('Sanctuary'))[0] >= rite.release);
+    const gain = (cue) => Math.max(...list.filter((h) => h.cue === cue).map((h) => h.gain));
+    report.cues ??= {};
+    report.cues[grade] = { heard: list, rite };
+    assert.equal((await snapshot()).finished, true);
+    await click('prayer-return');
+  }
+  assert(lengths.Humble < lengths.Kingly - 2, JSON.stringify(lengths));
+  // Louder and fuller for higher grades.
+  const loud = (grade, cue) => Math.max(...report.cues[grade].heard.filter((h) => h.cue === cue).map((h) => h.gain));
+  assert(loud('Kingly', 'Discover') > loud('Humble', 'Discover'));
+  // Korean: the dialog, then a kingly rite at its result.
+  await open('Clear', 12, gifts.Kingly);
+  await page.evaluate(() => prayerProbe.setLocale('ko'));
+  await frame(0.1);
+  await page.screenshot({ path: `${output}/grade-kingly-ko.png` });
+  await click('prayer-confirm');
+  await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().answer + 0.8));
+  await page.screenshot({ path: `${output}/rite-kingly-answer-ko.png` });
+  await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().end + 0.1));
+  await page.screenshot({ path: `${output}/rite-kingly-result-ko.png` });
+  await click('prayer-return');
+  await page.evaluate(() => prayerProbe.setLocale('en'));
+  // A reduced-motion rite must still run to the end.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await open('Clear', 12, gifts.Kingly);
+  await click('prayer-confirm');
+  await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().answer + 0.8));
+  await page.screenshot({ path: `${output}/rite-kingly-reduced.png` });
+  await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().end + 0.1));
+  assert.equal((await snapshot()).finished, true);
+  await click('prayer-return');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   const altarHit = await page.evaluate(() => {
     prayerProbe.reset('Clear', 12, false);
     const g = prayerProbe.game;
@@ -341,6 +447,16 @@ try {
     );
   }
   await page.screenshot({ path: `${output}/mobile-offering.png` });
+  for (const key of ['water', 'bones', 'gold', 'food', 'stone']) await fill(key, gifts.Kingly[key]);
+  await page.screenshot({ path: `${output}/mobile-grade-kingly.png` });
+  await click('prayer-confirm');
+  await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().answer + 0.8));
+  await page.screenshot({ path: `${output}/mobile-rite-kingly.png` });
+  await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().end + 0.1));
+  await page.screenshot({ path: `${output}/mobile-result-kingly.png` });
+  await click('prayer-return');
+  await page.evaluate(() => prayerProbe.game.openPrayer(1));
+  await frame(0);
   await page.keyboard.press('Escape');
   await page.requestGC();
   const beforeCancelLoops = await page.evaluate(() => prayerProbe.encodeTown(prayerProbe.game.town));

@@ -1,5 +1,5 @@
 import { Resources, resourceKeys } from './building-catalog';
-import { Calling, Person } from './person';
+import { Calling, Person, callingName } from './person';
 
 export const offeringKeys = ['water', 'bones', 'gold', 'food', 'stone'] as const;
 export type OfferingKey = (typeof offeringKeys)[number];
@@ -69,3 +69,104 @@ export function offeringOutcome(
   }
   return { level, calling: Calling.Settler };
 }
+
+export enum OfferingGrade {
+  Humble,
+  Worthy,
+  Bountiful,
+  Kingly,
+}
+/** Name, how it reads mid-sentence, and what such a gift tends to bring, in plain words. */
+const gradeWords = [
+  { name: 'Humble', lower: 'humble', line: 'A small gift. It tends to bring a plain settler.' },
+  { name: 'Worthy', lower: 'worthy', line: 'A fair gift. It tends to bring a settler with some skill.' },
+  {
+    name: 'Bountiful',
+    lower: 'bountiful',
+    line: 'A rich gift. It tends to bring a gifted and hardy resident.',
+  },
+  { name: 'Kingly', lower: 'kingly', line: 'A gift fit for a king. It tends to bring a hero.' },
+] as const;
+/** Lowest score of each grade after Humble; the score is the level ceiling plus the odds of a calling. */
+const gradeFloors = [3, 5, 7] as const;
+
+/** Worth of an offering from its profile alone: more levels and a better chance of a calling raise it. */
+export const offeringScore = (profile: ReturnType<typeof offeringProfile>): number =>
+  profile.levelMax + 3 * profile.specialistChance;
+
+export function gradeOfScore(score: number): OfferingGrade {
+  let grade = OfferingGrade.Humble;
+  for (const floor of gradeFloors) if (score >= floor) ++grade;
+  return grade;
+}
+export const gradeName = (grade: OfferingGrade): string => gradeWords[grade].name;
+export const gradeNameInSentence = (grade: OfferingGrade): string => gradeWords[grade].lower;
+export const offeringAcceptedText = (grade: OfferingGrade): string =>
+  `A ${gradeWords[grade].lower} offering was accepted.`;
+
+/** The calling the gifts favour, or null when they barely favour any. */
+export function favouredCalling(profile: ReturnType<typeof offeringProfile>): Calling | null {
+  if (profile.specialistChance < 0.05) return null;
+  return profile.classes.reduce((best, row) => (row.chance > best.chance ? row : best)).calling;
+}
+
+/** The fewest extra units of one resource that lift the offering to `target`, or -1 within `room`. */
+function topUp(offering: Resources, key: OfferingKey, target: OfferingGrade, room: number): number {
+  const reaches = (extra: number) => {
+    const gift = offering.clone();
+    gift[key] += extra;
+    return gradeOfScore(offeringScore(offeringProfile(gift))) >= target;
+  };
+  if (room <= 0 || !reaches(room)) return -1;
+  let low = 1,
+    high = room;
+  while (low < high) {
+    const mid = (low + high) >> 1;
+    if (reaches(mid)) high = mid;
+    else low = mid + 1;
+  }
+  return low;
+}
+
+export interface OfferingGradeReading {
+  grade: OfferingGrade;
+  name: string;
+  line: string;
+  favoured: Calling | null;
+  /** The resource that is quickest to add for the next grade, or null at the top or when the stores fall short. */
+  next: { grade: OfferingGrade; resource: OfferingKey } | null;
+}
+
+/** Plain-words reading of an offering; never changes the profile, so birth rules and odds are untouched. */
+export function offeringGradeOf(offering: Resources, stock?: Resources): OfferingGradeReading {
+  const profile = offeringProfile(offering),
+    grade = gradeOfScore(offeringScore(profile)),
+    reading: OfferingGradeReading = {
+      grade,
+      name: gradeWords[grade].name,
+      line: gradeWords[grade].line,
+      favoured: favouredCalling(profile),
+      next: null,
+    };
+  if (grade === OfferingGrade.Kingly) return reading;
+  const target = grade + 1;
+  let fewest = Infinity;
+  for (const key of offeringKeys) {
+    const room = Math.min(offeringLimit - offering[key], stock ? stock[key] - offering[key] : Infinity),
+      need = topUp(offering, key, target, room);
+    if (need > 0 && need < fewest) {
+      fewest = need;
+      reading.next = { grade: target, resource: key };
+    }
+  }
+  return reading;
+}
+export const favouredLine = (calling: Calling): string => `Leans toward ${callingName(calling)}s.`;
+
+/** Chance that Odin turns an offering of this grade away: the gifts are spent and no one comes. */
+export const refusalChances = [0.35, 0.15, 0.05, 0] as const;
+const refusalWords = ['Often refused', 'Sometimes refused', 'Rarely refused', 'Never refused'] as const;
+export const refusalWord = (grade: OfferingGrade): string => refusalWords[grade];
+/** A roll in [0, 1) refuses when it falls in the top slice, so a roll of 0 never refuses. */
+export const offeringRefused = (grade: OfferingGrade, roll: number): boolean =>
+  roll >= 1 - refusalChances[grade];

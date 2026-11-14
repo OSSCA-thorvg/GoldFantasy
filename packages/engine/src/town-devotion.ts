@@ -5,7 +5,8 @@ import { Building } from './town-models';
 import { CampReceipt } from './camp-economy';
 import { canControl, sameFaction, belongsToFaction } from './faction';
 import { distance, type Point } from './geometry';
-import { offeringReason, offeringOutcome } from './prayer-offering';
+import { offeringReason, offeringOutcome, offeringGradeOf, offeringRefused } from './prayer-offering';
+import { altarCap, altarCapReason } from './altar-cap';
 import { emptyEquipment } from './equipment';
 
 export const ceremonySeconds = 5;
@@ -30,6 +31,7 @@ export interface DevotionTown extends TownState {
   camp(id?: number): Building | null;
   settlementOf(item: Building | Person): number;
   stock(village?: number): Resources;
+  population(id?: number): number;
   makePerson(role: Role, calling: Calling, at: Point): Person;
   assignHomes(): void;
   staff(): void;
@@ -108,6 +110,7 @@ function altarReason(town: DevotionTown, id: number, personId = -1, checkFood = 
     return 'A resident is already preparing this altar.';
   if (localResidents(town, place) + reservedHomes(town, place, personId) >= localHousing(town, place))
     return 'No free resident bed. Complete a home in this settlement.';
+  if (town.population() >= altarCap(town)) return altarCapReason;
   if (checkFood && town.stock(camp.id).food < 4) return 'Need 4 food for the altar offering.';
   return '';
 }
@@ -132,12 +135,26 @@ export function altarOfferingReason(this: DevotionTown, id: number, offering: Re
   if (!this.stock(this.settlementOf(place)).covers(offering)) return 'The settlement does not have enough resources for this offering.';
   return '';
 }
+export interface OfferingResult {
+  born: Person | null;
+  /** Odin turned the gifts away: they are spent and no one came. */
+  refused: boolean;
+}
+export function summonFromOffering(this: DevotionTown, id: number, offering: Resources): Person | null {
+  return offerAtAltar.call(this, id, offering).born;
+}
 /** The presentation calls this once at transformation, while the world is paused.
  * Validation, payment and arrival are atomic. Closing before transformation costs nothing. */
-export function summonFromOffering(this: DevotionTown, id: number, offering: Resources): Person | null {
-  if (altarOfferingReason.call(this, id, offering)) return null;
-  const place = this.building(id)!, village = this.settlementOf(place),
-    outcome = offeringOutcome(offering, () => this.roll());
+export function offerAtAltar(this: DevotionTown, id: number, offering: Resources): OfferingResult {
+  if (altarOfferingReason.call(this, id, offering)) return { born: null, refused: false };
+  const place = this.building(id)!, village = this.settlementOf(place);
+  if (offeringRefused(offeringGradeOf(offering).grade, this.roll())) {
+    this.stock(village).subtract(offering);
+    this.notify('Odin turned the offering away. The gifts are gone.');
+    ++this.changes;
+    return { born: null, refused: true };
+  }
+  const outcome = offeringOutcome(offering, () => this.roll());
   const born = this.makePerson(Role.Resident, outcome.calling, this.grid.nearestWalkable(place.door()));
   born.faction = place.faction;
   born.village = village;
@@ -159,7 +176,7 @@ export function summonFromOffering(this: DevotionTown, id: number, offering: Res
   this.recordReceipt(new CampReceipt(0n, village, new Resources(), 0, 0, 1));
   this.notify(born.name + ' is shaped by the offering and joins the settlement.');
   ++this.changes;
-  return born;
+  return { born, refused: false };
 }
 export function prayerReason(this: DevotionTown, personId: number, altarId: number): string {
   const p = this.person(personId),

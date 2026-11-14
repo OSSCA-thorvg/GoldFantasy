@@ -1,7 +1,8 @@
 import type { Person } from '../../engine/src/person';
 import { Weather, type Climate } from '../../engine/src/climate';
 import type { Resources } from '../../engine/src/building-catalog';
-import { offeringKeys, type OfferingKey } from '../../engine/src/prayer-offering';
+import { offeringKeys, type OfferingKey, OfferingGrade } from '../../engine/src/prayer-offering';
+import { ravensFor, type RiteTimeline } from './offering-rite';
 import { point } from '../../engine/src/geometry';
 import { SceneNode, ShapeNode, type Rgb } from './paint';
 import { poly, oval, stroke, glow } from './sprite-primitives';
@@ -124,11 +125,16 @@ export class OfferingScene {
   private drops: ShapeNode[] = [];
   private night = new ShapeNode();
   private flash = new ShapeNode();
+  private wash = new ShapeNode();
+  private ring2 = new ShapeNode().appendCircle(0, 0, 24, 10).strokeWidth(1).strokeFill(223, 232, 180, 200);
+  private ravens = [0, 1].map(() => raven());
+  private rite: RiteTimeline | null = null;
   private size = '';
   constructor(
     readonly climate: Readonly<Climate>,
     people: readonly Person[],
     private ground: PortraitBackdrop,
+    private reducedMotion = false,
   ) {
     paintYmir(this.statue, point(), climate, false);
     this.table.add(
@@ -172,7 +178,7 @@ export class OfferingScene {
         { offset: 1, color: [243, 228, 173, 225] },
       ],
     };
-    this.arrival.add(this.halo).add(this.ring).add(this.beam).add(this.core);
+    this.arrival.add(this.halo).add(this.ring).add(this.ring2).add(this.beam).add(this.core);
     this.sparks.forEach((spark) => this.arrival.add(spark));
     const snow = climate.weather === Weather.Snow;
     if (snow || climate.weather === Weather.Rain || climate.weather === Weather.Storm)
@@ -186,7 +192,15 @@ export class OfferingScene {
     this.root.add(this.backdrop).add(this.statue).add(this.table);
     this.gifts.forEach((gift) => this.root.add(gift.node));
     this.worshippers.forEach((person) => this.root.add(person.node));
-    this.root.add(this.arrival).add(this.night).add(this.weather).add(this.flash);
+    this.ravens.forEach((r) => this.root.add(r));
+    this.root.add(this.arrival).add(this.night).add(this.weather).add(this.wash).add(this.flash);
+  }
+  get worshipperCount(): number {
+    return this.worshippers.length;
+  }
+  /** Starts the rite on this timeline; the grade sets how much light and how many ravens answer. */
+  begin(rite: RiteTimeline): void {
+    this.rite = rite;
   }
   update(
     width: number,
@@ -195,6 +209,7 @@ export class OfferingScene {
     ritual: number,
     offering: Resources,
     born: Person | null,
+    refused = false,
   ): void {
     const key = `${width}:${height}`;
     if (this.size !== key) {
@@ -242,31 +257,47 @@ export class OfferingScene {
         .appendRect(0, 0, width, height)
         .fill(9, 16, 31, Math.round(this.climate.night * 105));
       this.flash.reset().appendRect(0, 0, width, height).fill(222, 236, 241, 0);
+      this.wash.reset().appendRect(0, 0, width, height).fill(236, 232, 196, 0);
     }
     const s = Math.min(width / 650, height / 410),
       cx = width * 0.57,
       cy = height * 0.78,
-      lay = ritual < 0 ? 1 : smooth(ritual / 0.65),
-      transform = smooth((ritual - 3.2) / 1.6),
-      reveal = smooth((ritual - 4.8) / 1.2);
+      rite = ritual < 0 ? null : this.rite,
+      grade = rite?.grade ?? OfferingGrade.Humble,
+      size = [0.75, 0.95, 1.15, 1.4][grade],
+      gather = rite ? rite.release - rite.answer : 1,
+      transform = rite ? smooth((ritual - (rite.answer + 0.35 * gather)) / (0.65 * gather)) : 0,
+      reveal = rite && !refused ? smooth((ritual - rite.release) / 0.8) : 0;
     place(this.statue, cx, cy - 12 * s, 0.61 * s);
     place(this.table, cx, cy + 24 * s, s);
+    const handOf = (rank: number) => {
+      const k = rank % Math.max(1, this.worshippers.length);
+      return { x: cx - (130 - k * 43) * s, y: cy + (30 + (k % 2) * 18) * s };
+    };
+    let rank = 0;
     this.gifts.forEach((gift, i) => {
-      const fromX = cx + (i - 2) * 25 * s,
-        fromY = cy + (i % 2 ? 13 : 19) * s;
+      const present = offering[gift.key] > 0,
+        slotX = cx + (i - 2) * 25 * s,
+        slotY = cy + (i % 2 ? 13 : 19) * s,
+        lay = !rite ? 1 : smooth((ritual - (rite.lays[Math.min(rank, rite.lays.length - 1)] - 0.3)) / 0.3),
+        hand = handOf(rank);
+      if (present) ++rank;
+      const x = hand.x + (slotX - hand.x) * lay,
+        y = hand.y + (slotY - hand.y) * lay - Math.sin(lay * Math.PI) * 24 * s;
       place(
         gift.node,
-        fromX + (cx - fromX) * transform - (1 - lay) * 18 * s,
-        fromY + (1 - lay) * 30 * s - Math.sin(transform * Math.PI) * 30 * s - transform * 29 * s,
+        x + (cx - x) * transform,
+        y - Math.sin(transform * Math.PI) * 30 * s - transform * 29 * s,
         s * (0.8 + 0.2 * lay) * (1 - 0.94 * transform),
       );
-      gift.node.opacity(offering[gift.key] > 0 ? Math.round(255 * (1 - transform)) : 0);
+      gift.node.opacity(present && (!rite || lay > 0) ? Math.round(255 * (1 - transform)) : 0);
     });
     this.worshippers.forEach((p, i) => {
       const x = cx - (130 - i * 43) * s,
-        y = cy + (50 + (i % 2) * 18) * s;
+        y = cy + (50 + (i % 2) * 18) * s,
+        start = rite ? rite.bows[Math.min(i, rite.bows.length - 1)] : 0;
       place(p.node, x, y, 3.2 * s);
-      animatePrayer(p.parts, ritual < 0 ? 0 : Math.max(0, ritual - 0.45), 7.3);
+      animatePrayer(p.parts, rite ? Math.max(0, ritual - start) : 0, rite ? rite.release - start + 0.4 : 1);
       seatHead(p.parts);
     });
     if (born && this.born !== born.id) {
@@ -277,22 +308,57 @@ export class OfferingScene {
       this.arrival.add(this.arriving);
     }
     place(this.arrival, cx, cy - 3 * s, s);
-    const energy =
-      ritual < 0 ? 0 : ritual < 4.8 ? smooth((ritual - 1.2) / 3.6) : 1 - smooth((ritual - 4.8) / 2.2);
+    const energy = !rite
+      ? 0
+      : ritual < rite.answer
+        ? 0
+        : ritual < rite.release
+          ? smooth((ritual - rite.answer) / gather)
+          : refused
+            ? 1 - smooth((ritual - rite.release) / 0.5)
+            : 1 - smooth((ritual - rite.release) / Math.max(0.5, rite.end - rite.release - 0.2));
+    this.halo.transform([size, 0, 0, 0, size, 0, 0, 0, 1]);
     this.halo.opacity(Math.round(220 * energy));
+    this.beam.transform([size * 0.85, 0, 0, 0, size, 0, 0, 0, 1]);
     this.beam.opacity(Math.round(255 * energy));
-    this.core.opacity(Math.round(230 * energy * smooth((ritual - 3.2) / 0.8)));
-    const spread = 1 + 0.8 * smooth((ritual - 4.4) / 2.4);
+    this.core.opacity(
+      Math.round(230 * energy * (rite ? smooth((ritual - rite.answer - 0.6 * gather) / 0.8) : 0)),
+    );
+    const spread = (1 + 0.8 * (rite && !refused ? smooth((ritual - rite.release + 0.4) / 2.4) : 0)) * size;
     this.ring.transform([spread, 0, 0, 0, spread, 0, 0, 0, 1]);
     this.ring.opacity(Math.round(220 * energy));
+    const second = spread * (1.45 + 0.4 * reveal);
+    this.ring2.transform([second, 0, 0, 0, second, 0, 0, 0, 1]);
+    this.ring2.opacity(grade >= OfferingGrade.Bountiful ? Math.round(180 * energy * reveal) : 0);
+    const active = [6, 10, 14, 18][grade],
+      drift = this.reducedMotion ? 0 : seconds;
     this.sparks.forEach((spark, i) => {
-      const angle = (i * Math.PI * 2) / this.sparks.length + seconds * 0.23,
-        radius = (16 + (1 - transform) * 35 + reveal * 25) * (i % 2 ? 0.85 : 1);
+      const angle = (i * Math.PI * 2) / this.sparks.length + drift * 0.23,
+        radius = (16 + (1 - transform) * 35 + reveal * 25) * (i % 2 ? 0.85 : 1) * Math.sqrt(size);
       spark.translate(Math.cos(angle) * radius, -28 + Math.sin(angle) * radius * 0.65);
-      spark.opacity(Math.round(220 * energy * (0.65 + 0.35 * Math.sin(seconds * 2 + i))));
+      spark.opacity(i < active ? Math.round(220 * energy * (0.65 + 0.35 * Math.sin(drift * 2 + i))) : 0);
     });
+    this.ravens.forEach((bird, i) => {
+      const there = !!rite && i < ravensFor(grade) && ritual >= rite.answer + 0.1 * i,
+        side = i ? 1 : -1,
+        t = !rite || this.reducedMotion ? 1 : smooth((ritual - rite.answer - 0.1 - 0.35 * i) / 0.9),
+        perchX = cx + side * 66 * s,
+        perchY = cy + 21 * s,
+        leave = rite && refused ? smooth((ritual - rite.release - 0.2 - 0.25 * i) / 0.8) : 0,
+        x = perchX + side * ((1 - t) * 160 + leave * 200) * s,
+        y = perchY - ((1 - t) * 210 + leave * 260) * s + Math.sin(t * Math.PI) * 30 * s,
+        flap = t < 1 || (leave > 0 && leave < 1) ? Math.sin(ritual * 22 + i) : 0;
+      bird.transform([2.3 * s * (side < 0 ? -1 : 1), 0, x, 0, 2.3 * s, y, 0, 0, 1]);
+      bird.children[2].transform([1, 0, 0, 0, 1 + 0.9 * flap, 0, 0, 0, 1]);
+      bird.opacity(there && leave < 1 ? 255 : 0);
+    });
+    const burst = rite
+      ? smooth((ritual - rite.release) / 0.15) * (1 - smooth((ritual - rite.release - 0.15) / 0.7))
+      : 0;
+    if (refused) this.wash.fill(14, 18, 26, this.reducedMotion ? 0 : Math.round(burst * 70));
+    else this.wash.fill(236, 232, 196, this.reducedMotion ? 0 : Math.round(burst * [0, 30, 50, 80][grade]));
     if (this.arriving) {
-      const joining = smooth((ritual - 6) / 1.2);
+      const joining = rite ? smooth((ritual - rite.join) / 0.9) : 0;
       place(this.arriving, -14 * joining, -(1 - reveal) * 12 + joining * 25, 3.6 * (0.78 + 0.22 * reveal));
       if (this.bornParts) stridePose(this.bornParts, ritual * 7, joining > 0 && joining < 1);
       this.arriving.opacity(Math.round(255 * reveal));
@@ -309,4 +375,32 @@ export class OfferingScene {
       this.flash.fill(222, 236, 241, Math.round(flash * 130));
     }
   }
+}
+
+/** A flat raven in profile facing right: body, head, beak and a wing that can be scaled to flap. */
+function raven(): SceneNode {
+  const bird = new SceneNode();
+  bird.add(oval([0, 0], 7, 4.2, [30, 32, 40]));
+  bird.add(oval([6, -3], 3, 2.6, [30, 32, 40]));
+  bird.add(
+    poly(
+      [
+        [-3, -1],
+        [-12, -9],
+        [-8, 2],
+      ],
+      [48, 52, 62],
+    ),
+  );
+  bird.add(
+    poly(
+      [
+        [8, -3.6],
+        [12.5, -2.6],
+        [8, -1.8],
+      ],
+      [112, 96, 60],
+    ),
+  );
+  return bird;
 }

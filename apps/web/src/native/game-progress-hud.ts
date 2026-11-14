@@ -1,4 +1,5 @@
 import { Rect, Align, ButtonStyle, button, type Context, type Color } from '../../../../packages/native-ui/src';
+import { openExpedition } from './expedition-window';
 import { translate } from '../../../../packages/localization/src/index';
 import { Tool, toolStructure } from '../../../../packages/engine/src/game-tools';
 import {
@@ -250,7 +251,7 @@ function visitAction(app: GameHudApp, kind: Structure, label: string): QuestActi
   const tool = toolOf(kind);
   return tool === undefined ? null : placeAction(app, tool);
 }
-/** Centres the nearest found, unsealed gate and selects it when no residents are chosen. */
+/** Centres the nearest found, unsealed gate and opens its expedition window with the selection chosen. */
 export function jumpToGate(app: GameHudApp): void {
   const town = app.town,
     from = town.camp()?.center ?? town.map().camp();
@@ -271,12 +272,8 @@ export function jumpToGate(app: GameHudApp): void {
   }
   const site = town.map().dungeons()[best];
   look(app, f32(site.origin.x + 1), f32(site.origin.y + 1));
-  if (!app.chosen.length) {
-    app.selectTool(Tool.Select);
-    app.selected = app.selectedTree = app.selectedTreeInstance = app.selectedRock = app.selectedAnimal = -1;
-    app.selectedObjects = [];
-    app.selectedDungeon = best;
-  }
+  app.selectTool(Tool.Select, true);
+  openExpedition(app, best, app.chosen);
 }
 const inHand = (p: Person): boolean =>
   equipmentSlots.some((slot) => {
@@ -413,9 +410,9 @@ export function questAction(app: GameHudApp, goal: SettlementGoal): QuestAction 
     }
     case GoalKind.Floor:
     case GoalKind.Seal:
-      return { label: 'Find the nearest open gate', run: () => jumpToGate(app) };
+      return { label: 'Plan an expedition', run: () => jumpToGate(app) };
     case GoalKind.Deed:
-      if (gateDeeds.has(goal.deed)) return { label: 'Find the nearest open gate', run: () => jumpToGate(app) };
+      if (gateDeeds.has(goal.deed)) return { label: 'Plan an expedition', run: () => jumpToGate(app) };
       if (goal.deed === 'sworn') return visitAction(app, Structure.Guild, 'Open the guild');
       if (goal.deed === 'weaponsForged') return visitAction(app, Structure.Weaponsmith, 'Open the weaponsmith');
       return null;

@@ -65,7 +65,7 @@ function shaft(rig: ArmRig, reach: number): Point {
   return apply(rig.forearm!.matrix, apply(rig.hand!.matrix, grip));
 }
 const twoHanded = (tool: HeldTool | null): boolean =>
-  tool === 'axe' || tool === 'pickaxe' || tool === 'hoe' || tool === 'shovel';
+  tool === 'axe' || tool === 'pickaxe' || tool === 'hoe' || tool === 'shovel' || tool === 'spear';
 /** Sets the body over feet that stay where they stand, the leading foot stepping into the blow. */
 export function stand(parts: PersonParts, pose: ActionPose, spread: number, step = 0): void {
   const tall = 1 - pose.crouch;
@@ -130,7 +130,13 @@ export function poseFromClip(parts: PersonParts, clip: RigClip, frame: number, t
 }
 /** The shared blow a tool is swung with: heavy two-handed tools chop, bare hands punch, the rest cut. */
 const blowOf = (tool: HeldTool | null): RigClip =>
-  !tool ? humanoidClips.punch : twoHanded(tool) ? humanoidClips.chop : humanoidClips.slash;
+  !tool
+    ? humanoidClips.punch
+    : tool === 'spear'
+      ? humanoidClips.thrust
+      : twoHanded(tool)
+        ? humanoidClips.chop
+        : humanoidClips.slash;
 
 /** Draws and looses the bow along `phase` of a shot; `raise` tips the shot upward, in radians, for a volley. */
 function shootBow(parts: PersonParts, phase: number, raise: number): void {
@@ -335,25 +341,27 @@ export function animateGather(parts: PersonParts, amount: number): void {
   );
 }
 
-/** Kneeling over someone who has fallen, both hands at work on them. */
+/** Down beside someone who has fallen: bent low over them, both hands pressing in a steady rhythm. */
 export function animateTend(parts: PersonParts, seconds: number): void {
-  const press = Math.sin(seconds * 5.2),
+  // Two presses a second: down sharply, up slowly.
+  const beat = (seconds * 2) % 1,
+    press = beat < 0.25 ? smooth(beat / 0.25) : 1 - smooth((beat - 0.25) / 0.75),
     shoulder = parts.arms[1].shoulder.y;
-  reachArm(parts.arms[1], { x: 4.4 + press * 0.35, y: shoulder + 7.6 }, 1, 0, 0);
-  if (parts.arms[0].free) reachArm(parts.arms[0], { x: 2.8 - press * 0.3, y: shoulder + 7.9 }, 1, 0, 0);
+  reachArm(parts.arms[1], { x: 5.2, y: shoulder + 8.2 + press * 1.3 }, 1, 0, 0);
+  if (parts.arms[0].free) reachArm(parts.arms[0], { x: 3.6, y: shoulder + 8.4 + press * 1.3 }, 1, 0, 0);
   stand(
     parts,
     {
       upper: 0,
       elbow: 0,
       direction: 0,
-      crouch: 0.24 + press * 0.012,
+      crouch: 0.34 + press * 0.05,
       lift: 0,
-      lean: 0.13,
-      forward: 0.7,
-      nod: 0.24,
+      lean: 0.2 + press * 0.04,
+      forward: 1.1,
+      nod: 0.3 + press * 0.06,
     },
-    0.45,
+    0.7,
   );
 }
 

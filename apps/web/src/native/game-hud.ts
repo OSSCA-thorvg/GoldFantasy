@@ -55,14 +55,13 @@ import { guideHud } from './game-guide-panel';
 import { unitOrdersCard } from './unit-orders-card';
 import { groupTabs } from './control-groups';
 import { aimPrompt, currentAim } from './skill-commands';
-import { floorForecast } from './swarm-hud';
+import { gateKindName, gateLock, openExpedition } from './expedition-window';
 const tools = toolInfo;
 /** Every group with every building: locked ones stay in the menu, greyed, with what they need. */
 export function buildGroups(_town: Town): BuildGroup[] {
   return [...buildMenuGroups];
 }
-const dungeonKind = (kind: DungeonKind) =>
-  ['Cave', 'Crypt', 'Rift portal', 'Ruined tower', 'Coastal giant hall', 'Rift'][kind] ?? '';
+const dungeonKind = gateKindName;
 const wrap = wrapText;
 export function hud(this: GameHudApp, width: number, height: number): void {
   this.updateContextDock(width, height);
@@ -501,42 +500,32 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     } else {
       const gate = this.selectedDungeon,
         floors = this.town.gateFloors(gate),
-        chosen = Math.min(this.gateFloor.get(gate) ?? this.town.deepestOpenFloor(gate), this.town.deepestOpenFloor(gate));
+        lock = gateLock(this.town, gate);
       textRow(
         floors.sealed ? 'Sealed: no raid leaves this gate' : `Floors cleared: ${floors.cleared} of ${floors.total}`,
         floors.sealed ? t.success : t.text,
         12,
         true,
       );
-      const at = y;
-      rows.push(() => {
-        const span = f32(f32(inner - 8 * (floors.total - 1)) / floors.total);
-        for (let floor = 0; floor < floors.total; ++floor)
-          button(
-            c,
-            'gate-floor/' + floor,
-            new Rect(f32(left + f32((span + 8) * floor)), f32(f32(top + at) + 2), span, 26),
-            `Floor ${floor + 1}` + (floor < floors.cleared ? ' *' : ''),
-            () => this.gateFloor.set(gate, floor),
-            ButtonStyle.Default,
-            this.town.floorOpen(gate, floor),
-            undefined,
-            floor === chosen,
-          );
-      });
-      y = f32(y + 34);
-      floorForecast(this, gate, chosen).forEach((line, i) => {
-        for (const row of wrap(c, line, inner, 12)) textRow(row, i === 0 ? t.text : t.muted, 12);
-      });
-      const problem = this.town.expeditionProblem(gate, chosen);
       for (const line of wrap(
         c,
-        problem ||
-          `Select residents and right-click this gate to lead them to floor ${chosen + 1}. * marks a cleared floor that can be fought again. Clear floor ${floors.total} to seal the gate.`,
+        lock || 'Click the gate, or the button below, to choose a party and a floor and set out.',
         inner,
         12,
       ))
-        textRow(line, problem ? t.danger : t.muted, 12);
+        textRow(line, lock ? t.danger : t.muted, 12);
+      const at = y;
+      rows.push(() =>
+        button(
+          c,
+          'gate-expedition',
+          new Rect(left, f32(f32(top + at) + 2), Math.min(inner, 220), this.touchMode ? 44 : 28),
+          'Plan an expedition',
+          () => openExpedition(this, gate, this.chosen),
+          ButtonStyle.Primary,
+        ),
+      );
+      y = f32(y + (this.touchMode ? 52 : 36));
       const progress: InspectorRows = { rows, left, inner, top, y };
       progressInspector(this, null, gate, progress);
       y = progress.y;

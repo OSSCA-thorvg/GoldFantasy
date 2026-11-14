@@ -82,7 +82,8 @@ export class Person {
   relaxedAt = -1e9; prayedAt = -1e9; load = 0; breaking = 0; gear = 0; level = 1; experience = 0; purse = 0; worked = 0; unpaid = false; sleptOutside = false;
   customLook: Appearance | null = null; lookRevision = 0n; entrance = point(); threshold = point(); doorway = 0; faith = Faith.Dawn; past = ''; village = -1; supplyTarget = -1; supplyRoad = false; scheduleAt = 0;
   constructor(public id: number, public name: string, public role: Role, public calling: Calling, public race: Race, public look: number, public position: Point, public path: Point[] = []) {}
-  experienceToNextLevel(): number { return this.level >= Person.maximumLevel ? 0 : 30 + 20 * (this.level - 1); }
+  /** Each level asks more than the last, and the gap itself widens: a floor's worth of fighting is a level or two, not five. */
+  experienceToNextLevel(): number { const n = this.level - 1; return this.level >= Person.maximumLevel ? 0 : 40 + 30 * n + 3 * n * n; }
   /** Levels and a fighting calling are what turn a long brawl into a quick kill. */
   /** Growth a level brings to blows and to the health a blow takes away; strong enough that a level is felt. */
   static attackPerLevel = 0.15;

@@ -307,7 +307,7 @@
   },
   {
     "title": "Lead a party of three",
-    "description": "Select three residents and right-click a discovered gate to lead them into the world beyond.",
+    "description": "Click a discovered gate, choose three residents in the expedition window and set out.",
     "kind": "Deed",
     "building": "Count",
     "residents": 3,
