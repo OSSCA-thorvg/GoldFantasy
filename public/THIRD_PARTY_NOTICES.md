@@ -24,4 +24,4 @@ The optional original HUD scripting extension uses **Lua 5.4.8**, compiled to We
 
 Music, environmental sounds, effects and generated voice banks retain the [original audio provenance and licensing notice](assets/audio/NOTICE.md). That notice identifies the Loach procedural packs, the CC0 dedication for the Nature of Greoni pack and generated cat call, and the Qwen3-TTS voice-generation provenance. These sounds are shipped as original Ogg assets and/or PCM decoded from those assets; no speech model runs in the game.
 
-Building, character, wildlife and world vector artwork is carried over from the original game source under the project license. Midgard's display name does not change those assets' provenance or licensing.
+Building, character, wildlife and world vector artwork is carried over from the original game source under the project license. Midgard's display name does not change those assets' provenance or licensing. The opening saga painting (`assets/saga/midgard.jpg`) is original artwork made for this project and is distributed under the project license.
