@@ -29,6 +29,32 @@ function priority(cue: Cue): number {
   switch (cue) {
     case Cue.Alarm:
       return 10;
+    // A resident's own fall cuts through any crowd.
+    case Cue.Downed:
+      return 9;
+    case Cue.BroodBreak:
+      return 8;
+    case Cue.Challenge:
+    case Cue.Whirl:
+    case Cue.AimedShot:
+    case Cue.Volley:
+    case Cue.RuneBurst:
+    case Cue.FrostRing:
+    case Cue.Mend:
+    case Cue.Sanctuary:
+    case Cue.Rally:
+    case Cue.Dirge:
+      return 7;
+    case Cue.DenFall:
+    case Cue.WaveHorn:
+      return 6;
+    case Cue.Cleave:
+    case Cue.Crush:
+    case Cue.Pierce:
+    case Cue.Splash:
+      return 3;
+    case Cue.Spawn:
+      return 1;
     case Cue.Click:
     case Cue.Order:
     case Cue.Refuse:
@@ -41,7 +67,11 @@ function priority(cue: Cue): number {
     case Cue.Unseal:
     case Cue.ThunderCrack:
     case Cue.ThunderStrike:
-      return 6;
+    case Cue.Fall:
+      return 9;
+    case Cue.Slam:
+    case Cue.Swing:
+      return 4;
     case Cue.Place:
     case Cue.Demolish:
     case Cue.Howl:
@@ -82,7 +112,38 @@ function interval(cue: Cue): number {
     case Cue.Hammer:
       return 0.12;
     case Cue.TreeFall:
+    case Cue.Slam:
       return 0.4;
+    case Cue.Fall:
+      return 1;
+    case Cue.Cleave:
+    case Cue.Crush:
+    case Cue.Pierce:
+    case Cue.Splash:
+      return 0.06;
+    case Cue.SwarmDeath:
+      return 0.08;
+    case Cue.Spawn:
+      return 0.3;
+    case Cue.Challenge:
+    case Cue.Whirl:
+    case Cue.AimedShot:
+    case Cue.Volley:
+    case Cue.RuneBurst:
+    case Cue.FrostRing:
+    case Cue.Mend:
+    case Cue.Sanctuary:
+    case Cue.Rally:
+    case Cue.Dirge:
+      return 0.15;
+    case Cue.Downed:
+      return 0.1;
+    case Cue.DenFall:
+      return 0.6;
+    case Cue.BroodBreak:
+      return 3;
+    case Cue.WaveHorn:
+      return 4;
     case Cue.Raven:
       return 4;
     case Cue.Pig:
@@ -103,12 +164,22 @@ function interval(cue: Cue): number {
 const interaction = (cue: Cue): boolean =>
   cue === Cue.Click || cue === Cue.Order || cue === Cue.Place || cue === Cue.Refuse || cue === Cue.Open;
 const thunder = (cue: Cue): boolean => cue >= Cue.ThunderCrack && cue <= Cue.ThunderRumble;
+/** The many small sounds of a melee; together they never hold more than `maxCrowd` slots. */
+export const crowdCue = (cue: Cue): boolean =>
+  cue === Cue.Clash ||
+  cue === Cue.Bite ||
+  cue === Cue.Arrow ||
+  cue === Cue.Parry ||
+  (cue >= Cue.Cleave && cue <= Cue.Splash) ||
+  cue === Cue.SwarmDeath ||
+  cue === Cue.Spawn;
 export class EffectManager {
   static readonly maxEffects = 8;
   static readonly maxSelectedSpeech = 1;
   static readonly maxNearbySpeech = 2;
   static readonly maxSpeech = 3;
   static readonly maxConcurrent = 11;
+  static readonly maxCrowd = 4;
   private slots: Slot[] = Array.from({ length: EffectManager.maxConcurrent }, slot);
   private nextAllowed = new Float64Array(256);
   private nextSpeechAllowed = new Float64Array(EffectManager.maxSpeech);
@@ -180,13 +251,20 @@ export class EffectManager {
     } else {
       if (this.now + 1e-9 < this.nextAllowed[key]) return reject();
       let same = 0,
-        oldest = -1;
+        oldest = -1,
+        crowd = 0,
+        quietest = -1;
       for (let i = 0; i < EffectManager.maxEffects; ++i) {
         const s = this.slots[i];
         if (!s.token && chosen < 0) chosen = i;
         if (s.token && s.cue === sound.cue) {
           ++same;
           if (oldest < 0 || s.token < this.slots[oldest].token) oldest = i;
+        }
+        if (s.token && crowdCue(s.cue)) {
+          ++crowd;
+          const q = quietest >= 0 ? this.slots[quietest] : null;
+          if (!q || s.priority < q.priority || (s.priority === q.priority && s.token < q.token)) quietest = i;
         }
       }
       const limit =
@@ -199,12 +277,20 @@ export class EffectManager {
         sound.cue === Cue.Chicken ||
         sound.cue === Cue.Dog ||
         sound.cue === Cue.Growth ||
+        sound.cue === Cue.BroodBreak ||
+        sound.cue === Cue.WaveHorn ||
+        sound.cue === Cue.DenFall ||
         thunder(sound.cue)
           ? 1
           : 2;
       if (same >= limit) {
         if (!interaction(sound.cue)) return reject();
         chosen = oldest;
+      }
+      // A full crowd yields only to a more important crowd sound, never to one of its own rank.
+      if (crowdCue(sound.cue) && crowd >= EffectManager.maxCrowd) {
+        if (priority(sound.cue) <= this.slots[quietest].priority) return reject();
+        chosen = quietest;
       }
       if (chosen < 0) {
         let lowest = 0;

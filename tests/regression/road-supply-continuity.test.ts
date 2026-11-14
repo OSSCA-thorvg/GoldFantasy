@@ -1,3 +1,4 @@
+import { heldAmount } from '../../packages/engine/src/carried-resources';
 import { describe, expect, it } from 'vitest';
 import { Town } from '../../packages/engine/src/town';
 import { WorldMap } from '../../packages/engine/src/world-map';
@@ -127,12 +128,15 @@ describe('road supply transactions remain assigned until completion or cancellat
     ++town.changes;
     town.tick(0);
     expect(town.grid.path(worker.position, road.workPoint())).toEqual([]);
-    until(v, () => worker.activity === Activity.WaitingMaterials, 5);
-    const progress = road.built;
+    // The builder first finishes gathering its share on the far side, then finds the way back closed.
+    until(v, () => worker.activity === Activity.WaitingMaterials, 90);
+    const progress = road.built,
+      held = heldAmount(worker, Product.Wood);
+    expect(held).toBeGreaterThanOrEqual(3);
     for (let i = 0; i < 60; i++) {
       town.advance(0.1);
       retains(v);
-      expect(worker.carrying).toBe(3);
+      expect(heldAmount(worker, Product.Wood)).toBe(held);
       expect(road.built).toBe(progress);
     }
     expect(town.demolish(blocker.center)).toBe(true);

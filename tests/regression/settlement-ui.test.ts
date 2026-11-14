@@ -29,6 +29,7 @@ import {
   placementPanel,
   placementPanelBounds,
 } from '../../apps/web/src/native/game-hud';
+import { stationCrafter } from '../../apps/web/src/native/craft-station-hud';
 import { objectives } from '../../apps/web/src/native/game-objectives';
 import * as input from '../../apps/web/src/native/game-input';
 import { PointerButton, Tool, Order } from '../../packages/engine/src/game-tools';
@@ -175,7 +176,8 @@ it.each([
     ui.draw(() => personPanel.call(ui.app, selected));
     expect(selected.y + selected.h).toBe(height - 12);
     const actions = ui.controls.mock.calls.filter(([id]) => id.startsWith('unit/card-'));
-    expect(actions).toHaveLength(7);
+    // Build, Move, Attack, Hold, Stop, Work, Clear, Select.
+    expect(actions).toHaveLength(8);
     for (const [, r] of actions) {
       expect(r.w).toBeGreaterThanOrEqual(44);
       expect(r.h).toBeGreaterThanOrEqual(44);
@@ -378,10 +380,10 @@ it('keeps Unit management open while equipping its selected resident without sel
     expect(p.equipment.tool1).toBe(1);
     expect(ui.app.chosen).toEqual([ui.town.folk[1].id]);
     expect(ui.app.selectPeople).not.toHaveBeenCalled();
+    // Crafting is done at a workbench in the world; the unit window only leads there.
     draw();
-    click('equipment-tab-craft');
-    draw();
-    expect(ui.controls.mock.calls.some(([id]) => id.startsWith('craft-item-'))).toBe(true);
+    expect(ui.controls.mock.calls.some(([id]) => id === 'equipment-workbench')).toBe(true);
+    expect(ui.controls.mock.calls.some(([id]) => id.startsWith('craft-item-'))).toBe(false);
     expect(ui.app.rosterOpen).toBe(true);
   } finally {
     ui.dispose();
@@ -841,7 +843,7 @@ it.each([
       ui.draw(() => personPanel.call(ui.app, panel));
       if (count === 1 && !sheltered) ui.capture('selection-bottom-390x844');
       const commands = ui.controls.mock.calls.filter(([id]) => id.startsWith('unit/card-'));
-      expect(commands).toHaveLength(sheltered ? 8 : 7);
+      expect(commands).toHaveLength(sheltered ? 9 : 8);
       for (const [id, bounds] of commands) {
         expect(bounds.h, id).toBeGreaterThanOrEqual(28);
         expect(bounds.y, id).toBeGreaterThanOrEqual(panel.y + panel.h - 42 - 0.001);
@@ -901,21 +903,17 @@ it.each([
     expect(ui.town.settlementOf(smith)).toBe(10);
     ui.app.selected = smith.id;
     ui.app.chosen = selected === 'none' ? [] : [selected === 'local' ? preferred.id : foreign.id];
-    ui.draw(() => inspector.call(ui.app, new Rect(100, 100, 620, 420), true));
-    const action = ui.controls.mock.calls.find(([id]) => id === 'workshop-craft')!;
-    expect(action[3]).toBe(true);
-    ui.context.pointerDown(action[1].x + 10, action[1].y + 10);
-    ui.context.pointerUp(action[1].x + 10, action[1].y + 10);
+    // The station's own panel names the crafter: someone of its camp, the selected one first.
     const expected = selected === 'local' ? preferred : local;
-    expect(ui.app.selectPeople).toHaveBeenCalledWith([expected.id]);
-    expect(ui.app.equipmentTab).toBe('craft');
-    expect(ui.app.craftWorkshopFilter).toBe(kind);
+    expect(stationCrafter(ui.app, smith)?.id).toBe(expected.id);
     expect(ui.town.craftReason(expected.id, smith.id, kind === Structure.Weaponsmith ? 'axe' : 'cap')).toBe(
       '',
     );
-    local.faction = preferred.faction = 1;
     ui.draw(() => inspector.call(ui.app, new Rect(100, 100, 620, 420), true));
-    expect(ui.controls.mock.calls.find(([id]) => id === 'workshop-craft')![3]).toBe(false);
+    expect(ui.controls.mock.calls.some(([id]) => id === 'workshop-craft')).toBe(false);
+    expect(ui.controls.mock.calls.some(([id]) => String(id).startsWith('station-craft-'))).toBe(true);
+    local.faction = preferred.faction = 1;
+    expect(stationCrafter(ui.app, smith)).toBeNull();
   } finally {
     ui.dispose();
   }

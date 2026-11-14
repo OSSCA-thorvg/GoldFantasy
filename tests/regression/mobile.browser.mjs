@@ -33,9 +33,9 @@ try {
   await server.listen();
   browser = await chromium.launch({ headless: true, args: ['--mute-audio'] });
   for (const [width, height, renderer] of [
-    [390, 844, 'sw'],
+    [390, 844, 'gl'],
     [844, 390, 'gl'],
-    [360, 740, 'sw'],
+    [360, 740, 'gl'],
   ]) {
     const context = await browser.newContext({
       viewport: { width, height },

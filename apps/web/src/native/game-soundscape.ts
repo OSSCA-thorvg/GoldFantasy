@@ -105,6 +105,7 @@ export function soundscape(this: GameSoundApp, seconds: number): void {
     for (const animal of this.town.wildlife())
       if (
         animal.health > 0 &&
+        !this.town.animalAsleep(animal) &&
         (animal.animal === AnimalKind.Pig) === pig &&
         this.renderer.visible(animal.position)
       ) {

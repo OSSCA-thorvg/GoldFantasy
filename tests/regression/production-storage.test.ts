@@ -40,6 +40,7 @@ describe('processing and dedicated stores', () => {
     expect(goals.indexOf(Structure.Sawmill)).toBeLessThan(goals.indexOf(Structure.Weaponsmith));
     expect(goals.indexOf(Structure.Stoneworks)).toBeLessThan(goals.indexOf(Structure.Weaponsmith));
     const town = fixture();
+    expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Guild');
     facility(town, Structure.Guild);
     expect(buildingUnlock(town, Structure.Weaponsmith).reason).toBe('Complete Sawmill');
     facility(town, Structure.Sawmill);

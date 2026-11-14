@@ -1,3 +1,4 @@
+import { fieldRows } from '../../engine/src/farm-work';
 import { registerPick } from './world-pick-registry';
 import {
   add,
@@ -15,8 +16,17 @@ import { ShapeNode, SceneNode, type Rgb, type Rgba } from './paint';
 import { appendPolygon, fill, mix, opaque, sightDisc } from './vector-paint';
 import { region, eachCell, appendOutline, type Sample } from './contours';
 import type { Climate, TerrainMap, TileRegion, River, Sight } from './render-types';
+import { drift, Liquid, type Drift } from './water-motion';
+import { paintLava } from './lava-motion';
 const f = Math.fround;
 const seaDrop = f(22 / (2 * tileHalfHeight));
+// Water and Sea rows keep the drifting contour palette.
+const water = (base: Rgb): readonly Rgb[] => [
+  mix(base, [6, 7, 33], f(0.16)),
+  base,
+  mix(base, [255, 246, 226], f(0.04)),
+  mix(base, [255, 246, 226], f(0.08)),
+];
 const palette: readonly (readonly Rgb[])[] = [
   [
     [36, 50, 40],
@@ -36,12 +46,7 @@ const palette: readonly (readonly Rgb[])[] = [
     [34, 46, 37],
     [37, 49, 39],
   ],
-  [
-    [20, 31, 45],
-    [22, 34, 49],
-    [24, 37, 53],
-    [26, 40, 57],
-  ],
+  water([11, 44, 50]),
   [
     [58, 57, 61],
     [63, 62, 66],
@@ -54,12 +59,7 @@ const palette: readonly (readonly Rgb[])[] = [
     [92, 83, 64],
     [96, 87, 67],
   ],
-  [
-    [14, 24, 36],
-    [15, 26, 38],
-    [16, 28, 40],
-    [17, 30, 42],
-  ],
+  water([3, 24, 39]),
   [
     [52, 52, 60],
     [56, 56, 64],
@@ -91,11 +91,13 @@ const palette: readonly (readonly Rgb[])[] = [
     [186, 76, 30],
   ],
 ];
+const frozen: Rgb = [87, 104, 124];
 export type Tint = (climate: Climate) => Rgba;
 export interface Tinted {
   shape: ShapeNode;
   color: Tint;
   stroke: boolean;
+  drift?: Drift;
 }
 export interface FogPatch {
   disc: ShapeNode;
@@ -109,22 +111,24 @@ function layer(map: TerrainMap, which: Layer): Sample {
 }
 function paintSea(iso: SceneNode, map: TerrainMap, tints: Tinted[], area?: TileRegion): void {
   const land = layer(map, Layer.Land);
-  const bands: [number, Rgb, number][] = [
-    [0.32, [13, 22, 32], 0.08],
-    [0.18, [16, 28, 39], 0.13],
-    [0.09, [20, 35, 47], 0.18],
-    [0.04, [25, 43, 55], 0.22],
-    [0.012, [32, 53, 64], 0.26],
+  // Deep to shallow: indigo-blue to a sage teal at the shore. Each band drifts on its own loop.
+  const bands: [number, Rgb, number, number][] = [
+    [0.32, [2, 17, 34], 0.08, 0.24],
+    [0.18, [3, 24, 39], 0.13, 0.2],
+    [0.09, [5, 33, 44], 0.18, 0.17],
+    [0.04, [11, 44, 50], 0.22, 0.14],
+    [0.012, [26, 61, 60], 0.26, 0.11],
   ];
-  for (const [depth, color, freezes] of bands) {
+  bands.forEach(([depth, color, freezes, reach], index) => {
     const shape = region(map, 2, (i, j) => f(land(i, j) + f(depth)), drop({ x: 0, y: 0 }), area);
     tints.push({
       shape,
-      color: (k) => opaque(mix(color, [84, 98, 116], f(f(freezes) * k.frost))),
+      color: (k) => opaque(mix(color, frozen, f(f(freezes) * k.frost))),
       stroke: false,
+      drift: drift(Liquid.Water, f(reach), f(11 - index), index + 1),
     });
     iso.add(shape);
-  }
+  });
 }
 function paintCliffs(iso: SceneNode, map: TerrainMap, area?: TileRegion): void {
   const faces: { a: Point; b: Point; depth: number; color: Rgb; molten: boolean }[] = [];
@@ -215,7 +219,7 @@ export function groundColor(terrain: Terrain, shade: number, climate: Climate): 
     base = mix(base, [58, 72, 44], f(f(0.2) * climate.summer));
     base = mix(base, [92, 70, 40], f(f(0.32) * climate.autumn));
   }
-  if (isWater(terrain)) return mix(base, [84, 98, 116], f(f(0.55) * climate.frost));
+  if (isWater(terrain)) return mix(base, frozen, f(f(0.55) * climate.frost));
   if (terrain === Terrain.Lava) return base;
   return mix(base, [148, 156, 168], f(climate.snow * (isStone(terrain) ? f(0.55) : f(0.8))));
 }
@@ -261,9 +265,7 @@ export function paintGround(iso: SceneNode, map: TerrainMap, area?: TileRegion):
     onLand((i, j) => f(lavaLevel(land(i, j), heat(i, j), ridge(i, j)) - f(inset)));
   addTint(bounded(lava(-0.12)), (k) => opaque(mix([46, 40, 39], [148, 156, 168], f(k.snow * f(0.3)))));
   addTint(bounded(lava(-0.03)), () => opaque([30, 24, 24]));
-  addTint(bounded(lava(0)), tone(Terrain.Lava));
-  addTint(bounded(lava(0.05)), () => opaque([204, 92, 34]));
-  addTint(bounded(lava(0.13)), () => opaque([240, 150, 56]));
+  paintLava(iso, map, tints, lava, tone(Terrain.Lava), area);
   addTint(
     bounded(
       onLand((i, j) =>
@@ -306,17 +308,22 @@ export function paintGround(iso: SceneNode, map: TerrainMap, area?: TileRegion):
   const deeper =
     (color: Rgb): Tint =>
     (k) =>
-      opaque(mix(color, [84, 98, 116], f(f(0.55) * k.frost)));
+      opaque(mix(color, frozen, f(f(0.55) * k.frost)));
   const depths: [number, Rgb][] = [
-    [0.03, [20, 31, 45]],
-    [0.08, [16, 26, 38]],
-    [0.14, [13, 22, 33]],
+    [0.03, [5, 33, 44]],
+    [0.08, [3, 24, 39]],
+    [0.14, [2, 17, 34]],
   ];
-  for (const [depth, color] of depths)
-    addTint(
-      bounded((i, j) => f(lake(i, j) - f(depth))),
-      deeper(color),
-    );
+  depths.forEach(([depth, color], index) => {
+    const shape = bounded((i, j) => f(lake(i, j) - f(depth)));
+    tints.push({
+      shape,
+      color: deeper(color),
+      stroke: false,
+      drift: drift(Liquid.Water, f(0.07), f(9 + index), 11 + index),
+    });
+    iso.add(shape);
+  });
   addTint(
     bounded((i, j) => Math.min(lake(i, j), f(f(0.2) - heat(i, j)))),
     tone(Terrain.Ice),
@@ -340,14 +347,14 @@ export function paintGround(iso: SceneNode, map: TerrainMap, area?: TileRegion):
         Math.max(0, Math.min(1, f(-pond / f(0.03)))),
     );
   };
-  for (const [share, color] of [
-    [f(0.55), depths[0][1]],
-    [f(0.25), depths[1][1]],
-  ] as const)
-    addTint(
-      riverRibbon(river, (i) => f(f(f(river.width[i] / 2) * share) * inland(river.path[i]))),
-      deeper(color),
-    );
+  for (const [share, color, salt] of [
+    [f(0.55), depths[0][1], 15],
+    [f(0.25), depths[1][1], 16],
+  ] as const) {
+    const shape = riverRibbon(river, (i) => f(f(f(river.width[i] / 2) * share) * inland(river.path[i])));
+    tints.push({ shape, color: deeper(color), stroke: false, drift: drift(Liquid.Water, f(0.06), 7, salt) });
+    iso.add(shape);
+  }
   return tints;
 }
 export function tintGround(tints: Tinted[], climate: Climate): void {
@@ -361,7 +368,7 @@ export interface FieldTown {
   calendar(): { season: number };
   climate(): Climate;
   tendedFieldAcres(): number;
-  fields(): readonly { id?: number; outline: Point[]; acres(): number }[];
+  fields(): readonly { id?: number; outline: Point[]; acres(): number; tilled?: number }[];
   buildings(): readonly { id?: number; built(): boolean; footprint(): { corners(): Point[] } }[];
 }
 function crop(season: number, tended: boolean): { ground: Rgb; furrow: Rgb } {
@@ -385,10 +392,21 @@ export function paintFields(iso: SceneNode, town: FieldTown): void {
     colors.ground = mix(colors.ground, [148, 156, 168], f(snow * f(0.85)));
     colors.furrow = mix(colors.furrow, [128, 136, 148], f(snow * f(0.85)));
     const outline = field.outline,
+      tilled = field.tilled ?? 1,
+      rows = fieldRows(outline),
       plot = new ShapeNode();
     appendOutline(plot, outline);
-    fill(plot, opaque(colors.ground));
-    plot.strokeWidth(f(0.06)).strokeJoin('round').strokeFill(46, 34, 26);
+    if (tilled >= 1) {
+      fill(plot, opaque(colors.ground));
+      plot.strokeWidth(f(0.06)).strokeJoin('round').strokeFill(46, 34, 26);
+    } else {
+      // A staked plot: the ground shows through until the hoe has been over it.
+      plot.fill(52, 44, 30, 70);
+      plot
+        .strokeWidth(f(0.05))
+        .strokeDash([f(0.18), f(0.12)])
+        .strokeFill(214, 186, 120, 200);
+    }
     iso.add(plot);
     if (field.id !== undefined)
       registerPick(plot, {
@@ -397,31 +415,31 @@ export function paintFields(iso: SceneNode, town: FieldTown): void {
         foot: centroid(outline),
         groundOutline: outline,
       });
-    let along: Point = { x: 1, y: 0 },
-      longest = 0;
-    for (let i = 0; i < outline.length; i++) {
-      const edge = sub(outline[(i + 1) % outline.length], outline[i]);
-      if (length(edge) > longest) {
-        longest = length(edge);
-        along = normalized(edge);
-      }
+    const { along, across, center: c, reach } = rows,
+      front = f(reach * f(2 * tilled - 1)),
+      clip = () => {
+        const shape = new ShapeNode();
+        appendOutline(shape, outline);
+        shape.fill(255, 255, 255);
+        return shape;
+      };
+    if (tilled > 0 && tilled < 1) {
+      const soil = new ShapeNode(),
+        corner = (offset: number, side: number) => add(add(c, scale(across, offset)), scale(along, side * reach));
+      appendOutline(soil, [corner(-reach, -1), corner(-reach, 1), corner(front, 1), corner(front, -1)]);
+      fill(soil, opaque(mix([78, 60, 42], [148, 156, 168], f(snow * f(0.85)))));
+      iso.add(new SceneNode().add(soil).clip(clip()));
     }
-    const across = { x: -along.y, y: along.x },
-      c = centroid(outline);
-    let reach = 0;
-    for (const p of outline) reach = Math.max(reach, distance(p, c));
     const furrows = new ShapeNode();
-    for (let offset = -reach; offset <= reach; offset = f(offset + f(0.25))) {
+    for (let offset = -reach; offset <= (tilled >= 1 ? reach : front); offset = f(offset + f(0.25))) {
       const mid = add(c, scale(across, offset)),
         a = sub(mid, scale(along, reach)),
         b = add(mid, scale(along, reach));
       furrows.moveTo(a.x, a.y).lineTo(b.x, b.y);
     }
-    furrows.strokeWidth(f(0.06)).strokeFill(...colors.furrow);
-    const clip = new ShapeNode();
-    appendOutline(clip, outline);
-    clip.fill(255, 255, 255);
-    iso.add(new SceneNode().add(furrows).clip(clip));
+    if (tilled >= 1) furrows.strokeWidth(f(0.06)).strokeFill(...colors.furrow);
+    else furrows.strokeWidth(f(0.06)).strokeFill(56, 42, 30);
+    if (tilled > 0) iso.add(new SceneNode().add(furrows).clip(clip()));
   }
   for (const item of town.buildings()) {
     if (item.built()) continue;

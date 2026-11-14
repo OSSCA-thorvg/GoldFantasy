@@ -3,6 +3,7 @@ import { Key } from '../../../../packages/native-ui/src';
 import { emptyEvent, type Application, type AppEvent } from './application-contracts';
 import { applicationCursor } from './browser-cursor';
 import { BrowserTouch } from './browser-touch';
+import { isLetterCode, keyText } from './key-text';
 import { invalidateWebCanvasRasterResources } from '../../../../packages/native-renderer/src/webcanvas-adapter';
 
 const keys = new Map<string, Key>([
@@ -19,14 +20,6 @@ const keys = new Map<string, Key>([
   ['Backspace', Key.Backspace],
   ['Delete', Key.Delete],
 ]);
-const nativeKey = (key: string): string =>
-  key === ' '
-    ? 'space'
-    : key === 'Enter'
-      ? 'return'
-      : key.startsWith('Arrow')
-        ? key.slice(5).toLowerCase()
-        : key.toLowerCase();
 export interface BrowserHostOptions {
   autoStart?: boolean;
   devicePixelRatio?: boolean;
@@ -48,6 +41,8 @@ export class BrowserHost {
   private width = 0;
   private height = 0;
   private readonly pressed = new Set<string>();
+  /** What each held physical key was called when it went down, so its release carries the same name. */
+  private readonly heldText = new Map<string, string>();
   private touch: BrowserTouch;
   private readonly started = performance.now();
   constructor(
@@ -114,7 +109,10 @@ export class BrowserHost {
     );
     this.touch = new BrowserTouch(dispatch);
     this.app.setTouchInput?.(matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
-    const pointer = (type: 'PointerDown' | 'PointerMove' | 'PointerUp' | 'PointerCancel', e: PointerEvent) => {
+    const pointer = (
+      type: 'PointerDown' | 'PointerMove' | 'PointerUp' | 'PointerCancel',
+      e: PointerEvent,
+    ) => {
       const bounds = element.getBoundingClientRect(),
         event = emptyEvent(type);
       event.x = e.clientX - bounds.left;
@@ -181,11 +179,17 @@ export class BrowserHost {
     window.addEventListener(
       'keydown',
       (e) => {
-        if (!this.ownsFocus() || this.composing || e.isComposing || e.keyCode === 229) return;
-        const typing = document.activeElement === this.textInput;
+        if (!this.ownsFocus()) return;
+        const typing = document.activeElement === this.textInput,
+          composed = this.composing || e.isComposing || e.keyCode === 229;
+        // Composition belongs to a text field. Outside one, a letter pressed under an input method
+        // (Hangul, say) is still a hotkey, named by its place on the board.
+        if (composed && (typing || !isLetterCode(e.code))) return;
         const event = emptyEvent('KeyDown');
         event.key = keys.get(e.key) ?? Key.Unknown;
-        event.text = nativeKey(e.key);
+        event.text = keyText(e.key, e.code, typing);
+        event.code = e.code;
+        if (e.code) this.heldText.set(e.code, event.text);
         event.shift = e.shiftKey;
         event.control = e.ctrlKey;
         event.alt = e.altKey;
@@ -197,7 +201,9 @@ export class BrowserHost {
         // editable bridge owns committed text, including dead keys and IMEs.
         if (
           (!editable && !e.metaKey && !e.ctrlKey) ||
-          ((e.metaKey || e.ctrlKey) && ['s', 'o', 'z', 'y'].includes(event.text))
+          ((e.metaKey || e.ctrlKey) && ['s', 'o', 'z', 'y'].includes(event.text)) ||
+          // Ctrl/Cmd+1..9 makes a control group; left alone, the browser would switch tabs.
+          ((e.metaKey || e.ctrlKey) && /^Digit[1-9]$/.test(e.code))
         )
           e.preventDefault();
       },
@@ -206,10 +212,16 @@ export class BrowserHost {
     window.addEventListener(
       'keyup',
       (e) => {
-        if (!this.ownsFocus() || this.composing || e.isComposing || e.keyCode === 229) return;
+        if (!this.ownsFocus()) return;
+        const typing = document.activeElement === this.textInput,
+          // A release is named as its press was, even if a text field opened in between.
+          held = e.code ? this.heldText.get(e.code) : undefined;
+        if (e.code) this.heldText.delete(e.code);
+        if (held === undefined && (this.composing || e.isComposing || e.keyCode === 229)) return;
         const event = emptyEvent('KeyUp');
         event.key = keys.get(e.key) ?? Key.Unknown;
-        event.text = nativeKey(e.key);
+        event.text = held ?? keyText(e.key, e.code, typing);
+        event.code = e.code;
         event.shift = e.shiftKey;
         event.control = e.ctrlKey;
         event.alt = e.altKey;
@@ -292,6 +304,7 @@ export class BrowserHost {
       this.app.event(event);
     }
     this.pressed.clear();
+    this.heldText.clear();
     this.app.event(emptyEvent('PointerCancel'));
   }
   private createCanvas(): Canvas {
@@ -321,6 +334,25 @@ export class BrowserHost {
     this.canvas.update().render();
     this.app.presented?.(this.canvas.dpr);
     this.element.style.cursor = applicationCursor(this.app);
+  }
+  /** Renders the scene as it stands and returns it cropped to a small 16:9 JPEG data URL. */
+  capture(width = 384, height = 216): string {
+    if (this.closed || this.surfaceLost) return '';
+    // The GPU back buffer is only readable in the task that rendered it.
+    this.canvas.update().render();
+    const target = document.createElement('canvas'),
+      context = target.getContext('2d'),
+      scale = Math.max(width / this.element.width, height / this.element.height),
+      w = this.element.width * scale,
+      h = this.element.height * scale;
+    if (!context || !this.element.width || !this.element.height) return '';
+    target.width = width;
+    target.height = height;
+    context.drawImage(this.element, (width - w) / 2, (height - h) / 2, w, h);
+    return target.toDataURL('image/jpeg', 0.75);
+  }
+  present(): void {
+    if (!this.closed && !this.surfaceLost) this.canvas.update().render();
   }
   start(): void {
     if (this.closed) return;

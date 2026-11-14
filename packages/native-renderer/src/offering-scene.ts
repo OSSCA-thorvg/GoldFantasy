@@ -6,7 +6,7 @@ import { point } from '../../engine/src/geometry';
 import { SceneNode, ShapeNode, type Rgb } from './paint';
 import { poly, oval, stroke, glow } from './sprite-primitives';
 import { paintYmir } from './ymir-statue';
-import { personSprite, PersonParts, stridePose } from './world-sprites';
+import { personSprite, PersonParts, seatHead, stridePose } from './world-sprites';
 import { animatePrayer } from './devotion-effects';
 import { type PortraitBackdrop } from './portrait-background';
 
@@ -267,6 +267,7 @@ export class OfferingScene {
         y = cy + (50 + (i % 2) * 18) * s;
       place(p.node, x, y, 3.2 * s);
       animatePrayer(p.parts, ritual < 0 ? 0 : Math.max(0, ritual - 0.45), 7.3);
+      seatHead(p.parts);
     });
     if (born && this.born !== born.id) {
       this.born = born.id;

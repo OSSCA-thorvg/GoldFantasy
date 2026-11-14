@@ -7,6 +7,10 @@ export class Ledger {
   bounty = 0;
   eaten = 0;
   drunk = 0;
+  /** Market trade today, not saved: gold paid for goods, gold received for goods, and units moved. */
+  bought = 0;
+  sold = 0;
+  traded = 0;
 }
 export class CampEconomy {
   faction = 0;
@@ -19,6 +23,8 @@ export class CampEconomy {
   spoiledDay = -1;
   arrivalTimer = 1;
   bardDue = -1;
+  /** Day each mage tower rite was last performed here, by rite id. Transient. */
+  riteDays = new Map<string, number>();
   constructor(
     public camp = -1,
     public stock = new Resources(),

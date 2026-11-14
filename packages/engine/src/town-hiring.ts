@@ -40,11 +40,11 @@ export interface TrainingTown extends TownState {
   trainingReason(personId: number, guildId: number, calling: Calling): string;
 }
 const professions: readonly { calling: Calling; description: string }[] = [
-  { calling: Calling.Warrior, description: 'A close-combat profession. Equip a crafted weapon for stronger attacks.' },
-  { calling: Calling.Ranger, description: 'A ranged-combat profession. Equip a crafted bow to attack from a distance.' },
-  { calling: Calling.Mage, description: 'A rune-casting profession. Equip a crafted staff to attack from a distance.' },
-  { calling: Calling.Cleric, description: 'A sworn guardian who fights at close range.' },
-  { calling: Calling.Bard, description: 'A keeper of songs who can fight at close range.' },
+  { calling: Calling.Warrior, description: 'A close-combat profession that strikes 30% harder. Equip a crafted weapon for stronger attacks.' },
+  { calling: Calling.Ranger, description: 'A ranged-combat profession that strikes 15% harder. Equip a crafted bow to attack from a distance.' },
+  { calling: Calling.Mage, description: 'A rune-casting profession that strikes 15% harder. Equip a crafted staff to attack from a distance.' },
+  { calling: Calling.Cleric, description: 'A sworn guardian who fights at close range. Monsters hit the cleric and allies within 5 paces 20% softer.' },
+  { calling: Calling.Bard, description: 'A keeper of songs who fights at close range. Other allies within 5 paces strike 15% harder.' },
 ];
 function guild(place: Building | null): place is Building {
   return (

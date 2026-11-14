@@ -1,12 +1,27 @@
 import type { Town } from './town';
 import { Activity, type Person } from './person';
 import { distance } from './geometry';
+import { Product, structureSpec } from './building-catalog';
+import { unsourcedMaterial } from './settlement-progression';
 /** Twenty tiles are about ten ordinary two-tile buildings; direct orders have no range limit. */
 export const automaticConstructionRadius = 20;
 const blockedRetrySeconds = 30;
 const assignments = new WeakMap<Person, string>();
 const blocked = new WeakMap<Person, Map<string, number>>();
 const key = (work: Activity, id: number) => `${work}:${id}`;
+const announced = new WeakMap<Town, Set<string>>();
+/** Says once, per site and material, that a building waits for something nobody has found yet. */
+function announceShortage(town: Town, id: number): void {
+    const site = town.building(id),
+        lacking = site ? unsourcedMaterial(town, site) : null;
+    if (!site || lacking === null) return;
+    let told = announced.get(town);
+    if (!told) announced.set(town, (told = new Set()));
+    if (told.has(`${id}:${lacking}`)) return;
+    told.add(`${id}:${lacking}`);
+    const material = lacking === Product.Stone ? 'stone' : 'wood';
+    town.notify(`No ${material} in sight for the ${structureSpec(site.kind).name}: explore to find some`);
+}
 /** The requested road owns its clearing, supply and prerequisite-road work. */
 export function hasUnfinishedRoadwork(town: Town, person: Person): boolean {
     if (person.task !== Activity.Roadwork) return false;
@@ -42,6 +57,8 @@ export function deferAutomaticConstruction(town: Town, person: Person): boolean 
         person.until = town.time + 3;
         return true;
     }
+    // The builder goes back to other work, but not without a word: the player placed this site.
+    if (person.task === Activity.Building) announceShortage(town, person.taskSite);
     const taskKey = assignments.get(person) ?? key(person.task, person.taskSite);
     // This is called only after every usable source, gather target and processor
     // has failed. A building job yields when its transaction cannot advance;

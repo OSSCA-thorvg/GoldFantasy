@@ -3,10 +3,10 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
 
-const renderer = process.argv.find((arg) => arg.startsWith('--renderer='))?.slice(11) ?? 'sw';
-assert(['sw', 'gl'].includes(renderer));
+const renderer = process.argv.find((arg) => arg.startsWith('--renderer='))?.slice(11) ?? 'gl';
+assert(['gl'].includes(renderer));
 const onlyWeather = process.argv.find((arg) => arg.startsWith('--weather='))?.slice(10);
-const output = 'artifacts/regression/prayer' + (renderer === 'sw' ? '' : '/' + renderer);
+const output = 'artifacts/regression/prayer' + (renderer === 'gl' ? '' : '/' + renderer);
 const report = { renderer, cases: [], errors: [], passed: false };
 let server, browser, deadline;
 try {

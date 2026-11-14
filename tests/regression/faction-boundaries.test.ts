@@ -213,8 +213,9 @@ describe('construction material affiliation boundaries', () => {
     expect(town.collectConstructionSurplus(p, Activity.Roadwork, own.id)).toBe(true);
     p.target = -own.id - 2;
     town.fetchConstructionMaterials(p);
-    expect(p.carrying).toBe(3);
-    expect(own.materials.delivered.planks).toBe(1);
+    // One trip takes the whole orphan surplus, not three units of it.
+    expect(p.carrying).toBe(4);
+    expect(own.materials.delivered.planks).toBe(0);
     expect(foreign.materials.delivered.planks).toBe(5);
   });
 

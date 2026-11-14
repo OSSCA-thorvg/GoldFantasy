@@ -210,6 +210,7 @@ it('shows work equipment only while actually outdoors at the field or productive
       building: (id: number) => (id === b.id ? b : null),
       monsters: () => [],
       wildlife: () => [],
+      fields: () => [{ id: 0, tilled: 1 }],
       hits: () => [],
       clock: () => time,
       map: () => ({ giant: () => null, volcano: () => null }),
@@ -378,12 +379,20 @@ for (const activity of [Activity.Felling, Activity.Mining, Activity.Building, Ac
         expect(matrix[4], 'work torso compression stays below five percent').toBeGreaterThanOrEqual(0.95);
         expect(Math.abs(matrix[2]), 'work must not lunge away from its work spot').toBeLessThanOrEqual(0.4);
       }
-      for (const foot of feet) expect(foot).toEqual(feet[0]);
+      // The torso sways over feet that stay where they stand on the ground.
+      feet.forEach((foot, i) => {
+        expect(foot[0] + bodies[i][2]).toBeCloseTo(feet[0][0] + bodies[0][2], 5);
+        expect(foot[2] + bodies[i][2]).toBeCloseTo(feet[0][2] + bodies[0][2], 5);
+        expect([foot[1], foot[3]]).toEqual([0, 0]);
+      });
+      const tool =
+          activity === Activity.Felling ? 'axe' : activity === Activity.Mining ? 'pickaxe' : 'hammer',
+        contact = workPose(timing.impact, period, timing.impact, tool);
       expect(bodies[4][4], 'the actual renderer reaches contact at the shared impact time').toBeCloseTo(
-        0.965,
+        1 - contact.crouch,
         6,
       );
-      expect(bodies[4][2]).toBeCloseTo(0.3, 6);
+      expect(bodies[4][2]).toBeCloseTo(contact.forward, 6);
       expect(Math.max(...wrists) - Math.min(...wrists)).toBeGreaterThan(0.05);
     } finally {
       for (const state of states) state.adapter.dispose();
@@ -397,17 +406,21 @@ it('places the compact work strike at the supplied impact without changing comba
     expect(contact.direction).toBeGreaterThan(workPose(impact - 0.02, period, impact).direction);
     expect(contact.direction).toBeGreaterThan(workPose(impact + 0.02, period, impact).direction);
     const poses = Array.from({ length: 121 }, (_, i) => workPose((i * period) / 120, period, impact));
+    // A full wind-up beside the head and a blow to level, but never a leap, a deep squat or a lunge.
     expect(
       Math.max(...poses.map((p) => p.direction)) - Math.min(...poses.map((p) => p.direction)),
-    ).toBeLessThan(1.2);
-    expect(poses.every((p) => p.lift === 0 && p.crouch <= 0.04 && Math.abs(p.forward) <= 0.3)).toBe(true);
+    ).toBeLessThan(2.6);
+    expect(poses.every((p) => p.lift === 0 && p.crouch <= 0.05 && Math.abs(p.forward) <= 0.4)).toBe(true);
   }
   const person = new Person(0, 'Fighter', Role.Resident, Calling.Warrior, Race.Human, 499096, point()),
     parts = new PersonParts();
   personSprite(person, parts);
   animateAction(parts, 'sword', 0.5, 1);
-  expect(parts.body!.matrix[5]).toBe(-2.5);
-  expect(parts.feet[1]!.matrix[5]).toBeCloseTo(-0.35, 6);
+  // A fighter rises a little into the cut while the feet stay on the ground.
+  const rise = parts.body!.matrix[5];
+  expect(rise).toBeLessThan(0);
+  expect(rise).toBeGreaterThan(-0.5);
+  for (const foot of parts.feet) expect(rise + parts.body!.matrix[4] * foot!.matrix[5]).toBeCloseTo(0, 5);
 });
 
 for (const stone of [false, true])
@@ -482,7 +495,7 @@ for (const stone of [false, true])
       expect(figure.facing).toBe(-1);
       expect(parts.body!.matrix[5]).toBe(0);
       expect(parts.body!.matrix[4]).toBeCloseTo(
-        1 - workPose(harvestTiming.impact + 0.02, harvestTiming.period, harvestTiming.impact).crouch,
+        1 - workPose(harvestTiming.impact + 0.02, harvestTiming.period, harvestTiming.impact, tool).crouch,
         6,
       );
       for (const foot of parts.feet) expect(foot!.matrix[5]).toBe(0);

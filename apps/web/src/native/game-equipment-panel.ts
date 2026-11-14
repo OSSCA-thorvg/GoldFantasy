@@ -1,3 +1,4 @@
+import { burdenFrom, carriedWeight, carryLimit } from '../../../../packages/engine/src/carried-resources';
 import { Rect, button, ButtonStyle, Align, type Context } from '../../../../packages/native-ui/src';
 import {
   inventorySlots,
@@ -6,16 +7,21 @@ import {
   itemCatalog,
   attackDamage,
   armorProtection,
+  gearEffect,
+  workItem,
   type ItemSpec,
 } from '../../../../packages/engine/src/equipment';
-import { describe } from '../../../../packages/engine/src/building-catalog';
-import { distance } from '../../../../packages/engine/src/geometry';
+import { Activity } from '../../../../packages/engine/src/person';
+import { toolAvailable } from '../../../../packages/engine/src/settlement-progression';
+import { Tool } from '../../../../packages/engine/src/game-tools';
+import { project } from '../../../../packages/engine/src/geometry';
+import { nearestStation, openStation } from './craft-station-hud';
 import { canControl } from '../../../../packages/engine/src/faction';
 import type { Person } from '../../../../packages/engine/src/person';
 import type { GameHudApp } from './game-hud-contract';
 import { actionButton } from './hud-actions';
 
-function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder = false, active = false): void {
+export function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder = false, active = false): void {
   const t = c.theme(),
     x = r.x + r.w / 2,
     y = r.y + r.h / 2,
@@ -136,120 +142,59 @@ function itemIcon(c: Context, r: Rect, item: ItemSpec | null, placeholder = fals
   }
 }
 
+/** The tool doing the work under way, e.g. " · with a Wooden axe". */
+export function workPace(p: Person): string {
+  if (p.moving() || (p.activity !== Activity.Felling && p.activity !== Activity.Mining)) return '';
+  const tool = workItem(p, p.activity === Activity.Felling ? 'woodcutting' : 'mining');
+  return tool ? ` · with a ${tool.name}` : ' · by hand';
+}
+/** Selects the nearest workbench with `p` as its crafter, or, with none built, says so and offers to place one. */
+export function workbenchButton(app: GameHudApp, p: Person, r: Rect, id: string): void {
+  const bench = nearestStation(app.town, p.position);
+  actionButton(
+    app.context,
+    id,
+    r,
+    'craft',
+    bench ? 'Craft at the workbench' : 'No workbench yet: place one',
+    () => {
+      if (bench) {
+        app.rosterOpen = false;
+        openStation(app, bench, p.id);
+        const at = project(bench.center.x, bench.center.y);
+        app.camera.x = at.x;
+        app.camera.y = at.y;
+        return;
+      }
+      app.status = 'The settlement has no workbench yet';
+      app.rosterOpen = false;
+      if (toolAvailable(app.town, Tool.Workbench)) app.selectTool(Tool.Workbench);
+    },
+    false,
+    canControl(p),
+  );
+}
+
 /** Inventory owns real finite stacks; gear slots reference those same stacks. */
 export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
   const c = app.context,
     t = app.theme,
     enabled = canControl(p),
     top = panel.y + 33;
-  const tabs = [
-    ['equipment', 'gear', 'Equipment'],
-    ['craft', 'craft', 'Craft at a workshop'],
-  ] as const;
-  tabs.forEach(([tab, glyph, label], i) =>
-    actionButton(
-      c,
-      `equipment-tab-${tab}`,
-      new Rect(panel.x + i * 48, panel.y, 42, 28),
-      glyph,
-      label,
-      () => {
-        app.equipmentTab = tab;
-        app.craftWorkshopFilter = null;
-        app.inventorySelected = -1;
-      },
-      app.equipmentTab === tab,
-    ),
+  actionButton(
+    c,
+    'equipment-tab-equipment',
+    new Rect(panel.x, panel.y, 42, 28),
+    'gear',
+    'Equipment',
+    () => {
+      app.equipmentTab = 'equipment';
+      app.inventorySelected = -1;
+    },
+    true,
   );
-  if (app.equipmentTab === 'craft') {
-    const items = itemCatalog.filter(
-        (item) =>
-          item.workshop !== null &&
-          (app.craftWorkshopFilter === null || item.workshop === app.craftWorkshopFilter),
-      ),
-      rows = Math.max(2, Math.floor((panel.h - 66) / 35)),
-      pages = Math.ceil(items.length / rows);
-    app.craftPage = Math.max(0, Math.min(pages - 1, app.craftPage));
-    items.slice(app.craftPage * rows, (app.craftPage + 1) * rows).forEach((item, index) => {
-      const workshop = app.town
-        .buildings()
-        .filter(
-          (b) =>
-            b.kind === item.workshop &&
-            b.built() &&
-            b.faction === p.faction &&
-            app.town.settlementOf(b) === app.town.settlementOf(p),
-        )
-        .sort((a, b) => distance(p.position, a.center) - distance(p.position, b.center))[0];
-      const reason = app.town.craftReason(p.id, workshop?.id ?? -1, item.id),
-        r = new Rect(panel.x, top + index * 35, panel.w, 31);
-      const state = button(
-        c,
-        `craft-item-${item.id}`,
-        r,
-        '',
-        () => {
-          if (workshop && app.town.orderCraft(p.id, workshop.id, item.id))
-            app.status = `Crafting ${item.name}`;
-        },
-        ButtonStyle.Quiet,
-        enabled && !reason,
-      );
-      itemIcon(c, new Rect(r.x, r.y, 31, 31), item);
-      c.text(
-        new Rect(r.x + 36, r.y, r.w * 0.45 - 36, 31),
-        c.elideText(item.name, r.w * 0.45 - 36, 11, true),
-        reason ? t.muted : t.text,
-        11,
-        true,
-      );
-      c.text(
-        new Rect(r.x + r.w * 0.45, r.y, r.w * 0.55 - 9, 31),
-        c.elideText(`Lv ${item.minimumLevel} · ${describe(item.cost)}`, r.w * 0.55 - 9, 10),
-        t.accent,
-        10,
-        false,
-        Align.End,
-      );
-      if (state.hovered || r.contains(app.mouse.x, app.mouse.y))
-        c.text(
-          new Rect(panel.x, panel.y + panel.h - 24, panel.w, 22),
-          c.elideText(reason || item.description, panel.w, 10),
-          t.muted,
-          10,
-        );
-    });
-    const y = panel.y + panel.h - 28;
-    actionButton(
-      c,
-      'craft-prev',
-      new Rect(panel.x + panel.w - 92, y, 28, 26),
-      'back',
-      'Previous recipes',
-      () => --app.craftPage,
-      false,
-      app.craftPage > 0,
-    );
-    c.text(
-      new Rect(panel.x + panel.w - 62, y, 28, 26),
-      `${app.craftPage + 1}/${pages}`,
-      t.muted,
-      10,
-      false,
-      Align.Center,
-    );
-    actionButton(
-      c,
-      'craft-next',
-      new Rect(panel.x + panel.w - 30, y, 28, 26),
-      'next',
-      'Next recipes',
-      () => ++app.craftPage,
-      false,
-      app.craftPage < pages - 1,
-    );
-    return;
-  }
+  // Crafting happens at a workbench in the world: this leads there, or to placing one.
+  workbenchButton(app, p, new Rect(panel.x + 48, panel.y, 42, 28), 'equipment-workbench');
   const cell = Math.max(16, Math.min(45, Math.floor((panel.w - 18) / 7), Math.floor((panel.h - 85) / 4))),
     bagW = cell * 4,
     gearX = panel.x + bagW + 14;
@@ -412,11 +357,8 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
       );
       text(
         105,
-        selected.item.attackBonus
-          ? `Attack +${selected.item.attackBonus}`
-          : selected.item.defense
-            ? `Armor ${Math.round(selected.item.defense * 100)}%`
-            : `Quantity ${selected.quantity} / ${selected.item.maximumStack}`,
+        gearEffect(selected.item) || `Quantity ${selected.quantity} / ${selected.item.maximumStack}`,
+        selected.item.category === 'resource' ? t.text : t.success,
       );
       text(130, selected.item.description, t.muted, 10);
       text(
@@ -439,10 +381,24 @@ export function equipmentPanel(app: GameHudApp, p: Person, panel: Rect): void {
         }`,
         t.muted,
       );
-      text(121, `Backpack ${slots.filter((slot) => !slot.cargo && slot.item).length} / 15`, t.muted);
+      // Live load against this resident's own limit, which a pack basket raises.
+      const weight = carriedWeight(p),
+        slowed = weight > burdenFrom(p),
+        used = slots.filter((slot) => !slot.cargo && slot.item).length;
+      text(
+        121,
+        `Backpack ${used} / 15 · ${weight.toFixed(1)} / ${carryLimit(p)} kg` + (slowed ? ' · slowed' : ''),
+        slowed ? t.danger : t.muted,
+      );
       text(157, 'Select an item, then choose a gear slot.', t.muted, 10);
     }
   }
-  if (p.craftItem)
-    c.text(new Rect(panel.x + 106, panel.y, panel.w - 106, 28), `Crafting ${p.craftItem}`, t.accent, 11);
+  const making = p.craftItem ? itemCatalog.find((item) => item.id === p.craftItem) : null;
+  if (making)
+    c.text(
+      new Rect(panel.x + 106, panel.y, panel.w - 106, 28),
+      `Crafting ${making.name} · ${Math.trunc((p.craftProgress / making.seconds) * 100)}%`,
+      t.accent,
+      11,
+    );
 }

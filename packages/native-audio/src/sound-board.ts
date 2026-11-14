@@ -5,7 +5,7 @@ import { Clip, MusicStream, SoundLibrary, sounds, onsets } from './sound-library
 import { voiceSample } from './spoken-voice';
 import { EffectManager } from './effect-manager';
 import { Score } from './music-score';
-import { animalCallWindows, workClipWindows, cueClips } from './sound-catalog';
+import { animalCallWindows, workClipWindows, cueClips, swarmBedPrefix } from './sound-catalog';
 import { ambient, voice, clipEnd, effectDuration, type Voice, type Stereo } from './sound-synthesis';
 export enum Playback {
   Playing,
@@ -58,7 +58,7 @@ export class SoundBoard {
   private fadingLevel = 0;
   private tune = new Float32Array(2048);
   private tuneFading = new Float32Array(2048);
-  private lastTake = new Uint8Array(64);
+  private lastTake = new Uint8Array(128);
   private picking = 0x2545f491;
   private target = new Ambience();
   level = new Ambience();
@@ -91,6 +91,7 @@ export class SoundBoard {
   owlPan = 0;
   songPan = 0;
   song = Array(5).fill(0) as number[];
+  swarmBed = new Clip();
   private score = new Score(rate);
   constructor(private readonly library: SoundLibrary = sounds) {
     this.refreshHammer();
@@ -175,7 +176,7 @@ export class SoundBoard {
   setAmbience(mix: Ambience): void {
     if (this.target.rain > thunderRainFloor && mix.rain <= thunderRainFloor)
       this.weatherEpoch = BigInt.asUintN(64, this.weatherEpoch + 1n);
-    this.target = { ...mix };
+    this.target = { ...new Ambience(), ...mix };
   }
   playback(value: Playback): void {
     const freezeFade =
@@ -253,6 +254,9 @@ export class SoundBoard {
       this.musicLevel = 0;
       this.silence = false;
     }
+    // The bed's clip may arrive after the board starts; look again only while it is wanted.
+    if (!this.swarmBed.pcm && (goal.swarm > 0 || this.level.swarm > 0))
+      this.swarmBed = this.library.clip(swarmBedPrefix, 0);
     const glide = f(4 / f(rate * f(0.8))),
       swell = f(4 / f(rate * 3)),
       workGlide = f(4 / f(rate * f(0.02))),
@@ -292,6 +296,8 @@ export class SoundBoard {
         );
         background('fire');
         for (const key of ['hammerPan', 'firePan', 'raid', 'dark', 'winter', 'gloom'] as const) ease(key);
+        background('swarm', 1.5, 2.5);
+        ease('swarmPan');
         background('water');
         ease('waterPan');
         background('woods');

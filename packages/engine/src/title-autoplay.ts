@@ -27,6 +27,8 @@ import * as mining from './mining';
 import type { AltarStatus } from './town-devotion';
 export interface TitleTown extends TownState {
   prepareTitlePreview(): void;
+  yearFraction(): number;
+  dayFraction(): number;
   site(id: number): Building | null;
   recount(): void;
   staff(): void;
@@ -126,8 +128,9 @@ export function maintainTitleBuilder(this: TitleTown): void {
       break;
     }
 }
-export function startTitleAutoplay(this: TitleTown, seed: number): void {
+export function startTitleAutoplay(this: TitleTown, seed: number, holdSky = false): void {
   seed >>>= 0;
+  this.titleSky = holdSky ? { year: this.yearFraction(), day: this.dayFraction() } : null;
   this.prepareTitlePreview();
   this.titleAutoplay = true;
   this.dice = (this.dice ^ (seed || 0x9e3779b9)) >>> 0;
@@ -151,7 +154,7 @@ export function advanceTitleAutoplay(this: TitleTown, seconds: number): void {
   seconds = Math.min(seconds, 0.25) * titleAutoplayRate;
   this.titlePlanTimer -= seconds;
   this.titleWeatherTimer -= seconds;
-  if (this.titleWeatherTimer <= 0) {
+  if (this.titleWeatherTimer <= 0 && !this.titleSky) {
     const choices = [Weather.Clear, Weather.Cloudy, Weather.Rain, Weather.Storm];
     let weather = choices[Math.min(3, Math.trunc(f(this.roll() * 4)))];
     if (weather === this.sky.now().weather)

@@ -70,6 +70,8 @@ export function ambience(this: GameAmbienceApp): Ambience {
   mix.dark = sky.night;
   mix.winter = this.town.calendar().season === Season.Winter ? 1 : 0;
   mix.gloom = wet || sky.weather === Weather.Snow ? 1 : 0;
+  mix.swarm = this.combatHud.sound.swarm;
+  mix.swarmPan = this.combatHud.sound.swarmPan;
   const near = clamp(f(f(this.camera.zoom - f(0.3)) / f(0.9)), 0, 1);
   for (const level of ['birds', 'night', 'fire', 'water', 'woods', 'chopping'] as const)
     mix[level] = f(mix[level] * near);

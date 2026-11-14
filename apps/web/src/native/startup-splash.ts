@@ -1,6 +1,6 @@
 import type { ThorVGNamespace } from '@thorvg/webcanvas';
 
-/** A separate SW worker keeps the supplied animation moving during world generation. */
+/** A separate worker keeps the supplied animation moving during world generation. */
 export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVGNamespace>) {
   const target = element.querySelector('canvas')!;
   const assetUrl = new URL(

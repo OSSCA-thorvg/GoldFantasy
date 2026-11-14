@@ -1,6 +1,7 @@
 import { type ThorVGNamespace } from '@thorvg/webcanvas';
 import { initializeWebCanvas } from './startup-canvas';
-import { Context, loadNativeFonts, type NativeFontMetrics } from '../../../../packages/native-ui/src';
+import { Context, loadKoreanFont, loadNativeFonts, type NativeFontMetrics } from '../../../../packages/native-ui/src';
+import { setLocale, storedLocale } from '../../../../packages/localization/src/index';
 import { prepareScriptRuntime } from '../../../../packages/native-ui/src/script';
 import hudScript from '../../../../packages/native-ui/assets/hud.lua?raw';
 import demoScript from '../../../../packages/native-ui/assets/demo.lua?raw';
@@ -29,6 +30,7 @@ export function createNativeServices(
   tvg: ThorVGNamespace,
   fonts: NativeFontMetrics,
   files: BrowserFiles,
+  frame?: () => Pick<BrowserHost, 'capture' | 'present'> | undefined,
 ): SceneServices {
   for (const [path, source] of [
     ['/scripts/hud.lua', hudScript],
@@ -76,6 +78,47 @@ export function createNativeServices(
     },
     createSound: applicationServices.createSound,
     exists: (path) => files.exists(path),
+    savedAt: (path) => {
+      try {
+        const meta: unknown = JSON.parse(files.readSync(path + '.meta', 4096));
+        if (typeof meta === 'object' && meta !== null && 'time' in meta && typeof meta.time === 'number')
+          return meta.time;
+      } catch {
+        // Saves written before slots carry no metadata.
+      }
+      return 0;
+    },
+    captureSave: (path, worldOnly) => {
+      const host = frame?.();
+      let shot = '';
+      if (host) {
+        try {
+          worldOnly(true);
+          shot = host.capture();
+        } catch (error) {
+          console.error(error);
+        } finally {
+          worldOnly(false);
+          // Repaint with the interface so the bare frame is never shown.
+          host.present();
+        }
+      }
+      // An empty record clears the picture of the save this one replaced.
+      files.stage(path + '.shot', shot);
+    },
+    clearSaveShot: (path) => {
+      if (files.exists(path + '.shot') && files.readSync(path + '.shot', 1024 * 1024)) files.stage(path + '.shot', '');
+    },
+    saveShot: (path) => {
+      try {
+        const shot = files.readSync(path + '.shot', 1024 * 1024),
+          data = shot.slice(shot.indexOf(',') + 1);
+        if (!shot.startsWith('data:image/jpeg;base64,') || !data) return undefined;
+        return Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+      } catch {
+        return undefined;
+      }
+    },
     preferenceSavePath: () => '/saves/current.goldfantasy',
     randomDevice,
     designedWorldSeed,
@@ -95,7 +138,7 @@ export interface NativeRuntime {
 export async function startNativeGame(
   element: HTMLCanvasElement,
   options: Partial<LaunchOptions> = {},
-  renderer: 'gl' | 'sw' | 'wg' = 'gl',
+  renderer: 'gl' | 'wg' = 'gl',
   preparedCanvas?: ThorVGNamespace,
   autoStart = true,
 ): Promise<NativeRuntime> {
@@ -103,14 +146,25 @@ export async function startNativeGame(
   let files: BrowserFiles | undefined, host: BrowserHost | undefined;
   try {
     const fonts = await loadNativeFonts(tvg);
+    if (storedLocale() === 'KR')
+      // A failed download leaves the game playable in English.
+      await loadKoreanFont(tvg, fonts).then(
+        () => setLocale('KR'),
+        (error) => console.error(error),
+      );
     files = await BrowserFiles.open();
     // Sound devices prepare asynchronously when the scene creates them. The
     // first frame must not wait for the complete effects sample download.
     await prepareScriptRuntime();
-    const services = createNativeServices(tvg, fonts, files),
+    const services = createNativeServices(tvg, fonts, files, () => host),
       app = services.createApplication({ ...defaultLaunchOptions(), titleScreen: true, ...options });
     host = new BrowserHost(element, tvg, app, { autoStart });
     let closed = false;
+    // Hidden is the last state a mobile browser reliably reports before discarding the tab.
+    const autosave = () => {
+      if (document.visibilityState === 'hidden' && !closed) app.command('session.autosave');
+    };
+    document.addEventListener('visibilitychange', autosave);
     const runtime: NativeRuntime = {
       host,
       app,
@@ -119,6 +173,7 @@ export async function startNativeGame(
       async dispose() {
         if (closed) return;
         closed = true;
+        document.removeEventListener('visibilitychange', autosave);
         try {
           host!.dispose();
           await files!.sync();
@@ -132,6 +187,7 @@ export async function startNativeGame(
     window.addEventListener(
       'pagehide',
       () => {
+        if (!closed) app.command('session.autosave');
         void runtime.dispose();
       },
       { once: true },

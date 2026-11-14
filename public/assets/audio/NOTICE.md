@@ -8,6 +8,12 @@ the files; it needs neither Loach nor any model, recording or network service.
   (https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 - `ui/`, the other `sfx/` and `wildlife/raven_02` come from the Norse game pack's procedural sounds (modal
   resonance, filtered noise and formant synthesis; no recordings or models).
+- `narration/en/` holds the opening saga, told in English by one designed storyteller voice:
+  takes generated with Qwen3-TTS (Apache-2.0) through Loach's `tools/voice-qwen`, then given a hall echo and
+  levelled with ffmpeg.
+- `sfx/saga/giant_fall` is the giant's fall in the opening saga: Loach's `acc_troll_grumble`, `nif_frost_giant`,
+  `wx_thunder_rolling` and `wx_rockfall` (procedural, no recordings), slowed, layered and
+  given a long echo with ffmpeg.
 - `voice/<kind>/` holds the Norse pack's villager and combat voice banks, one folder per voice: takes
   generated with Qwen3-TTS (Apache-2.0), trimmed and levelled by Loach.
 
@@ -19,3 +25,9 @@ Middle-region wildlife uses Loach's `beast_cow`, `beast_boar`, `bird_hens`, `bir
 `src/game/tools/render_cat_call.py` through Loach's offline export API; no cat recording exists in
 the local pack. This newly generated call is also dedicated to CC0. Its raw WAV and Loach
 provenance sidecar are reproducibly written under `.temp/wildlife-audio-source/`.
+
+`sfx/combat/` (weapon blows, calling skills, swarm deaths, dens, the brood, raid waves and the pack bed) is built by
+`scripts/audio/combat_audio.py`: Loach recipe layers (`loach synth --recipe`, procedural, no recordings or models)
+mixed with slices of the Norse packs above (`sfx_weapon_swing`, `sfx_shield_block`, `sfx_war_horn`, `wx_rockfall`,
+`wx_thunder_rolling`, `wx_ice_boom`, `acc_troll_grumble`, `acc_draugr_breath`), then trimmed, levelled and encoded
+like the other one-shots. The script writes each recipe beside its WAV in its work directory.

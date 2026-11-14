@@ -22,7 +22,14 @@ export class Building {
   door(): Point { const local = this.entrance(); local.y = f(Math.max(local.y, f(structureSpec(this.kind).size / 2)) + f(.25)); const walls = this.footprint(); let p = add(this.center, rotated(local, this.angle)); for (let step = 0; step < 20; ++step) { const cell = point(f(Math.floor(p.x) + f(.5)), f(Math.floor(p.y) + f(.5))); if (!walls.contains(cell, f(.05))) break; local.y = f(local.y + f(.05)); p = add(this.center, rotated(local, this.angle)); } return p; }
   threshold(): Point { return add(this.center, rotated(this.entrance(), this.angle)); }
 }
-export class Field { faction = 0; constructor(public id: number, public outline: Outline, public village = -1) {} acres(): number { return lround(area(this.outline)); } }
+export class Field {
+  faction = 0;
+  /** Share of the plot turned by hand; a staked plot yields nothing until it is tilled. */
+  tilled = 1;
+  constructor(public id: number, public outline: Outline, public village = -1) {}
+  acres(): number { return lround(area(this.outline)); }
+  tilledAcres(): number { return lround(f(area(this.outline) * this.tilled)); }
+}
 export class Placement { constructor(public center: Point = point(), public angle = 0, public snapped = false) {} }
 export class Check { constructor(public ok = false, public reason = '', public cost = new Resources()) {} }
 export enum Season { Spring, Summer, Autumn, Winter }

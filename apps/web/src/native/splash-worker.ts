@@ -4,7 +4,7 @@ let tvg: ThorVGNamespace | undefined, animation: Animation | undefined, canvas: 
 let timer: ReturnType<typeof setTimeout> | undefined;
 let nextFrame = 0,
   displayedFrame = 0,
-  nextFrameAt = 0,
+  startedAt = 0,
   totalFrames = 1,
   fps = 30,
   reducedMotion = false,
@@ -30,16 +30,17 @@ function tick() {
     // Present the final authored frame for its full interval before handing off.
     timer = setTimeout(() => self.postMessage({ kind: 'finished' }), reducedMotion ? 0 : 1000 / fps);
   } else {
-    ++nextFrame;
-    nextFrameAt += 1000 / fps;
-    timer = setTimeout(tick, Math.max(0, nextFrameAt - performance.now()));
+    // A slow frame drops the ones it overran, so the animation keeps its authored length.
+    const due = Math.floor((performance.now() - startedAt) / (1000 / fps));
+    nextFrame = Math.min(totalFrames - 1, Math.max(nextFrame + 1, due));
+    timer = setTimeout(tick, Math.max(0, startedAt + nextFrame * (1000 / fps) - performance.now()));
   }
 }
 self.onmessage = async ({ data }) => {
   try {
     if (data.kind === 'start') {
       const [namespace, json] = await Promise.all([
-        ThorVG.init({ renderer: 'sw', locateFile: () => data.wasmUrl }),
+        ThorVG.init({ renderer: 'gl', locateFile: () => data.wasmUrl }),
         fetch(data.assetUrl).then(async (response) => {
           if (!response.ok) throw Error('Cannot load ThorVG splash.');
           return response.text();
@@ -59,7 +60,7 @@ self.onmessage = async ({ data }) => {
       });
       canvas.add(animation.picture);
       resize(data.width, data.height);
-      nextFrameAt = performance.now();
+      startedAt = performance.now();
       tick();
       self.postMessage({ kind: 'ready' });
     } else if (data.kind === 'resize' && canvas) {

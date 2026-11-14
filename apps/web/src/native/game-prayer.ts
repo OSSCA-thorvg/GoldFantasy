@@ -55,7 +55,7 @@ export function altarInspector(this: GameAppState, building: Building, panel: Re
     t = this.theme,
     x = panel.x + 12,
     w = panel.w - 24;
-  c.text(new Rect(x, panel.y + 8, w, 24), 'Altar of Ymir', t.text, 17, true);
+  c.text(new Rect(x, panel.y + 8, w, 24), 'Altar of Odin', t.text, 17, true);
   c.text(new Rect(x, panel.y + 37, w, 19), 'Shape a new life from an offering.', t.muted, 12);
   if (h > 120) c.text(new Rect(x, panel.y + 62, w, 26), 'Water · Bones · Gold · Food · Stone', t.accent, 11);
   button(
@@ -208,7 +208,7 @@ export function renderPrayer(this: GameAppState, width: number, height: number):
   c.rect(panel, rgba(31, 39, 39), 6, rgba(145, 155, 130));
   c.text(
     new Rect(panel.x + 18, panel.y + 10, w - 36, 24),
-    'AN OFFERING TO YMIR',
+    'AN OFFERING TO ODIN',
     t.text,
     short ? 15 : 19,
     true,
@@ -350,7 +350,7 @@ export function renderPrayer(this: GameAppState, width: number, height: number):
     const title = state.error
       ? 'The rite could not be completed'
       : elapsed < 0.65
-        ? 'Lay the offering before Ymir'
+        ? 'Lay the offering before Odin'
         : elapsed < 3.2
           ? 'A prayer for a new life'
           : elapsed < transformAt

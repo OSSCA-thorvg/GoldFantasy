@@ -2,6 +2,7 @@ import type { Animation } from '@thorvg/webcanvas';
 import { Context, Theme, Rect, Align, rgba, setTransform } from '../../../../packages/native-ui/src';
 import { structureSpec } from '../../../../packages/engine/src/building-catalog';
 import type { Town } from '../../../../packages/engine/src/town';
+import { Season } from '../../../../packages/engine/src/town-models';
 import type { Point } from '../../../../packages/engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../../../packages/engine/src/numeric';
 import { resourceIcons, nativeFixed } from './hud-assets';
@@ -21,6 +22,28 @@ const duration = 0.75,
     'Bones',
   ],
   artwork = [0, 1, 2, 3, 4, 5, 8, 6, 7, 9, 10, 11];
+export interface WinterLine {
+  text: string;
+  /** Stored and expected food falls short of the need. */
+  short: boolean;
+}
+/** Food against the coming (or current) winter; null outside autumn and winter or without a settlement. */
+export function winterOutlookLine(town: Town, village?: number): WinterLine | null {
+  const season = town.calendar().season;
+  if ((season !== Season.Autumn && season !== Season.Winter) || !town.camp(village)) return null;
+  const outlook = town.winterOutlook(village),
+    have = outlook.foodStored + outlook.harvestExpected,
+    days = outlook.daysToWinter;
+  return {
+    text:
+      days > 0
+        ? `Winter in ${days} ${days === 1 ? 'day' : 'days'} · food ${have} of ${outlook.foodNeeded} needed`
+        : `Winter · food ${have} of ${outlook.foodNeeded} needed until spring`,
+    short: !outlook.enough,
+  };
+}
+/** Height the winter line adds below the store grid. */
+export const winterLineHeight = 22;
 const amount = (value: number) =>
   value < 10000
     ? String(value)
@@ -256,7 +279,9 @@ export class CampResourceHud {
     if (!anchor || !seat || viewport.w < 240 || viewport.h < 36 + 36 * Math.ceil(names.length / 3)) return;
     const w = Math.min(336, viewport.w),
       row = viewport.h < 220 ? 36 : 46,
-      h = f(36 + f(row * Math.ceil(names.length / 3)));
+      h = f(
+        f(36 + f(row * Math.ceil(names.length / 3))) + (winterOutlookLine(town, hovered) ? winterLineHeight : 0),
+      );
     let x = f(anchor.roof.x + 30);
     if (f(x + w) > f(viewport.x + viewport.w)) x = f(f(anchor.roof.x - w) - 30);
     x = clamp(x, viewport.x, f(f(viewport.x + viewport.w) - w));
@@ -300,10 +325,12 @@ export class CampResourceHud {
         capacity.cutStone,
         capacity.bones,
       ];
-    const { x, y, w, h } = panel,
+    const winter = winterOutlookLine(town, camp),
+      { x, y, w } = panel,
+      h = f(panel.h - (winter ? winterLineHeight : 0)),
       row = f((h - 36) / Math.ceil(names.length / 3)),
       fill = { ...theme.raised, a: 255 };
-    context.rect(new Rect(x, y + 3, w, h), rgba(0, 0, 0, 75), theme.radius);
+    context.rect(new Rect(x, y + 3, w, panel.h), rgba(0, 0, 0, 75), theme.radius);
     context.rect(panel, fill, theme.radius, theme.border);
     context.text(
       new Rect(x + 12, y + 5, f(w * f(0.55)), 24),
@@ -339,6 +366,17 @@ export class CampResourceHud {
         true,
       );
       if (i === 6) context.line(x + 12, box.y - 1, f(f(x + w) - 12), box.y - 1, theme.border);
+    }
+    if (winter) {
+      context.line(x + 12, f(y + h), f(f(x + w) - 12), f(y + h), theme.border);
+      context.text(
+        new Rect(x + 12, f(y + h + 2), w - 24, winterLineHeight - 4),
+        context.elideText(winter.text, w - 24, 10, winter.short),
+        winter.short ? theme.danger : theme.muted,
+        10,
+        winter.short,
+        Align.Center,
+      );
     }
   }
 }

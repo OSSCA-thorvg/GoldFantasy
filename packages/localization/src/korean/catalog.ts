@@ -1,0 +1,672 @@
+import type { Phrases } from '../phrases';
+
+export const catalogPhrases: Phrases = {
+  // Callings and races
+  'Settler': '정착민',
+  'Traveller': '여행자',
+  'Warrior': '전사',
+  'Ranger': '순찰자',
+  'Mage': '마법사',
+  'Cleric': '성직자',
+  'Bard': '음유시인',
+  'Human': '인간',
+  'God': '신',
+  'Giant': '거인',
+
+  // Activities
+  'Idle': '대기 중',
+  'Moving on orders': '명령에 따라 이동 중',
+  'Holding position': '위치 사수 중',
+  'Building': '건설 중',
+  'Working on a road': '길 공사 중',
+  'Working': '작업 중',
+  'Eating': '식사 중',
+  'Sleeping': '수면 중',
+  'Relaxing at the tavern': '선술집에서 휴식 중',
+  'Delving the dungeon': '던전 탐사 중',
+  'Brooding': '시름에 잠김',
+  'Arriving': '도착 중',
+  'Leaving': '떠나는 중',
+  'On watch': '경계 중',
+  'Fighting': '전투 중',
+  'On an expedition': '원정 중',
+  'Praying': '기도 중',
+  'Buying gear': '장비 구매 중',
+  'Carrying goods': '물자 운반 중',
+  'Felling a tree': '나무 베는 중',
+  'Collecting resources': '자원 수집 중',
+  'Mining stone': '석재 채굴 중',
+  'Receiving treatment': '치료받는 중',
+  'Fetching supplies': '보급품 가져오는 중',
+  'Delivering materials': '자재 운반 중',
+  'Waiting for materials': '자재 대기 중',
+  'Drinking water': '물 마시는 중',
+  'Training at the guild': '길드에서 훈련 중',
+  'Crafting equipment': '장비 제작 중',
+  Downed: '쓰러짐',
+  'Tending the fallen': '쓰러진 동료 돌보는 중',
+
+  // Conditions
+  'Hungry': '배고픔',
+  'Starving': '굶주림',
+  'Exhausted': '탈진',
+  'Thirsty': '목마름',
+  'Cold': '추위',
+  'Soaked': '비에 젖음',
+  'Snowed on': '눈을 맞음',
+  'Slept outside': '노숙함',
+  'No home': '집 없음',
+  'Unpaid': '임금 미지급',
+  'Short of coin': '돈이 부족함',
+  'No bed at an inn': '여관에 빈 침대 없음',
+  'Enjoyed the tavern': '선술집에서 즐거웠음',
+  'Wounded': '부상',
+  'Breaking down': '무너지기 직전',
+  'Content': '만족',
+
+  // Animals
+  'Cow': '소',
+  'Pig': '돼지',
+  'Chicken': '닭',
+  'Wolf': '늑대',
+  'Dog': '개',
+  'Cat': '고양이',
+
+  // Weather and seasons
+  'Clear': '맑음',
+  'Cloudy': '흐림',
+  'Rain': '비',
+  'Storm': '폭풍',
+  'Snow': '눈',
+  'Spring': '봄',
+  'Summer': '여름',
+  'Autumn': '가을',
+  'Winter': '겨울',
+
+  // Worlds
+  'Midgard': '미드가르드',
+  'Asgard': '아스가르드',
+  'Vanaheim': '바나헤임',
+  'Alfheim': '알프헤임',
+  'Jotunheim': '요툰헤임',
+  'Svartalfheim': '스바르탈프헤임',
+  'Niflheim': '니플헤임',
+  'Muspelheim': '무스펠헤임',
+  'Helheim': '헬헤임',
+
+  // Gate and site names
+  'Tower of Ravens': '까마귀 탑',
+  'The Broken Hall': '무너진 전당',
+  "Bifrost's Foot": '비프로스트의 기슭',
+  'Valgrind': '발그린드',
+  'The Green Door': '초록 문',
+  'The Vanir Well': '바니르의 샘',
+  'The Golden Glade': '황금 숲터',
+  "Njord's Gate": '뇨르드의 관문',
+  'The Bright Gate': '빛나는 관문',
+  "Freyr's Glade": '프레이의 숲터',
+  'The Elfhame Door': '엘프하임의 문',
+  'Glimmering Rift': '반짝이는 균열',
+  'Ironwood Den': '철의 숲 소굴',
+  'Wargmaw': '바르그의 아가리',
+  'The Howling Cleft': '울부짖는 협곡',
+  'Greyfang Hollow': '잿빛 송곳니 골짜기',
+  "Dvalin's Door": '드발린의 문',
+  'The Deep Delving': '깊은 갱도',
+  "Brokk's Stair": '브로크의 계단',
+  'The Forge Below': '땅속 대장간',
+  'The Mist Gate': '안개의 관문',
+  'Rime Rift': '서리 균열',
+  'The Frozen Throat': '얼어붙은 목구멍',
+  'The Weeping Gate': '흐느끼는 관문',
+  "Surt's Door": '수르트의 문',
+  'The Burning Hall': '불타는 전당',
+  'The Ember Gate': '잉걸불의 관문',
+  'The Cinder Rift': '잿불 균열',
+  'Barrow of Kings': '왕들의 무덤',
+  'The Drowned Howe': '물에 잠긴 봉분',
+  'Draugmound': '드라우그 봉분',
+  'Gjallar Crossing': '걀라르 나루',
+  'Eastshore Stone Hall': '동쪽 해안 돌 전당',
+  'The Tideworn Hall': '파도에 닳은 전당',
+
+  // Faiths and goal branches
+  'Order of the Dawn': '새벽의 교단',
+  'Grove Mother': '숲의 어머니',
+  'Forge Father': '대장간의 아버지',
+  'Wild Moon': '야생의 달',
+  'Founding': '개척',
+  'Trade': '교역',
+  'Arms': '무구',
+  'Faith': '신앙',
+  'Saga': '사가',
+
+  // Founders
+  'Askr': '아스크',
+  'Embla': '엠블라',
+  "Askr and Embla wake before Odin's statue: an ash and an elm he gave breath":
+    '오딘이 숨을 불어넣은 물푸레나무와 느릅나무, 아스크와 엠블라가 오딘의 석상 앞에서 깨어납니다',
+  'An ash on the shore, given breath by Odin': '바닷가의 물푸레나무, 오딘이 숨을 불어넣음',
+  "Born under Ymir's left arm": '바닷가의 물푸레나무, 오딘이 숨을 불어넣음',
+  'An elm on the shore, woken beside Askr': '바닷가의 느릅나무, 아스크 곁에서 깨어남',
+  "Woke under Ymir's arm beside Askr": '바닷가의 느릅나무, 아스크 곁에서 깨어남',
+
+  // Resources and item names
+  'Wood': '목재',
+  'Stone': '석재',
+  'Food': '식량',
+  'Water': '물',
+  'Planks': '판자',
+  'Cut stone': '다듬은 돌',
+  'Gold': '골드',
+  'Mana': '마나',
+  'Bones': '뼈',
+  'gold': '골드',
+  'wood': '목재',
+  'stone': '석재',
+  'food': '식량',
+  'mana': '마나',
+  'water': '물',
+  'planks': '판자',
+  'cut stone': '다듬은 돌',
+  'bones': '뼈',
+  'free': '무료',
+  '{0} gold': '골드 {0}',
+  '{0} wood': '목재 {0}',
+  '{0} stone': '석재 {0}',
+  '{0} food': '식량 {0}',
+  '{0} mana': '마나 {0}',
+  '{0} water': '물 {0}',
+  '{0} planks': '판자 {0}',
+  '{0} cut stone': '다듬은 돌 {0}',
+  '{0} bones': '뼈 {0}',
+  'Remains gathered from hunts and defeated monsters. Offered to Odin, who gives breath to a new settler.':
+    '사냥과 쓰러뜨린 몬스터에게서 모은 유해입니다. 오딘에게 바치면 새 주민에게 숨을 불어넣습니다.',
+  'Wooden axe': '나무 도끼',
+  'Wooden pick': '나무 곡괭이',
+  'Wooden mallet': '나무 망치',
+  'Wooden hoe': '나무 괭이',
+  'Wooden sword': '나무 검',
+  'Wooden club': '나무 몽둥이',
+  'Short bow': '짧은 활',
+  'Iron axe': '철 도끼',
+  'Iron pick': '철 곡괭이',
+  'Iron hammer': '철 망치',
+  'Iron hoe': '철 괭이',
+  'Watering can': '물뿌리개',
+  'Iron saw': '철 톱',
+  'Iron sword': '철검',
+  'Hunting bow': '사냥 활',
+  'Rune staff': '룬 지팡이',
+  'Stone mace': '돌 철퇴',
+  'Leather cap': '가죽 모자',
+  'Iron helmet': '철 투구',
+  'Leather armor': '가죽 갑옷',
+  'Mail armor': '사슬 갑옷',
+  'Runic robe': '룬 로브',
+  'Leather boots': '가죽 장화',
+  'Work gloves': '작업 장갑',
+  'Wooden shield': '나무 방패',
+  'Travel cloak': '여행용 망토',
+  'Wooden shovel': '나무 삽',
+  'Stone axe': '돌 도끼',
+  'Stone pick': '돌 곡괭이',
+  'Stone hammer': '돌 망치',
+  'Stone hoe': '돌 괭이',
+  'Flint sickle': '부싯돌 낫',
+  'Hunting knife': '사냥 칼',
+  'Wooden spear': '나무 창',
+  'Pack basket': '등 바구니',
+  'Iron shovel': '철 삽',
+  'Iron sickle': '철 낫',
+  'Iron spear': '철 창',
+
+  // Item descriptions, categories, slots and work kinds
+  'Improves {0}; can serve as a melee weapon.': '{0} 효율 향상. 근접 무기로도 쓸 수 있습니다.',
+  "Made at a workbench. Improves {0}, though less than the smith's tools.":
+    '작업대에서 만듭니다. {0} 효율이 오르지만 대장간 도구보다는 덜합니다.',
+  "Made at a workbench. Hits harder than fists, though less than the smith's weapons.":
+    '작업대에서 만듭니다. 맨주먹보다 세게 치지만 대장간 무기보다는 약합니다.',
+  'Made by the smith: hits harder than anything from the workbench.':
+    '대장간에서 만듭니다: 작업대에서 만든 어떤 것보다 세게 칩니다.',
+  'Worn armor that takes part of every blow.': '입고 있으면 모든 공격의 일부를 막아 주는 방어구입니다.',
+  'Fells trees': '나무 베기',
+  'Breaks stone': '돌 캐기',
+  'Builds and crafts': '건설과 제작',
+  'Farms': '농사',
+  'Waters crops': '물주기',
+  'Saws planks': '판자 켜기',
+  'Crafts': '제작',
+  'Tills and lays roads': '밭 일구기와 길 닦기',
+  'Tends summer and autumn crops': '여름과 가을 밭일',
+  '{0} faster': '{0} 속도가 빨라집니다',
+  '{0} faster than a {1}': '{0} 속도가 {1}보다 빠릅니다',
+  'Tills and lays roads faster than a mallet or a hoe': '밭 일구기와 길 닦기가 망치나 괭이보다 빠릅니다',
+  'Tends summer and autumn crops faster than a hoe': '여름과 가을 밭일이 괭이보다 빠릅니다',
+  'Hits harder than fists': '맨주먹보다 세게 칩니다',
+  'Hits harder than a {0}': '{0}보다 세게 칩니다',
+  'Hits harder than a {0} and runs an enemy through': '{0}보다 세게 치고 적을 꿰뚫습니다',
+  'Reaches further and runs an enemy through': '더 멀리 닿고 적을 꿰뚫습니다',
+  'Takes less damage': '받는 피해가 줄어듭니다',
+  'Takes much less damage': '받는 피해가 크게 줄어듭니다',
+  'Brings more home from a hunt': '사냥에서 더 많이 가져옵니다',
+  'Carries more before slowing down': '느려지기 전에 더 많이 나릅니다',
+  'wooden axe': '나무 도끼',
+  'wooden pick': '나무 곡괭이',
+  'wooden mallet': '나무 망치',
+  'wooden hoe': '나무 괭이',
+  'wooden shovel': '나무 삽',
+  'stone axe': '돌 도끼',
+  'stone pick': '돌 곡괭이',
+  'stone hammer': '돌 망치',
+  'stone hoe': '돌 괭이',
+  'flint sickle': '부싯돌 낫',
+  'wooden sword': '나무 검',
+  'wooden club': '나무 몽둥이',
+  'short bow': '짧은 활',
+  'wooden spear': '나무 창',
+  "Made at a workbench with a stone head. Improves {0}: better than wood, short of the smith's iron.":
+    '작업대에서 돌 날을 달아 만듭니다. {0} 효율이 나무보다 높지만 대장간의 철에는 못 미칩니다.',
+  'Digs: lays and mends roads and breaks in new fields, faster than a hammer or a hoe of the same make.':
+    '땅을 팝니다: 길을 닦고 고치며 새 밭을 일구는 일이 같은 재질의 망치나 괭이보다 빠릅니다.',
+  "Cuts the standing crop: a farmhand's field work in summer and autumn goes faster than with a hoe.":
+    '자란 작물을 벱니다: 여름과 가을에 일꾼의 밭일이 괭이보다 빠릅니다.',
+  'Skins and butchers the kill: a hunt brings home more food and bones.':
+    '잡은 짐승의 가죽을 벗기고 고기를 발라냅니다: 사냥에서 식량과 뼈를 더 얻습니다.',
+  'A long thrusting weapon: reaches farther than a sword and runs through one enemy behind its target.':
+    '길게 찌르는 무기입니다: 검보다 멀리 닿고, 노린 적 뒤의 적 하나까지 꿰뚫습니다.',
+  'A wicker pack worn on the back: carries more before slowing and before the pack is full.':
+    '등에 메는 고리 바구니입니다: 느려지기 전과 짐이 가득 차기 전에 더 많이 나릅니다.',
+  'Building and crafting': '건설과 제작',
+  'Farming': '농사',
+  'Watering': '물주기',
+  'Sawing': '제재',
+  'woodcutting': '벌목',
+  'mining': '채굴',
+  'construction': '건설',
+  'farming': '농사',
+  'watering': '물주기',
+  'sawing': '제재',
+  'crafting': '제작',
+  'digging': '땅파기',
+  'reaping': '거두기',
+  'construction and crafting': '건설 및 제작',
+  'resource': '자원',
+  'tool': '도구',
+  'weapon': '무기',
+  'armor': '방어구',
+  'tool1': '도구 1',
+  'tool2': '도구 2',
+  'head': '머리',
+  'body': '몸통',
+  'feet': '발',
+  'hands': '손',
+  'offhand': '보조 손',
+  'accessory': '장신구',
+
+  // Building names
+  'Camp': '캠프',
+  'Tent': '천막',
+  'Cottage': '오두막',
+  'Townhouse': '연립 주택',
+  'Manor': '저택',
+  'Market stalls': '시장 좌판',
+  'Market hall': '시장 회관',
+  'Grand bazaar': '대시장',
+  'Farmhouse': '농가',
+  'Lumberyard': '벌목장',
+  'Quarry': '채석장',
+  'Well': '우물',
+  'Storehouse': '창고',
+  'Altar of Odin': '오딘의 제단',
+  'Mage tower': '마법탑',
+  'Portal': '포털',
+  'Tavern': '선술집',
+  'Hostel': '여관',
+  'Inn': '큰 여관',
+  'Grand inn': '대형 여관',
+  'Guild': '길드',
+  'Guild hall': '길드 회관',
+  'Chapel': '예배당',
+  'Weaponsmith': '무기 대장간',
+  'Armorer': '갑옷 대장간',
+  'Apothecary': '약제상',
+  'Palisade fort': '목책 요새',
+  'Stone keep': '돌 성채',
+  'Castle': '성',
+  'Torch': '횃불',
+  'Sawmill': '제재소',
+  'Stoneworks': '석공소',
+  'Timber store': '목재 저장소',
+  'Granary': '곡물 창고',
+  'Stone store': '석재 저장소',
+  'Watchtower': '망루',
+  'Training yard': '훈련장',
+  'Runestone': '룬석',
+  'Tower': '망루',
+  'Yard': '훈련장',
+  'Arms & defence': '무구와 방어',
+
+  // Building descriptions
+  'A timber lookout. While someone keeps watch, it shoots raiders and angry monsters that come near.':
+    '나무로 지은 망대입니다. 누군가 망을 보는 동안 가까이 온 습격자와 성난 몬스터를 쏩니다.',
+  'Posts and practice blades. Two residents drill here: each day of drilling brings experience up to level 10 and eases stress.':
+    '말뚝과 연습용 칼이 있는 곳입니다. 주민 두 명이 이곳에서 훈련하며, 하루 훈련할 때마다 10레벨까지 경험치를 얻고 스트레스가 줄어듭니다.',
+  'A carved stone that names the fallen. While one stands, the settlement grieves its dead less.':
+    '쓰러진 이들의 이름을 새긴 돌입니다. 하나라도 서 있는 동안 정착지는 죽은 이를 덜 슬퍼합니다.',
+  'A covered hall. Fully staffed, it becomes a grand bazaar.':
+    '지붕을 얹은 회관입니다. 일꾼이 모두 차면 대시장이 됩니다.',
+  'A first shelter for two. Once full, in a settlement of six, it becomes a cottage.':
+    '두 명이 머무는 첫 보금자리입니다. 가득 차고 정착지 주민이 6명이 되면 오두막이 됩니다.',
+  'A grand hall for residents to take their one-time professional oath.':
+    '주민이 단 한 번의 직업 서약을 하는 웅장한 회관입니다.',
+  'A hall of professional oaths. Residents visit to train once as a Warrior, Ranger, Mage, Cleric or Bard. Eight trained residents make it a guild hall.':
+    '직업 서약의 전당입니다. 주민이 찾아와 전사, 순찰자, 마법사, 성직자, 음유시인 중 하나로 한 번 훈련합니다. 훈련받은 주민이 8명이 되면 길드 회관이 됩니다.',
+  'A house of prayer. Choose its faith to calm the faithful; new residents are born only at an altar.':
+    '기도의 집입니다. 신앙을 정해 신자들의 마음을 달래세요. 새 주민은 제단에서만 태어납니다.',
+  'Ale, songs and dice. Settlers and guests shed their stress here; guests pay.':
+    '맥주와 노래, 주사위가 있는 곳입니다. 정착민과 손님이 스트레스를 풀며, 손님은 값을 치릅니다.',
+  'A noble household with its own tower.': '탑을 갖춘 귀족의 저택입니다.',
+  'A ring of standing stones humming with mana. Guests of every people step through it, far more often and with fuller purses.':
+    '마나가 울리는 선돌의 고리입니다. 온갖 종족의 손님이 훨씬 자주, 더 두둑한 지갑을 들고 찾아옵니다.',
+  'A small road torch that lights the way.': '길을 밝히는 작은 횃불입니다.',
+  'A timber camp near a dungeon, well away from any other camp. Shelters five; with twelve residents it becomes a palisade fort.':
+    '던전 근처에 세우는 통나무 캠프로, 다른 캠프와 멀리 떨어져야 합니다. 다섯 명이 머물며, 주민이 12명이 되면 목책 요새가 됩니다.',
+  'A timber-framed home for four. Once full, in a town of fourteen, it becomes a townhouse.':
+    '네 명이 사는 목조 주택입니다. 가득 차고 마을 주민이 14명이 되면 연립 주택이 됩니다.',
+  'Caravans from distant lands trade here.': '먼 땅에서 온 대상들이 이곳에서 거래합니다.',
+  'Draws mana from the ley lines.': '지맥에서 마나를 끌어옵니다.',
+  'Draws water for everyone; each person drinks every day. It draws more beside a lake or river.':
+    '모두가 마실 물을 길어 올립니다. 사람마다 날마다 물을 마십니다. 호수나 강 옆에서는 더 많이 길어 올립니다.',
+  'Farmers tend the fields around the farmhouse; more farmers tend more fields.':
+    '농부가 농가 둘레의 밭을 돌봅니다. 농부가 많을수록 더 많은 밭을 돌봅니다.',
+  'Forges blades: staffed, residents and guards strike harder, and adventurers buy here.':
+    '칼날을 벼립니다. 일꾼이 있으면 주민과 경비가 더 강하게 공격하고, 모험가가 이곳에서 물건을 삽니다.',
+  'Mail and shields: staffed, monsters wound your people less, and adventurers buy here.':
+    '사슬 갑옷과 방패를 만듭니다. 일꾼이 있으면 몬스터에게 입는 피해가 줄고, 모험가가 이곳에서 물건을 삽니다.',
+  'Offer water, bones, gold, food and stone at the altar to shape a new resident.':
+    '제단에 물, 뼈, 골드, 식량, 석재를 바쳐 새 주민을 빚습니다.',
+  'Potions and salves: staffed, the wounded heal faster, and adventurers buy here.':
+    '물약과 연고를 만듭니다. 일꾼이 있으면 부상자가 더 빨리 회복하고, 모험가가 이곳에서 물건을 삽니다.',
+  'Room for 300 more of each wood, stone, food and water. What does not fit is lost.':
+    '목재, 석재, 식량, 물을 각각 300씩 더 보관합니다. 들어가지 못한 자원은 사라집니다.',
+  'Six beds for paying temporary guests. Earning 150 gold more makes it a grand inn.':
+    '돈을 내고 잠시 머무는 손님을 위한 침대 6개가 있습니다. 150골드를 더 벌면 대형 여관이 됩니다.',
+  'Stonecutters. Needs rocky ground close by.':
+    '석공들의 일터입니다. 가까이에 바위 지대가 있어야 합니다.',
+  'Stores 240 additional food. Residents can collect meals here.':
+    '식량을 240 더 보관합니다. 주민이 이곳에서 식사를 가져갈 수 있습니다.',
+  'Stores 240 additional logs and planks. A depot for timber deliveries.':
+    '통나무와 판자를 240 더 보관합니다. 목재를 들여오는 집하장입니다.',
+  'Stores 240 additional rough and cut stone. A depot for stone deliveries.':
+    '원석과 다듬은 돌을 240 더 보관합니다. 석재를 들여오는 집하장입니다.',
+  'Ten beds, a stable and a hall for paying temporary guests.':
+    '돈을 내고 잠시 머무는 손님을 위한 침대 10개와 마구간, 홀이 있습니다.',
+  'The camp grown into a stockade. With twenty residents it is rebuilt in stone.':
+    '캠프가 자라 목책이 되었습니다. 주민이 20명이 되면 돌로 다시 짓습니다.',
+  'The seat of your realm.': '당신이 다스리는 땅의 중심입니다.',
+  'Three beds for paying travellers. Guests stay temporarily and never become residents. Earning 40 gold makes this an inn.':
+    '돈을 내는 여행자를 위한 침대 3개가 있습니다. 손님은 잠시 머물 뿐 주민이 되지 않습니다. 40골드를 벌면 큰 여관이 됩니다.',
+  "Traders' tents. Staff them to grow a market hall.": '상인들의 천막입니다. 일꾼을 배치하면 시장 회관으로 성장합니다.',
+  'Two storeys. In a town of twenty-four, four huddled together merge into a manor.':
+    '2층 주택입니다. 마을 주민이 24명이 되면 모여 있는 네 채가 저택 하나로 합쳐집니다.',
+  'Walls of stone. With twenty-six residents the realm raises a castle.':
+    '돌로 쌓은 성벽입니다. 주민이 26명이 되면 성을 세웁니다.',
+  'Woodcutters fell the trees around it and carry the logs in. Felled woods grow back slowly.':
+    '나무꾼이 둘레의 나무를 베어 통나무를 나릅니다. 베어낸 숲은 천천히 다시 자랍니다.',
+  'Workers dress two rough stones into one cut stone for advanced construction.':
+    '일꾼이 원석 2개를 다듬은 돌 1개로 가공합니다. 고급 건설에 쓰입니다.',
+  'Workers saw two logs into one plank. Advanced construction needs finished timber.':
+    '일꾼이 통나무 2개를 판자 1개로 켭니다. 고급 건설에는 가공한 목재가 필요합니다.',
+
+  // Unlock reasons
+  'Complete {0}': '{0} 완성 필요',
+  'Complete a road': '길 완성 필요',
+  'Needs {0} residents': '주민 {0}명 필요',
+  'Clear a floor beyond a gate': '관문 너머 한 층 돌파 필요',
+
+  // Goal progress
+  'Built': '완성됨',
+  'Under construction': '건설 중',
+  'Not built yet': '아직 짓지 않음',
+  'Road complete': '길 완성됨',
+  'No completed road yet': '아직 완성된 길 없음',
+  'Field planted': '밭을 일굼',
+  'No field yet': '아직 밭 없음',
+  '{0} / {1} raids beaten off': '물리친 습격 {0} / {1}',
+  '{0} / {1} guardians slain': '처치한 수호자 {0} / {1}',
+  '{0} / {1} parties led': '이끈 파티 {0} / {1}',
+  'Largest party {0} / {1}': '가장 큰 파티 {0} / {1}',
+  '{0} / {1} downed residents revived': '일으킨 주민 {0} / {1}',
+  '{0} / {1} weapons forged': '벼린 무기 {0} / {1}',
+  '{0} / {1} monsters slain': '처치한 몬스터 {0} / {1}',
+  '{0} / {1} residents sworn to a calling': '직업을 서약한 주민 {0} / {1}',
+  '{0} / {1} residents with gear in hand': '장비를 든 주민 {0} / {1}',
+  '{0} / {1} crafted': '만든 것 {0} / {1}',
+  Crafted: '제작 완료',
+  'Wood {0} / {1} for {2}': '{2}에 쓸 목재 {0} / {1}',
+  'Stone {0} / {1} for {2}': '{2}에 쓸 돌 {0} / {1}',
+  'Ready to craft {0}': '{0} 만들 준비 완료',
+
+  // Placement reasons
+  'Camps must be at least 50 tiles apart': '캠프는 서로 50칸 이상 떨어져야 합니다',
+  'Occupied': '이미 사용 중인 자리',
+  'Fields in the way': '밭이 가로막고 있음',
+  'On the road': '길 위에는 지을 수 없음',
+
+  // Settlement goals
+  'Found a camp': '캠프 세우기',
+  'Mark a camp near a discovered dungeon. Settlers gather and deliver its 12 wood.':
+    '발견한 던전 근처에 캠프 자리를 정하세요. 정착민이 목재 12를 모아 나릅니다.',
+  'Craft a wooden axe': '나무 도끼 만들기',
+  'Craft wooden tools': '나무 도구 만들기',
+  'Craft a first weapon': '첫 무기 만들기',
+  'Equip both founders': '두 개척자 모두 장비하기',
+  'A wooden axe fells trees faster than bare hands. Craft one at the workbench from 3 wood.':
+    '나무 도끼는 맨손보다 나무를 빨리 벱니다. 작업대에서 목재 3으로 만드세요.',
+  'A pick, mallet or hoe makes mining, building or farming faster; a shovel tills and lays roads faster still. Craft two at the workbench.':
+    '곡괭이, 망치, 괭이는 채굴, 건설, 농사를 빠르게 하고, 삽은 밭 일구기와 길 닦기를 더 빠르게 합니다. 작업대에서 두 개를 만드세요.',
+  'A wooden sword, club, spear or short bow hits harder than fists. Craft one at the bench.':
+    '나무 검, 몽둥이, 창, 짧은 활은 맨주먹보다 세게 칩니다. 작업대에서 하나를 만드세요.',
+  'Build a workbench': '작업대 짓기',
+  'An open bench where residents craft wooden and stone tools and weapons, one at a time. It takes 4 wood.':
+    '주민이 한 명씩 나무와 돌로 도구와 무기를 만드는 야외 작업대입니다. 목재 4가 듭니다.',
+  'Workbench': '작업대',
+  'An open-air bench with a chopping block where residents craft wooden tools and weapons, one at a time.':
+    '도끼질 받침이 놓인 야외 작업대입니다. 주민이 한 명씩 나무 도구와 무기를 만듭니다.',
+  'Crafted gear goes straight into a free hand. Give each founder a tool or a weapon of their own.':
+    '만든 장비는 바로 빈 손에 듭니다. 개척자마다 자기 도구나 무기를 하나씩 주세요.',
+  'Needs a guild and 10 residents. Forges iron tools and weapons, far better than wooden ones.':
+    '길드와 주민 10명이 필요합니다. 나무 장비보다 훨씬 나은 철 도구와 무기를 만듭니다.',
+  "Craft an iron weapon at the weaponsmith from a resident's equipment. Camp-made weapons do not count.":
+    '주민의 장비 창에서 무기 대장간의 철 무기를 제작하세요. 캠프에서 만든 무기는 세지 않습니다.',
+  'Shelter the founders and make room for the newcomers to come.': '개척자에게 쉴 곳을 주고 앞으로 올 이들의 자리를 마련하세요.',
+  'Needs a road. Establish a timber supply near trees; its workers fell faster with axes in hand.':
+    '길이 필요합니다. 나무 가까이에 목재 공급처를 마련하세요. 일꾼이 도끼를 들면 더 빨리 벱니다.',
+  'Needs a road. Establish a supply of stone.': '길이 필요합니다. 석재 공급처를 마련하세요.',
+  'Needs the altar of Odin and 6 residents. Its healer treats the hurt and closes lasting wounds sooner.':
+    '오딘의 제단과 주민 6명이 필요합니다. 치료사가 다친 이를 돌보고 오래가는 상처를 더 빨리 아물게 합니다.',
+  'Lay a road': '길 놓기',
+  'Draw and complete a road connected to the camp.': '캠프와 이어지는 길을 그려 완성하세요.',
+  'Build an altar': '제단 짓기',
+  "Odin's altar needs 4 stone: builders break grey rock by hand. No rock in sight? Explore for it.":
+    '오딘의 제단에는 돌 4가 필요합니다. 일꾼이 회색 바위를 맨손으로 깹니다. 바위가 보이지 않으면 탐험하세요.',
+  "Pray at Odin's altar with 4 food and a free bed: a new resident joins when the prayer ends.":
+    '식량 4와 빈 침상을 두고 오딘의 제단에서 기도하세요. 기도가 끝나면 새 주민이 합류합니다.',
+  'Choose a resident to pray at the altar. Offer 4 food and keep a home free; a new resident appears here the next day.':
+    '제단에서 기도할 주민을 고르세요. 식량 4를 바치고 빈 집을 하나 남겨 두면 다음 날 이곳에 새 주민이 나타납니다.',
+  'Build a lumberyard': '벌목장 짓기',
+  'Establish a timber supply near trees.': '나무 가까이에 목재 공급처를 마련하세요.',
+  'Build a farmhouse': '농가 짓기',
+  'Prepare a food supply for the settlement.': '정착지의 식량 공급을 준비하세요.',
+  'Plant a field': '밭 일구기',
+  'Draw a field near the farmhouse.': '농가 근처에 밭을 그리세요.',
+  'Build a well': '우물 짓기',
+  'Give your residents drinking water.': '주민에게 마실 물을 마련해 주세요.',
+  'Build a tent': '천막 짓기',
+  'Provide housing for newcomers.': '새로 오는 이들이 살 집을 마련하세요.',
+  'Reach {0} residents': '주민 {0}명 달성',
+  'Pray at the altar and keep homes and food available for next-day residents.':
+    '제단에서 기도하고, 다음 날 올 주민을 위해 집과 식량을 준비해 두세요.',
+  'Build a quarry': '채석장 짓기',
+  'Establish a supply of stone.': '석재 공급처를 마련하세요.',
+  'Build a storehouse': '창고 짓기',
+  'Increase room for delivered resources.': '들여온 자원을 보관할 공간을 늘리세요.',
+  'Build a sawmill': '제재소 짓기',
+  'Assign a worker to turn two logs into one plank for advanced construction.':
+    '일꾼을 배치해 통나무 2개를 판자 1개로 만드세요. 고급 건설에 쓰입니다.',
+  'Build stoneworks': '석공소 짓기',
+  'Dress two rough stones into one cut stone for advanced construction.':
+    '원석 2개를 다듬은 돌 1개로 가공하세요. 고급 건설에 쓰입니다.',
+  'Build a hostel': '여관 짓기',
+  'Earn lodging income from temporary visitors. Guests never become residents.':
+    '잠시 머무는 방문객에게서 숙박 수입을 얻으세요. 손님은 주민이 되지 않습니다.',
+  'Build a tavern': '선술집 짓기',
+  'Give residents somewhere to relax.': '주민이 쉴 곳을 마련해 주세요.',
+  'Expand housing and supplies for growth.': '성장에 대비해 집과 물자를 늘리세요.',
+  'Build a market': '시장 짓기',
+  'Let trade support the settlement.': '교역으로 정착지를 뒷받침하세요.',
+  'Build a guild': '길드 짓기',
+  'Needs a quarry and 6 residents. Choose a resident to take a one-time professional oath at the guild.':
+    '채석장과 주민 6명이 필요합니다. 길드에서 단 한 번의 직업 서약을 할 주민을 고르세요.',
+  'Support a larger working population.': '더 많은 일꾼을 부양하세요.',
+  'Build a weaponsmith': '무기 대장간 짓기',
+  'Crafted weapons turn a long brawl into a quick kill.': '제작한 무기가 있으면 긴 싸움도 금세 끝납니다.',
+  'Expand the settlement.': '정착지를 넓히세요.',
+  'Build an armorer': '갑옷 대장간 짓기',
+  'Protect your fighters.': '싸우는 이들을 보호하세요.',
+  'Build a chapel': '예배당 짓기',
+  'Needs an altar and 10 residents. Gives residents a place to pray.':
+    '제단과 주민 10명이 필요합니다. 주민에게 기도할 곳이 생깁니다.',
+  'Make room for skilled residents.': '숙련된 주민이 머물 자리를 마련하세요.',
+  'Build a mage tower': '마법탑 짓기',
+  'Needs a chapel. Develops a source of mana.': '예배당이 필요합니다. 마나의 원천을 마련합니다.',
+  'Keep a growing town supplied.': '커지는 마을에 물자가 끊기지 않게 하세요.',
+  'Build an apothecary': '약제상 짓기',
+  'Provide treatment for injured residents.': '다친 주민을 치료할 곳을 마련하세요.',
+  'Step through a gate': '관문 넘어가기',
+  "Select a party and right-click a discovered gate to lead it into the world beyond. Kill the floor's guardian and bring the party home.":
+    '파티를 선택하고 발견한 관문을 우클릭해 너머의 세계로 보내세요. 그 층의 수호자를 처치하고 파티를 귀환시키세요.',
+  'Seal a gate': '관문 봉인하기',
+  'Kill the guardian of the third floor beyond one gate. A sealed gate never raids again and pays a great hoard.':
+    '관문 하나 너머의 3층 수호자를 처치하세요. 봉인된 관문에서는 다시 습격이 오지 않으며 큰 보물을 얻습니다.',
+  'Maintain homes, food and water for everyone.': '모두를 위한 집과 식량, 물을 유지하세요.',
+  'Build a portal': '포털 짓기',
+  'Needs a mage tower and a guild. Draws more visitors, and for 8 mana pulls a party home from beyond a gate, even mid-fight.':
+    '마법탑과 길드가 필요합니다. 방문객이 늘어나며, 마나 8로 관문 너머의 파티를 전투 중에도 귀환시킵니다.',
+  'Swear a fighter': '싸울 이 서약시키기',
+  'Select the guild and choose a settler to swear a calling. Each calling has one ability: press Q to use it.':
+    '길드를 선택하고 직업을 서약할 정착민을 고르세요. 직업마다 능력이 하나 있으며 Q를 눌러 씁니다.',
+  'Build a training yard': '훈련장 짓기',
+  'Needs a guild. Two residents drill there each day and gain experience, though fighting still teaches faster.':
+    '길드가 필요합니다. 주민 두 명이 매일 훈련하며 경험치를 얻지만, 실전이 더 빨리 가르칩니다.',
+  'Beat off a raid': '습격 물리치기',
+  'Raids are warned during the day. Gather your fighters by the camp and kill every raider that comes.':
+    '습격은 낮에 미리 알려집니다. 싸울 이들을 캠프 곁에 모아 몰려오는 습격자를 모두 처치하세요.',
+  'Build a watchtower': '망루 짓기',
+  'Needs a training yard and a raid beaten off. A resident keeps watch and shoots raiders who come near.':
+    '훈련장이 있고 습격을 한 번 물리쳐야 합니다. 주민이 망을 보며 가까이 온 습격자를 쏩니다.',
+  'Needs a training yard and 10 residents. Crafted weapons turn a long brawl into a quick kill.':
+    '훈련장과 주민 10명이 필요합니다. 제작한 무기가 있으면 긴 싸움도 금세 끝납니다.',
+  'Forge a weapon': '무기 벼리기',
+  "Open a resident's equipment and craft a weapon at the weaponsmith. A crafted weapon ends fights far sooner.":
+    '주민의 장비 창을 열고 무기 대장간에서 무기를 제작하세요. 제작한 무기는 싸움을 훨씬 빨리 끝냅니다.',
+  'Needs a floor cleared beyond a gate. Mail and shields keep your fighters on their feet.':
+    '관문 너머 한 층을 돌파해야 합니다. 사슬 갑옷과 방패가 싸우는 이들을 버티게 합니다.',
+  'Needs a chapel and 12 residents. Its healer treats the hurt and closes lasting wounds sooner.':
+    '예배당과 주민 12명이 필요합니다. 치료사가 다친 이를 돌보고 오래가는 상처를 더 빨리 아물게 합니다.',
+  'Needs an apothecary. Develops a source of mana.': '약제상이 필요합니다. 마나의 원천을 마련합니다.',
+  'Lead a party of three': '세 명의 파티 이끌기',
+  'Select three residents and right-click a discovered gate to lead them into the world beyond.':
+    '주민 세 명을 선택하고 발견한 관문을 우클릭해 너머의 세계로 이끄세요.',
+  'Slay a floor guardian': '층의 수호자 처치하기',
+  'Fight through to the heart of a floor and kill its guardian. When it winds up a slam, move your party off the marked ground.':
+    '층의 중심까지 싸워 나아가 수호자를 처치하세요. 수호자가 내려치기를 준비하면 표시된 땅에서 파티를 옮기세요.',
+  'Revive a downed ally': '쓰러진 동료 일으키기',
+  'A resident at 0 health is downed, not dead. Select an ally and right-click the fallen one to revive them before they bleed out.':
+    '체력이 0이 된 주민은 죽은 것이 아니라 쓰러진 것입니다. 동료를 선택하고 쓰러진 이를 우클릭해 숨이 끊어지기 전에 일으키세요.',
+  'Raise a runestone': '룬석 세우기',
+  'Carve the names of the fallen in stone. While it stands, the settlement grieves less.':
+    '쓰러진 이들의 이름을 돌에 새기세요. 룬석이 서 있는 동안 정착지의 슬픔이 줄어듭니다.',
+  'Needs a mage tower, a guild and a sealed gate. Draws more visitors, and for 8 mana pulls a party home from beyond a gate, even mid-fight.':
+    '마법탑과 길드, 봉인한 관문이 필요합니다. 방문객이 늘어나며, 마나 8로 관문 너머의 파티를 전투 중에도 귀환시킵니다.',
+  'Seal every gate': '모든 관문 봉인하기',
+  'Close every gate to the other worlds to make Midgard safe.':
+    '다른 세계로 통하는 모든 관문을 닫아 미드가르드를 안전하게 만드세요.',
+
+  // Raids
+  'Many small tracks circle {0}: a horde will come tonight':
+    '{0} 주변에 작은 발자국이 가득합니다. 오늘 밤 무리가 몰려옵니다',
+  'Heavy tracks lead from {0}: a few great brutes will come tonight':
+    '{0}에서 무거운 발자국이 이어집니다. 오늘 밤 거대한 괴수 몇이 옵니다',
+  'Two gates stir at once: raiders will come from both sides tonight':
+    '두 관문이 동시에 꿈틀댑니다. 오늘 밤 양쪽에서 습격자가 옵니다',
+  'Fresh tracks lead from {0}: a raid will come tonight':
+    '{0}에서 새 발자국이 이어집니다. 오늘 밤 습격이 옵니다',
+  'Week {0}: raiders are at their full strength. Only sealing the gates ends the raids.':
+    '{0}주차: 습격자가 최대로 강해졌습니다. 관문을 봉인해야만 습격이 끝납니다.',
+  'Week {0}: raiders now have {1}% health. Seal a gate to end its raids.':
+    '{0}주차: 습격자의 체력이 {1}%로 늘었습니다. 관문을 봉인하면 그 관문의 습격이 끝납니다.',
+
+  // Offerings
+  'Offering amounts must be whole numbers between 0 and 9999.': '공물의 양은 0에서 9999 사이의 정수여야 합니다.',
+  'Only water, bones, gold, food and stone can be offered.': '물, 뼈, 골드, 식량, 석재만 바칠 수 있습니다.',
+  'Offer at least 4 resources to call a new life.': '새 생명을 부르려면 자원을 4 이상 바치세요.',
+
+  // Control reasons
+  'This resident is unavailable.': '이 주민에게는 명령할 수 없습니다.',
+  'Guests are visitors and cannot be commanded or hired.': '손님은 방문객이므로 명령하거나 고용할 수 없습니다.',
+  'This resident belongs to a neutral settlement.': '이 주민은 중립 정착지 소속입니다.',
+  'Overwhelmed: resting until stress recovers.': '한계에 달함: 스트레스가 풀릴 때까지 쉽니다.',
+  'This resident is on an expedition.': '이 주민은 원정 중입니다.',
+  'This building is unavailable.': '이 건물은 사용할 수 없습니다.',
+  'This building belongs to a neutral settlement.': '이 건물은 중립 정착지 소속입니다.',
+
+  // Notices
+  '{0} is overwhelmed and needs time to rest.': '{0}: 한계에 달해 쉴 시간이 필요합니다.',
+  '{0} feels ready to work again.': '{0}: 다시 일할 준비가 되었습니다.',
+  '{0} has left with supplies to found an independent village.':
+    '{0}: 물자를 챙겨 독립 마을을 세우러 떠났습니다.',
+
+  // Character reference names
+  'Bald': '민머리',
+  'Braids': '땋은 머리',
+  'Curly crown': '곱슬 정수리',
+  'Flipped bob': '뻗친 단발',
+  'High bun': '올림머리',
+  'Light crop': '가벼운 짧은 머리',
+  'Long centre part': '긴 가운데 가르마',
+  'Long locks': '긴 머리',
+  'Long waves': '긴 웨이브',
+  'Short centre part': '짧은 가운데 가르마',
+  'Short twin tails': '짧은 양갈래',
+  'Side fringe': '옆 앞머리',
+  'Side part': '옆 가르마',
+  'Soft bob': '부드러운 단발',
+  'Spiky crop': '삐죽한 짧은 머리',
+  'Tousled crop': '헝클어진 짧은 머리',
+  'Twin buns': '양쪽 당고머리',
+  'Twin loops': '양쪽 고리머리',
+  'Wild tuft': '뻗친 머리채',
+  'Wind swept': '바람에 날린 머리',
+  'Flat-lid elf': '납작 눈꺼풀 엘프',
+  'Flat lids / elf': '납작 눈꺼풀 / 엘프',
+  'Construction / {0}': '구조 / {0}',
+  'Dot study / {0}': '점 습작 / {0}',
+  'Dot construction {0}': '점 구조 {0}',
+  'Colour {0}': '색상 {0}',
+  'Cape & leggings': '망토와 레깅스',
+  'Dark mantle & breeches': '어두운 망토와 반바지',
+  'Fur collar & coat': '모피 깃과 외투',
+  'Fur mantle & cape': '모피 망토와 케이프',
+  'High collar robe': '높은 깃 로브',
+  'Hood & breeches': '두건과 반바지',
+  'Round travel cloak': '둥근 여행 망토',
+  'Short cape & boots': '짧은 망토와 장화',
+  'Sleeveless tunic': '민소매 튜닉',
+  'Small shoulder cape': '작은 어깨 망토',
+  'Split hem tunic': '트임 튜닉',
+  'Traveller tunic': '여행자 튜닉',
+  'Wrapped cape & trousers': '두른 망토와 바지',
+  'Wrapped robe': '두른 로브',
+};

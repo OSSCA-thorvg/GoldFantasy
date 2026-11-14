@@ -1,4 +1,4 @@
-import { Rect, button, ButtonStyle } from '../../../../packages/native-ui/src';
+import { Rect, Align, button, ButtonStyle } from '../../../../packages/native-ui/src';
 import {
   Role,
   Activity,
@@ -8,6 +8,7 @@ import {
   type Person,
 } from '../../../../packages/engine/src/person';
 import { canControl, controlReason } from '../../../../packages/engine/src/faction';
+import { combatRules } from '../../../../packages/engine/src/combat-events';
 import { structureSpec, describe } from '../../../../packages/engine/src/building-catalog';
 import { resourceBundle } from '../../../../packages/engine/src/construction-materials';
 import { personPortrait, moodOf } from '../../../../packages/native-renderer/src/person-portrait';
@@ -17,11 +18,15 @@ import { hudPaint } from './hud-paint';
 import { actionButton } from './hud-actions';
 import type { GameHudApp } from './game-hud-contract';
 import { touchCommandColumns } from './mobile-layout';
+import { skillCard, skillCardHeight } from './skill-card';
+import { unitOrders } from './unit-orders-card';
+import { groupsOf } from './control-groups';
+import { workPace, workbenchButton } from './game-equipment-panel';
 
 const footerHeight = 42;
 function commandFooter(app: GameHudApp, width: number): number {
   if (!app.touchMode) return footerHeight;
-  const count = app.shelteredSelection() ? 8 : 7,
+  const count = unitOrders(app).length,
     columns = touchCommandColumns(width - 24, count),
     rows = Math.ceil(count / columns);
   return rows * 44 + (rows - 1) * 6 + 10;
@@ -44,7 +49,10 @@ export function personPanelBounds(this: GameHudApp, width: number, height: numbe
         ? 116
         : 132
       : 34 + Math.min(3, Math.ceil(Math.min(20, this.chosen.length) / columns)) * 56;
-  const h = Math.min(Math.max(90, height - 96), content + (commands ? commandFooter(this, w) : 12));
+  const h = Math.min(
+    Math.max(90, height - 96),
+    content + skillCardHeight(this) + (commands ? commandFooter(this, w) : 12),
+  );
   return new Rect((width - w) / 2, height - 12 - h, w, h);
 }
 export function personPanel(this: GameHudApp, panel: Rect): void {
@@ -107,15 +115,25 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
     'Unit equipment and inventory',
     manage,
   );
+  if (this.chosen.length === 1 && first && canControl(first))
+    workbenchButton(
+      this,
+      first,
+      this.touchMode
+        ? new Rect(panel.x + panel.w - 106, panel.y + 5, 44, 44)
+        : new Rect(panel.x + panel.w - 101, panel.y + 5, 30, 28),
+      'unit-workbench',
+    );
   if (this.chosen.length === 1 && first) {
     const p = first,
       narrow = panel.w < 520,
       size = narrow ? 48 : 72,
       left = panel.x + size + 24;
     portrait(p, new Rect(panel.x + 12, panel.y + 10, size, size));
+    portraitMarks(this, p, new Rect(panel.x + 12, panel.y + 10, size, size));
     c.text(
-      new Rect(left, panel.y + 7, panel.w - size - 104, 24),
-      c.elideText(p.name + ' · Lv ' + p.level, panel.w - size - 104, 15, true),
+      new Rect(left, panel.y + 7, panel.w - size - 140, 24),
+      c.elideText(p.name + ' · Lv ' + p.level, panel.w - size - 140, 15, true),
       t.text,
       15,
       true,
@@ -129,7 +147,14 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
       t.accent,
       11,
     );
-    const action = controlReason(p) || (p.moving() ? 'On the way: ' : '') + activityName(p.activity);
+    const action =
+      p.downedAt >= 0 && p.health > -0.5
+        ? `Downed: bleeds out in ${Math.ceil(this.town.bleedOutLeft(p))} s unless an ally kneels beside them`
+        : controlReason(p) ||
+          (p.holding
+            ? 'Holding position: strikes what comes into reach, never chases'
+            : (p.moving() ? 'On the way: ' : '') + activityName(p.activity) + workPace(p));
+    if (p.downedAt >= 0) c.requestFrameAt(c.time() + 0.5);
     c.text(
       new Rect(left, panel.y + 51, panel.w - size - 40, 18),
       c.elideText(action, panel.w - size - 40, 11),
@@ -137,11 +162,14 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
       11,
     );
     const home = this.town.building(p.role === Role.Guest ? p.bed : p.home);
-    const detail = p.carrying
-      ? 'Carrying ' + describe(resourceBundle(p.carriedProduct, p.carrying))
-      : home
-        ? 'Home: ' + structureSpec(home.kind).name
-        : 'No home assigned';
+    const detail =
+      p.woundDays > 0
+        ? `Wounded: health held below ${Math.round(combatRules.woundedHealth * 100)}% for ${Math.ceil(p.woundDays)} more ${Math.ceil(p.woundDays) === 1 ? 'day' : 'days'}`
+        : p.carrying
+          ? 'Carrying ' + describe(resourceBundle(p.carriedProduct, p.carrying))
+          : home
+            ? 'Home: ' + structureSpec(home.kind).name
+            : 'No home assigned';
     const y = panel.y + (narrow ? 72 : 91),
       gap = 8,
       w = (panel.w - 24 - gap * 4) / 5;
@@ -204,8 +232,21 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
         p.health < 0.3 ? t.danger : t.success,
         1,
       );
+      if (p.downedAt >= 0) c.rect(r, { r: 0, g: 0, b: 0, a: 0 }, t.radius, t.danger, 2);
+      portraitMarks(this, p, r);
     }
   }
+  const abilities = skillCardHeight(this);
+  if (abilities)
+    skillCard(
+      this,
+      new Rect(
+        panel.x + 12,
+        panel.y + panel.h - (commands ? commandFooter(this, panel.w) : 12) - abilities,
+        panel.w - 24,
+        abilities - 6,
+      ),
+    );
   if (commands)
     this.commandCard(
       new Rect(
@@ -221,4 +262,27 @@ export function personPanel(this: GameHudApp, panel: Rect): void {
       c.deferRelease(() => entry.paint.dispose());
       this.dockPortraits.delete(id);
     }
+}
+/** A planted shield while holding position, and the control groups a resident belongs to. */
+function portraitMarks(app: GameHudApp, p: Person, r: Rect): void {
+  const c = app.context,
+    t = app.theme;
+  if (p.holding) {
+    const x = r.x + 9,
+      y = r.y + 9;
+    c.rect(new Rect(r.x + 2, r.y + 2, 14, 15), t.surface, 3, t.accent, 1);
+    c.line(x - 4, y - 4, x + 4, y - 4, t.accent, 1.4);
+    c.line(x - 4, y - 4, x - 4, y + 1, t.accent, 1.4);
+    c.line(x + 4, y - 4, x + 4, y + 1, t.accent, 1.4);
+    c.line(x - 4, y + 1, x, y + 5, t.accent, 1.4);
+    c.line(x + 4, y + 1, x, y + 5, t.accent, 1.4);
+  }
+  const groups = groupsOf(app, p.id);
+  if (groups.length) {
+    const label = groups.join(''),
+      w = c.textWidth(label, 9, true) + 8,
+      box = new Rect(r.x + r.w - w - 2, r.y + 2, w, 13);
+    c.rect(box, t.surface, 3, t.border, 1);
+    c.text(box, label, t.text, 9, true, Align.Center);
+  }
 }

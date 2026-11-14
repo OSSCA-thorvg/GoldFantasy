@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { ArmyState } from '../../apps/web/src/native/army-state';
 import { Activity, Calling, Person, Race, Role } from '../../packages/engine/src/person';
 import { point } from '../../packages/engine/src/geometry';
 import { Order, Tool, PointerButton } from '../../packages/engine/src/game-tools';
@@ -28,6 +29,7 @@ function fixture() {
   people[3].role = Role.Guest;
   const town = {
     person: (id: number) => people.find((p) => p.id === id) ?? null,
+    downedResidents: () => [],
     setAuto: vi.fn(),
     orderStop: vi.fn(),
     orderLeave: vi.fn(() => true),
@@ -60,6 +62,7 @@ function fixture() {
     buildingAtScreen: () => -1,
     hoveredRoad: () => -1,
     pending: Order.None,
+    army: new ArmyState(),
   } as unknown as GameCommandApp;
   return { app, town, people };
 }

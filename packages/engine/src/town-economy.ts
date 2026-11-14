@@ -19,6 +19,10 @@ import { Ledger, type CampEconomy } from './camp-economy';
 import { Terrain, type Tile } from './world-types';
 import { add, sub, scale, point, rotated, distance, type Point } from './geometry';
 import { f32 as f, lround, hash01 } from './numeric';
+import { pressureNotice } from './raid-progression';
+import { gateSealed, sealable } from './gate-seals';
+import { Boon, boon, boonRules } from './gate-boons';
+import { economyRules, swornCalling } from './economy-rules';
 export interface Reason {
   value: string;
 }
@@ -48,9 +52,11 @@ export interface EconomyTown extends TownState {
   staff(): void;
   grow(): void;
   processDevotion(): void;
+  runDrills(): void;
   capacity(village?: number): Resources;
   credit(gain: Resources, village: number): void;
   wageOf(person: Person): number;
+  winterOutlook(village?: number): WinterOutlook;
   site(id: number): Building | null;
   near(center: Point, radius: number, predicate: (kind: Structure) => boolean, faction?: number): boolean;
   needMet(item: Building, reason?: Reason): boolean;
@@ -86,7 +92,10 @@ export function tendedFieldAcres(this: EconomyTown): number {
   for (const item of this.placed)
     if (item.kind === Structure.Farm && item.built())
       capacity = f(capacity + f(f(item.workers * item.attendance) * structureSpec(item.kind).perWorker));
-  return Math.min(lround(capacity), this.fieldAcres());
+  return Math.min(
+    lround(capacity),
+    this.farmland.reduce((sum, field) => sum + field.tilledAcres(), 0),
+  );
 }
 export function dailyOutput(this: EconomyTown, item: Building): Resources {
   const spec = structureSpec(item.kind),
@@ -126,6 +135,7 @@ export function dailyOutput(this: EconomyTown, item: Building): Resources {
           share = acres ? Math.trunc((this.tendedFieldAcres(village) * Math.min(amount, acres)) / acres) : 0;
         out.food = Math.trunc(share / 2);
       } else out.food = lround(f(f(item.workers * item.attendance) * 2));
+      if (boon(this, Boon.Plenty)) out.food = lround(out.food * boonRules.plentyFood);
       break;
     }
     case Product.None:
@@ -139,7 +149,8 @@ export function advance(this: EconomyTown, seconds: number): boolean {
   for (let left = seconds; left > 1e-9; left -= step) {
     const dt = Math.min(step, left);
     this.time += dt;
-    this.sky.advance(dt, TownState.secondsPerDay, this.yearFraction(), this.dayFraction());
+    if (this.titleSky) this.sky.advance(0, TownState.secondsPerDay, this.titleSky.year, this.titleSky.day);
+    else this.sky.advance(dt, TownState.secondsPerDay, this.yearFraction(), this.dayFraction());
     this.tick(dt);
     while (this.time >= (this.days + 1) * TownState.secondsPerDay) {
       this.newDay();
@@ -170,7 +181,7 @@ export function newDay(this: EconomyTown): void {
       ++village.growingDays;
     }
     if (before.month !== harvestMonth || date.month === harvestMonth) continue;
-    const harvest = village.growingDays ? lround(f(f(village.growingTended / village.growingDays) * 10)) : 0;
+    const harvest = expectedHarvest(this, village);
     village.growingTended = 0;
     village.growingDays = 0;
     const beforeHarvest = village.stock.food;
@@ -187,12 +198,34 @@ export function newDay(this: EconomyTown): void {
     this.notify(
       seasonName(date.season) + (date.season === Season.Spring ? ` of year ${date.year}` : '') + ' begins',
     );
+  if (before.season !== date.season && date.season === Season.Autumn)
+    this.notify('Winter is one season away: fields will lie fallow and game will thin. Store food.');
+  if (before.season !== date.season && date.season === Season.Winter)
+    this.notify('Winter: game is scarce and hungry monsters raid more often');
+  if (before.season === Season.Autumn && date.season === Season.Autumn)
+    for (const village of this.villages) {
+      if (village.faction !== this.controlFaction || !this.population(village.camp)) continue;
+      const outlook = this.winterOutlook(village.camp);
+      if (!outlook.enough)
+        this.notify(
+          `Winter in ${outlook.daysToWinter} days: ${outlook.foodStored + outlook.harvestExpected} food stored or due, ${outlook.foodNeeded} needed. Farm, hunt or trade for food.`,
+        );
+    }
+  if (
+    this.days % 7 === 0 &&
+    this.camp() &&
+    this.world.dungeons().some((site, index) => sealable(site) && site.discovered && !gateSealed(this, index))
+  ) {
+    const notice = pressureNotice(this.days / 7);
+    if (notice) this.notify(notice);
+  }
   this.regrow();
   this.settleGuests();
   this.assignHomes();
   this.staff();
   this.grow();
   this.processDevotion();
+  this.runDrills();
   ++this.changes;
 }
 export function capacity(this: EconomyTown, village = this.camp()?.id ?? -1): Resources {
@@ -241,8 +274,47 @@ export function store(this: EconomyTown, gain: Resources, village: number): void
     this.notify('The stores are full: build a suitable depot or storehouse');
   }
 }
-export function wageOf(_person: Person): number {
-  return 3;
+/** 3 gold, +1 for every five levels above the first, +1 for a sworn calling. */
+export function wageOf(person: Person): number {
+  return (
+    economyRules.wage +
+    Math.trunc(Math.max(0, person.level - 1) / economyRules.levelsPerRaise) +
+    (swornCalling(person) ? economyRules.swornWage : 0)
+  );
+}
+const daysPerYear = TownState.daysPerMonth * monthsPerYear,
+  winterStartDay = TownState.daysPerMonth * harvestMonth;
+function expectedHarvest(town: EconomyTown, village: CampEconomy): number {
+  const yieldFood = village.growingDays ? f(f(village.growingTended / village.growingDays) * 10) : 0;
+  return lround(boon(town, Boon.Plenty) ? f(yieldFood * f(boonRules.plentyFood)) : yieldFood);
+}
+export interface WinterOutlook {
+  /** 0 while winter lasts. */
+  daysToWinter: number;
+  foodStored: number;
+  /** The autumn harvest still to come in (it lands on the first day of winter), within storage room. */
+  harvestExpected: number;
+  /** What the settlement eats through the (rest of the) winter at its current size. */
+  foodNeeded: number;
+  /** Stored plus expected food covers the need. */
+  enough: boolean;
+}
+export function winterOutlook(this: EconomyTown, village = this.camp()?.id ?? -1): WinterOutlook {
+  const day = this.days % daysPerYear,
+    winter = day >= winterStartDay,
+    ledger = this.settlement(village),
+    stored = ledger.stock.food,
+    room = Math.max(0, this.capacity(village).food - stored),
+    due = winter || this.calendar().season === Season.Spring ? 0 : Math.min(room, expectedHarvest(this, ledger)),
+    mouths = this.population(village) + this.guests(village),
+    needed = Math.ceil((mouths * (winter ? daysPerYear - day : daysPerYear - winterStartDay)) / economyRules.daysPerMeal);
+  return {
+    daysToWinter: winter ? 0 : winterStartDay - day,
+    foodStored: stored,
+    harvestExpected: due,
+    foodNeeded: needed,
+    enough: stored + due >= needed,
+  };
 }
 export function forecast(this: EconomyTown, village = this.camp()?.id ?? -1): Forecast {
   const day = new Forecast();

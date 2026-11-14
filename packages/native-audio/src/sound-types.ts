@@ -37,6 +37,45 @@ export enum Cue {
   Hammer,
   /** Host-only request to warm recorded speech without playing or reserving a channel. */
   PrepareSpeech,
+  /** A shield turning a blow aside. */
+  Parry,
+  /** A heavy swing drawn back: a guardian's wind-up, a cast. */
+  Swing,
+  /** One heavy crash: a guardian's slam, a body falling. */
+  Slam,
+  /** A low stone thud for a death. */
+  Fall,
+  /** A sword's sweep biting into flesh or wood. */
+  Cleave,
+  /** A mace's heavy low thud. */
+  Crush,
+  /** A bowstring, a short flight and an arrow striking. */
+  Pierce,
+  /** A staff bolt's muffled burst. */
+  Splash,
+  // One cue per calling skill, so each has its own priority and interval.
+  Challenge,
+  Whirl,
+  AimedShot,
+  Volley,
+  RuneBurst,
+  FrostRing,
+  Mend,
+  Sanctuary,
+  Rally,
+  Dirge,
+  /** One monster of a swarm falling: short and dull, made to be heard in numbers. */
+  SwarmDeath,
+  /** A monster scrabbling out of the wet earth of its den. */
+  Spawn,
+  /** A den caving in. */
+  DenFall,
+  /** The brood breaking: a low roll that dies away. */
+  BroodBreak,
+  /** A low horn as a raid wave sets out. */
+  WaveHorn,
+  /** A resident struck down: the same crash as `Slam`, mixed above the crowd. */
+  Downed,
   Count,
 }
 export enum SpeechChannel {
@@ -116,6 +155,9 @@ export class Ambience {
   dark = 0;
   winter = 0;
   gloom = 0;
+  /** A large pack of monsters close by: 0 for none, 1 for a swarm filling the view. */
+  swarm = 0;
+  swarmPan = 0;
 }
 export function effectVolume(zoom: number): number {
   zoom = Math.fround(zoom);

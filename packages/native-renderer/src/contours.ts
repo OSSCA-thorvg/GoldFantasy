@@ -105,8 +105,8 @@ export function region(
   interface Edge {
     a: Point;
     b: Point;
-    from: string;
-    to: string;
+    from: number;
+    to: number;
   }
   const edges: Edge[] = [],
     stride = bounds.right - bounds.left + 1;
@@ -123,11 +123,12 @@ export function region(
     read = (i, j) => field[(j - bounds.top) * stride + i - bounds.left];
   }
   const node = (i: number, j: number) => (j - bounds.top) * stride + i - bounds.left;
-  const vertex = (i: number, j: number) => `v${node(i, j)}`;
+  // Numeric joint ids: grid vertices are negative, edge crossings are not.
+  const vertex = (i: number, j: number) => -1 - node(i, j);
   const crossing = (i: number, j: number, side: number) => {
     if (side === 1) i++;
     if (side === 2) j++;
-    return `e${node(i, j) * 2 + (side % 2)}`;
+    return node(i, j) * 2 + (side % 2);
   };
   for (let j = bounds.top; j < bounds.bottom; j++)
     for (let i = bounds.left; i < bounds.right; i++) {
@@ -144,7 +145,7 @@ export function region(
       for (const edge of contourCell(i, j, read).edges)
         edges.push({ a: edge.a, b: edge.b, from: crossing(i, j, edge.from), to: crossing(i, j, edge.to) });
     }
-  const border = (i: number, j: number, nextI: number, nextJ: number, edge: string) => {
+  const border = (i: number, j: number, nextI: number, nextJ: number, edge: number) => {
     const a = f(read(i, j)),
       b = f(read(nextI, nextJ));
     if (a < 0 && b < 0) return;
@@ -172,21 +173,21 @@ export function region(
     border(bounds.right, j, bounds.right, j + 1, crossing(bounds.right - 1, j, 1));
     border(bounds.left, j + 1, bounds.left, j, crossing(bounds.left, j, 3));
   }
-  const outgoing = new Map<string, number>();
+  const outgoing = new Map<number, number>();
   for (let k = 0; k < edges.length; k++) if (!outgoing.has(edges[k].from)) outgoing.set(edges[k].from, k);
-  const used = new Set<number>();
+  const used = new Uint8Array(edges.length);
   for (let start = 0; start < edges.length; start++) {
-    if (used.has(start)) continue;
+    if (used[start]) continue;
     shape.moveTo(f(edges[start].a.x + shift.x), f(edges[start].a.y + shift.y));
     let current = start;
     do {
-      used.add(current);
+      used[current] = 1;
       const edge = edges[current];
       shape.lineTo(f(edge.b.x + shift.x), f(edge.b.y + shift.y));
       const next = outgoing.get(edge.to);
       if (next === undefined) break;
       current = next;
-    } while (!used.has(current));
+    } while (!used[current]);
     shape.close();
   }
   return shape;

@@ -8,6 +8,9 @@ interface PendingFile extends StoredFile {
   revision: number;
 }
 const encoder = new TextEncoder();
+// UTF-8 needs at most three bytes per UTF-16 unit, so most texts skip the encoding pass.
+const exceeds = (text: string, maxBytes: number) =>
+  text.length * 3 > maxBytes && encoder.encode(text).byteLength > maxBytes;
 function filePath(path: string): string {
   const parts: string[] = [];
   for (const part of path.replaceAll('\\', '/').split('/')) {
@@ -100,7 +103,7 @@ export class BrowserFiles implements DocumentFiles {
     this.assertOpen();
     const text = this.cache.get(filePath(path));
     if (text === undefined) throw new Error('File does not exist');
-    if (encoder.encode(text).byteLength > maxBytes) throw new Error('File exceeds size limit');
+    if (exceeds(text, maxBytes)) throw new Error('File exceeds size limit');
     return text;
   }
   async read(path: string, maxBytes: number): Promise<string> {
@@ -108,7 +111,7 @@ export class BrowserFiles implements DocumentFiles {
   }
   stage(path: string, text: string, maxBytes = 96 * 1024 * 1024): void {
     this.assertOpen();
-    if (encoder.encode(text).byteLength > maxBytes) throw new Error('File exceeds size limit');
+    if (exceeds(text, maxBytes)) throw new Error('File exceeds size limit');
     const canonical = filePath(path);
     this.cache.set(canonical, text);
     this.pending.set(canonical, { path: canonical, text, revision: ++this.revision });

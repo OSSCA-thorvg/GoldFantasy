@@ -1,3 +1,4 @@
+import { itemSpec } from './equipment';
 import { ceremonySeconds } from './town-devotion';
 // Resident arrivals and guest activities; resident priorities live in unit-scheduler.
 import { TownState } from './town-state';
@@ -26,6 +27,7 @@ export interface PeopleTown extends TownState {
   takeBreak(p: Person): boolean;
   eat(p: Person): boolean;
   haulCargo(p: Person): boolean;
+  keepCargo(p: Person): boolean;
   nearest(at: Point, match: (b: Building) => boolean): Building | null;
   roadReady(id: number): boolean;
   layRoadFirst(p: Person, site: number): boolean;
@@ -85,7 +87,7 @@ export function think(this: PeopleTown, p: Person): void {
   if (this.takeBreak(p)) return;
   if (this.resumeOrder(p)) return;
   if (p.food < f(0.35) && this.eat(p)) return;
-  if (p.carrying > 0) {
+  if (p.carrying > 0 && !this.keepCargo(p)) {
     if (!this.haulCargo(p)) {
       p.activity = Activity.Idle;
       p.until = this.time + 2;
@@ -285,6 +287,17 @@ export function arrive(this: PeopleTown, p: Person): void {
         delivered = Math.min(p.carrying, Math.max(0, room));
       this.store(resourceBundle(p.carriedProduct, delivered), village);
       p.carrying -= delivered;
+      // A trip to storage empties the whole pack, not just the hands.
+      for (let slot = 0; slot < p.inventory.length; ++slot) {
+        const stack = p.inventory[slot],
+          item = stack && itemSpec(stack.item);
+        if (!stack || !item || item.category !== 'resource') continue;
+        const space = resourceAmount(limit, item.product) - resourceAmount(treasury, item.product),
+          unloaded = Math.min(stack.quantity, Math.max(0, space));
+        this.store(resourceBundle(item.product, unloaded), village);
+        stack.quantity -= unloaded;
+        if (!stack.quantity) p.inventory[slot] = null;
+      }
       p.activity = Activity.Idle;
       p.until = this.time + (p.carrying ? 2 : 0);
       break;

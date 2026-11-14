@@ -6,13 +6,18 @@ import { Tool, Order, PointerButton } from '../../../../packages/engine/src/game
 import { Town } from '../../../../packages/engine/src/town';
 import { Camera, project, point } from '../../../../packages/engine/src/geometry';
 import { Weather } from '../../../../packages/engine/src/climate';
-import { encodeTown, decodeTown } from '../../../../packages/engine/src/save-game';
+import { encodeTown, encodeTownPayload, decodeTown } from '../../../../packages/engine/src/save-game';
+import { sealSaveInBackground } from './background-save-seal';
+import { sealProgress } from '../../../../packages/engine/src/gate-seals';
 import { decodeCharacter } from '../../../../packages/engine/src/character-preset';
 import { structureSpec } from '../../../../packages/engine/src/building-catalog';
 import { clamp, f32 as f } from '../../../../packages/engine/src/numeric';
 import { applyBuildingAsset } from '../../../../packages/native-renderer/src/building-assets';
 import { Context, Key, Rect, Theme } from '../../../../packages/native-ui/src';
 import { Script } from '../../../../packages/native-ui/src/script';
+import { combatHotkey } from './game-combat-hud';
+import { armyKeyDown, armyKeyUp } from './army-keys';
+import { guideHotkey } from './game-guide';
 export interface ApplicationFiles {
   readSync(path: string, maxBytes?: number): string;
   stage(path: string, text: string): void;
@@ -54,22 +59,23 @@ function objectId(object: string, prefix: string): number | undefined {
   const value = Number(suffix);
   return value >= 0 && value <= 2147483647 ? value : undefined;
 }
+/** Building keys; in the Command state the command card's own letters win (see `army-keys.ts`). */
 const shortcuts = new Map<string, Tool>([
   ['q', Tool.Select],
-  ['1', Tool.Road],
-  ['2', Tool.Field],
+  ['d', Tool.Road],
+  ['e', Tool.Field],
   ['p', Tool.Pave],
   ['c', Tool.Camp],
-  ['3', Tool.Tent],
-  ['4', Tool.Farm],
-  ['5', Tool.Lumberyard],
-  ['6', Tool.Quarry],
+  ['t', Tool.Tent],
+  ['f', Tool.Farm],
+  ['l', Tool.Lumberyard],
+  ['z', Tool.Quarry],
   ['w', Tool.Well],
   ['j', Tool.Storehouse],
-  ['7', Tool.Market],
-  ['8', Tool.Tavern],
-  ['9', Tool.Inn],
-  ['0', Tool.Guild],
+  ['m', Tool.Market],
+  ['y', Tool.Tavern],
+  ['i', Tool.Inn],
+  ['u', Tool.Guild],
   ['h', Tool.Shrine],
   ['k', Tool.MageTower],
   ['v', Tool.Portal],
@@ -88,6 +94,7 @@ const property = (
   step: number,
   readOnly = false,
 ): Property => ({ id, label, value, minimum, maximum, step, readOnly });
+const saveSerials = new Map<string, number>();
 export class GameApplication implements Application {
   private readonly root: Scene;
   private game: GameRuntime;
@@ -107,6 +114,7 @@ export class GameApplication implements Application {
   private playback = Playback.Playing;
   private editorAttached = false;
   private dirty = true;
+  private milestones = '';
   private remount = false;
   private singleStep = false;
   private lastWidth = 0;
@@ -348,19 +356,15 @@ export class GameApplication implements Application {
       this.command('edit.building');
       return;
     }
-    if (
-      e.type === 'KeyDown' &&
-      !e.control &&
-      !e.meta &&
-      !e.alt &&
-      !this.scriptContext.textFocused() &&
-      !this.game.buildings &&
-      !this.game.atlas &&
-      !this.game.editor &&
-      this.game.selectedPeople().length &&
-      (e.text.toLowerCase() === 'a' || e.text.toLowerCase() === 'm')
-    ) {
-      this.game.prepare(e.text.toLowerCase() === 'a' ? Order.Attack : Order.Move);
+    // F1 opens the guide log; Escape closes it before it reaches any other meaning.
+    if (e.type === 'KeyDown' && !this.authoringTool() && guideHotkey(this.game, e.text)) return;
+    // Army keys come before a focused HUD button can take them; a focused text field keeps its typing.
+    if (e.type === 'KeyDown' && !this.scriptContext.textFocused() && !this.authoringTool() && armyKeyDown(this.game, e)) {
+      this.keys.add(e.text);
+      return;
+    }
+    if (e.type === 'KeyUp' && !this.authoringTool() && armyKeyUp(this.game, e)) {
+      this.keys.delete(e.text);
       return;
     }
     if (this.script.ready() && !this.game.buildings) {
@@ -438,23 +442,16 @@ export class GameApplication implements Application {
       }
       if (e.text === 'f2' || e.text === 'f3') return;
       if (e.control || e.meta || e.alt) return;
+      // The command card's keys were taken above in the Command state; what reaches here is a building or game key.
       if (e.text === 'space') this.game.togglePause();
+      // R recall and ` party beyond a gate; otherwise these keys keep their usual meaning.
+      else if (['r', '`'].includes(e.text) && combatHotkey(this.game, e.text)) this.dirty = true;
       else if (e.text === 'tab') this.game.cycleSpeed();
       else if (e.text === 'escape') this.game.cancel();
       else if (e.text === 'return') this.game.finish();
       else if (e.text === 'backspace') this.game.undoPoint();
       else if (e.text === 'r') this.game.rotate(f((e.shift ? -1 : 1) * f(0.2618)));
-      else if (e.text === 'm') this.game.prepare(Order.Move);
       else if (e.text === 'a') this.game.prepare(Order.Attack);
-      else if (
-        e.text === 'w' &&
-        (this.game.selectedPeople().length > 0 ||
-          this.game.selectedTreeCell() >= 0 ||
-          this.game.selectedRockCell() >= 0)
-      )
-        this.game.prepare(Order.Work);
-      else if (e.text === 's') this.game.stopSelected();
-      else if (e.text === 'b' && this.game.selectedPeople().length) this.game.openUnitBuild();
       else {
         const tool = shortcuts.get(e.text);
         if (tool !== undefined) this.game.selectTool(tool, this.game.selectedPeople().length > 0);
@@ -468,6 +465,16 @@ export class GameApplication implements Application {
   }
   takesTyping(): boolean {
     return this.authoringTool() || this.editorAttached || !!this.scriptContext.focused();
+  }
+  /** Changes whenever the settlement passes a point worth an autosave. */
+  private milestoneMark(): string {
+    const town = this.game.state();
+    return [
+      town.placed.length,
+      town.placed.filter((building) => building.built()).length,
+      town.days,
+      sealProgress(town).sealed,
+    ].join('/');
   }
   properties(): Property[] {
     return [
@@ -511,9 +518,11 @@ export class GameApplication implements Application {
       return true;
     }
     if (id === 'session.focus-settlement') {
-      const p = this.game.state().camp()?.center ?? this.game.state().map().camp(),
+      // A game saved beyond a gate resumes on the party, not on the empty settlement.
+      const party = this.game.state().realmParty()[0],
+        p = party?.position ?? this.game.state().camp()?.center ?? this.game.state().map().camp(),
         at = project(p.x, p.y);
-      this.game.setView(new Camera(at.x, f(at.y - 32), f(1.4)));
+      this.game.setView(new Camera(at.x, f(at.y - (party ? 0 : 32)), f(1.4)));
       return true;
     }
     if (id === 'session.suspend') {
@@ -529,9 +538,37 @@ export class GameApplication implements Application {
       this.resumeFrame = true;
       return true;
     }
+    if (id === 'session.world-only') {
+      const shown = argument === 'off';
+      this.game.hudScene().visible(shown);
+      this.scriptContext.scene().visible(shown);
+      return true;
+    }
+    if (id === 'session.save-later') {
+      // A later save of the same file, from any session, makes this one stale.
+      const serial = (saveSerials.get(argument) ?? 0) + 1,
+        time = Date.now(),
+        files = this.services.files;
+      saveSerials.set(argument, serial);
+      try {
+        void sealSaveInBackground(encodeTownPayload(this.game.state())).then(
+          (text) => {
+            if (saveSerials.get(argument) !== serial) return;
+            files.stage(argument, text);
+            files.stage(argument + '.meta', JSON.stringify({ time }));
+          },
+          (error) => console.error(error),
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    }
     if (id === 'session.save') {
       try {
+        saveSerials.set(argument, (saveSerials.get(argument) ?? 0) + 1);
         this.services.files.stage(argument, encodeTown(this.game.state()));
+        this.services.files.stage(argument + '.meta', JSON.stringify({ time: Date.now() }));
         return true;
       } catch {
         return false;
@@ -544,15 +581,22 @@ export class GameApplication implements Application {
           (map) => new Town(map, 176, false, true),
         );
         this.game.town = loaded;
-        const p = loaded.map().camp(),
+        const p = loaded.realmParty()[0]?.position ?? loaded.map().camp(),
           at = project(p.x, p.y);
         this.game.setView(new Camera(at.x, at.y, 1));
+        this.milestones = this.milestoneMark();
         this.dirty = true;
         this.lastTime = -1;
         return true;
       } catch {
         return false;
       }
+    }
+    if (id === 'session.milestone') {
+      const mark = this.milestoneMark(),
+        reached = this.milestones !== '' && mark !== this.milestones;
+      this.milestones = mark;
+      return reached;
     }
     if (id === 'session.authoring') return this.authoringTool();
     if (id === 'ui.cursor') return argument === 'crosshair' && this.game.targetingCursor();

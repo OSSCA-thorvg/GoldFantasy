@@ -18,7 +18,7 @@ import { f32 as f, clamp } from './numeric';
 import * as mining from './mining';
 import { hammerTiming, harvestTiming, harvestDuration, workElapsed, workImpactBetween } from './work-timing';
 import { animalSpec } from './wildlife';
-import { prepareFarmWork, farmWorkPhase } from './farm-work';
+import { prepareFarmWork, fieldEfficiency, tillField } from './farm-work';
 import { separatePeople, roadWorkSpot, buildingWorkSpot } from './person-navigation';
 import type { Town } from './town';
 import type { Building } from './town-models';
@@ -26,6 +26,9 @@ import { resourceAmount } from './construction-materials';
 import { processingRecipe } from './town-production';
 import { workEfficiency } from './equipment';
 import { prepareBuildingRepair, restoreBuildingHealth } from './building-repair';
+import { healthCap } from './resident-wounds';
+import { Boon, boon } from './gate-boons';
+import { playerFaction } from './faction';
 export interface TickTown extends PeopleTown {
   updateStress(p: Person, dt: number): boolean;
   advanceNeutralSettlements(dt: number): void;
@@ -63,6 +66,12 @@ export interface TickTown extends PeopleTown {
   credit(gain: Resources, village: number): void;
   think(p: Person): void;
   recount(): void;
+  killResident(p: Person, cause: string, notice?: string): void;
+  advanceWounds(): void;
+  advanceDowned(): void;
+  advanceAbilities(dt: number): void;
+  rallied(p: Person): boolean;
+  tend(p: Person): void;
 }
 /** Sounds are emitted by productive ticks, never an unrelated ambience timer. */
 function hammerContact(town: TickTown, p: Person, dt: number): void {
@@ -82,10 +91,10 @@ export function dangerNear(town: TickTown, p: Person): boolean {
     return (
       threat.health > 0 &&
       !threat.insideLair &&
-      (!threat.giant() || threat.angry) &&
-      town.map().revealed(threat.position) &&
       gap <= notice &&
-      (threat.raider || threat.angry || gap < f(2.5))
+      (!threat.giant() || threat.angry) &&
+      (threat.raider || threat.angry || gap < f(2.5)) &&
+      town.map().revealed(threat.position)
     );
   });
 }
@@ -101,6 +110,12 @@ export function tick(this: TickTown, dt: number): void {
   this.admitGuests(dt);
   this.processDevotion();
   if (!this.titleAutoplay) this.stir(dt);
+  if (this.controlFaction === playerFaction) {
+    this.advanceWounds();
+    this.advanceDowned();
+    this.advanceAbilities(dt);
+  }
+  const hearth = boon(this, Boon.Hearth);
   const sky = this.climate(),
     days = f(dt / TownState.secondsPerDay),
     raining = sky.weather === Weather.Rain || sky.weather === Weather.Storm || sky.weather === Weather.Snow,
@@ -108,6 +123,8 @@ export function tick(this: TickTown, dt: number): void {
   for (let i = 0; i < this.folk.length; ++i) {
     const p = this.folk[i];
     if (p.faction !== this.controlFaction) continue;
+    // The downed lie still: no needs, work or fighting until tended or dead.
+    if (p.downedAt >= 0) continue;
     if (p.activity === Activity.Exploring) {
       p.path = [];
       if (p.inside || p.crossingDoorway()) this.walkTo(p, p.entrance);
@@ -167,13 +184,13 @@ export function tick(this: TickTown, dt: number): void {
       p.health = f(p.health - f(f(0.1) * days));
     }
     if (p.food < f(0.05)) p.health = f(p.health - f(f(0.5) * days));
-    else if (!sheltered && sky.temperature < -3) p.health = f(p.health - f(f(0.15) * days));
+    else if (!sheltered && sky.temperature < -3 && !hearth) p.health = f(p.health - f(f(0.15) * days));
     else if (p.food > f(0.4) && p.rest > f(0.3))
       p.health = Math.min(1, f(p.health + f((healers ? f(0.3) : f(0.15)) * days)));
+    if (p.health > healthCap(p)) p.health = healthCap(p);
     if (p.health <= 0 && p.activity !== Activity.Leaving) {
-      this.notify(p.name + (p.food < f(0.05) ? ' starved to death' : ' died of the cold'));
-      p.activity = Activity.Leaving;
-      p.health = -1;
+      const starved = p.food < f(0.05);
+      this.killResident(p, starved ? 'Starved' : 'Died of the cold', p.name + (starved ? ' starved to death' : ' died of the cold'));
     }
     if (p.health < f(-0.5)) continue;
     const stressHandled = this.updateStress(p, dt);
@@ -193,7 +210,7 @@ export function tick(this: TickTown, dt: number): void {
     if (p.activity === Activity.Fighting || p.crossingDoorway()) continue;
     if (
       p.role === Role.Resident &&
-      !p.autoMode &&
+      (!p.autoMode || this.awaiting) &&
       p.task === Activity.Idle &&
       !p.ordered &&
       p.activity !== Activity.Leaving &&
@@ -201,7 +218,8 @@ export function tick(this: TickTown, dt: number): void {
     ) {
       p.path = [];
       p.foe = -1;
-      p.activity = Activity.Holding;
+      // An explicit Stop holds position; before the player's first order residents simply stand.
+      p.activity = p.autoMode ? Activity.Idle : Activity.Holding;
       continue;
     }
     if (p.role === Role.Resident && p.autoMode && this.time >= p.scheduleAt) {
@@ -447,7 +465,7 @@ export function tick(this: TickTown, dt: number): void {
           p.activity = Activity.Idle;
           p.until = this.time;
           if (p.task === Activity.Building || p.task === Activity.Roadwork) this.resumeOrder(p);
-          else if (!this.haulCargo(p)) p.until = this.time + 2;
+          else if (!this.keepCargo(p) && !this.haulCargo(p)) p.until = this.time + 2;
         }
         break;
       case Activity.FetchingMaterials:
@@ -463,7 +481,9 @@ export function tick(this: TickTown, dt: number): void {
       case Activity.Working:
         if (place?.kind === Structure.Farm && prepareFarmWork(this as Town, p, place)) {
           if (!p.moving() && distance(p.position,p.goal) <= .04) {
-            place.workedSeconds = f(place.workedSeconds + f(dt * workEfficiency(p, farmWorkPhase(p, this.time) === 1 ? 'watering' : 'farming')));
+            const effort = f(dt * fieldEfficiency(this as Town, p));
+            place.workedSeconds = f(place.workedSeconds + effort);
+            if (tillField(this as Town, p, effort)) ++this.changes;
           }
           break;
         }
@@ -518,8 +538,8 @@ export function tick(this: TickTown, dt: number): void {
           p.until = this.time;
           break;
         }
-        p.health = Math.min(1, f(p.health + f(f(dt) * f(0.05))));
-        if (p.health >= 1) {
+        p.health = Math.min(healthCap(p), f(p.health + f(f(dt) * f(0.05))));
+        if (p.health >= healthCap(p)) {
           if (p.task === Activity.Treating) {
             p.task = Activity.Idle;
             p.taskSite = -1;
@@ -533,21 +553,21 @@ export function tick(this: TickTown, dt: number): void {
         break;
       case Activity.Sleeping: {
         const restTask = p.task === Activity.Sleeping,
-          needsMeal = restTask && (p.food < f(.25) || (p.health < 1 && p.food <= f(.4)));
+          needsMeal = restTask && (p.food < f(.25) || (p.health < healthCap(p) && p.food <= f(.4)));
         // A meal is part of recovery when low food prevents passive healing;
         // preserve the explicit rest target while visiting the pantry.
         if (needsMeal && (this.eat(p) || this.huntFood(p))) break;
         // Unavailable food makes further healing impossible; a rested direct
         // order returns to Auto so ordinary food/work decisions can continue.
-        const cannotHeal = needsMeal && p.health < 1;
+        const cannotHeal = needsMeal && p.health < healthCap(p);
         if (
           p.rest >= f(0.95) &&
-          (!(p.recoveringHealth || restTask) || p.health >= 1 || cannotHeal) &&
+          (!(p.recoveringHealth || restTask) || p.health >= healthCap(p) || cannotHeal) &&
           (!p.ordered || p.task === Activity.Sleeping)
         ) {
           if (dangerNear(this, p)) break;
           p.recoveringRest = false;
-          if (p.health >= 1) p.recoveringHealth = false;
+          if (p.health >= healthCap(p)) p.recoveringHealth = false;
           // Finish before doorway exit drains rest below the completion threshold.
           if (p.task === Activity.Sleeping) {
             p.task = Activity.Idle;
@@ -614,6 +634,9 @@ export function tick(this: TickTown, dt: number): void {
         break;
       case Activity.Guarding:
         if (this.time >= p.until) this.think(p);
+        break;
+      case Activity.Tending:
+        this.tend(p);
         break;
       case Activity.Expedition:
       case Activity.Fighting:

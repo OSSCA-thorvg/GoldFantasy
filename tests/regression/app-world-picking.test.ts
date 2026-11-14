@@ -36,6 +36,7 @@ function fixture() {
     town: {
       person: (id: number) => people[id],
       people: () => people,
+      downedResidents: () => [],
       building: (id: number) => (id === 8 ? building : null),
       creature: () => null,
       map: () => null,

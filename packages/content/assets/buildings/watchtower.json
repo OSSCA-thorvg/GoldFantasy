@@ -1,0 +1,364 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "watchtower",
+  "name": "Watchtower",
+  "footprint": 1,
+  "variants": [
+    {
+      "patches": [
+        {
+          "bounds": [
+            0.16,
+            0.16,
+            0.84,
+            0.84
+          ],
+          "color": [
+            164,
+            154,
+            154
+          ],
+          "furrows": 0,
+          "furrow": [
+            0,
+            0,
+            0
+          ],
+          "delay": 0
+        }
+      ],
+      "blocks": [
+        {
+          "bounds": [
+            0.34,
+            0.34,
+            0.66,
+            0.66
+          ],
+          "wall": 40,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            146,
+            112,
+            84
+          ],
+          "wallShade": [
+            114,
+            90,
+            84
+          ],
+          "roofLit": [
+            156,
+            120,
+            90
+          ],
+          "roofShade": [
+            156,
+            120,
+            90
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 1,
+          "door": true,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.24,
+            0.24,
+            0.76,
+            0.76
+          ],
+          "wall": 6,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            182,
+            142,
+            98
+          ],
+          "wallShade": [
+            138,
+            111,
+            94
+          ],
+          "roofLit": [
+            195,
+            152,
+            105
+          ],
+          "roofShade": [
+            195,
+            152,
+            105
+          ],
+          "base": 40,
+          "delay": 8,
+          "windows": 0,
+          "door": false,
+          "trim": "stakes",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.26,
+            0.26,
+            0.31,
+            0.31
+          ],
+          "wall": 8,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            146,
+            112,
+            84
+          ],
+          "wallShade": [
+            114,
+            90,
+            84
+          ],
+          "roofLit": [
+            156,
+            120,
+            90
+          ],
+          "roofShade": [
+            156,
+            120,
+            90
+          ],
+          "base": 46,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.69,
+            0.26,
+            0.74,
+            0.31
+          ],
+          "wall": 8,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            146,
+            112,
+            84
+          ],
+          "wallShade": [
+            114,
+            90,
+            84
+          ],
+          "roofLit": [
+            156,
+            120,
+            90
+          ],
+          "roofShade": [
+            156,
+            120,
+            90
+          ],
+          "base": 46,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.26,
+            0.69,
+            0.31,
+            0.74
+          ],
+          "wall": 8,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            146,
+            112,
+            84
+          ],
+          "wallShade": [
+            114,
+            90,
+            84
+          ],
+          "roofLit": [
+            156,
+            120,
+            90
+          ],
+          "roofShade": [
+            156,
+            120,
+            90
+          ],
+          "base": 46,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.69,
+            0.69,
+            0.74,
+            0.74
+          ],
+          "wall": 8,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            146,
+            112,
+            84
+          ],
+          "wallShade": [
+            114,
+            90,
+            84
+          ],
+          "roofLit": [
+            156,
+            120,
+            90
+          ],
+          "roofShade": [
+            156,
+            120,
+            90
+          ],
+          "base": 46,
+          "delay": 10,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.22,
+            0.22,
+            0.78,
+            0.78
+          ],
+          "wall": 1,
+          "roof": 16,
+          "shape": "pyramid",
+          "wallLit": [
+            146,
+            112,
+            84
+          ],
+          "wallShade": [
+            114,
+            90,
+            84
+          ],
+          "roofLit": [
+            158,
+            84,
+            68
+          ],
+          "roofShade": [
+            122,
+            71,
+            73
+          ],
+          "base": 54,
+          "delay": 12,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "banner",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        }
+      ]
+    }
+  ]
+}

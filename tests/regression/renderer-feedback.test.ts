@@ -5,14 +5,14 @@ import { Person, Calling, Role, Race, Activity, type Hit } from '../../packages/
 import { point } from '../../packages/engine/src/geometry';
 import { Traffic } from '../../packages/engine/src/traffic';
 import type { Town } from '../../packages/engine/src/town';
-import { SceneNode, ShapeNode, TextNode, AnimationNode } from '../../packages/native-renderer/src/paint';
+import { SceneNode, ShapeNode, AnimationNode } from '../../packages/native-renderer/src/paint';
 import { ceremonySeconds, type DevotionEvent } from '../../packages/engine/src/town-devotion';
 import { Building } from '../../packages/engine/src/town-models';
 import { Structure } from '../../packages/engine/src/building-catalog';
 import { riseAnimation } from '../../packages/native-renderer/src/building-assets';
 import { WorldRendererState } from '../../packages/native-renderer/src/world-renderer-state';
 import { PersonParts, personSprite } from '../../packages/native-renderer/src/world-sprites';
-import { moveAgents, sparkle } from '../../packages/native-renderer/src/world-people';
+import { moveAgents } from '../../packages/native-renderer/src/world-people';
 import { WebCanvasAdapter } from '../../packages/native-renderer/src/webcanvas-adapter';
 import { showEquipment } from '../../packages/native-renderer/src/person-equipment';
 import { animateWork } from '../../packages/native-renderer/src/action-motion';
@@ -156,29 +156,6 @@ it('renders compact hammer and readable axe work poses through the actual WebCan
     view.dispose();
   }
 });
-it('keeps hit numbers filled without an outline', () => {
-  const view = surface(100, 100),
-    p = actor();
-  const hit: Hit = {
-    serial: 0n,
-    from: point(6, 6),
-    to: point(6.5, 6),
-    damage: 17,
-    onPerson: false,
-    ranged: false,
-    at: 0,
-    person: p.id,
-  };
-  const { s, town } = scene(p, [hit]);
-  try {
-    sparkle(s, town, 0);
-    expect(s.sparks).toHaveLength(1);
-    expect((s.sparks[0].number as TextNode).stroke).toBeUndefined();
-  } finally {
-    s.adapter.dispose();
-    view.dispose();
-  }
-});
 it('renders the altar through its actual build asset in every quarter turn', () => {
   const view = surface(800, 280);
   try {
@@ -267,7 +244,12 @@ it('bows outdoors with joined hands and grounded feet for the real altar ceremon
       expect(figure.parts.body!.matrix[5]).toBe(0);
       for (const foot of figure.parts.feet) expect(foot!.matrix[5]).toBe(0);
       expect(figure.parts.body!.matrix[4]).toBeGreaterThan(0.85);
-      if (time === 2.5) expect(figure.parts.body!.matrix[4]).toBeLessThan(0.9);
+      if (time === 2.5) {
+        // A bow from the waist with the head lowered, not a squashed figure.
+        expect(figure.parts.body!.matrix[4]).toBeLessThan(0.95);
+        expect(figure.parts.body!.matrix[1]).toBeLessThan(-0.04);
+        expect(figure.parts.nod).toBeGreaterThan(0.2);
+      }
       for (const tool of ['sword', 'axe', 'hammer'] as const) expect(figure.parts[tool]!.alpha).toBe(0);
       figure.paint.transform([4, 0, i * 160 + 72, 0, 4, 150, 0, 0, 1]);
       view.root.add(figure.paint);

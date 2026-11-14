@@ -2,6 +2,7 @@ import { add, sub, scale, point, length, distance, normalized, lerp, segmentDist
 import { clamp, f32, hash01, lround, remainder, u32 } from './numeric';
 import { DungeonKind, Giant, Layer, Region, Terrain, Volcano, World, impassable, isStone, isWater, lavaFloor, lavaLevel, makeTile, volcanicCrest, volcanoFoot, type Dungeon, type River, type Sight, type Tile, type TileCoord } from './world-types';
 import { placeDungeons } from './dungeon-sites';
+import { copyNative } from './native-copy';
 const smooth = (t: number): number => f32(f32(t * t) * (f32(3 - f32(2 * t))));
 interface NoiseLattice {
     x: number;
@@ -170,6 +171,7 @@ export function wildTrees(map: WorldMap, x: number, y: number): number {
 }
 export function treePosition(map: WorldMap, x: number, y: number, index: number): Point { return point(f32(f32(x + f32(.2)) + f32(hash01(map.seed(), x, y, 30 + index) * f32(.6))), f32(f32(y + f32(.2)) + f32(hash01(map.seed(), x, y, 40 + index) * f32(.6)))); }
 export const worldName = (world: World): string => ['Asgard', 'Vanaheim', 'Alfheim', 'Jotunheim', 'Svartalfheim', 'Niflheim', 'Muspelheim', 'Helheim'][world] || '';
+let lastGenerated: { seed: number; width: number; height: number; map: WorldMap } | undefined;
 export class WorldMap {
     static readonly resolution = 2;
     columns = 0;
@@ -316,6 +318,14 @@ export class WorldMap {
             found.push(i);
     } return found; }
     static generate(seed: number, width = 176, height = 176): WorldMap {
+        // The title, a new game and the map editor each ask for the launch seed's world.
+        if (lastGenerated?.seed === seed && lastGenerated.width === width && lastGenerated.height === height)
+            return copyNative(lastGenerated.map);
+        const map = WorldMap.generateFresh(seed, width, height);
+        lastGenerated = { seed, width, height, map: copyNative(map) };
+        return map;
+    }
+    private static generateFresh(seed: number, width: number, height: number): WorldMap {
         const previous = generationNoiseLattices;
         generationNoiseLattices = new Map();
         try {

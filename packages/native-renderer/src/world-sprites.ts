@@ -2,21 +2,27 @@
 import { point, add, sub, mul, lerp, project, type Point } from '../../engine/src/geometry';
 import { f32 } from '../../engine/src/numeric';
 import { Person, Calling } from '../../engine/src/person';
-import { appearanceOf, injuryOf, Injury } from '../../engine/src/person-look';
-import { HairStyle, BodyType, type Appearance } from '../../engine/src/person-appearance';
-import { safeCharacterHairAsset, baldHairAsset } from '../../engine/src/character-reference';
+import { injuryOf, Injury, Mood } from '../../engine/src/person-look';
+import { BodyType } from '../../engine/src/person-appearance';
+import { likenessOf } from '../../engine/src/character-cast';
+import { HairCut, type Likeness } from '../../engine/src/likeness';
 import { Agent, AgentKind } from '../../engine/src/traffic';
 import { DungeonKind, type Dungeon } from '../../engine/src/world-types';
 import { SceneNode, ShapeNode, TextNode, PaintNode, type Matrix, type Rgb } from './paint';
-import { poly, oval, stroke, opaque, scale, fill, glow } from './sprite-primitives';
-import { ArmRig, connectArm, poseArm } from './idle-gesture';
-import { stoneGiantSprite } from './stone-giant';
-import { createEquipment } from './person-equipment';
+import { poly, oval, stroke, opaque, scale, glow } from './sprite-primitives';
+import { ArmRig, connectArm, poseArm } from './person-arm';
+import { monsterBody } from './monster-figures';
+import { humanoidClips } from './humanoid-rig';
+import { clipStretch, clipTurn } from './rig-clip';
+import { MonsterRank } from '../../engine/src/combat-events';
+import { createEquipment, type HeldTool, type ToolMaterial } from './person-equipment';
 import { equippedItem } from '../../engine/src/equipment';
-import { wearableBack, wearableBody, wearableHead } from './person-wearables';
+import { wearableBack, wearableBody } from './person-wearables';
 import { createWorkProps } from './work-motion';
-import { characterFigure } from './character-assets';
-import { Mood } from './person-portrait';
+import { garmentBack, garmentFront, garmentOf, wardrobeOf, type Wardrobe } from './calling-garments';
+import { dusk } from './form-paint';
+import { drawHead, expressionOf, streetFinish, type FaceRig } from './likeness-head';
+import { oval as ring, pen, shapeOf } from './outline-form';
 export interface TextBounds {
   x: number;
   y: number;
@@ -32,6 +38,17 @@ export class PersonParts {
   staff: PaintNode | null = null;
   mace: PaintNode | null = null;
   lute: PaintNode | null = null;
+  /** Cloak hanging from the shoulders at `capeTop`; it trails the walk. */
+  /** Eyes and brows, re-posed as the mood changes and the eyes blink. */
+  face: FaceRig | null = null;
+  look: Likeness | null = null;
+  /** Hair behind the body and the head in front of it, seated on `neck` (see seatHead). */
+  head: PaintNode[] = [];
+  neck = point();
+  /** How far the head bows toward the way the figure faces, in radians; set by each motion. */
+  nod = 0;
+  cape: PaintNode | null = null;
+  capeTop = 0;
   bowString: ShapeNode | null = null;
   arrow: PaintNode | null = null;
   alert: PaintNode | null = null;
@@ -48,6 +65,12 @@ export class PersonParts {
   hammer: PaintNode | null = null;
   axe: PaintNode | null = null;
   pickaxe: PaintNode | null = null;
+  shovel: PaintNode | null = null;
+  sickle: PaintNode | null = null;
+  knife: PaintNode | null = null;
+  spear: PaintNode | null = null;
+  /** The wood, stone and iron heads of each tool that comes in more than one material. */
+  toolHeads: Partial<Record<HeldTool, Record<ToolMaterial, SceneNode>>> = {};
   sack: PaintNode | null = null;
   logs: PaintNode | null = null;
   stone: PaintNode | null = null;
@@ -60,6 +83,58 @@ export interface LanternLight {
   glow: PaintNode;
   halo: PaintNode;
   flame: Point;
+}
+// The head is drawn two units wide and set on the shoulders at this size: a storybook proportion.
+const headSize = f32(4.3),
+  headLift = f32(4);
+/**
+ * Keeps the head one rigid shape on the neck however the body leans, crouches or flinches:
+ * the body may shear and squash, a face may not.
+ */
+export function seatHead(parts: PersonParts): void {
+  const b = parts.body?.matrix;
+  if (!b || !parts.head.length) return;
+  const n = parts.neck,
+    nx = b[0] * n.x + b[1] * n.y + b[2],
+    ny = b[3] * n.x + b[4] * n.y + b[5],
+    // The head follows most of a lean and all of a fall, and adds its own nod.
+    lean = Math.atan2(-b[1], b[4]),
+    turn = lean * (Math.abs(lean) > 0.5 ? 1 : 0.7) + parts.nod,
+    c = Math.cos(turn),
+    s = Math.sin(turn),
+    w = [headSize * c, -headSize * s, nx + s * headLift, headSize * s, headSize * c, ny - c * headLift],
+    det = b[0] * b[4] - b[1] * b[3] || 1,
+    ia = b[4] / det,
+    ib = -b[1] / det,
+    ic = -b[3] / det,
+    id = b[0] / det,
+    tx = w[2] - b[2],
+    ty = w[5] - b[5],
+    seat: Matrix = [
+      f32(ia * w[0] + ib * w[3]),
+      f32(ia * w[1] + ib * w[4]),
+      f32(ia * tx + ib * ty),
+      f32(ic * w[0] + id * w[3]),
+      f32(ic * w[1] + id * w[4]),
+      f32(ic * tx + id * ty),
+      0,
+      0,
+      1,
+    ];
+  for (const part of parts.head) part.transform(seat);
+}
+/** Lays the figure on its back (1) or leaves it standing (0), turning about the feet. */
+export function layDown(parts: PersonParts, amount: number): void {
+  const turn = -1.5 * amount,
+    c = f32(Math.cos(turn)),
+    s = f32(Math.sin(turn));
+  parts.body?.transform([c, -s, 0, s, c, f32(-2.8 * amount), 0, 0, 1]);
+  // Arms fall open beside the body.
+  poseArm(parts.arms[0], f32(-0.5 * amount), 0, 0);
+  poseArm(parts.arms[1], f32(0.6 * amount), 0, 0);
+  for (const foot of parts.feet) foot?.translate(0, 0);
+  parts.shadow?.transform([f32(1 + 1.1 * amount), 0, f32(-7.5 * amount), 0, 1, 0, 0, 0, 1]);
+  parts.nod = 0;
 }
 const bodyProportions = (type: BodyType) =>
   type === BodyType.Female
@@ -105,97 +180,197 @@ function figure(sprite: SceneNode, robe: Rgb, skin: Rgb, height = 11, width = f3
   );
   sprite.add(oval([0, f32(-height - 3)], f32(3.2), f32(3.2), opaque(skin)));
 }
-// A person's walking figure at its old proportions: boots under the hem, a robe lit on the left,
-// sleeves and hands, a belt and collar, then a shaded head with eyes looking the way they walk.
+// A person's walking figure: stepping legs or a sweeping hem, a torso lit on the left,
+// sleeves and hands, then the calling's belt, collar and trimmings.
 function personFigure(
   sprite: SceneNode,
-  a: Appearance,
-  robe: Rgb,
+  look: Likeness,
+  wardrobe: Wardrobe,
   height: number,
   width: number,
   parts: PersonParts,
 ): void {
-  let boot: Rgb = [58, 44, 36],
-    belt: Rgb = [84, 60, 42];
+  const garment = garmentOf(look.body, wardrobe),
+    skinTone = color(look.skin),
+    calling = wardrobe.calling,
+    robe = garment.body,
+    boot: Rgb = [58, 44, 36];
   let foot = f32(width * f32(0.55));
-  parts.feet[0] = poly(
-    [
-      [-foot, 0],
-      [f32(-foot + f32(1.8)), 0],
-      [f32(-foot + f32(1.8)), -f32(1.9)],
-      [-foot, -f32(1.9)],
-    ],
-    opaque(boot),
-  );
-  parts.feet[1] = poly(
-    [
-      [f32(foot - f32(1.8)), 0],
-      [foot, 0],
-      [foot, -f32(1.9)],
-      [f32(foot - f32(1.8)), -f32(1.9)],
-    ],
-    opaque(scale(boot, f32(0.78))),
-  );
-  sprite.add(parts.feet[0]);
-  sprite.add(parts.feet[1]);
+  for (let i = 0; i < 2; ++i) {
+    const left = i ? f32(foot - f32(1.8)) : -foot,
+      right = f32(left + f32(1.8)),
+      shade = i ? f32(0.78) : 1,
+      leg = new SceneNode();
+    if (garment.legs)
+      leg.add(
+        poly(
+          [
+            [f32(left + f32(0.15)), -f32(1.5)],
+            [f32(right - f32(0.15)), -f32(1.5)],
+            [f32(right - f32(0.15)), f32(-garment.hem - 1)],
+            [f32(left + f32(0.15)), f32(-garment.hem - 1)],
+          ],
+          opaque(i ? dusk(garment.legs, f32(0.3)) : garment.legs),
+        ),
+      );
+    // Cloth strips wound up the shin.
+    if (garment.legs && calling != Calling.Warrior && calling != Calling.Bard)
+      for (const y of [-f32(2.5), -f32(3.4)])
+        leg.add(
+          stroke(
+            [f32(left + f32(0.2)), y],
+            [f32(right - f32(0.2)), f32(y - f32(0.5))],
+            f32(0.32),
+            [186, 170, 138],
+          ),
+        );
+    leg.add(
+      poly(
+        [
+          [left, 0],
+          [f32(right + f32(0.35)), 0],
+          [f32(right + f32(0.35)), -f32(1)],
+          [right, -f32(1.9)],
+          [left, -f32(1.9)],
+        ],
+        opaque(scale(boot, shade)),
+      ),
+    );
+    parts.feet[i] = leg;
+    sprite.add(leg);
+  }
   let shoulderJoins = new SceneNode();
   sprite.add(shoulderJoins);
-  let body = bodyProportions(a.bodyType);
-  let hem = -f32(1.3),
+  let body = bodyProportions(look.body);
+  let hem = f32(-garment.hem),
     top = -height,
     shoulder = f32(f32(width * f32(0.55)) * body.shoulders);
   let waist = f32(-height * f32(0.42)),
-    hips = f32(width * body.hips);
+    hips = f32(f32(width * body.hips) * garment.hips);
   let waistWidth = f32(
     f32(hips - f32(f32(f32(hips - shoulder) * f32(waist - hem)) / f32(top - hem))) * body.waist,
   );
-  sprite.add(
-    poly(
-      [
-        [-hips, hem],
-        [hips, hem],
-        [waistWidth, waist],
-        [shoulder, top],
-        [-shoulder, top],
-        [-waistWidth, waist],
-      ],
-      opaque(robe),
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [0, hem],
-        [hips, hem],
-        [waistWidth, waist],
-        [shoulder, top],
-        [0, top],
-      ],
-      opaque(scale(robe, f32(0.66))),
-    ),
-  );
-  // Belt across the waist.
+  // One soft silhouette: rounded shoulders and a hem that swells like hanging cloth.
+  const round = f32(0.9),
+    swell = f32(0.75),
+    torso = (from: number) => {
+      const shape = new ShapeNode();
+      shape.moveTo(from, f32(hem + (from < 0 ? 0 : swell * f32(0.75))));
+      if (from < 0)
+        shape.cubicTo(
+          f32(-hips * f32(0.5)),
+          f32(hem + swell),
+          f32(hips * f32(0.5)),
+          f32(hem + swell),
+          hips,
+          hem,
+        );
+      else
+        shape.cubicTo(
+          f32(hips * f32(0.3)),
+          f32(hem + swell * f32(0.75)),
+          f32(hips * f32(0.7)),
+          f32(hem + swell * f32(0.4)),
+          hips,
+          hem,
+        );
+      shape
+        .lineTo(waistWidth, waist)
+        .lineTo(shoulder, f32(top + round))
+        .cubicTo(shoulder, f32(top + f32(0.2)), f32(shoulder - f32(0.3)), top, f32(shoulder - round), top);
+      if (from < 0)
+        shape
+          .lineTo(f32(-shoulder + round), top)
+          .cubicTo(
+            f32(-shoulder + f32(0.3)),
+            top,
+            -shoulder,
+            f32(top + f32(0.2)),
+            -shoulder,
+            f32(top + round),
+          )
+          .lineTo(-waistWidth, waist);
+      else shape.lineTo(0, top);
+      return shape.close();
+    };
+  // Only the edge away from the light falls into dusk, as on the head.
+  // The lit face is the torso itself drawn a little narrower from its left side: no clip needed.
+  const lit = torso(-hips).fill(...opaque(robe)),
+    hold = -Math.min(shoulder, waistWidth);
+  lit.transform([f32(0.86), 0, f32(hold * f32(0.14)), 0, f32(0.96), f32(top * f32(0.04)), 0, 0, 1]);
+  sprite.add(torso(-hips).fill(...opaque(dusk(robe))));
+  sprite.add(lit);
+  garmentFront(sprite, look.body, wardrobe, height, width, hem);
   const halfAt = (y: number) => {
     return y < waist
       ? f32(waistWidth + f32(f32(f32(shoulder - waistWidth) * f32(y - waist)) / f32(top - waist)))
       : f32(waistWidth + f32(f32(f32(hips - waistWidth) * f32(y - waist)) / f32(hem - waist)));
   };
-  sprite.add(
-    poly(
-      [
-        [-halfAt(waist), waist],
-        [halfAt(waist), waist],
-        [halfAt(f32(waist - 1)), f32(waist - 1)],
-        [-halfAt(f32(waist - 1)), f32(waist - 1)],
-      ],
-      opaque(belt),
-    ),
-  );
-  sprite.add(oval([f32(0.7), f32(waist - f32(0.5))], f32(0.45), f32(0.45), [212, 172, 82]));
+  if (garment.belt) {
+    sprite.add(
+      poly(
+        [
+          [-halfAt(waist), waist],
+          [halfAt(waist), waist],
+          [halfAt(f32(waist - 1)), f32(waist - 1)],
+          [-halfAt(f32(waist - 1)), f32(waist - 1)],
+        ],
+        opaque(garment.belt),
+      ),
+    );
+    // A square buckle, and for those who work or wander, a pouch on the hip.
+    sprite.add(
+      poly(
+        [
+          [f32(0.1), f32(waist + f32(0.2))],
+          [f32(1.4), f32(waist + f32(0.2))],
+          [f32(1.4), f32(waist - f32(1.2))],
+          [f32(0.1), f32(waist - f32(1.2))],
+        ],
+        [214, 178, 96],
+      ),
+    );
+    sprite.add(
+      poly(
+        [
+          [f32(0.45), f32(waist - f32(0.15))],
+          [f32(1.05), f32(waist - f32(0.15))],
+          [f32(1.05), f32(waist - f32(0.85))],
+          [f32(0.45), f32(waist - f32(0.85))],
+        ],
+        opaque(garment.belt),
+      ),
+    );
+    if (calling == Calling.Settler || calling == Calling.Traveller || calling == Calling.Ranger) {
+      const x = -halfAt(waist);
+      sprite.add(
+        poly(
+          [
+            [f32(x + f32(0.3)), f32(waist - f32(0.2))],
+            [f32(x + f32(2.1)), f32(waist - f32(0.2))],
+            [f32(x + f32(2)), f32(waist + f32(1.7))],
+            [f32(x + f32(0.5)), f32(waist + f32(1.7))],
+          ],
+          [128, 94, 62],
+        ),
+      );
+      sprite.add(
+        poly(
+          [
+            [f32(x + f32(0.3)), f32(waist - f32(0.2))],
+            [f32(x + f32(2.1)), f32(waist - f32(0.2))],
+            [f32(x + f32(2.05)), f32(waist + f32(0.6))],
+            [f32(x + f32(0.4)), f32(waist + f32(0.6))],
+          ],
+          [158, 120, 78],
+        ),
+      );
+    }
+  }
   // Sleeves and hands, each arm its own part so it can swing.
   for (let i = 0; i < 2; ++i) {
     let side = i ? 1 : -1;
-    let sleeve = side < 0 ? scale(robe, f32(0.88)) : scale(robe, f32(0.58));
+    let sleeve = side < 0 ? scale(garment.sleeve, f32(0.92)) : dusk(garment.sleeve, f32(0.42));
     let x = f32(side * shoulder),
       hand = f32(side * f32(width * f32(0.82)));
     let arm = parts.arms[Number(i)];
@@ -206,24 +381,25 @@ function personFigure(
     sprite.add(arm.upper);
     arm.forearm = new SceneNode();
     arm.hand = new SceneNode();
-    connectArm(arm, shoulderJoins, sleeve, f32(1.45), f32(0.52));
-    let skin = opaque(side < 0 ? color(a.skin) : color(a.skinShade));
-    arm.hand.add(oval(arm.wrist, f32(0.85), f32(0.95), skin));
+    connectArm(arm, shoulderJoins, sleeve, f32(1.75), f32(0.52));
+    let skin = opaque(side < 0 ? skinTone : dusk(skinTone, f32(0.22)));
+    arm.hand.add(oval(arm.wrist, f32(1.05), f32(1.1), skin));
     arm.hand.add(
       oval([f32(hand - f32(side * f32(0.6))), f32(arm.wrist.y - f32(0.2))], f32(0.32), f32(0.42), skin),
     );
     arm.forearm!.add(arm.hand);
   }
-  sprite.add(
-    poly(
-      [
-        [-f32(1.3), top],
-        [f32(1.3), top],
-        [0, f32(top + f32(1.7))],
-      ],
-      opaque(color(a.trim)),
-    ),
-  );
+  if (calling !== Calling.Traveller && calling !== Calling.Ranger)
+    sprite.add(
+      poly(
+        [
+          [-f32(1.3), top],
+          [f32(1.3), top],
+          [0, f32(top + f32(1.7))],
+        ],
+        opaque(calling === Calling.Warrior ? dusk(robe, f32(0.4)) : wardrobe.trim),
+      ),
+    );
 }
 function bandagedWrist(arm: ArmRig): void {
   let axis = sub(arm.elbow, arm.wrist);
@@ -254,508 +430,12 @@ export interface MonsterParts {
 }
 const monsterRigs = new WeakMap<SceneNode, MonsterParts>();
 export const monsterParts = (sprite: SceneNode): MonsterParts | undefined => monsterRigs.get(sprite);
-function monster(root: SceneNode, lair: DungeonKind): void {
-  const sprite = lair === DungeonKind.GiantHall ? stoneGiantSprite() : new SceneNode();
-  const shadow = lair === DungeonKind.GiantHall ? sprite.children[0] : oval([0, 0], 9, 3.4, [0, 0, 0, 120]);
-  if (lair === DungeonKind.GiantHall) sprite.remove(shadow);
-  root.add(shadow).add(sprite);
-  monsterRigs.set(root, { body: sprite, shadow, last: point(-1, -1), facing: 1 });
-  if (lair === DungeonKind.GiantHall) return;
-  const dark: Rgb = [23, 25, 29];
-  if (lair === DungeonKind.Cave) {
-    // A low, bristled wolf: the muzzle, folded hind legs and tail read at world scale.
-    const fur: Rgb = [66, 62, 71],
-      lit: Rgb = [86, 82, 91],
-      shade: Rgb = [43, 42, 50];
-    sprite.add(
-      poly(
-        [
-          [-7, -8],
-          [-12, -10],
-          [-15, -7],
-          [-12, -7],
-          [-8, -4],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [-6, -6],
-          [-3, -5],
-          [-4, -2],
-          [-3, 0],
-          [-6, 0],
-          [-7, -3],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [3, -6],
-          [5, -6],
-          [6, -0.5],
-          [3, 0],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [-9, -6],
-          [-6, -10],
-          [-2, -11],
-          [1, -10],
-          [3, -12],
-          [7, -9],
-          [8, -6],
-          [4, -3],
-          [-5, -4],
-        ],
-        fur,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [-8, -7],
-          [-5, -10],
-          [-2, -11],
-          [1, -10],
-          [4, -11],
-          [5, -8],
-          [0, -7],
-          [-4, -8],
-        ],
-        lit,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [-7, -5],
-          [-4, -5],
-          [-5, -2],
-          [-4, -0.4],
-          [-7, 0],
-          [-8, -2],
-        ],
-        fur,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [5, -7],
-          [7, -6],
-          [7, -1],
-          [9, -0.2],
-          [5, 0],
-          [4, -3],
-        ],
-        lit,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [5, -10],
-          [8, -12],
-          [10, -11],
-          [11, -9],
-          [14, -8],
-          [14, -6.7],
-          [10, -5.5],
-          [7, -6],
-        ],
-        fur,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [7, -11],
-          [7.5, -15],
-          [10, -11.5],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [8.5, -11.5],
-          [10.2, -14],
-          [11.2, -10],
-        ],
-        fur,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [8, -8],
-          [10, -7.7],
-          [13.4, -7.5],
-          [12, -6],
-          [9, -5.8],
-        ],
-        [109, 103, 103],
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [12.8, -8.4],
-          [14.5, -8],
-          [14.2, -6.8],
-          [12.8, -7],
-        ],
-        dark,
-      ),
-    );
-    sprite.add(stroke([9.1, -9.6], [10.7, -9.2], 0.65, dark));
-    sprite.add(stroke([10.5, -6.3], [12.7, -6.8], 0.35, shade));
-    return;
-  }
-  if (lair === DungeonKind.Crypt) {
-    const bone: Rgb = [166, 160, 143],
-      pale: Rgb = [196, 190, 170],
-      shade: Rgb = [110, 108, 99];
-    sprite.add(stroke([-2.5, -5], [-3, -1], 1.5, shade));
-    sprite.add(stroke([2, -5], [3.2, -0.7], 1.5, bone));
-    sprite.add(stroke([-3.3, -0.5], [-1, -0.5], 1.1, shade));
-    sprite.add(stroke([2.5, -0.4], [5, -0.4], 1.2, bone));
-    sprite.add(
-      poly(
-        [
-          [-4, -6],
-          [-3, -12],
-          [0, -14],
-          [4, -12],
-          [4, -6],
-          [1, -7],
-          [-1, -4],
-        ],
-        [62, 60, 62],
-      ),
-    );
-    sprite.add(stroke([0, -12.8], [0, -6], 1.2, bone));
-    for (let rib = 0; rib < 3; ++rib) {
-      sprite.add(stroke([-2.7, -12 + rib * 1.7], [0, -10.9 + rib * 1.7], 0.9, shade));
-      sprite.add(stroke([0, -10.9 + rib * 1.7], [3, -12 + rib * 1.7], 0.9, bone));
-    }
-    sprite.add(
-      poly(
-        [
-          [-3.6, -12],
-          [-5.4, -9],
-          [-5.5, -5],
-          [-4.2, -4],
-          [-4, -8],
-          [-2.4, -11],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [3, -12],
-          [5.6, -9],
-          [7, -5.7],
-          [5.7, -4.7],
-          [4.2, -8],
-          [2, -11],
-        ],
-        bone,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [-1.5, -18],
-          [1, -20],
-          [4, -19.6],
-          [5.6, -17.6],
-          [5, -14.5],
-          [3.5, -12.8],
-          [0, -13],
-          [-1.6, -15],
-        ],
-        bone,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [-1.5, -18],
-          [1, -20],
-          [2, -19.5],
-          [1.4, -16.5],
-          [-1.2, -15.5],
-        ],
-        pale,
-      ),
-    );
-    sprite.add(oval([0.2, -16.6], 1.05, 1.2, dark));
-    sprite.add(oval([3.6, -16.8], 1.1, 1.15, dark));
-    sprite.add(
-      poly(
-        [
-          [1.8, -15.8],
-          [2.4, -14.6],
-          [1.2, -14.6],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(stroke([0.3, -13.9], [3.9, -14.1], 0.55, shade));
-    return;
-  }
-  const portal = lair === DungeonKind.Portal,
-    cloth: Rgb = portal ? [64, 49, 77] : [62, 76, 50],
-    lit: Rgb = portal ? [85, 68, 99] : [91, 108, 70],
-    shade: Rgb = portal ? [39, 35, 49] : [42, 51, 36];
-  sprite.add(
-    poly(
-      [
-        [-3.5, -5],
-        [-0.7, -4],
-        [-1, -0.5],
-        [-4, 0],
-        [-4.8, -0.7],
-      ],
-      shade,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [1.5, -5],
-        [4, -5],
-        [5, -0.6],
-        [2, 0],
-        [1.3, -1],
-      ],
-      cloth,
-    ),
-  );
-  if (portal) {
-    sprite.add(
-      poly(
-        [
-          [-3, -14],
-          [-9, -18],
-          [-8, -11],
-          [-11, -7],
-          [-7, -8],
-          [-7, -3],
-          [-3, -5],
-        ],
-        shade,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [2, -14],
-          [7, -17],
-          [8, -10],
-          [10, -7],
-          [6, -8],
-          [7, -3],
-          [3, -5],
-        ],
-        shade,
-      ),
-    );
-  }
-  sprite.add(
-    poly(
-      [
-        [-5, -5],
-        [-5.5, -10],
-        [-3, -14],
-        [1, -15],
-        [5, -12],
-        [5.5, -5],
-        [2, -3],
-        [-1, -5],
-      ],
-      cloth,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [-5.5, -10],
-        [-3, -14],
-        [1, -15],
-        [1.5, -8],
-        [-2, -6],
-      ],
-      lit,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [-4, -11],
-        [-7, -8],
-        [-6.5, -4],
-        [-4.9, -3.5],
-        [-4.8, -7],
-        [-2.4, -10],
-      ],
-      shade,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [4, -11],
-        [7, -8],
-        [7.8, -3.7],
-        [6, -3.4],
-        [5, -6.8],
-        [2, -10],
-      ],
-      lit,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [-4, -6.3],
-        [4.7, -6.3],
-        [4.9, -5.2],
-        [-4, -5.2],
-      ],
-      [79, 61, 46],
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [-1.5, -18.7],
-        [1, -20],
-        [4.8, -19],
-        [6, -16.3],
-        [4.8, -12.7],
-        [1, -12.3],
-        [-1.8, -14.4],
-      ],
-      lit,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [2, -19.5],
-        [4.8, -19],
-        [6, -16.3],
-        [4.8, -12.7],
-        [2.6, -13.2],
-      ],
-      cloth,
-    ),
-  );
-  if (portal) {
-    sprite.add(
-      poly(
-        [
-          [-1.5, -17],
-          [-3.8, -21.7],
-          [-0.2, -19.6],
-          [1, -17.4],
-        ],
-        [115, 107, 116],
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [3.8, -18],
-          [6.5, -21],
-          [5.9, -16.2],
-        ],
-        [84, 79, 92],
-      ),
-    );
-  } else {
-    sprite.add(
-      poly(
-        [
-          [-1.5, -16.7],
-          [-5, -18.8],
-          [-3.7, -15.6],
-          [-1, -14.7],
-        ],
-        lit,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [4.8, -17],
-          [8, -18.1],
-          [6.2, -14.9],
-          [4.8, -14.7],
-        ],
-        cloth,
-      ),
-    );
-    sprite.add(
-      poly(
-        [
-          [0.4, -13.7],
-          [4.7, -14],
-          [4.2, -12.3],
-          [1, -11.8],
-        ],
-        [110, 118, 79],
-      ),
-    );
-  }
-  // Recessed eyes remain dark; there is no eye light, colored halo or emissive paint.
-  sprite.add(
-    poly(
-      [
-        [-0.3, -17.1],
-        [1.5, -16.7],
-        [1.3, -15.8],
-        [-0.2, -16],
-      ],
-      dark,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [3, -16.8],
-        [4.8, -17.1],
-        [4.7, -16],
-        [3.2, -15.8],
-      ],
-      dark,
-    ),
-  );
-  sprite.add(
-    poly(
-      [
-        [2, -16.6],
-        [1.6, -14.5],
-        [3, -14.2],
-      ],
-      shade,
-    ),
-  );
-  sprite.add(stroke([1, -13.6], [4.2, -13.8], 0.5, shade));
+function monster(root: SceneNode, lair: DungeonKind, id: number, rank: MonsterRank): void {
+  const body = new SceneNode(),
+    // The figure is a rig posed by shared clips (monster-figures.ts); `body` stays free for recoil and the like.
+    shadow = monsterBody(body, lair, id, rank);
+  root.add(shadow).add(body);
+  monsterRigs.set(root, { body, shadow, last: point(-1, -1), facing: 1 });
 }
 function dungeonCenter(site: Dungeon): Point {
   return project(f32(site.origin.x + 1), f32(site.origin.y + 1));
@@ -782,7 +462,7 @@ function label(objects: SceneNode, at: Point, text: string, measure: TextMeasure
   name.translate(f32(f32(at.x - f32(box.w / 2)) - box.x), f32(at.y - 6));
   objects.add(name);
 }
-export function agentSprite(agent: Agent, lair: DungeonKind): SceneNode {
+export function agentSprite(agent: Agent, lair: DungeonKind, rank = MonsterRank.Grunt): SceneNode {
   let sprite = new SceneNode();
   let skin = skins[Math.trunc(agent.look / 7) % skins.length];
   switch (agent.kind) {
@@ -804,7 +484,7 @@ export function agentSprite(agent: Agent, lair: DungeonKind): SceneNode {
       sprite.add(oval([f32(7.5), -5], f32(1.8), f32(1.8), opaque(warm)));
       break;
     case AgentKind.Monster:
-      monster(sprite, lair);
+      monster(sprite, lair, agent.id, rank);
       break;
   }
   return sprite;
@@ -817,235 +497,88 @@ function figureHeight(person: Person): number {
   let widthScale = person.customLook ? person.customLook.bodyWidth : 1;
   return f32(tall * heightScale);
 }
-function streetHairStyle(a: Appearance): HairStyle {
-  const styles = [
-    HairStyle.Swept,
-    HairStyle.Long,
-    HairStyle.Swept,
-    HairStyle.Wild,
-    HairStyle.Wild,
-    HairStyle.Bob,
-    HairStyle.Long,
-    HairStyle.Wild,
-    HairStyle.Bob,
-    HairStyle.TwinTails,
-    HairStyle.Crop,
-    HairStyle.Braids,
-    HairStyle.Long,
-    HairStyle.Crop,
-    HairStyle.Wild,
-    HairStyle.TwinTails,
-    HairStyle.Bun,
-    HairStyle.Crop,
-    HairStyle.Bun,
-  ];
-  let source = safeCharacterHairAsset(a.hairAsset);
-  if (source == baldHairAsset) return HairStyle.Bald;
-  return source < styles.length ? styles[source] : HairStyle.Long;
-}
-function streetCrownRise(style: HairStyle): number {
-  return style == HairStyle.Wild
-    ? f32(5.5)
-    : style == HairStyle.Bun
-      ? f32(5.2)
-      : style == HairStyle.Bald
-        ? f32(3.2)
-        : f32(4.5);
-}
-// Small world silhouettes have a fixed head frame. Portrait locks, cut-outs
-// and face morphs never enter this rig; even long styles end near the shoulders.
-function streetHairBehind(sprite: SceneNode, a: Appearance, style: HairStyle, head: Point): void {
-  if (style == HairStyle.Long || style == HairStyle.Bob) {
-    let bottom = style == HairStyle.Bob ? 3 : 5;
-    let fall = new ShapeNode();
-    fall.moveTo(f32(head.x - f32(3.3)), f32(head.y - 1));
-    fall.cubicTo(
-      f32(head.x - f32(4.1)),
-      f32(head.y + 1),
-      f32(head.x - 4),
-      f32(head.y + bottom),
-      f32(head.x - f32(2.8)),
-      f32(head.y + bottom),
-    );
-    fall.lineTo(f32(head.x + f32(2.8)), f32(head.y + bottom));
-    fall.cubicTo(
-      f32(head.x + 4),
-      f32(head.y + bottom),
-      f32(head.x + f32(4.1)),
-      f32(head.y + 1),
-      f32(head.x + f32(3.3)),
-      f32(head.y - 1),
-    );
-    fall.close();
-    fill(fall, opaque(color(a.hairShade)));
-    sprite.add(fall);
-  } else if (style == HairStyle.Braids) {
-    for (const side of [-1, 1])
-      sprite.add(
-        stroke(
-          add(head, point(f32(side * 3), f32(0.2))),
-          add(head, point(f32(side * f32(3.3)), f32(4.8))),
-          f32(1.1),
-          opaque(color(a.hair)),
-        ),
-      );
-  } else if (style == HairStyle.TwinTails) {
-    for (const side of [-1, 1])
-      sprite.add(
-        oval(add(head, point(f32(side * f32(3.6)), f32(0.8))), f32(1.1), f32(1.6), opaque(color(a.hair))),
-      );
-  }
-}
-function streetHead(sprite: SceneNode, a: Appearance, style: HairStyle, head: Point): void {
-  sprite.add(oval(head, f32(3.2), f32(3.2), opaque(color(a.skin))));
-  let shade = oval(add(head, point(f32(1.9), 0)), f32(1.7), f32(3.2), opaque(color(a.skinShade), 170));
-  shade.clip(oval(head, f32(3.2), f32(3.2), opaque(color(a.skin))));
-  sprite.add(shade);
-  for (const x of [f32(0.65), f32(1.95)])
-    sprite.add(oval(add(head, point(x, f32(0.3))), f32(0.16), f32(0.24), opaque(ink)));
-  if (style == HairStyle.Bald) return;
-  let fringe = style == HairStyle.Swept ? f32(0.8) : 0;
-  let cap = new ShapeNode();
-  cap.moveTo(f32(head.x - f32(3.45)), f32(head.y + f32(1.6)));
-  if (style == HairStyle.Wild) {
-    // One connected silhouette; small tufts must not let above the cap.
-    for (const p of [
-      point(-f32(3.5), -f32(2.2)),
-      point(-f32(3.2), -f32(4.6)),
-      point(-f32(1.9), -f32(3.5)),
-      point(-1, -f32(5.2)),
-      point(0, -f32(3.9)),
-      point(f32(1.2), -f32(5.5)),
-      point(f32(1.7), -f32(3.5)),
-      point(f32(2.8), -f32(4.6)),
-      point(f32(3.35), -f32(1.4)),
-    ])
-      cap.lineTo(f32(head.x + p.x), f32(head.y + p.y));
-  } else
-    cap.cubicTo(
-      f32(head.x - 4),
-      f32(head.y - f32(3.6)),
-      f32(head.x + f32(1.2)),
-      f32(head.y - f32(4.9)),
-      f32(head.x + f32(3.35)),
-      f32(f32(head.y - f32(1.4)) + fringe),
-    );
-  cap.cubicTo(
-    f32(head.x + f32(2.2)),
-    f32(f32(head.y - f32(2.4)) + fringe),
-    f32(head.x + f32(0.6)),
-    f32(head.y - f32(2.5)),
-    f32(head.x - f32(0.8)),
-    f32(head.y - f32(1.4)),
-  );
-  cap.cubicTo(
-    f32(head.x - f32(1.8)),
-    f32(head.y - f32(0.4)),
-    f32(head.x - f32(2.4)),
-    f32(head.y + f32(0.8)),
-    f32(head.x - f32(3.45)),
-    f32(head.y + f32(1.6)),
-  );
-  cap.close();
-  fill(cap, opaque(color(a.hair)));
-  sprite.add(cap);
-  if (style == HairStyle.Bun)
-    sprite.add(oval(add(head, point(-f32(1.6), -f32(3.9))), f32(1.5), f32(1.3), opaque(color(a.hair))));
-}
 // World walking bodies retain their gameplay rig and their own compact head.
 function figureOf(person: Person, parts: PersonParts): SceneNode {
   const root = new SceneNode(),
     sprite = new SceneNode();
   parts.body = sprite;
-  let look = appearanceOf(person);
+  let look = likenessOf(person);
   let broad = f32(f32(4.2) * (person.customLook?.bodyWidth ?? 1)),
     height = figureHeight(person);
   parts.shadow = oval([0, 0], broad + 1.3, (broad + 1.3) * 0.42, [0, 0, 0, 110]);
   root.add(parts.shadow).add(sprite);
-  let head = point(0, f32(-height - 3));
-  let hair = streetHairStyle(look);
-  streetHairBehind(sprite, look, hair, head);
-  if (person.calling == Calling.Traveller)
-    sprite.add(
-      poly(
-        [
-          [-7, -4],
-          [-2, -4],
-          [-2, -13],
-          [-7, -13],
-        ],
-        [104, 76, 50],
-      ),
+  // The portrait's own head, seated on the neck: it never moves apart from the body.
+  const gear = equippedItem(person, 'head')?.id,
+    head = drawHead(
+      look,
+      streetFinish,
+      expressionOf(look, Mood.Content),
+      gear === 'cap' || gear === 'helmet' ? gear : null,
+    ),
+    loads = new SceneNode();
+  if (person.woundDays > 0) {
+    // A lasting wound keeps its linen binding round the brow.
+    head.front.add(
+      shapeOf([
+        pen(-1.04, -0.56)
+          .curve([0, -0.4], [1.02, -0.12])
+          .line(1.03, 0.08)
+          .curve([0, -0.18], [-1.05, -0.36])
+          .close(),
+        ring(0.92, -0.02, 0.14, 0.11),
+      ]).fill(228, 218, 196),
     );
+  }
+  parts.head = [head.back, head.front];
+  parts.neck = point(0, -height);
+  parts.face = head.rig;
+  parts.look = look;
+  seatHead(parts);
+  const wardrobe = wardrobeOf(person);
+  const worn = garmentBack(sprite, wardrobe, height, broad);
+  parts.lute = worn.lute;
+  parts.cape = worn.cape;
+  parts.capeTop = -height;
+  sprite.add(head.back);
+  // Loads ride on the back: behind the torso and the head, never across the face.
+  sprite.add(loads.translate(-f32(0.9), f32(3.2)));
   wearableBack(sprite, person, height, broad);
-  personFigure(sprite, look, color(look.cloth), height, broad, parts);
+  personFigure(sprite, look, wardrobe, height, broad, parts);
   if (injuryOf(person) == Injury.Bandaged) bandagedWrist(parts.arms[person.look % 2]);
   parts.arms[0].free = equippedItem(person, 'offhand')?.id !== 'shield';
   parts.arms[1].free = true;
-  switch (person.calling) {
-    case Calling.Settler:
-      break;
-    case Calling.Traveller:
-      break;
-    case Calling.Warrior:
-      sprite.add(
-        poly(
-          [
-            [-f32(1.6), f32(-height + 1)],
-            [f32(1.6), f32(-height + 1)],
-            [f32(1.9), -2],
-            [-f32(1.9), -2],
-          ],
-          opaque(color(look.cloth)),
-        ),
-      ); // Tabard.
-      break;
-    case Calling.Ranger:
-    case Calling.Mage:
-      break;
-    case Calling.Cleric:
-      sprite.add(
-        poly(
-          [
-            [-1, -4],
-            [1, -4],
-            [1, -10],
-            [-1, -10],
-          ],
-          opaque(color(look.trim)),
-        ),
-      );
-      break;
-    case Calling.Bard:
-      break;
-  }
   // Equipment appears only when a real inventory item occupies the slot.
   if (equippedItem(person, 'offhand')?.id === 'shield') {
-    sprite.add(
+    // A round northern shield in the calling's colours, quartered around an iron boss.
+    const centre = point(-f32(4.4), -f32(7.2));
+    sprite.add(oval(centre, f32(3.5), f32(3.9), opaque([92, 70, 52])));
+    sprite.add(oval(centre, f32(3), f32(3.4), opaque(wardrobe.cloth)));
+    const quarter = oval(centre, f32(3), f32(3.4), opaque(dusk(wardrobe.trim, f32(0.2))));
+    quarter.clip(
       poly(
         [
-          [-f32(6.5), -4],
-          [-2, -4],
-          [-2, -11],
-          [-f32(6.5), -11],
+          [centre.x, centre.y],
+          [f32(centre.x + 4), centre.y],
+          [f32(centre.x + 4), f32(centre.y - 5)],
+          [centre.x, f32(centre.y - 5)],
         ],
-        opaque(color(look.cloth)),
+        [0, 0, 0],
       ),
-    ); // Shield in the house colours.
-    sprite.add(stroke([-f32(4.25), -f32(4.6)], [-f32(4.25), -f32(10.4)], f32(0.7), [212, 172, 82]));
+    );
+    sprite.add(quarter);
+    sprite.add(oval(centre, f32(0.95), f32(1.05), opaque([176, 182, 188])));
   }
 
   wearableBody(sprite, person, parts, height, broad);
-  streetHead(sprite, look, hair, head);
-  wearableHead(sprite, person, head);
-  for (const arm of parts.arms) sprite.add(arm.forearm!);
+  sprite.add(head.front);
+  for (const arm of parts.arms) sprite.add(arm.lower!);
   createEquipment(parts, person.calling);
   createWorkProps(root, parts);
   // Loads carried on the back.
   let sack = new SceneNode();
   sack.add(oval([-f32(4.5), -11], f32(3.6), f32(4.2), [176, 150, 96]));
   sack.opacity(0);
-  sprite.add(sack);
+  loads.add(sack);
   parts.sack = sack;
   let logs = new SceneNode();
   for (let i = 0; i < 3; ++i) {
@@ -1054,7 +587,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
     logs.add(oval(end, f32(1.8), f32(1.8), [164, 124, 78]));
   }
   logs.opacity(0);
-  sprite.add(logs);
+  loads.add(logs);
   parts.logs = logs;
   let stones = new SceneNode();
   stones.add(
@@ -1069,7 +602,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
     ),
   );
   stones.opacity(0);
-  sprite.add(stones);
+  loads.add(stones);
   parts.stone = stones;
   const planks = new SceneNode(),
     cutStone = new SceneNode();
@@ -1150,10 +683,10 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   planks.add(stroke([-7, -14], [-3, -10], 0.7, [84, 65, 43]));
   planks.opacity(0);
   cutStone.opacity(0);
-  sprite.add(planks).add(cutStone);
+  loads.add(planks).add(cutStone);
   parts.planks = planks;
   parts.cutStone = cutStone;
-  let mark = oval([0, -22], f32(2.4), f32(2.4), [230, 80, 64, 255]);
+  let mark = oval([0, -27], f32(2.4), f32(2.4), [230, 80, 64, 255]);
   mark.opacity(0);
   sprite.add(mark);
   parts.alert = mark;
@@ -1172,6 +705,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
   recovery.add(stroke([-1, -25], [-1, -21], 1, [49, 41, 31]));
   recovery.add(stroke([1, -25], [1, -21], 1, [49, 41, 31]));
   recovery.opacity(0);
+  recovery.translate(0, -5);
   root.add(recovery);
   parts.stressRecovery = recovery;
   const affiliation = new SceneNode();
@@ -1188,6 +722,7 @@ function figureOf(person: Person, parts: PersonParts): SceneNode {
     ),
   );
   affiliation.opacity(0);
+  affiliation.translate(0, -5);
   root.add(affiliation);
   parts.affiliation = affiliation;
   return root;
@@ -1196,29 +731,65 @@ export function personSprite(person: Person, parts: PersonParts): SceneNode {
   Object.assign(parts, new PersonParts());
   return figureOf(person, parts);
 }
+/** How far above the head's centre a cut rises, in head units. */
+const crownRise = (cut: HairCut): number =>
+  cut === HairCut.HighBun || cut === HairCut.Topknot
+    ? f32(1.75)
+    : cut === HairCut.SpikyCrop || cut === HairCut.WildTuft || cut === HairCut.TwinBuns
+      ? f32(1.5)
+      : cut === HairCut.Bald
+        ? 1
+        : f32(1.25);
 export function personSpeechAnchor(person: Person): Point {
-  let a = appearanceOf(person);
-  let rise = streetCrownRise(streetHairStyle(a));
-  return point(0, f32(f32(f32(-figureHeight(person) - 3) - rise) - f32(1.5)));
+  const rise = crownRise(likenessOf(person).cut);
+  return point(0, f32(f32(f32(-figureHeight(person) - headLift) - f32(rise * headSize)) - f32(1.5)));
 }
-export function personCloseup(person: Person, _mood: Mood): SceneNode {
-  return characterFigure(appearanceOf(person));
-}
+// Residents' legs are short stubs under the hem: the walk clip's leg angles only say where each foot goes.
+const thigh = f32(2.2),
+  shin = f32(2.2);
 export function stridePose(parts: PersonParts, stride: number, walking: boolean): void {
-  // The figure faces the viewer three-quarters on, toward +x: the arm swinging forward reaches
-  // that way and shortens toward the eye, the other trails behind. Feet step and lift in turn.
-  let swing = walking ? f32(Math.sin(stride)) : 0;
-  for (let i = 0; i < 2; ++i) {
-    let phase = f32((i ? -1 : 1) * swing),
-      forward = Math.max(0, phase),
-      back = Math.max(0, -phase);
-    let angle = f32(f32(-f32(0.5) * forward) + f32(f32(0.35) * back)),
-      squash = f32(1 - f32(f32(0.25) * forward));
-    poseArm(parts.arms[Number(i)], angle, 0, 0, 0, squash);
-    let lift = walking ? f32(Math.max(0, f32((i ? -1 : 1) * f32(Math.cos(stride)))) * f32(0.55)) : 0;
-    setTransform(parts.feet[i], [1, 0, f32((i ? -f32(0.75) : f32(0.75)) * swing), 0, 1, -lift, 0, 0, 1]);
+  parts.nod = 0;
+  if (!walking) {
+    for (const arm of parts.arms) poseArm(arm);
+    for (const foot of parts.feet) setTransform(foot, [1, 0, 0, 0, 1, 0, 0, 0, 1]);
+    return;
   }
+  // The shared walk: each arm swings against the leg on its side, shortening toward the eye as it
+  // reaches; a carried tool keeps its angle. `stride` runs a full cycle every two pi.
+  // A stride of zero finds the far foot in mid-air, a quarter of the clip in.
+  const clip = humanoidClips.walk,
+    frame = (stride / (2 * Math.PI) + 0.25) * clip.frames,
+    turn = (bone: string) => clipTurn(clip, bone, frame),
+    lean = turn('spine') + turn('chest'),
+    reach: number[] = [],
+    rise: number[] = [];
+  (['l', 'r'] as const).forEach((side, i) => {
+    const upper = turn(`arm.${side}.1`),
+      elbow = turn(`arm.${side}.2`),
+      wrist = turn(`hand.${side}`);
+    poseArm(
+      parts.arms[i],
+      upper,
+      elbow,
+      // The clip aims the tool hand for a body that turns; a resident's body leans without turning its arms.
+      side === 'r' ? wrist + lean : wrist,
+      0,
+      clipStretch(clip, `arm.${side}.1`, frame),
+    );
+    const hip = turn(`leg.${side}.1`),
+      knee = hip + turn(`leg.${side}.2`);
+    reach[i] = -(thigh * Math.sin(hip) + shin * Math.sin(knee));
+    rise[i] = thigh * (Math.cos(hip) - 1) + shin * (Math.cos(knee) - 1);
+  });
+  // The lower foot is the one on the ground.
+  const ground = Math.max(rise[0], rise[1]);
+  parts.feet.forEach((foot, i) =>
+    setTransform(foot, [1, 0, f32(reach[i] * 0.75), 0, 1, f32(rise[i] - ground), 0, 0, 1]),
+  );
 }
+/** Walking rise: lowest as a foot lands, smooth through the passing step. */
+export const strideBob = (stride: number): number =>
+  f32(-f32(0.22) * f32(1 - f32(Math.cos(f32(2 * stride)))));
 const dungeonBodies = new WeakMap<SceneNode, readonly PaintNode[]>();
 export const dungeonBody = (paint: SceneNode): readonly PaintNode[] => dungeonBodies.get(paint) ?? [];
 export function dungeonSprite(
@@ -1232,7 +803,8 @@ export function dungeonSprite(
     rockShade: Rgb = [48, 46, 54],
     dark: Rgb = [8, 8, 12];
   let pulse: PaintNode | null = null;
-  switch (site.kind) {
+  // The way home borrows the rift portal's look.
+  switch (site.kind === DungeonKind.Return ? DungeonKind.Portal : site.kind) {
     case DungeonKind.GiantHall: {
       objects.add(
         poly(

@@ -4,209 +4,372 @@
     "description": "Mark a camp near a discovered dungeon. Settlers gather and deliver its 12 wood.",
     "kind": "Building",
     "building": "Camp",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
   },
   {
-    "title": "Lay a road",
-    "description": "Draw and complete a road connected to the camp.",
-    "kind": "Road",
+    "title": "Build a workbench",
+    "description": "An open bench where residents craft wooden and stone tools and weapons, one at a time. It takes 4 wood.",
+    "kind": "Building",
+    "building": "Workbench",
+    "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Craft a wooden axe",
+    "description": "A wooden axe fells trees faster than bare hands. Craft one at the workbench from 3 wood.",
+    "kind": "Craft",
     "building": "Count",
-    "residents": 0
+    "residents": 1,
+    "branch": "Core",
+    "items": [
+      "wooden-axe"
+    ]
   },
   {
-    "title": "Build an altar",
-    "description": "Choose a resident to pray at the altar. Offer 4 food and keep a home free; a new resident appears here the next day.",
-    "kind": "Building",
-    "building": "Shrine",
-    "residents": 0
+    "title": "Craft wooden tools",
+    "description": "A pick, mallet or hoe makes mining, building or farming faster; a shovel tills and lays roads faster still. Craft two at the workbench.",
+    "kind": "Craft",
+    "building": "Count",
+    "residents": 2,
+    "branch": "Core",
+    "items": [
+      "wooden-pick",
+      "wooden-mallet",
+      "wooden-hoe",
+      "wooden-shovel"
+    ]
   },
   {
-    "title": "Build a lumberyard",
-    "description": "Establish a timber supply near trees.",
+    "title": "Craft a first weapon",
+    "description": "A wooden sword, club, spear or short bow hits harder than fists. Craft one at the bench.",
+    "kind": "Craft",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Core",
+    "items": [
+      "wooden-sword",
+      "wooden-club",
+      "wooden-spear",
+      "short-bow"
+    ]
+  },
+  {
+    "title": "Equip both founders",
+    "description": "Crafted gear goes straight into a free hand. Give each founder a tool or a weapon of their own.",
+    "kind": "Equip",
+    "building": "Count",
+    "residents": 2,
+    "branch": "Core"
+  },
+  {
+    "title": "Build a tent",
+    "description": "Shelter the founders and make room for the newcomers to come.",
     "kind": "Building",
-    "building": "Lumberyard",
-    "residents": 0
+    "building": "Tent",
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Build a farmhouse",
     "description": "Prepare a food supply for the settlement.",
     "kind": "Building",
     "building": "Farm",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Plant a field",
     "description": "Draw a field near the farmhouse.",
     "kind": "Field",
     "building": "Count",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Build an altar",
+    "description": "Odin's altar needs 4 stone: builders break grey rock by hand. No rock in sight? Explore for it.",
+    "kind": "Building",
+    "building": "Shrine",
+    "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Reach 4 residents",
+    "description": "Pray at Odin's altar with 4 food and a free bed: a new resident joins when the prayer ends.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 4,
+    "branch": "Core"
+  },
+  {
+    "title": "Lay a road",
+    "description": "Draw and complete a road connected to the camp.",
+    "kind": "Road",
+    "building": "Count",
+    "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Build a lumberyard",
+    "description": "Needs a road. Establish a timber supply near trees; its workers fell faster with axes in hand.",
+    "kind": "Building",
+    "building": "Lumberyard",
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Build a well",
     "description": "Give your residents drinking water.",
     "kind": "Building",
     "building": "Well",
-    "residents": 0
-  },
-  {
-    "title": "Build a tent",
-    "description": "Provide housing for newcomers.",
-    "kind": "Building",
-    "building": "Tent",
-    "residents": 0
-  },
-  {
-    "title": "Build a hostel",
-    "description": "Earn lodging income from temporary visitors. Guests never become residents.",
-    "kind": "Building",
-    "building": "Hostel",
-    "residents": 0
-  },
-  {
-    "title": "Reach 4 residents",
-    "description": "Pray at the altar and keep homes and food available for next-day residents.",
-    "kind": "Population",
-    "building": "Count",
-    "residents": 4
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Build a quarry",
-    "description": "Establish a supply of stone.",
+    "description": "Needs a road. Establish a supply of stone.",
     "kind": "Building",
     "building": "Quarry",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Build a storehouse",
     "description": "Increase room for delivered resources.",
     "kind": "Building",
     "building": "Storehouse",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Build a sawmill",
     "description": "Assign a worker to turn two logs into one plank for advanced construction.",
     "kind": "Building",
     "building": "Sawmill",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
   },
   {
     "title": "Build stoneworks",
     "description": "Dress two rough stones into one cut stone for advanced construction.",
     "kind": "Building",
     "building": "Stoneworks",
-    "residents": 0
+    "residents": 0,
+    "branch": "Core"
+  },
+  {
+    "title": "Build a hostel",
+    "description": "Earn lodging income from temporary visitors. Guests never become residents.",
+    "kind": "Building",
+    "building": "Hostel",
+    "residents": 0,
+    "branch": "Trade"
   },
   {
     "title": "Build a tavern",
     "description": "Give residents somewhere to relax.",
     "kind": "Building",
     "building": "Tavern",
-    "residents": 0
+    "residents": 0,
+    "branch": "Trade"
   },
   {
     "title": "Reach 6 residents",
     "description": "Expand housing and supplies for growth.",
     "kind": "Population",
     "building": "Count",
-    "residents": 6
+    "residents": 6,
+    "branch": "Trade"
   },
   {
     "title": "Build a market",
     "description": "Let trade support the settlement.",
     "kind": "Building",
     "building": "MarketStalls",
-    "residents": 0
+    "residents": 0,
+    "branch": "Trade"
   },
   {
     "title": "Build a guild",
-    "description": "Choose a resident to take a one-time professional oath at the guild.",
+    "description": "Needs a quarry and 6 residents. Choose a resident to take a one-time professional oath at the guild.",
     "kind": "Building",
     "building": "Guild",
-    "residents": 0
+    "residents": 0,
+    "branch": "Arms"
+  },
+  {
+    "title": "Swear a fighter",
+    "description": "Select the guild and choose a settler to swear a calling. Each calling has one ability: press Q to use it.",
+    "kind": "Deed",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Arms",
+    "deed": "sworn"
+  },
+  {
+    "title": "Build a training yard",
+    "description": "Needs a guild. Two residents drill there each day and gain experience, though fighting still teaches faster.",
+    "kind": "Building",
+    "building": "TrainingYard",
+    "residents": 0,
+    "branch": "Arms"
+  },
+  {
+    "title": "Beat off a raid",
+    "description": "Raids are warned during the day. Gather your fighters by the camp and kill every raider that comes.",
+    "kind": "Deed",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Arms",
+    "deed": "raidsRepelled"
+  },
+  {
+    "title": "Build a watchtower",
+    "description": "Needs a training yard and a raid beaten off. A resident keeps watch and shoots raiders who come near.",
+    "kind": "Building",
+    "building": "Watchtower",
+    "residents": 0,
+    "branch": "Arms"
   },
   {
     "title": "Reach 10 residents",
     "description": "Support a larger working population.",
     "kind": "Population",
     "building": "Count",
-    "residents": 10
+    "residents": 10,
+    "branch": "Arms"
   },
   {
     "title": "Build a weaponsmith",
-    "description": "Equip your fighters.",
+    "description": "Needs a guild and 10 residents. Forges iron tools and weapons, far better than wooden ones.",
     "kind": "Building",
     "building": "Weaponsmith",
-    "residents": 0
+    "residents": 0,
+    "branch": "Arms"
+  },
+  {
+    "title": "Forge a weapon",
+    "description": "Craft an iron weapon at the weaponsmith from a resident's equipment. Camp-made weapons do not count.",
+    "kind": "Deed",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Arms",
+    "deed": "weaponsForged"
   },
   {
     "title": "Reach 12 residents",
     "description": "Expand the settlement.",
     "kind": "Population",
     "building": "Count",
-    "residents": 12
+    "residents": 12,
+    "branch": "Arms"
   },
   {
     "title": "Build an armorer",
-    "description": "Protect your fighters.",
+    "description": "Needs a floor cleared beyond a gate. Mail and shields keep your fighters on their feet.",
     "kind": "Building",
     "building": "Armorer",
-    "residents": 0
-  },
-  {
-    "title": "Reach 16 residents",
-    "description": "Make room for skilled residents.",
-    "kind": "Population",
-    "building": "Count",
-    "residents": 16
-  },
-  {
-    "title": "Build a mage tower",
-    "description": "Develop a source of mana.",
-    "kind": "Building",
-    "building": "MageTower",
-    "residents": 0
-  },
-  {
-    "title": "Reach 18 residents",
-    "description": "Keep a growing town supplied.",
-    "kind": "Population",
-    "building": "Count",
-    "residents": 18
+    "residents": 0,
+    "branch": "Arms"
   },
   {
     "title": "Build an apothecary",
-    "description": "Provide treatment for injured residents.",
+    "description": "Needs the altar of Odin and 6 residents. Its healer treats the hurt and closes lasting wounds sooner.",
     "kind": "Building",
     "building": "Apothecary",
-    "residents": 0
-  },
-  {
-    "title": "Reach 26 residents",
-    "description": "Grow a thriving settlement.",
-    "kind": "Population",
-    "building": "Count",
-    "residents": 26
+    "residents": 0,
+    "branch": "Faith"
   },
   {
     "title": "Build a chapel",
-    "description": "Give residents a place to pray.",
+    "description": "Needs an altar and 10 residents. Gives residents a place to pray.",
     "kind": "Building",
     "building": "Chapel",
-    "residents": 0
+    "residents": 0,
+    "branch": "Faith"
+  },
+  {
+    "title": "Reach 16 residents",
+    "description": "Keep a growing town supplied.",
+    "kind": "Population",
+    "building": "Count",
+    "residents": 16,
+    "branch": "Faith"
+  },
+  {
+    "title": "Build a mage tower",
+    "description": "Needs an apothecary. Develops a source of mana.",
+    "kind": "Building",
+    "building": "MageTower",
+    "residents": 0,
+    "branch": "Faith"
+  },
+  {
+    "title": "Lead a party of three",
+    "description": "Select three residents and right-click a discovered gate to lead them into the world beyond.",
+    "kind": "Deed",
+    "building": "Count",
+    "residents": 3,
+    "branch": "Saga",
+    "deed": "largestParty"
+  },
+  {
+    "title": "Slay a floor guardian",
+    "description": "Fight through to the heart of a floor and kill its guardian. When it winds up a slam, move your party off the marked ground.",
+    "kind": "Deed",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Saga",
+    "deed": "guardiansSlain"
+  },
+  {
+    "title": "Revive a downed ally",
+    "description": "A resident at 0 health is downed, not dead. Select an ally and right-click the fallen one to revive them before they bleed out.",
+    "kind": "Deed",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Saga",
+    "deed": "rescues"
+  },
+  {
+    "title": "Raise a runestone",
+    "description": "Carve the names of the fallen in stone. While it stands, the settlement grieves less.",
+    "kind": "Building",
+    "building": "Runestone",
+    "residents": 0,
+    "branch": "Saga"
+  },
+  {
+    "title": "Seal a gate",
+    "description": "Kill the guardian of the third floor beyond one gate. A sealed gate never raids again and pays a great hoard.",
+    "kind": "Seal",
+    "building": "Count",
+    "residents": 1,
+    "branch": "Saga"
   },
   {
     "title": "Reach 30 residents",
     "description": "Maintain homes, food and water for everyone.",
     "kind": "Population",
     "building": "Count",
-    "residents": 30
+    "residents": 30,
+    "branch": "Saga"
   },
   {
     "title": "Build a portal",
-    "description": "Connect the settlement to distant lands.",
+    "description": "Needs a mage tower, a guild and a sealed gate. Draws more visitors, and for 8 mana pulls a party home from beyond a gate, even mid-fight.",
     "kind": "Building",
     "building": "Portal",
-    "residents": 0
+    "residents": 0,
+    "branch": "Saga"
+  },
+  {
+    "title": "Seal every gate",
+    "description": "Close every gate to the other worlds to make Midgard safe.",
+    "kind": "Seal",
+    "building": "Count",
+    "residents": 0,
+    "branch": "Saga"
   }
 ]

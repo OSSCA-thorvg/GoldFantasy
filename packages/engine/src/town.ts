@@ -34,12 +34,21 @@ import * as economy from './town-economy';
 import * as production from './town-production';
 import * as settlements from './town-settlements';
 import * as title from './title-autoplay';
+import * as realm from './town-realm';
+import * as defences from './town-defences';
+import * as memorial from './town-memorial';
+import * as drills from './town-drills';
+import * as downed from './town-downed';
+import * as abilities from './calling-abilities';
+import * as market from './town-trade';
+import * as rituals from './town-rites';
 const { population: scopedPopulation, guests: scopedGuests, housing: scopedHousing, guestBeds: scopedGuestBeds, fieldAcres: scopedFields, tendedFieldAcres: scopedTended, roadSettlement: scopedRoadSettlement, ...settlementMethods } = settlements;
 const { fieldAcres: totalFields, tendedFieldAcres: totalTended, ...economyMethods } = economy;
 const { finishCeremony: unusedCeremonyHelper, ceremonySeconds: unusedCeremonySeconds, ...devotionMethods } = devotion;
 const { stressPolicy: unusedStressPolicy, ...stressMethods } = stress;
+const { realmRules: unusedRealmRules, ...realmMethods } = realm;
 const { defectionPolicy: unusedDefectionPolicy, ...neutralMethods } = neutral;
-const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...devotionMethods, ...equipment, ...stressMethods, ...neutralMethods, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...status, ...economyMethods, ...production, ...settlementMethods, ...title };
+const methods = { ...supplies, ...construction, ...roadConstruction, ...orders, ...scheduler, ...needs, ...housing, ...residents, ...hiring, ...devotionMethods, ...equipment, ...stressMethods, ...neutralMethods, ...harvesting, ...people, ...ticking, ...combat, ...encounters, ...giants, ...wildlife, ...realmMethods, ...defences, ...memorial, ...drills, ...downed, ...abilities, ...market, ...rituals, ...status, ...economyMethods, ...production, ...settlementMethods, ...title };
 type Bound<T> = { [K in keyof T]: T[K] extends (...args: infer A) => infer R ? (...args: A) => R : never };
 export interface Town extends Bound<typeof methods> {}
 export class Town extends TownState {

@@ -198,7 +198,7 @@ export interface YmirLight {
   dais: Point;
   glints: PaintNode[];
 }
-export const ymirHeight = 450;
+export const ymirHeight = 510;
 export function lightYmir(lights: SceneNode, base: Point): void {
   lights.add(glow(base, 210, 105, [150, 190, 235], 34));
 }
@@ -1273,20 +1273,224 @@ export function paintYmir(objects: SceneNode, base: Point, climate: Climate, inW
       ),
     );
   }
-  // Eyes that catch a cold light only after dark.
+  // Odin gave an eye for wisdom: the right socket is carved shut under a strap.
+  objects.add(
+    facet(
+      base,
+      [
+        [0, -386],
+        [9, -391],
+        [47, -357],
+        [41, -350],
+      ],
+      deep,
+    ),
+  );
+  objects.add(ellipse(add(base, point(20, -361)), 14, 9, opaque(deep)));
+  objects.add(ellipse(add(base, point(18, -363)), 9, 5, opaque(shade)));
+  // Gungnir stands in his right hand, its butt on the dais and its blade above the throne.
+  const butt = point(-131, -36),
+    neck = point(-124, -452),
+    tip = point(-123, -506);
+  objects.add(
+    facet(
+      base,
+      [
+        [butt.x - 4, butt.y],
+        [butt.x + 4, butt.y],
+        [neck.x + 3.5, neck.y],
+        [neck.x - 3.5, neck.y],
+      ],
+      stone,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [butt.x, butt.y],
+        [butt.x + 4, butt.y],
+        [neck.x + 3.5, neck.y],
+        [neck.x, neck.y],
+      ],
+      deep,
+    ),
+  );
+  // A carved fist as heavy as the rest of him closes round the shaft beside the knee:
+  // the wrist, the block of the hand, four thick fingers across the front, the thumb locked over them.
+  objects.add(
+    worn(
+      base,
+      [
+        [-108, -190],
+        [-82, -178],
+        [-78, -138],
+        [-102, -130],
+      ],
+      shade,
+    ),
+  );
+  objects.add(
+    worn(
+      base,
+      [
+        [-162, -182],
+        [-104, -190],
+        [-98, -132],
+        [-158, -126],
+      ],
+      stone,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [-162, -182],
+        [-104, -190],
+        [-107, -176],
+        [-160, -169],
+      ],
+      lit,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [-162, -182],
+        [-153, -181],
+        [-150, -127],
+        [-158, -126],
+      ],
+      deep,
+    ),
+  );
+  for (const y of [-156, -143])
+    groove(
+      objects,
+      base,
+      [
+        [-158, y + 1],
+        [-102, y - 4],
+      ],
+      f32(2.2),
+      210,
+    );
+  // The knuckles catch the light along their upper edges.
+  for (const y of [-168, -155, -142])
+    groove(
+      objects,
+      base,
+      [
+        [-150, y + 3],
+        [-112, y],
+      ],
+      f32(1),
+      60,
+    );
+  objects.add(
+    worn(
+      base,
+      [
+        [-128, -198],
+        [-98, -190],
+        [-102, -164],
+        [-130, -172],
+      ],
+      lit,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [-102, -164],
+        [-130, -172],
+        [-129, -166],
+        [-103, -158],
+      ],
+      shade,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [tip.x, tip.y],
+        [neck.x + 13, neck.y - 14],
+        [neck.x + 5, neck.y + 4],
+        [neck.x - 5, neck.y + 4],
+        [neck.x - 13, neck.y - 14],
+      ],
+      lit,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [tip.x, tip.y],
+        [neck.x + 13, neck.y - 14],
+        [neck.x + 5, neck.y + 4],
+        [neck.x, neck.y + 4],
+      ],
+      shade,
+    ),
+  );
+  objects.add(
+    facet(
+      base,
+      [
+        [neck.x - 9, neck.y + 4],
+        [neck.x + 9, neck.y + 4],
+        [neck.x + 7, neck.y + 11],
+        [neck.x - 7, neck.y + 11],
+      ],
+      glint,
+    ),
+  );
+  // Huginn and Muninn, thought and memory, perch on the throne's shoulders and look inward.
+  for (const side of [-1, 1]) {
+    const at = (x: number, y: number) => [side * (104 + x), -414 + y];
+    objects.add(
+      worn(
+        base,
+        [at(-20, -6), at(-12, -22), at(4, -24), at(22, -8), at(34, 4), at(20, 2), at(6, 2), at(-12, 2)],
+        side < 0 ? shade : deep,
+      ),
+    );
+    // Head, with the beak turned toward Odin.
+    objects.add(ellipse(add(base, pt(at(-17, -24))), 9, 8, opaque(side < 0 ? shade : deep)));
+    objects.add(facet(base, [at(-24, -28), at(-39, -21), at(-24, -19)], crevice));
+    objects.add(facet(base, [at(-12, -20), at(2, -22), at(18, -8), at(2, -10)], side < 0 ? lit : stone));
+    objects.add(ellipse(add(base, pt(at(-19, -26))), 1.6, 1.6, opaque(glint)));
+    for (const x of [-4, 6]) groove(objects, base, [at(x, 2), at(x, 9)], f32(1.4), 200);
+  }
+  // His one eye and the spear's blade catch a cold light only after dark.
   const light: YmirLight = {
     eyes: [
       add(add(base, crown), mul(sub(point(-17, -362), crown), big)),
-      add(add(base, crown), mul(sub(point(17, -362), crown), big)),
+      add(base, point(tip.x, neck.y - 20)),
     ],
     dais: base,
     glints: [],
   };
-  for (let i = 0; i < 2; ++i) {
-    const eye = ellipse(light.eyes[i], 5, f32(2.4), [176, 214, 255, 255]);
-    eye.opacity(0);
-    objects.add(eye);
-    light.glints[i] = eye;
+  const eye = ellipse(light.eyes[0], 5, f32(2.4), [176, 214, 255, 255]),
+    blade = facet(
+      base,
+      [
+        [tip.x, tip.y + 8],
+        [neck.x + 7, neck.y - 13],
+        [neck.x, neck.y - 2],
+        [neck.x - 7, neck.y - 13],
+      ],
+      [176, 214, 255, 190],
+    );
+  for (const [i, node] of [eye, blade].entries()) {
+    node.opacity(0);
+    objects.add(node);
+    light.glints[i] = node;
   }
   return light;
 }

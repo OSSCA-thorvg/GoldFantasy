@@ -1,18 +1,24 @@
+import { DungeonKind } from '../../../../packages/engine/src/world-types';
 // Direct translation of native game_commands.cpp.
 import type { GameInputApp } from './game-input';
 import { Tool, Order } from '../../../../packages/engine/src/game-tools';
-import { type Point, point, distance } from '../../../../packages/engine/src/geometry';
+import { type Point, point, distance, centroid } from '../../../../packages/engine/src/geometry';
 import { f32 as f } from '../../../../packages/engine/src/numeric';
-import { Activity } from '../../../../packages/engine/src/person';
-import { isHome, structureSpec } from '../../../../packages/engine/src/building-catalog';
+import { Activity, type Person } from '../../../../packages/engine/src/person';
+import { isHome, structureSpec, Structure } from '../../../../packages/engine/src/building-catalog';
+import type { Building } from '../../../../packages/engine/src/town-models';
+import { TownState } from '../../../../packages/engine/src/town-state';
 import { treePosition } from '../../../../packages/engine/src/world-map';
 import * as mining from '../../../../packages/engine/src/mining';
 import { cachedWorldHit } from './world-targets';
+import { isCraftStation } from '../../../../packages/engine/src/equipment';
+import { openStation } from './craft-station-hud';
 import {
   canControl,
   isPlayerBuilding,
   buildingControlReason,
   belongsToFaction,
+  isPlayerResident,
 } from '../../../../packages/engine/src/faction';
 import { controllableIds, selectionControlReason } from './game-control';
 import { Cue } from '../../../../packages/native-audio/src/sound-types';
@@ -60,9 +66,52 @@ export function animalAtScreen(this: GameCommandApp, screen: Point): number {
   const hit = cachedWorldHit(this, screen);
   return hit?.kind === 'animal' ? hit.id : -1;
 }
+/** The downed resident of the player lying under the cursor, if any. */
+export function downedUnderCursor(app: GameCommandApp): Person | null {
+  if (app.mouse.x < 0 || app.context.controlAt(app.mouse.x, app.mouse.y)) return null;
+  let best: Person | null = null,
+    gap = Infinity;
+  for (const p of app.town.downedResidents()) {
+    const at = app.toScreen(p.position),
+      tile = distance(at, app.toScreen(point(f(p.position.x + 1), p.position.y))),
+      d = distance(at, app.mouse);
+    if (d <= Math.max(18, f(tile * 0.8)) && d < gap) {
+      best = p;
+      gap = d;
+    }
+  }
+  return best;
+}
+function tendRefusal(app: GameCommandApp, ids: readonly number[], hurt: Person): string {
+  const side = app.town.inRealm(hurt.position),
+    near = ids.filter((id) => {
+      const p = app.town.person(id);
+      return p && p.id !== hurt.id && app.town.inRealm(p.position) === side;
+    });
+  if (!near.length) return `${hurt.name} lies on the other side of the gate`;
+  return `No path to ${hurt.name}`;
+}
+function farmOfField(app: GameCommandApp, id: number): Building | null {
+  const field = app.town.field(id);
+  if (!field) return null;
+  const middle = centroid(field.outline);
+  return (
+    app.town
+      .buildings()
+      .filter(
+        (b) =>
+          b.kind === Structure.Farm &&
+          b.built() &&
+          isPlayerBuilding(b) &&
+          distance(b.center, middle) <= TownState.farmReach,
+      )
+      .sort((a, b) => distance(a.center, middle) - distance(b.center, middle) || a.id - b.id)[0] ?? null
+  );
+}
 export function prepare(this: GameCommandApp, order: Order): void {
   if (!this.chosen.length) {
     if (this.selectedAnimal >= 0 && order === Order.Attack) {
+      // Attack on a selected animal sends whoever is nearest and free; with nobody free it does nothing.
       const animal = this.town.creature(this.selectedAnimal),
         candidates: { busy: boolean; distance: number; id: number }[] = [];
       if (animal && animal.animal !== null && animal.health > 0)
@@ -72,9 +121,8 @@ export function prepare(this: GameCommandApp, order: Order): void {
           candidates.push({ busy: !idle, distance: distance(p.position, animal.position), id: p.id });
         }
       candidates.sort((a, b) => Number(a.busy) - Number(b.busy) || a.distance - b.distance || a.id - b.id);
-      if (candidates.length && this.town.orderAttack([candidates[0].id], this.selectedAnimal))
+      if (candidates.some((candidate) => this.town.orderAttack([candidate.id], this.selectedAnimal)))
         this.cue(Cue.Order);
-      else this.status = 'Select a resident, then use Attack';
     }
     if (this.selectedTree >= 0 && (order === Order.Attack || order === Order.Work)) {
       this.queueWork(Activity.Felling, this.selectedTree);
@@ -160,13 +208,56 @@ export function issueOrder(this: GameCommandApp, order: Order): void {
     creature =
       hit?.kind === 'animal' || hit?.kind === 'monster' ? this.town.creature(hit.id) : null,
     place = hit?.kind === 'building' ? this.town.building(hit.id) : null,
+    // A downed body is not pickable, so it is found by distance on screen.
+    fallen = order === Order.Work && !personTarget && !creature ? downedUnderCursor(this) : null,
     moving: number[] = [];
   if (order === Order.Move) this.town.orderMove(ids, this.cursor);
-  else if (personTarget) {
-    if (order === Order.Attack) this.town.orderAttackPerson(ids, personTarget.id);
+  else if (fallen) {
+    // Re-ordering an ally already kneeling there would restart their tending without end.
+    const kneeling = (id: number) => {
+        const p = this.town.person(id);
+        return p?.activity === Activity.Tending && p.taskSite === fallen.id;
+      },
+      sent = ids.filter((id) => !kneeling(id));
+    if ((!sent.length || !this.town.orderTend(sent, fallen.id)) && sent.length === ids.length) {
+      this.status = tendRefusal(this, ids, fallen);
+      return;
+    }
+  } else if (order === Order.Work && hit?.kind === 'field') {
+    const farm = farmOfField(this, hit.id);
+    if (!farm) {
+      this.status = 'No farm stands close enough to work this field';
+      this.town.orderMove(ids, this.cursor);
+    } else if (this.town.assignJob(ids, farm.id)) {
+      this.town.approachOrder(ids, this.cursor);
+      const left = ids.filter((id) => this.town.person(id)?.job !== farm.id);
+      if (left.length) this.town.orderMove(left, this.cursor);
+    } else {
+      this.status = 'The farm by this field has no room for more workers';
+      this.town.orderMove(ids, this.cursor);
+    }
+  } else if (personTarget) {
+    // Companions are never attacked: an Attack click on one is an attack-move to where they stand.
+    if (order === Order.Attack && isPlayerResident(personTarget)) this.town.orderAttackMove(ids, this.cursor);
+    else if (order === Order.Attack) this.town.orderAttackPerson(ids, personTarget.id);
     else this.town.orderMove(ids, personTarget.position);
   } else if (order === Order.Work && hit?.kind === 'dungeon') {
-    if (!this.town.sendExpedition(ids, hit.id)) this.town.orderMove(ids, this.cursor);
+    if (this.town.map().dungeons()[hit.id]?.kind === DungeonKind.Return) {
+      // Walking up to the way home gathers the party; leaving is the explicit Go home.
+      const plan = this.town.realmPlan();
+      if (plan) this.town.orderMove(ids, plan.entry);
+      return;
+    }
+    const floor = Math.min(this.gateFloor.get(hit.id) ?? Infinity, this.town.deepestOpenFloor(hit.id));
+    if (!this.town.sendExpedition(ids, hit.id, floor)) {
+      const problem = this.town.expeditionProblem(hit.id, floor);
+      if (problem) this.status = problem;
+      this.town.orderMove(ids, this.cursor);
+    }
+  } else if (order === Order.Work && place && isPlayerBuilding(place) && place.built() && isCraftStation(place.kind)) {
+    // A crafting station opens its recipes with the first selected resident as crafter; nothing starts by itself.
+    openStation(this, place, ids[0]);
+    return;
   } else if (order === Order.Attack && !creature && hit?.kind !== 'tree' && hit?.kind !== 'rock') {
     this.town.orderAttackMove(ids, this.cursor);
   } else {

@@ -29,6 +29,8 @@ export interface AppEvent {
   meta: boolean;
   pointerType?: string;
   gesture?: { dx: number; dy: number; scale: number };
+  /** The physical key of a key event (`KeyboardEvent.code`), the same on every keyboard layout. */
+  code?: string;
 }
 export interface Property {
   id: string;
@@ -100,7 +102,8 @@ export interface PreviewWorld {
   advanceTitleAutoplay(seconds: number): void;
   titleAutoplaySubject(): Person | null;
   building(id: number): Building | null | undefined;
-  startTitleAutoplay(seed: number): void;
+  /** holdSky keeps the daylight and weather the world was loaded with. */
+  startTitleAutoplay(seed: number, holdSky?: boolean): void;
   map(): { camp(): Point };
   camp(): { center: Point } | undefined | null;
   people(): readonly { id: number; moving(): boolean; activity: Activity }[];
@@ -124,6 +127,14 @@ export interface SceneServices {
   loadPreview(preview: Preview, path: string): boolean;
   createSound(): NativeSound;
   exists(path: string): boolean;
+  /** Wall-clock milliseconds of the save at path; 0 when unknown. */
+  savedAt(path: string): number;
+  /** Stores a picture of the frame beside the save; worldOnly hides every interface layer while it is taken. */
+  captureSave(path: string, worldOnly: (on: boolean) => void): void;
+  /** Drops the picture of the save a pictureless one replaces. */
+  clearSaveShot(path: string): void;
+  /** JPEG bytes captured with the save at path, if any. */
+  saveShot(path: string): Uint8Array | undefined;
   preferenceSavePath(): string;
   randomDevice(): number;
   designedWorldSeed: number;

@@ -1,13 +1,14 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Town } from '../../packages/engine/src/town';
 import { Activity, Monster, type Person } from '../../packages/engine/src/person';
-import { Structure } from '../../packages/engine/src/building-catalog';
+import { Product, Structure } from '../../packages/engine/src/building-catalog';
 import { add, point, scale, type Point } from '../../packages/engine/src/geometry';
 import { sharpAnchor, type RoadPath } from '../../packages/engine/src/road-network';
 import { copyNative } from '../../packages/engine/src/native-copy';
 import { Tool } from '../../packages/engine/src/game-tools';
 import { dispatchWork, queueWork, type GameCommandApp } from '../../apps/web/src/native/game-commands';
 import { finishRoad, selectTool } from '../../apps/web/src/native/game-input';
+import { heldAmount, packAmount } from '../../packages/engine/src/carried-resources';
 // Only presentation callbacks and pointer sampling are excluded. Validated paths
 // enter the real finishRoad handler; dispatch, navigation, collection and building
 // all use production code. Browser regressions cover actual pointer strokes.
@@ -199,7 +200,7 @@ describe('new player road requests after the first Camp', () => {
     advanceUntil(app, () => camp.built(), 180);
     expect(camp.materials.delivered.wood).toBeGreaterThanOrEqual(camp.materials.required.wood);
   });
-  it('lets an active resource delivery finish, then admits the pending player road', () => {
+  it('keeps the gathered load in the pack, then admits the pending player road', () => {
     const app = fixture(),
       town = app.town,
       worker = town.people()[0];
@@ -212,7 +213,8 @@ describe('new player road requests after the first Camp', () => {
     expect(worker.carrying).toBe(carried);
     advanceUntil(app, () => worker.task === Activity.Roadwork && worker.taskSite === road.id, 30);
     expect(worker.carrying).toBe(0);
-    expect(town.stock().wood).toBe(stock + carried);
+    expect(packAmount(worker, Product.Wood)).toBeGreaterThanOrEqual(carried);
+    expect(town.stock().wood).toBe(stock);
     advanceUntil(app, () => road.built === 1, 120);
   });
   it('preserves a blocked cargo load in construction inventory when storage is full', () => {
@@ -228,12 +230,12 @@ describe('new player road requests after the first Camp', () => {
       () => !worker.moving() && [Activity.Idle, Activity.Holding].includes(worker.activity),
       30,
     );
-    expect(worker.carrying).toBeGreaterThan(0);
-    const wood = town.stock().wood + worker.carrying;
+    expect(heldAmount(worker, Product.Wood)).toBeGreaterThan(0);
+    const wood = town.stock().wood + heldAmount(worker, Product.Wood);
     const road = requestRoad(app, radial(app, point(1, 0)));
     expect(worker.task).toBe(Activity.Roadwork);
     advanceUntil(app, () => road.built === 1, 120);
-    expect(town.stock().wood + worker.carrying + road.materials.delivered.wood).toBe(wood);
+    expect(town.stock().wood + heldAmount(worker, Product.Wood) + road.materials.delivered.wood).toBe(wood);
   });
   it('retries a pending road after recovery even when automatic harvesting resumes in the same frame', () => {
     const app = fixture(),

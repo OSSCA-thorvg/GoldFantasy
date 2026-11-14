@@ -7,7 +7,7 @@ import type {
   WorldObjectRef,
   GroundSelectionMarker,
 } from '../../../../packages/native-renderer/src/world-picking-types';
-import { worldNameplateBounds, paintWorldNameplate } from './world-nameplate';
+import { nameplatePlace, paintWorldNameplate } from './world-nameplate';
 
 /** Ground feedback belongs beneath world objects; only nameplates are drawn in the HUD. */
 export function objectSelectionOverlay(app: GameCommandApp): void {
@@ -30,19 +30,20 @@ export function objectSelectionOverlay(app: GameCommandApp): void {
       ...(target ? { geometry: target.geometry } : {}),
     });
     if (!target) continue;
-    const g = target.geometry;
-    const r = worldNameplateBounds(app.context, target.name, g.labelAnchor.x, g.labelAnchor.y - 7, 1.25);
-    r.w = Math.min(180, app.viewWidth - 8, r.w);
-    r.x = Math.max(4, Math.min(app.viewWidth - r.w - 4, g.labelAnchor.x - r.w / 2));
-    r.y = Math.max(4, r.y);
-    while (
-      occupied.some(
-        (other) =>
-          r.x < other.x + other.w && r.x + r.w > other.x && r.y < other.y + other.h && r.y + r.h > other.y,
-      ) &&
-      r.y > 25
-    )
-      r.y -= 20;
+    const g = target.geometry,
+      dock = app.dockBounds,
+      center = g.bounds.x + g.bounds.w / 2,
+      // The name sits under the target, where no health bar or mark is; the bottom panel is its floor.
+      floor = dock && dock.h > 0 && center > dock.x - 90 && center < dock.x + dock.w + 90 ? dock.y : app.viewHeight,
+      { bounds: r, below } = nameplatePlace(app.context, target.name, g, app.viewWidth, floor, 1.25),
+      taken = () =>
+        occupied.some(
+          (other) =>
+            r.x < other.x + other.w && r.x + r.w > other.x && r.y < other.y + other.h && r.y + r.h > other.y,
+        );
+    // Plates of neighbours stack away from the targets rather than over one another.
+    if (below) while (taken() && r.y + r.h + 20 <= floor - 4) r.y += 20;
+    else while (taken() && r.y > 25) r.y -= 20;
     occupied.push(r);
     paintWorldNameplate(
       app.context,

@@ -14,11 +14,11 @@ import {
 import {
   characterAssetGender,
   CharacterAssetGender,
-  randomCharacterReference,
   resolveCharacterAssets,
   useCharacterReference,
 } from './character-reference';
-import { f32 as f, hash01 } from './numeric';
+import { callingOutfit, castMember, legacyHairAsset } from './character-cast';
+import { f32 as f } from './numeric';
 export const rgb = (r = 0, g = 0, b = 0): Rgb => ({ r, g, b });
 export function scaleColor(c: Rgb, k: number): Rgb {
   k = f(k);
@@ -154,46 +154,19 @@ export function appearanceOf(person: Person): Appearance {
     resolveCharacterAssets(look);
     return look;
   }
-  const roll = (salt: number) => hash01(person.look, 0, salt, 0x5eed),
-    skins = [
-      rgb(240, 205, 179),
-      rgb(231, 183, 159),
-      rgb(211, 153, 130),
-      rgb(183, 126, 100),
-      rgb(151, 98, 76),
-      rgb(109, 73, 57),
-    ],
-    hair = [
-      rgb(34, 35, 34),
-      rgb(67, 55, 46),
-      rgb(106, 91, 76),
-      rgb(164, 91, 54),
-      rgb(207, 183, 126),
-      rgb(224, 222, 209),
-    ],
-    cloth = [
-      rgb(96, 106, 99),
-      rgb(76, 87, 83),
-      rgb(102, 108, 110),
-      rgb(85, 99, 88),
-      rgb(70, 87, 98),
-      rgb(115, 118, 113),
-      rgb(106, 92, 80),
-    ];
-  const a = defaultAppearance();
+  // Legacy heads only: the game draws residents from their likeness (see character-cast).
+  const cast = castMember(person.look),
+    a = defaultAppearance();
   a.seed = person.look;
-  a.bodyType = roll(5) < f(0.5) ? BodyType.Male : BodyType.Female;
-  useCharacterReference(a, randomCharacterReference(person.look, a.bodyType));
+  a.bodyType = cast.body;
+  useCharacterReference(a, legacyHairAsset(cast.cut));
   a.outfitAsset = person.calling;
-  a.skin = skins[Math.trunc(f(roll(2) * skins.length)) % skins.length];
+  a.skin = { ...cast.skin };
   a.skinShade = mixColor(a.skin, rgb(123, 81, 69), f(0.18));
-  a.hair = hair[Math.trunc(f(roll(3) * hair.length)) % hair.length];
-  a.hairShade = scaleColor(a.hair, f(0.42));
+  a.hair = { ...cast.hair };
+  a.hairShade = scaleColor(a.hair, f(0.72));
   a.hairEnd = { ...a.hair };
   a.eyes = rgb(20, 23, 22);
-  a.cloth = cloth[person.calling];
-  a.clothShade = scaleColor(a.cloth, f(0.68));
-  a.trim = rgb(146, 130, 99);
   a.faceWidth = f(0.5);
   a.jaw = f(0.4);
   a.eyeSize = 1;
@@ -201,6 +174,14 @@ export function appearanceOf(person: Person): Appearance {
   a.browWeight = 1;
   a.mouthWidth = 6;
   a.mouthStyle = MouthStyle.Neutral;
+  a.whiskers = cast.whiskers;
+  a.freckles = cast.freckles;
+  a.scar = cast.scar;
+  a.warpaint = cast.paint;
+  const outfit = callingOutfit(person.calling, person.look);
+  a.cloth = { ...outfit.cloth };
+  a.clothShade = scaleColor(a.cloth, f(0.68));
+  a.trim = { ...outfit.trim };
   return a;
 }
 export function founderAppearance(person: Person, type: BodyType): Appearance {

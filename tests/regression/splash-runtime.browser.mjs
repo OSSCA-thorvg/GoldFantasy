@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
 
-const backend = process.env.GOLDFANTASY_TEST_RENDERER ?? 'sw';
+const backend = process.env.GOLDFANTASY_TEST_RENDERER ?? 'gl';
 const baseline = process.env.GOLDFANTASY_TEST_BASELINE === '1';
 const modes = (process.env.GOLDFANTASY_TEST_MODES ?? 'worker,fallback').split(',');
 const output = process.env.GOLDFANTASY_TEST_OUTPUT ?? 'artifacts/runtime-lifecycle/splash-runtime';

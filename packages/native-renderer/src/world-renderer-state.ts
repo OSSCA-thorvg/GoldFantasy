@@ -50,6 +50,13 @@ export interface Figure extends Sprite {
   stride: number;
   facing: number;
   striding: boolean;
+  /** When the figure was last drawn, and the flinch spring a blow sets off. */
+  shown?: number;
+  squish?: number;
+  squishSpeed?: number;
+  shownHealth?: number;
+  /** 0 standing, 1 flat on the ground: eased toward whichever the resident is. */
+  lying?: number;
 }
 export interface Pool {
   center: Point;
@@ -132,6 +139,8 @@ export class WorldRendererState {
   sunlight = new SceneNode();
   ornaments = new SceneNode();
   combat = new SceneNode();
+  /** Combat shapes flat on the ground (telegraphs, skill areas, rings), under selection rings and figures. */
+  combatGround = new SceneNode();
   prints = isoLayer();
   overcast = new ShapeNode();
   precipitation = new ShapeNode();
@@ -175,6 +184,11 @@ export class WorldRendererState {
   cloudShapes: SceneNode[] = [];
   mottle: CloudMottle | null = null;
   ornamentLook = -1n;
+  /** A terrain edit waits this long for the stroke to move on before trees and props are rebuilt. */
+  terrainEditedAt = -1;
+  terrainEditPending = false;
+  /** Screen-space centre of the latest terrain edit; its nearest ground chunks repaint first. */
+  terrainEditFocus = { x: 0, y: 0 };
   sunPasses: ShapeNode[] = [];
   darkVeil: ShapeNode | null = null;
   fitted = [0, 0, 0, 0];
@@ -186,8 +200,6 @@ export class WorldRendererState {
   fallingIntensity = 0;
   falling = Weather.Rain;
   weatherAt = -1;
-  sparks: { hit: Hit; shown: number; paint: SceneNode; number: PaintNode }[] = [];
-  nextSpark = 0n;
   footprints: { at: Point; made: number }[] = [];
   lastStep = new Map<number, Point>();
   leftFoot = false;
@@ -220,6 +232,11 @@ export class WorldRendererState {
   treeCounts = new Uint8Array();
   renderedAt = 0;
   seenTreeEvent = 0n;
+  /** Keeps water and other ambient motion still; the app may set it from its own preference. */
+  reducedMotion =
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  waterAt = -1;
+  waterStill = false;
   constructor(readonly tvg: ThorVGNamespace) {
     this.adapter = new WebCanvasAdapter(tvg);
     this.root.add(this.background).add(this.world).add(this.overcast).add(this.vignette);
@@ -230,6 +247,8 @@ export class WorldRendererState {
       this.roads,
       this.prints,
       this.lights,
+      // Combat marks lie under the selection and hover rings, so a ring stays readable on a skill's disc.
+      this.combatGround,
       this.selection,
       this.objects,
       this.effects,

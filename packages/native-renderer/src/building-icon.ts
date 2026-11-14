@@ -4,7 +4,7 @@ import { Structure, structureSpec } from '../../engine/src/building-catalog';
 import { SceneNode, ShapeNode, type Rgb } from './paint';
 import { BuildingProjection, orientModel, splitAngle, type Model } from './building-model';
 import { validateBuildingAsset } from './building-asset';
-import { buildingFaces, Motion, FaceStyle } from './building-faces';
+import { buildingFaces, Motion, FaceStyle, softEdge } from './building-faces';
 import { depthBatches } from './building-depth';
 import { structureModel } from './building-assets';
 export function buildingIcon(
@@ -64,9 +64,9 @@ export function buildingIcon(
     const a = Math.trunc(f32(255 * alpha)) & 255;
     if (batch.line) {
       const outline = face.style === FaceStyle.Outlined,
-        color: Rgb = outline ? [20, 18, 24] : face.color;
+        color: Rgb = outline ? softEdge(face) : face.color;
       shape
-        .strokeWidth(Math.max(outline ? f32(0.5) : f32(0.6), f32((outline ? f32(1.2) : face.width) * k)))
+        .strokeWidth(Math.max(outline ? f32(0.5) : f32(0.6), f32(face.width * k)))
         .strokeCap('round')
         .strokeJoin('round')
         .strokeFill(...color, a);

@@ -1,4 +1,4 @@
-import { Footprint, distance, project, type Point } from '../../engine/src/geometry';
+import { Footprint, distance, project, unproject, type Point } from '../../engine/src/geometry';
 import { f32, clamp } from '../../engine/src/numeric';
 import { Giant, Volcano } from '../../engine/src/world-types';
 import { WorldMap } from '../../engine/src/world-map';
@@ -17,6 +17,11 @@ interface DepthItem {
   baseline: GroundBaseline;
   key: string;
   bounds?: Rect;
+  /** The box used for culling: `bounds`, or a generous one round the baseline. */
+  box?: Rect;
+  /** Explored-fog revision this item was last tested against, and whether the veil hid all of it. */
+  veilAt?: number;
+  veiled?: boolean;
 }
 const depthItems = new WeakMap<PaintNode, DepthItem>();
 
@@ -137,14 +142,60 @@ function orderedPaints(items: readonly DepthItem[]): PaintNode[] {
 }
 
 /** Rows are geometry caches only. All visible objects share one retained painter order. */
-export function sortWorldObjects(s: WorldRendererState): void {
+/** The part of the world the camera shows, with a margin for what is about to enter. */
+export function viewRect(s: WorldRendererState): Rect {
   const margin = 64 / s.view.zoom;
-  const visible = new Rect(
+  return new Rect(
     s.view.x - s.viewWidth / s.view.zoom / 2 - margin,
     s.view.y - s.viewHeight / s.view.zoom / 2 - margin,
     (s.viewWidth + 128) / s.view.zoom,
     (s.viewHeight + 128) / s.view.zoom,
   );
+}
+/** A generous box round whatever stands on a baseline: a figure with its tool, or a building. */
+function standingBox(baseline: GroundBaseline): Rect {
+  const wide = baseline.right.x - baseline.left.x,
+    tall = wide > 1 ? 300 : 150,
+    top = Math.min(baseline.left.y, baseline.right.y) - tall;
+  return new Rect(
+    baseline.left.x - 72,
+    top,
+    wide + 144,
+    Math.max(baseline.left.y, baseline.right.y) + 48 - top,
+  );
+}
+/** Whether someone standing at a tile could show anywhere on screen; true until a camera is set. */
+export function standsInView(s: WorldRendererState, view: Rect, at: Point): boolean {
+  if (s.viewWidth <= 0 || s.viewHeight <= 0) return true;
+  const overlap = standingBox(groundBaseline(at)).intersect(view);
+  return overlap.w > 0 && overlap.h > 0;
+}
+/** Culls a figure by where it is drawn, not by its depth baseline (a doorway's, mid-crossing). */
+export function cullAround(paint: PaintNode, at: Point): void {
+  const item = depthItems.get(paint);
+  if (item) item.box = standingBox(groundBaseline(at));
+}
+/** True when land nobody has seen, whose veil is opaque, covers every part of a box. */
+function underVeil(s: WorldRendererState, box: Rect): boolean {
+  // The veil's edge is soft, so test a little beyond the box, at its corners, edges and middle.
+  const pad = 24;
+  for (const across of [0, 0.5, 1])
+    for (const down of [0, 0.5, 1]) {
+      const tile = unproject(
+        box.x - pad + (box.w + pad * 2) * across,
+        box.y - pad + (box.h + pad * 2) * down,
+      );
+      if (s.exploredVisibility.sample(tile) > 0) return false;
+    }
+  return true;
+}
+export function sortWorldObjects(s: WorldRendererState): void {
+  const visible = viewRect(s),
+    // Fog only exists once vision has run; the editors and scene views show everything.
+    foggy = !s.editorView && !!s.visibilityPicture,
+    // Without a camera nothing is known to be off screen; only registered bounds are trusted.
+    framed = s.viewWidth > 0 && s.viewHeight > 0,
+    explored = foggy ? s.exploredVisibility.revision() : -1;
   const entries: DepthItem[] = [];
   for (const [category, rows] of [s.rowBuildings, s.rowLamps, s.rowTrees, s.rows].entries())
     rows.forEach((row, index) => {
@@ -156,9 +207,22 @@ export function sortWorldObjects(s: WorldRendererState): void {
           key: `row:${index}:${category}:${order}`,
         };
         if (!depthItems.has(paint)) depthItems.set(paint, item);
-        if (item.bounds) {
-          const overlap = item.bounds.intersect(visible);
-          if (overlap.w <= 0 || overlap.h <= 0) return;
+        // Switched off (a figure out of sight, a spent effect): nothing to draw or to keep in step.
+        if (!paint.alpha) return;
+        // Landmarks tower over any box; they are few and stay in.
+        if (!item.key.startsWith('landmark:')) {
+          const box = (item.box ??= item.bounds ?? standingBox(item.baseline));
+          if (item.bounds || framed) {
+            const overlap = box.intersect(visible);
+            if (overlap.w <= 0 || overlap.h <= 0) return;
+          }
+          if (foggy) {
+            if (item.veilAt !== explored) {
+              item.veilAt = explored;
+              item.veiled = underVeil(s, box);
+            }
+            if (item.veiled) return;
+          }
         }
         entries.push(item);
       });

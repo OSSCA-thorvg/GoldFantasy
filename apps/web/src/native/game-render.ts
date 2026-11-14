@@ -5,9 +5,12 @@ import { GameAppState, type Plan, type WorldRenderer } from './game-app-state';
 import type { Traffic } from '../../../../packages/engine/src/traffic';
 import type { Town } from '../../../../packages/engine/src/town';
 import { Tool, Preview } from '../../../../packages/engine/src/game-tools';
-import { Camera, distance, unproject, type Point } from '../../../../packages/engine/src/geometry';
+import { Camera, distance, project, unproject, type Point } from '../../../../packages/engine/src/geometry';
 import { clamp, f32 as f } from '../../../../packages/engine/src/numeric';
-import { Cue, Sound, SpeechChannel, noticeCue } from '../../../../packages/native-audio/src/sound-types';
+import { Cue, Sound, SpeechChannel, VoiceLine, noticeCue } from '../../../../packages/native-audio/src/sound-types';
+import { combatFrame } from './game-combat-hud';
+import { bannerNotice } from './swarm-hud';
+import { commandGroundMarks } from './command-ground-marks';
 import { Moment } from '../../../../packages/native-audio/src/music-director';
 import { Rect } from '../../../../packages/native-ui/src';
 import { queueWorkSounds } from './work-audio';
@@ -23,6 +26,8 @@ import {
 import { applyBuildingAsset } from '../../../../packages/native-renderer/src/building-assets';
 import type { BuildingFiles } from './building-files';
 import { portraitBackdrop } from '../../../../packages/native-renderer/src/portrait-background';
+import { noticeDue, showNotice } from './notice-toast';
+import { guideFrame } from './game-guide';
 export interface RenderWorld extends WorldRenderer {
   update(
     town: Town,
@@ -59,6 +64,7 @@ export interface GameRenderApp extends GameCommandApp {
   plan(): Plan;
   raiseAlarm(seconds: number): void;
   grunt(id: number): void;
+  sayLine(id: number, line: VoiceLine): boolean;
   playMoment(moment: Moment, seconds: number): void;
   soundscape(seconds: number): void;
   updateSpeech(seconds: number): void;
@@ -95,6 +101,8 @@ export function render(
   uiSeconds = -1,
 ): void {
   this.theme.reducedMotion = this.reducedMotion();
+  // The in-game setting, not only the OS preference, stills the water and the world shake.
+  this.renderer.reducedMotion = this.theme.reducedMotion;
   width = f(width);
   height = f(height);
   if (this.atlas || this.buildings) this.campResources.reset();
@@ -179,14 +187,40 @@ export function render(
     this.town.advance(editing || this.prayer ? 0 : elapsed * this.gameSpeed());
     if (!editing && !this.prayer) this.dispatchWork();
   }
+  if (this.realmSeen !== this.town.realmRevision || this.realmGateSeen !== this.town.realmGate) {
+    // Land was raised or sunk, or a save made beyond a gate was loaded: repaint
+    // the map and put the view and the selection on the party.
+    const entered = this.realmSeen !== this.town.realmRevision;
+    this.realmSeen = this.town.realmRevision;
+    this.renderer.invalidateMap();
+    const plan = this.town.realmPlan(),
+      party = plan ? this.town.realmParty() : [],
+      home = this.town.map().dungeons()[this.realmGateSeen],
+      focus = plan
+        ? entered || !party.length
+          ? plan.entry
+          : party[0].position
+        : home
+          ? { x: home.origin.x + 1, y: home.origin.y + 2.3 }
+          : null;
+    if (focus) {
+      const at = project(focus.x, focus.y);
+      this.camera.x = at.x;
+      this.camera.y = at.y;
+    }
+    if (party.length) this.selectPeople(party.map((p) => p.id));
+    this.realmGateSeen = this.town.realmGate;
+  }
   this.chosen = this.chosen.filter((id) => !!this.town.person(id));
   for (const id of this.speakers.keys()) if (!this.town.person(id)) this.speakers.delete(id);
+  if (simulate && !editing && !this.prayer) guideFrame(this);
   if (simulate || this.town.isTitleAutoplay()) {
-    if (seconds >= this.noticeUntil) {
-      const text = this.town.takeNotice();
+    if (noticeDue(this, seconds, this.town.notices.length > 0)) {
+      let text = this.town.takeNotice();
+      // A den falling and the brood breaking have their own banner.
+      while (text && bannerNotice(text)) text = this.town.takeNotice();
       if (text) {
-        this.notice = text;
-        this.noticeUntil = seconds + 3.5;
+        showNotice(this, text, seconds);
         this.cue(noticeCue(text));
       }
     }
@@ -197,18 +231,13 @@ export function render(
       this.raiseAlarm(seconds);
     }
     this.heardRaids = this.town.raids();
-    let heard = 0;
+    // The blow itself is heard through combatSounds, which knows the weapon's shape.
     for (const hit of this.town.hits()) {
       if (hit.serial < this.heardBlow) continue;
       this.heardBlow = hit.serial + 1n;
-      const picked = this.chosen.includes(hit.person);
-      if (!this.renderer.visible(hit.to)) continue;
-      if (hit.onPerson && picked) this.grunt(hit.person);
-      if (heard++ >= 4) continue;
-      const blow = this.spatial(hit.onPerson ? Cue.Bite : hit.ranged ? Cue.Arrow : Cue.Clash, hit.to);
-      blow.gain = f(blow.gain * f(0.6));
-      if (blow.gain > f(0.03) && this.cues.length < 32) this.cues.push(blow);
+      if (this.chosen.includes(hit.person) && hit.onPerson && this.renderer.visible(hit.to)) this.grunt(hit.person);
     }
+    combatFrame(this, seconds);
     queueWorkSounds(this);
     let completed = false;
     for (const item of this.town.buildings()) {
@@ -223,6 +252,7 @@ export function render(
   }
   if (this.selected >= 0 && !this.town.building(this.selected)) this.selected = -1;
   this.current = this.plan();
+  commandGroundMarks(this);
   this.renderer.update(
     this.town,
     this.traffic,

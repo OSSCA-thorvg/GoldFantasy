@@ -100,7 +100,11 @@ The media above is captured from the actual renderer. The settlement showcase is
 | Select a unit or object      | Left click                                |
 | Select a group               | Left-button drag                          |
 | Command selected units       | Right click a destination or target       |
-| Prepare Move / Attack / Work | `M` / `A` / `W`, then choose a target     |
+| Prepare Move / Attack / Work | `M` / `A` / `E`, then choose a target     |
+| Hold position / Stop         | `H` / `S`                                 |
+| Skills of the selection      | `Q` / `W` (ground skills: hold, release)  |
+| Control groups               | `Ctrl+1-9` make, `1-9` select, twice look |
+| Select the fighters          | `F2` or `` ` ``                           |
 | Pan the camera               | Arrow keys or right-button drag           |
 | Zoom                         | Mouse wheel                               |
 | Pause / change speed         | `Space` / `Tab`                           |
@@ -133,7 +137,7 @@ npm run preview
 
 The production site is written to `dist/`. It runs on static HTTP(S) hosting; no game server or account is required.
 
-Optional launch parameters include `?seed=42`, `?renderer=sw`, `?renderer=wg`, `?character-studio` and `?map-editor`.
+Optional launch parameters include `?seed=42`, `?renderer=wg`, `?character-studio` and `?map-editor`.
 
 ## GitHub Pages
 

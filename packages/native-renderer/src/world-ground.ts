@@ -23,11 +23,13 @@ import { registerPick } from './world-pick-registry';
 import { paintGround, tintGround } from './terrain-painter';
 import { WorldRendererState, isoLayer, type GroundChunk } from './world-renderer-state';
 import type { TileRegion } from './render-types';
+/** The open sea beyond the deepest contour band: a dusk indigo-blue. */
+const deepSea = [0, 10, 28] as const;
 export function resize(s: WorldRendererState, width: number, height: number): void {
   if (width === s.viewWidth && height === s.viewHeight) return;
   s.viewWidth = width;
   s.viewHeight = height;
-  s.background.reset().appendRect(0, 0, width, height).fill(11, 18, 27);
+  s.background.reset().appendRect(0, 0, width, height).fill(...deepSea);
   s.overcast.reset().appendRect(0, 0, width, height);
   s.vignette.remove();
   const reach = f32(f32(Math.hypot(width, height)) / 2),
@@ -276,6 +278,7 @@ export function buildPreview(s: WorldRendererState, preview: Preview): void {
       .add(ellipse(at, f32(f32(1.5) * k), f32(f32(1.5) * k), [tint[0], tint[1], tint[2], 230]));
   }
 }
+const repaintBudget = 6;
 export function updateGroundChunks(
   s: WorldRendererState,
   map: WorldMap,
@@ -307,7 +310,7 @@ export function updateGroundChunks(
           scene = new SceneNode().transform(projected),
           clip = new ShapeNode().appendRect(x, y, width, height).fill(255, 255, 255).transform(projected);
         scene.clip(clip);
-        if (patches) scene.add(new ShapeNode().appendRect(x, y, width, height).fill(11, 18, 27));
+        if (patches) scene.add(new ShapeNode().appendRect(x, y, width, height).fill(...deepSea));
         const terrain = isoLayer();
         scene.add(terrain);
         group.add(scene);
@@ -354,8 +357,16 @@ export function updateGroundChunks(
     right = f32(f32(s.view.x + f32(f32(s.viewWidth / 2) / s.view.zoom)) + 8),
     top = f32(f32(s.view.y - f32(f32(s.viewHeight / 2) / s.view.zoom)) - 8),
     bottom = f32(f32(s.view.y + f32(f32(s.viewHeight / 2) / s.view.zoom)) + 8);
+  // A wide brush or a zoom-out dirties many chunks at once. Those beyond the frame's
+  // budget wait a frame or two, nearest the brush (or the view centre) first.
+  const started = performance.now(),
+    focus = s.groundChunks.some((chunk) => chunk.dirty && chunk.edited) ? s.terrainEditFocus : s.view,
+    gap = (chunk: GroundChunk) =>
+      Math.hypot(chunk.bounds.x + chunk.bounds.w / 2 - focus.x, chunk.bounds.y + chunk.bounds.h / 2 - focus.y);
+  let repainted = 0;
   const update = (chunks: GroundChunk[], patchesOnly: boolean, wholeMap = false) => {
-    for (const chunk of chunks) {
+    const ordered = wholeMap ? chunks : [...chunks].sort((a, b) => Number(b.dirty) - Number(a.dirty) || gap(a) - gap(b));
+    for (const chunk of ordered) {
       const a = chunk.area,
         b = chunk.bounds,
         visible =
@@ -366,6 +377,9 @@ export function updateGroundChunks(
           b.y <= bottom;
       chunk.scene.opacity(visible ? 255 : 0);
       if (visible && chunk.dirty) {
+        // Zooming out reveals dozens of chunks at once; they fill in over a few frames.
+        if (!wholeMap && repainted && performance.now() - started > repaintBudget) continue;
+        ++repainted;
         chunk.terrain.remove();
         const padding: TileRegion = {
           left: f32(a.left - 2),

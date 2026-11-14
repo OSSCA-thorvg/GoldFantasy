@@ -1,9 +1,13 @@
 import { Person, Activity } from '../../engine/src/person';
-import { appearanceOf, Mood } from '../../engine/src/person-look';
+import { Mood } from '../../engine/src/person-look';
 export { Mood } from '../../engine/src/person-look';
+import { likenessOf } from '../../engine/src/character-cast';
+import { equippedItem } from '../../engine/src/equipment';
 import { f32 } from '../../engine/src/numeric';
 import { SceneNode, ShapeNode } from './paint';
-import { characterHead, characterPortraitPlacement } from './character-assets';
+import { drawBust } from './calling-bust';
+import { wardrobeOf } from './calling-garments';
+import { drawHead, expressionOf, portraitFinish } from './likeness-head';
 import { portraitBackground, type PortraitBackdrop } from './portrait-background';
 export function moodOf(p: Person): Mood {
   if (p.activity === Activity.Sleeping && !p.moving() && !p.crossingDoorway()) return Mood.Asleep;
@@ -25,16 +29,32 @@ export function moodName(mood: Mood): string {
 }
 export function personPortrait(
   person: Person,
-  _mood: Mood,
+  mood: Mood,
   width: number,
   height: number,
   backdrop: PortraitBackdrop,
 ): SceneNode {
   const frame = new SceneNode().add(portraitBackground(backdrop, width, height)),
-    look = appearanceOf(person),
-    figure = characterHead(look),
-    placement = characterPortraitPlacement(look, width, height);
-  figure.transform([placement.scale, 0, placement.origin.x, 0, placement.scale, placement.origin.y, 0, 0, 1]);
+    look = likenessOf(person),
+    // What is really worn shows here as it does on the street figure.
+    gear = equippedItem(person, 'head')?.id,
+    armour = equippedItem(person, 'body')?.id,
+    head = drawHead(
+      look,
+      portraitFinish,
+      expressionOf(look, mood),
+      gear === 'cap' || gear === 'helmet' ? gear : null,
+    ),
+    bust = drawBust(
+      look,
+      wardrobeOf(person),
+      portraitFinish,
+      armour === 'leather-armor' || armour === 'mail-armor' ? armour : null,
+    ),
+    figure = new SceneNode().add(bust.back).add(head.back).add(bust.front).add(head.front),
+    // The head fills most of the frame; the shoulders carry the calling.
+    scale = Math.min(f32(width * f32(0.335)), f32(height * f32(0.262)));
+  figure.transform([scale, 0, f32(width * f32(0.5)), 0, scale, f32(height * f32(0.47)), 0, 0, 1]);
   frame.add(figure);
   const r = f32(Math.min(width, height) * f32(0.035));
   frame.clip(new ShapeNode().appendRect(0, 0, width, height, r, r));

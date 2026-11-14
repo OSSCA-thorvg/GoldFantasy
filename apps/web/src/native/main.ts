@@ -9,7 +9,7 @@ const element = document.querySelector('#world');
 if (!(element instanceof HTMLCanvasElement)) throw new Error('Midgard canvas is missing.');
 const query = new URLSearchParams(location.search),
   renderer = query.get('renderer');
-const backend = renderer === 'sw' ? 'sw' : renderer === 'wg' || renderer === 'wgpu' ? 'wg' : 'gl';
+const backend = renderer === 'wg' || renderer === 'wgpu' ? 'wg' : 'gl';
 const audio = captureStartupAudio(document.querySelector<HTMLElement>('#startup-audio-hint')!);
 const canvasReady = initializeWebCanvas(backend);
 // The splash can finish loading after a failed graphics request; handle that

@@ -80,7 +80,7 @@ try {
       import('/packages/engine/src/work-timing.ts'),
       import('/packages/engine/src/equipment.ts'),
     ]);
-    const tvg = await initializeWebCanvas('sw'),
+    const tvg = await initializeWebCanvas('gl'),
       element = document.createElement('canvas');
     document.body.append(element);
     const canvas = new tvg.Canvas(element, { width: 640, height: 480, enableDevicePixelRatio: false }),

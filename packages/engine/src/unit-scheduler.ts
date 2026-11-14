@@ -5,12 +5,16 @@ import { Building } from './town-models';
 import { Structure } from './building-catalog';
 import { add, distance, normalized, point, rotated, scale, sub } from './geometry';
 import { f32 as f } from './numeric';
+import { healthCap } from './resident-wounds';
+import type { Road } from './road-network';
 import { automaticConstructionAllowed, hasUnfinishedRoadwork, registerAutomaticConstruction } from './automatic-work';
 
 export function orderAutomatic(this: Town, ids: number[]): void {
+  this.commanded();
   for (const p of this.folk) {
     if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
     p.autoMode = true;
+    p.holding = false;
     p.ordered = p.approachingOrder = p.hunting = false;
     p.recoveringRest = p.recoveringHealth = false;
     p.trainingCalling = -1;
@@ -26,6 +30,20 @@ export function orderAutomatic(this: Town, ids: number[]): void {
 // chain intact, and selects roads before buildings. Once road work is accepted,
 // ordinary needs wait for completion; only combat or a new player order interrupts.
 // Explicit Stop/Auto OFF is the sole idle hold.
+/** A road its crew will finish before this resident could walk there is not worth setting out for. */
+function roadWorthJoining(town: Town, p: Person, road: Road): boolean {
+  if (road.built >= 1 || road.materials.limit() < 1) return true;
+  const crew = town.folk.filter(
+    (other) =>
+      other.id !== p.id &&
+      other.health > 0 &&
+      other.task === Activity.Roadwork &&
+      (other.taskSite === road.id || other.target === road.id),
+  ).length;
+  if (!crew) return true;
+  const remaining = ((1 - road.built) * Math.max(1, road.length())) / (0.32 * 0.7 * crew);
+  return remaining > distance(p.position, road.workPoint()) + 2;
+}
 export function scheduleAutomatic(this: Town, p: Person): boolean {
   if (p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || p.activity === Activity.Leaving) return false;
   if (p.faction !== this.controlFaction) return false;
@@ -41,11 +59,12 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
   }
   const directWork = p.ordered && p.task === Activity.Working;
   if ((p.ordered && !directWork) || p.approachingOrder) return true;
-  if (!p.autoMode && !directWork) return false;
+  // Beyond a gate nobody farms, sleeps or builds: the party only follows orders.
+  if ((!p.autoMode && !directWork) || this.inRealm(p.position)) return false;
   // A player-selected workplace is an ongoing order, not just a trip to its
   // door. Night is a routine Auto preference; critical care still takes priority.
   const night = !directWork && this.climate().night > f(.5);
-  if (p.health >= 1) p.recoveringHealth = false;
+  if (p.health >= healthCap(p)) p.recoveringHealth = false;
   if (p.rest >= f(.95)) p.recoveringRest = false;
   const care = (place: Building | null, activity: Activity): boolean => {
     if (p.activity === activity && p.target === (place?.id ?? -1)) return true;
@@ -58,7 +77,7 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
   if (p.activity === Activity.Eating || p.activity === Activity.Drinking) return true;
   if (p.activity === Activity.Treating) {
     const clinic = this.building(p.target);
-    if (p.health < 1 && clinic?.built() && clinic.workers > 0) return true;
+    if (p.health < healthCap(p) && clinic?.built() && clinic.workers > 0) return true;
     p.activity = Activity.Idle;
   }
   // Hunger may interrupt recovery; its stored flags survive the meal.
@@ -108,7 +127,7 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
     if (this.resumeOrder(p) && Number(p.task) !== Activity.Idle) return true;
   }
   if (p.activity === Activity.Collecting || p.activity === Activity.Hauling) return true;
-  if (p.carrying > 0 && this.haulCargo(p)) return true;
+  if (p.carrying > 0 && !this.keepCargo(p) && this.haulCargo(p)) return true;
   const automatic = (accepted: boolean): boolean => {
     if (accepted) {
       registerAutomaticConstruction(this, p, p.task, p.taskSite);
@@ -117,7 +136,7 @@ export function scheduleAutomatic(this: Town, p: Person): boolean {
     return accepted;
   };
   for (const road of this.network.roads())
-    if ((road.built < 1 || road.paving >= 0 || road.wear > 0) && automaticConstructionAllowed(this,p,Activity.Roadwork,road.id) && automatic(this.orderRoadwork([p.id], road.id))) return true;
+    if ((road.built < 1 || road.paving >= 0 || road.wear > 0) && automaticConstructionAllowed(this,p,Activity.Roadwork,road.id) && roadWorthJoining(this, p, road) && automatic(this.orderRoadwork([p.id], road.id))) return true;
   for (const b of this.placed)
     if ((!b.built() || b.health < 1) && automaticConstructionAllowed(this,p,Activity.Building,b.id) && automatic(this.orderBuild([p.id], b.id))) return true;
 

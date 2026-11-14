@@ -114,7 +114,7 @@ describe('presented world inspection', () => {
   });
   it('takes new landmark geometry after camera/repaint changes and rejects invalidated or absent art', () => {
     const { app, geometry } = fixture();
-    expect(worldTarget(app, { kind: 'landmark', id: 0 })!.name).toBe('Ymir');
+    expect(worldTarget(app, { kind: 'landmark', id: 0 })!.name).toBe('Odin');
     const updated = { ...geometry.get('landmark:0')!, bounds: { x: 50, y: -100, w: 800, h: 1160 } };
     geometry.set('landmark:0', updated);
     expect(worldTarget(app, { kind: 'landmark', id: 0 })!.geometry).toBe(updated);
@@ -162,7 +162,7 @@ it('shows a static landmark description without building or unit command actions
     },
   });
   worldObjectPanel.call(app as any, new Rect(0, 0, 420, 148));
-  expect(text).toContain('Ymir');
-  expect(text.some((s) => s.includes('primordial giant'))).toBe(true);
+  expect(text).toContain('Odin');
+  expect(text.some((s) => s.includes('Allfather'))).toBe(true);
   expect(controls).toEqual(['objects-prev', 'objects-next']);
 });

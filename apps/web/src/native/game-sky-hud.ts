@@ -14,6 +14,7 @@ import type { Paint, Scene, Shape, ThorVGNamespace } from '@thorvg/webcanvas';
 import { f32 as f, clamp, lround } from '../../../../packages/engine/src/numeric';
 import type { GameHudApp } from './game-hud-contract';
 import { skyMural as mural } from './hud-assets';
+import { winterOutlookLine, winterLineHeight } from './camp-resource-hud';
 const revealDuration = f(0.18),
   controlStep = 34,
   panelWidth = 6 * controlStep + 8;
@@ -247,7 +248,13 @@ export function calendarDetails(this: GameHudApp, width: number): void {
     date = this.town.calendar(),
     sky = this.town.climate(),
     w = Math.min(288, width - 24),
-    panel = new Rect(f(f(width - w) / 2), f(f(this.skyBounds.y + this.skyBounds.h) + 10), w, 154);
+    winter = winterOutlookLine(this.town),
+    panel = new Rect(
+      f(f(width - w) / 2),
+      f(f(this.skyBounds.y + this.skyBounds.h) + 10),
+      w,
+      winter ? 154 + winterLineHeight + 4 : 154,
+    );
   c.rect(new Rect(panel.x, panel.y + 3, panel.w, panel.h), rgba(0, 0, 0, 70), t.radius);
   c.rect(panel, { ...t.raised, a: 255 }, t.radius, t.border);
   c.line(panel.x + 12, panel.y, f(f(panel.x + panel.w) - 12), panel.y, { ...t.accent, a: 150 });
@@ -284,6 +291,17 @@ export function calendarDetails(this: GameHudApp, width: number): void {
     11,
     true,
   );
+  if (winter) {
+    c.line(panel.x + 16, panel.y + 154, f(f(panel.x + w) - 16), panel.y + 154, t.border);
+    c.text(
+      new Rect(panel.x + 12, panel.y + 158, w - 24, winterLineHeight - 2),
+      c.elideText(winter.text, w - 24, 11, winter.short),
+      winter.short ? t.danger : t.text,
+      11,
+      winter.short,
+      Align.Center,
+    );
+  }
 }
 export function timeControls(this: GameHudApp, width: number): void {
   const c = this.context,

@@ -10,6 +10,7 @@ import { SceneNode, ShapeNode, PictureNode } from './paint';
 import { softDisc } from './vector-paint';
 import { brightest } from './light-flicker';
 import { fitToView } from './world-ground';
+import { lightLava } from './lava-motion';
 export function buildDarkness(s: WorldRendererState, map: WorldMap): void {
   s.darkness.remove();
   const top = project(0, 0),
@@ -29,6 +30,7 @@ export function buildDarkness(s: WorldRendererState, map: WorldMap): void {
     pool.tint = softDisc(f32(pool.rx * f32(0.8)), pool.warmth, 255);
     s.warmth.add(pool.tint);
   }
+  lightLava(s, lit);
   dark.mask(lit, 'inverseAlpha');
   s.darkness.add(dark);
   fitToView(s, true);

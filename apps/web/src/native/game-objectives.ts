@@ -1,32 +1,47 @@
-import { Rect, Align, ButtonStyle, button } from '../../../../packages/native-ui/src';
+import { translate } from '../../../../packages/localization/src/index';
+import { Rect, Align, ButtonStyle, EventType, button } from '../../../../packages/native-ui/src';
 import { lerpFloat } from '../../../../packages/native-ui/src/numeric';
 import {
   settlementGoals,
   goalComplete,
+  goalProgress,
+  currentGoal,
+  goalBranchName,
+  GoalBranch,
   GoalKind,
+  unsourcedMaterial,
 } from '../../../../packages/engine/src/settlement-progression';
-import { Tool, Order, toolStructure } from '../../../../packages/engine/src/game-tools';
+import { Tool, Order } from '../../../../packages/engine/src/game-tools';
 import { compactViewport } from './mobile-layout';
-import { project } from '../../../../packages/engine/src/geometry';
 import { f32, clamp } from '../../../../packages/engine/src/numeric';
-import { structureSpec, describe } from '../../../../packages/engine/src/building-catalog';
+import { describe, Product, Structure } from '../../../../packages/engine/src/building-catalog';
 import {
   constructionProducts,
   resourceAmount,
   resourceBundle,
 } from '../../../../packages/engine/src/construction-materials';
 import type { Building } from '../../../../packages/engine/src/town-models';
+import { sealProgress } from '../../../../packages/engine/src/gate-seals';
+import { isPlayerBuilding } from '../../../../packages/engine/src/faction';
 import type { GameHudApp } from './game-hud-contract';
+import { questAction, boonTip } from './game-progress-hud';
+import { craftBars } from './craft-station-hud';
 export function objectives(this: GameHudApp, width: number, height: number, top: number): void {
+  // Work at a crafting station shows over it in the world.
+  craftBars(this, width, height);
   const compact = this.touchMode && compactViewport(width, height);
   if (compact && (this.tool !== Tool.Select || this.pending !== Order.None)) return;
   const goals = settlementGoals();
-  let completed = 0,
-    current = goals.length;
-  for (let i = 0; i < goals.length; i++) {
-    if (goalComplete(this.town, goals[i])) ++completed;
-    else if (current === goals.length) current = i;
-  }
+  let completed = 0;
+  for (const goal of goals) if (goalComplete(this.town, goal)) ++completed;
+  // The founding chain is ordered; afterwards the player picks which branch to follow.
+  const branches = [GoalBranch.Trade, GoalBranch.Arms, GoalBranch.Faith, GoalBranch.Saga],
+    core = currentGoal(this.town, GoalBranch.Core),
+    open = branches.filter((branch) => currentGoal(this.town, branch) >= 0);
+  if (core < 0 && open.length && !open.includes(this.questBranch)) this.questBranch = open[0];
+  const picked = core >= 0 ? core : currentGoal(this.town, this.questBranch),
+    current = picked < 0 ? goals.length : picked,
+    seals = sealProgress(this.town);
   const c = this.context,
     t = this.theme,
     now = c.time();
@@ -83,21 +98,28 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
       .stroke({ width: f32(1.2), color: [ink.r, ink.g, ink.b, ink.a] });
   });
   c.text(
-    new Rect(f32(bounds.x + 38), f32(y + 7), f32(w - (compact && collapsed ? 50 : 148)), 24),
+    new Rect(f32(bounds.x + 38), f32(y + 7), f32(w - (compact && collapsed ? 50 : 196)), 24),
     compact && collapsed ? `Quests ${completed}/${goals.length}` : 'Quests',
     t.text,
     compact && collapsed ? 11 : 13,
     true,
   );
-  if (!compact || !collapsed)
+  if (!compact || !collapsed) {
+    const counter = new Rect(f32(f32(bounds.x + w) - 172), f32(y + 9), 128, 20);
     c.text(
-      new Rect(f32(f32(bounds.x + w) - 102), f32(y + 9), 58, 20),
-      completed + ' / ' + goals.length,
+      counter,
+      (seals.total ? `Gates ${seals.sealed}/${seals.total}   ` : '') + completed + ' / ' + goals.length,
       t.muted,
       10,
       false,
       Align.End,
     );
+    // Sealed worlds' boons are listed on hover or focus of the counter.
+    if (seals.sealed) {
+      const state = c.control('quest-boons', counter, undefined, true, true);
+      if (state.hovered || state.focused) boonTip(this, counter);
+    }
+  }
   if (h < 76) return;
   c.clip(bounds.inset(6), () => {
     if (current === goals.length) {
@@ -106,7 +128,25 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
       return;
     }
     const goal = goals[current];
-    c.text(new Rect(left, f32(y + 42), f32(w - 28), 16), 'Current quest', t.accent, 9, true);
+    if (core >= 0) c.text(new Rect(left, f32(y + 42), f32(w - 28), 16), 'Current quest', t.accent, 9, true);
+    else {
+      const tab = f32(f32(w - 28) / branches.length);
+      branches.forEach((branch, index) => {
+        const done = !open.includes(branch),
+          area = new Rect(f32(left + f32(tab * index)), f32(y + 38), tab, 20);
+        c.control('quest-branch/' + branch, area, (event) => {
+          if (event.type === EventType.Activate && !done) this.questBranch = branch;
+        });
+        c.text(
+          area,
+          goalBranchName(branch),
+          done ? t.success : branch === this.questBranch ? t.accent : t.muted,
+          10,
+          branch === this.questBranch,
+          Align.Center,
+        );
+      });
+    }
     c.text(new Rect(left, f32(y + 61), f32(w - 28), 23), goal.title, t.text, 14, true);
     let words = '',
       row = '',
@@ -121,28 +161,28 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
       } else row = next;
       words = '';
     };
-    for (const character of goal.description) {
+    for (const character of translate(goal.description)) {
       if (character === ' ') flush();
       else words = words.concat(character);
     }
     flush();
     if (row && descriptionY < f32(y + 117))
       c.text(new Rect(left, descriptionY, f32(w - 28), 16), row, t.muted, 10);
-    let progress = 0,
-      status = 'Not started',
-      action = '',
+    const measured = goalProgress(this.town, goal),
+      action = questAction(this, goal);
+    let progress = f32(measured.have / Math.max(1, measured.need)),
+      status = measured.label,
+      warn = false,
       site: Building | null = null;
-    if (goal.kind === GoalKind.Building) {
-      action = 'Place ' + structureSpec(goal.building).name;
+    if (goal.kind === GoalKind.Building && !measured.have) {
       for (const b of this.town.buildings())
-        if (b.kind === goal.building && !b.built()) {
+        if (b.kind === goal.building && !b.built() && isPlayerBuilding(b)) {
           site = b;
           break;
         }
       if (site) {
         progress = site.progress;
-        action = 'Find construction site';
-        status = 'Building ' + Math.trunc(f32(progress * 100)) + '%';
+        status = `${measured.label} · ${Math.trunc(f32(progress * 100))}%`;
         if (site.materials.limit() < 1) {
           status = 'Materials: ';
           let first = true;
@@ -156,19 +196,31 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
                   describe(resourceBundle(product, resourceAmount(site.materials.required, product))),
               );
             }
+          // Builders give up quietly when nothing is in sight; say what is missing and how to get it.
+          const lacking = unsourcedMaterial(this.town, site);
+          if (lacking !== null) {
+            warn = true;
+            status =
+              lacking === Product.Stone
+                ? 'No rock in sight: send a resident out to explore'
+                : 'No trees in sight: send a resident out to explore';
+          }
         }
       }
-    } else if (goal.kind === GoalKind.Road) {
-      action = 'Draw a road';
-      for (const road of this.town.roads().roads()) progress = Math.max(progress, road.built);
+    } else if (goal.kind === GoalKind.Population && measured.have < measured.need) {
+      const altar = this.town.buildings().find((b) => b.kind === Structure.Shrine && b.built() && isPlayerBuilding(b));
+      const reason = altar ? this.town.altarStatus(altar.id).reason : '';
+      if (reason) status = `${measured.label} · ${reason}`;
+    } else if (goal.kind === GoalKind.Road && !measured.have) {
+      for (const road of this.town.roads().roads()) progress = Math.max(progress, f32(road.built));
       if (this.town.roads().roads().length) status = 'Laying road ' + Math.trunc(f32(progress * 100)) + '%';
-    } else if (goal.kind === GoalKind.Field) action = 'Plant a field';
-    else {
-      action = 'Build housing';
-      progress = f32(this.town.population() / Math.max(1, goal.residents));
-      status = this.town.population() + ' / ' + goal.residents + ' residents';
     }
-    c.text(new Rect(left, f32(y + 127), f32(w - 28), 18), c.elideText(status, f32(w - 28), 10), t.text, 10);
+    c.text(
+      new Rect(left, f32(y + 127), f32(w - 28), 18),
+      c.elideText(status, f32(w - 28), 10),
+      warn ? t.danger : t.text,
+      10,
+    );
     const displayed = c.animate('quests/progress/' + current, clamp(progress, 0, 1), 0.2);
     c.rect(new Rect(left, f32(y + 152), f32(w - 28), 3), t.border);
     c.rect(new Rect(left, f32(y + 152), f32(f32(w - 28) * displayed), 3), t.accent);
@@ -176,31 +228,13 @@ export function objectives(this: GameHudApp, width: number, height: number, top:
       const at = f32(left + f32(f32(f32(w - 28) * i) / 4));
       c.line(at, f32(y + 150), at, f32(y + 157), f32(i / 4) <= displayed ? t.accent : t.border, f32(0.8));
     }
-    if (expanded < 200) return;
+    if (expanded < 200 || !action) return;
     button(
       c,
       'quest-action/' + current,
       new Rect(left, f32(y + (this.touchMode ? 160 : 171)), f32(w - 28), this.touchMode ? 44 : 29),
-      action,
-      () => {
-        if (goal.kind === GoalKind.Building) {
-          for (const b of this.town.buildings())
-            if (b.kind === goal.building && !b.built()) {
-              this.selectBuilding(b.id);
-              const p = project(b.center.x, b.center.y);
-              this.camera.x = p.x;
-              this.camera.y = p.y;
-              return;
-            }
-          for (let i = 0; i < Tool.Count; i++)
-            if (toolStructure(i) === goal.building) {
-              this.selectTool(i);
-              return;
-            }
-        } else if (goal.kind === GoalKind.Road) this.selectTool(Tool.Road);
-        else if (goal.kind === GoalKind.Field) this.selectTool(Tool.Field);
-        else this.selectTool(Tool.Tent);
-      },
+      action.label,
+      action.run,
       ButtonStyle.Primary,
       reveal > f32(0.98),
     );

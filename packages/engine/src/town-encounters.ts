@@ -1,15 +1,19 @@
 import { nativeRandomRadial } from './native-random-order';
 // Translated from Town::stir in src/game/town_monsters.cpp.
 import { TownState } from './town-state';
-import { Activity, Calling, Role, type Monster, type Person, type Expedition } from './person';
+import { Activity, Calling, Role, type Monster, type Person } from './person';
 import { Resources, Structure } from './building-catalog';
 import type { Building } from './town-models';
 import type { CampEconomy } from './camp-economy';
 import { point, add, sub, scale, rotated, normalized, distance, type Point } from './geometry';
 import { f32 as f, lround } from './numeric';
-import { breedOf, steps } from './town-monsters';
+import { breedOf, lairOf, monsterBite, steps } from './town-monsters';
+import { raidDue, raidKind, raidWarning } from './raid-progression';
+import { combatRules } from './combat-events';
+import { gateSealed, sealable } from './gate-seals';
+import { Season, type Calendar } from './town-models';
 import { planRaiderApproach, separateMonsters } from './monster-navigation';
-import { armorProtection } from './equipment';
+import { choosePrey, rankPace, tauntedBy } from './monster-ranks';
 export interface EncounterTown extends TownState {
   wakeGiants(): void;
   stirWildlife(dt: number): void;
@@ -26,14 +30,22 @@ export interface EncounterTown extends TownState {
   settlementAt(at: Point): number;
   credit(gain: Resources, id: number): void;
   economy(id: number): CampEconomy;
-  returnFrom(party: Expedition): void;
+  advanceRealm(dt: number): void;
+  defendSettlement(dt: number): void;
+  realmKill(beast: Monster): void;
+  tallyKill(beast: Monster): void;
+  strikeDown(p: Person, cause: string, notice?: string): void;
+  settlementOf(p: Person | Building): number;
+  inRealm(p: Point): boolean;
+  calendar(): Calendar;
 }
 export function stir(this: EncounterTown, dt: number): void {
   this.blows = this.blows.filter((h) => !(this.time - h.at > 2));
+  this.events = this.events.filter((event) => !(this.time - event.at > combatRules.eventSeconds));
   this.wakeGiants();
   this.stirWildlife(dt);
   const fire = this.camp(),
-    roaming = this.beasts.filter((m) => !m.raider && !m.giant()).length;
+    roaming = this.beasts.filter((m) => !m.raider && !m.giant() && !this.inRealm(m.home)).length;
   if (
     fire &&
     this.days >= 1 &&
@@ -49,6 +61,16 @@ export function stir(this: EncounterTown, dt: number): void {
       break;
     }
   }
+  const due = raidDue(this.world.seed(), this.days, this.calendar().season === Season.Winter);
+  if (fire && fire.built() && due && this.dayFraction() > f(0.3) && this.raidWarnedDay !== this.days) {
+    this.raidWarnedDay = this.days;
+    const gate = this.world
+      .dungeons()
+      .map((site, index) => ({ site, index }))
+      .filter((g) => sealable(g.site) && g.site.discovered && !gateSealed(this, g.index))
+      .sort((a, b) => distance(lairOf(a.site), fire.center) - distance(lairOf(b.site), fire.center))[0];
+    if (gate) this.notify(raidWarning(raidKind(this.world.seed(), this.days), gate.site.name));
+  }
   if (
     fire &&
     fire.built() &&
@@ -57,27 +79,32 @@ export function stir(this: EncounterTown, dt: number): void {
     this.raidedDay !== this.days
   ) {
     this.raidedDay = this.days;
-    this.summonRaid();
+    if (due) this.summonRaid();
   }
   const raidOn = this.raiding();
+  this.defendSettlement(dt);
   for (const beast of this.beasts) {
-    if (beast.health <= 0) continue;
+    if (beast.health <= 0 || this.inRealm(beast.home)) continue;
     if (beast.giant() && (beast.insideLair || (!this.giantsAwake() && !beast.angry))) {
       this.roamGiant(beast, dt);
       continue;
     }
     const breed = breedOf(this.world.dungeons()[beast.lair].kind);
-    let prey: Person | undefined;
     const scent = beast.raider ? 9 : beast.angry ? 7 : 4;
-    for (const p of this.folk)
-      if (!beast.giant() || (p.id === beast.provokedBy && distance(p.position, beast.home) <= 7))
-        if (
-          !p.inside &&
-          p.health > 0 &&
-          distance(p.position, beast.position) < scent &&
-          (!prey || distance(p.position, beast.position) < distance(prey.position, beast.position))
-        )
-          prey = p;
+    let prey = tauntedBy(this, beast, scent * 1.5) ?? undefined;
+    if (!prey)
+      prey =
+        choosePrey(
+          beast,
+          this.folk.filter(
+            (p) =>
+              (!beast.giant() || (p.id === beast.provokedBy && distance(p.position, beast.home) <= 7)) &&
+              !p.inside &&
+              p.health > 0 &&
+              p.downedAt < 0 &&
+              distance(p.position, beast.position) < scent,
+          ),
+        ) ?? undefined;
     if (prey) {
       const gap = distance(prey.position, beast.position);
       beast.path = [];
@@ -87,7 +114,7 @@ export function stir(this: EncounterTown, dt: number): void {
           beast.position,
           scale(
             normalized(sub(prey.position, beast.position)),
-            Math.min(gap, f(f(breed.speed * f(0.8)) * f(dt))),
+            Math.min(gap, f(f(breed.speed * f(0.8) * rankPace(beast)) * f(dt))),
           ),
         );
         const stone = (at: Point): boolean => this.world.giant()?.covers(at) ?? false;
@@ -104,28 +131,7 @@ export function stir(this: EncounterTown, dt: number): void {
         )
           beast.position = next;
       } else if (this.time >= beast.ready) {
-        const bite = f(breed.bite * beast.strength * (1 - armorProtection(prey)));
-        prey.health = f(prey.health - f(bite / prey.vitalityMultiplier()));
-        this.blows.push({
-          serial: this.nextBlow++,
-          from: { ...beast.position },
-          to: { ...prey.position },
-          damage: Math.max(1, lround(f(bite * 100))),
-          onPerson: true,
-          ranged: false,
-          at: this.time,
-          person: prey.id,
-        });
-        prey.stress = Math.min(1, f(prey.stress + f(0.03)));
-        beast.ready = this.time + breed.pause;
-        this.hurtGuest(prey, prey.health <= 0);
-        if (prey.health <= 0) {
-          this.notify(
-            prey.name + (beast.giant() ? ' was killed by a provoked giant' : ' was killed by monsters'),
-          );
-          prey.activity = Activity.Leaving;
-          prey.health = -1;
-        }
+        monsterBite(this, beast, prey, breed);
       }
       continue;
     }
@@ -145,7 +151,7 @@ export function stir(this: EncounterTown, dt: number): void {
       ];
     }
     this.wreck(beast, dt);
-    let step = f((beast.raider ? f(breed.speed * f(0.8)) : f(0.5)) * f(dt));
+    let step = f((beast.raider ? f(breed.speed * f(0.8) * rankPace(beast)) : f(0.5)) * f(dt));
     while (step > 0 && beast.path.length) {
       const gap = distance(beast.position, beast.path[0]),
         next =
@@ -167,8 +173,13 @@ export function stir(this: EncounterTown, dt: number): void {
   separateMonsters(this, dt);
   for (const beast of this.beasts) {
     if (beast.health > 0) continue;
+    this.tallyKill(beast);
+    if (this.inRealm(beast.home)) {
+      this.realmKill(beast);
+      continue;
+    }
     const bounty = lround(
-        f(breedOf(this.world.dungeons()[beast.lair].kind).health * (beast.raider ? f(1.5) : f(1.2))),
+        f(breedOf(this.world.dungeons()[beast.lair].kind).health * (beast.raider ? f(0.5) : f(0.4))),
       ),
       village = this.settlementAt(beast.position);
     this.credit(new Resources(bounty), village);
@@ -179,15 +190,9 @@ export function stir(this: EncounterTown, dt: number): void {
   }
   this.beasts = this.beasts.filter((m) => m.health > 0);
   if (raidOn && !this.raiding()) {
+    ++this.chronicle.raidsRepelled;
     this.notify(`The raid is beaten off (${this.raidKills} slain, +${this.raidBounty} gold)`);
     this.raidKills = this.raidBounty = 0;
   }
-  for (const party of this.parties) {
-    party.members = party.members.filter((id) => !!this.person(id));
-    if (!party.members.length) continue;
-    const inside = party.members.every((id) => this.person(id)!.inside);
-    if (inside && party.returnAt < 0) party.returnAt = this.time + TownState.secondsPerDay * 0.5;
-    if (party.returnAt > 0 && this.time >= party.returnAt) this.returnFrom(party);
-  }
-  this.parties = this.parties.filter((e) => e.members.length > 0);
+  this.advanceRealm(dt);
 }

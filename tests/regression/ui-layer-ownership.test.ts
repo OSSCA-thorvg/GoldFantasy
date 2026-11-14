@@ -117,6 +117,8 @@ it('reuses animated camp receipt icons across changed clipped HUD layouts', asyn
     receipts: () => receipts,
     clock: () => clock,
     camp: () => ({ kind: Structure.Camp }),
+    // Spring: the stores show no winter outlook.
+    calendar: () => ({ season: 0 }),
     stock: () => new Resources(100, 100, 100, 100, 100, 100),
     capacity: () => new Resources(100, 100, 100, 100, 100, 100),
     renown: () => 10,

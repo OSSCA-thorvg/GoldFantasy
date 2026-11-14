@@ -56,7 +56,7 @@ export function refreshHoveredTarget(app: GameCommandApp): void {
 
 export const landmarkDescription = (id: number): string =>
   [
-    'Ymir, the primordial giant. An ancient stone landmark beside the founding shore.',
+    'Odin, the Allfather. An ancient stone statue beside the founding shore.',
     'Fire Mountain. A volcanic landmark with lava flows and a smoking crater.',
     'Hvergelmir. The deep northern spring from which the rivers flow.',
   ][id] ?? '';
@@ -103,7 +103,7 @@ export function worldTarget(app: GameCommandApp, ref: WorldObjectRef): WorldTarg
       if (town.field(ref.id)) name = 'Field';
       break;
     case 'landmark':
-      name = ['Ymir', 'Fire Mountain', 'Hvergelmir'][ref.id];
+      name = ['Odin', 'Fire Mountain', 'Hvergelmir'][ref.id];
       break;
   }
   return name ? { ...ref, key: targetKey(ref), name, bounds: geometry.bounds, geometry } : null;

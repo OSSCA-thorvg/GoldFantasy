@@ -43,6 +43,9 @@ export interface GameHudApp extends GameAppState {
   rosterBounds(width: number, height: number): Rect;
   rosterPanel(panel: Rect): void;
   objectives(width: number, height: number, top: number): void;
+  realmPanel(width: number, height: number): void;
+  realmRewardBanner(width: number, height: number): void;
+  sagaBanner(width: number, height: number): void;
   skyMural(width: number): void;
   calendarDetails(width: number): void;
   timeControls(width: number): void;

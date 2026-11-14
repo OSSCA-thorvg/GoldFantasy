@@ -68,6 +68,8 @@ export class ShapeNode extends PaintNode {
   readonly type = 'shape' as const;
   commands: Command[] = [];
   pathVersion = 0;
+  /** Bumped by fill and stroke setters only, so a move or a fade re-sends no style. */
+  styleVersion = 0;
   color?: Rgba;
   gradient?: Gradient;
   strokeColor?: Rgba;
@@ -115,42 +117,50 @@ export class ShapeNode extends PaintNode {
   fill(r: number, g: number, b: number, a = 255): this {
     this.color = [r & 255, g & 255, b & 255, a & 255];
     this.gradient = undefined;
+    this.styleVersion++;
     this.version++;
     return this;
   }
   fillGradient(gradient: Gradient): this {
     this.gradient = gradient;
     this.color = undefined;
+    this.styleVersion++;
     this.version++;
     return this;
   }
   strokeFill(r: number, g: number, b: number, a = 255): this {
     this.strokeColor = [r & 255, g & 255, b & 255, a & 255];
+    this.styleVersion++;
     this.version++;
     return this;
   }
   strokeWidth(value: number): this {
     this.width = f(value);
+    this.styleVersion++;
     this.version++;
     return this;
   }
   strokeCap(value: 'butt' | 'round' | 'square'): this {
     this.cap = value;
+    this.styleVersion++;
     this.version++;
     return this;
   }
   strokeJoin(value: 'miter' | 'round' | 'bevel'): this {
     this.join = value;
+    this.styleVersion++;
     this.version++;
     return this;
   }
   strokeDash(value: number[]): this {
     this.dash = value.map(f);
+    this.styleVersion++;
     this.version++;
     return this;
   }
   fillRule(value: 'winding' | 'evenOdd'): this {
     this.rule = value;
+    this.styleVersion++;
     this.version++;
     return this;
   }

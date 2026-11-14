@@ -1,6 +1,9 @@
 // Translated from src/game/save_game.cpp. Browser storage is owned by the host.
+import { MonsterRank, type Fallen } from './combat-events';
 import {
   SaveArchive,
+  sealSave,
+  writeFloats,
   raw,
   record,
   vector,
@@ -108,7 +111,7 @@ const dungeonCodec = record<Dungeon>(
   () => ({ name: '', kind: DungeonKind.Cave, origin: { x: 0, y: 0 }, discovered: false }),
   { name: string, kind: u8, origin: coordCodec, discovered: boolean },
   (v) => {
-    if (v.kind >= 5) throw new Error('Invalid dungeon kind');
+    if (v.kind > DungeonKind.Return) throw new Error('Invalid dungeon kind');
   },
 );
 const riverCodec = record((): River => ({ path: [], width: [] }), {
@@ -122,7 +125,7 @@ function worldFields(a: SaveArchive, v: WorldMap): void {
   v.tiles = a.value(vector(tileCodec), v.tiles);
   for (let i = 0; i < Layer.Count; ++i) {
     if (a.reading) v.layers[i] = new Float32Array(vector(f32).read(a));
-    else vector(f32).write(a, v.layers[i]);
+    else writeFloats(a, v.layers[i]);
   }
   a.fields(v, {
     stream: riverCodec,
@@ -208,10 +211,45 @@ const buildingCodec = record(
   },
 );
 const fieldCodec = record(() => new Field(0, []), { id: i32, outline: vector(pointCodec) });
-const expeditionCodec = record<Expedition>(() => ({ dungeon: 0, members: [], returnAt: -1 }), {
+// The third field held the native return time; it now carries the chosen floor.
+const fallenCodec = record<Fallen>(
+  () => ({
+    id: 0,
+    name: '',
+    past: '',
+    look: 0,
+    calling: 0,
+    race: 0,
+    level: 1,
+    days: 0,
+    kills: 0,
+    cause: '',
+    place: '',
+    day: 0,
+    at: 0,
+    position: point(),
+  }),
+  {
+    id: i32,
+    name: string,
+    past: string,
+    look: u32,
+    calling: u8,
+    race: u8,
+    level: i32,
+    days: i32,
+    kills: i32,
+    cause: string,
+    place: string,
+    day: i32,
+    at: f64,
+    position: pointCodec,
+  },
+);
+const expeditionCodec = record<Expedition>(() => ({ dungeon: 0, members: [], floor: 0 }), {
   dungeon: i32,
   members: vector(i32),
-  returnAt: f64,
+  floor: f64,
 });
 function monsterFields(a: SaveArchive, v: Monster): void {
   a.fields(v, {
@@ -231,6 +269,17 @@ function monsterFields(a: SaveArchive, v: Monster): void {
   if (a.formatVersion >= 9) {
     a.fields(v, { strength: f32 });
     if (!Number.isFinite(v.strength) || v.strength <= 0) throw new Error('Invalid monster strength');
+  }
+  if (a.formatVersion >= 15) {
+    a.fields(v, { rank: u8, vigor: f32, windupUntil: f64 });
+    const most = a.formatVersion >= 16 ? MonsterRank.Den : MonsterRank.Guardian;
+    if (a.reading && (v.rank > most || !Number.isFinite(v.vigor) || v.vigor < 0))
+      throw new Error('Invalid monster rank');
+  }
+  // Version 16: swarms. A monster's den; the den's brood is found again by this link after a load.
+  if (a.formatVersion >= 16) {
+    a.fields(v, { brood: i32 });
+    if (a.reading && v.brood < -1) throw new Error('Invalid monster brood');
   }
   if (v.race !== null && v.race >= 3) throw new Error('Invalid creature race');
 }
@@ -368,6 +417,34 @@ function personFields(a: SaveArchive, v: Person): void {
         v.craftWorkshop < -1 || (v.craftItem !== null && (!item || item.workshop === null || v.craftWorkshop < 0 || v.craftProgress > item.seconds + .25)) ||
         (v.craftItem === null && (v.craftWorkshop !== -1 || v.craftProgress !== 0)))
       throw new Error('Invalid inventory or crafting state');
+  }
+  if (a.formatVersion >= 15) {
+    a.fields(v, {
+      downedAt: f64,
+      kills: i32,
+      abilityReadyAt: f64,
+      abilityUntil: f64,
+      abilityAuto: i32,
+      woundDays: i32,
+    });
+    if (
+      a.reading &&
+      (!Number.isFinite(v.downedAt) ||
+        v.downedAt < -1 ||
+        v.kills < 0 ||
+        v.woundDays < 0 ||
+        v.abilityAuto < -1 ||
+        v.abilityAuto > 1)
+    )
+      throw new Error('Invalid combat record');
+  }
+  if (a.formatVersion >= 16) {
+    a.fields(v, { abilityReadyAt2: f64, abilityUntil2: f64, abilityAuto2: i32, holding: boolean });
+    if (
+      a.reading &&
+      (!Number.isFinite(v.abilityReadyAt2) || !Number.isFinite(v.abilityUntil2) || v.abilityAuto2 < -1 || v.abilityAuto2 > 1)
+    )
+      throw new Error('Invalid second skill');
   }
   if (
     a.reading &&
@@ -551,6 +628,56 @@ function townFields(a: SaveArchive, v: SaveTown): void {
       for (const field of v.farmland) a.fields(field, { faction: i32 });
       a.fields(v, { neutralSettlements: vector(neutralCodec) });
     }
+    if (a.formatVersion >= 14) for (const field of v.farmland) a.fields(field, { tilled: f32 });
+    if (a.formatVersion >= 13) {
+      a.fields(v, {
+        realmGate: i32,
+        realmFloor: i32,
+        realmLoot: resourcesCodec,
+        realmCleared: boolean,
+        realmGuardian: i32,
+      });
+      const area = v.realmArea ?? { x: 0, y: 0, size: 0 };
+      a.fields(area, { x: i32, y: i32, size: i32 });
+      v.realmArea = v.realmGate >= 0 ? area : null;
+      if (
+        a.reading &&
+        v.realmGate >= 0 &&
+        (v.realmGate >= v.world.sites.length ||
+          v.realmFloor < 0 ||
+          area.size <= 0 ||
+          area.x < 0 ||
+          area.y < 0 ||
+          area.x + area.size > v.world.columns ||
+          area.y + area.size > v.world.rows)
+      )
+        throw new Error('Invalid realm');
+    }
+    if (a.formatVersion >= 15) {
+      a.fields(v.chronicle, {
+        raidsRepelled: i32,
+        guardiansSlain: i32,
+        partiesLed: i32,
+        largestParty: i32,
+        rescues: i32,
+        weaponsForged: i32,
+        monstersSlain: i32,
+      });
+      a.fields(v, {
+        fallen: vector(fallenCodec),
+        realmPatrol: vector(i32),
+        realmPatrolAt: f64,
+        realmBroodCalled: boolean,
+        wardUntil: f64,
+      });
+      if (a.reading && (Object.values(v.chronicle).some((count) => count < 0) || !Number.isFinite(v.wardUntil)))
+        throw new Error('Invalid chronicle');
+    }
+    if (a.formatVersion >= 17) {
+      a.fields(v, { told: vector(string) });
+      if (a.reading && (v.told.length > 512 || v.told.some((key) => !key || key.length > 64)))
+        throw new Error('Invalid guide record');
+    }
     const extent = a.cursor - start,
       stored = a.value(u32, extent);
     if (a.reading) {
@@ -676,8 +803,11 @@ function townFields(a: SaveArchive, v: SaveTown): void {
     v.recount();
   }
 }
-export function encodeTown(town: SaveTown): string {
-  const a = new SaveArchive();
+let lastEncodedSize = 1024;
+/** The save without its checksum; sealSave finishes it, on any thread. */
+export function encodeTownPayload(town: SaveTown): Uint8Array {
+  // Saves of one session are about the same size; starting there skips the regrowth copies.
+  const a = new SaveArchive(false, new Uint8Array(lastEncodedSize));
   // Preserve historical v7/v8 encodings unless the settlement uses v9 state.
   const refined = (resources: Resources) => resources.planks !== 0 || resources.cutStone !== 0;
   const newMaterials = (materials: ConstructionMaterials) =>
@@ -724,7 +854,40 @@ export function encodeTown(town: SaveTown): string {
     town.placed.some(b => b.materials.required.bones !== 0 || b.materials.delivered.bones !== 0) ||
     town.network.list.some(r => r.materials.required.bones !== 0 || r.materials.delivered.bones !== 0) ||
     town.folk.some(p => p.carriedProduct === Product.Bones && p.carrying > 0);
-  a.formatVersion = bones
+  // Version 15 carries the combat record: downed and wounded residents, kills,
+  // abilities, monster ranks, the fallen and the chronicle of deeds.
+  const combat =
+    town.fallen.length > 0 ||
+    Object.values(town.chronicle).some((count) => count !== 0) ||
+    town.realmPatrol.length > 0 ||
+    town.realmBroodCalled ||
+    town.wardUntil > 0 ||
+    town.folk.some(
+      (p) =>
+        p.downedAt >= 0 ||
+        p.kills > 0 ||
+        p.abilityReadyAt > 0 ||
+        p.abilityUntil > 0 ||
+        p.abilityAuto !== -1 ||
+        p.woundDays > 0,
+    ) ||
+    [...town.beasts, ...town.animals].some((m) => m.rank !== MonsterRank.Grunt || m.vigor > 0 || m.windupUntil >= 0);
+  // Version 16 carries second skills, hold position and the swarm ranks with their dens.
+  const swarm =
+    town.folk.some((p) => p.abilityReadyAt2 > 0 || p.abilityUntil2 > 0 || p.abilityAuto2 !== -1 || p.holding) ||
+    [...town.beasts, ...town.animals].some((m) => m.rank > MonsterRank.Guardian || m.brood !== -1);
+  // Version 17 carries which first-time explanations the player has been given.
+  a.formatVersion = town.told.length > 0
+    ? 17
+    : swarm
+    ? 16
+    : combat
+    ? 15
+    : town.farmland.some((field) => field.tilled < 1)
+    ? 14
+    : town.realmGate >= 0
+    ? 13
+    : bones
     ? 12
     : equipment
     ? 11
@@ -745,10 +908,11 @@ export function encodeTown(town: SaveTown): string {
     { version: u32, endian: u32, appearanceSize: u32, climateSize: u32 },
   );
   townFields(a, town);
-  u64.write(a, digest(a.buffer()));
-  let text = 'GoldFantasy-save\n';
-  const hex = '0123456789abcdef';
-  for (const byte of a.buffer()) text += hex[byte >> 4] + hex[byte & 15];
+  lastEncodedSize = a.cursor + 4096;
+  return a.buffer();
+}
+export function encodeTown(town: SaveTown): string {
+  const text = sealSave(encodeTownPayload(town));
   if (text.length > maxSaveBytes) throw new Error('Save exceeds size limit');
   return text;
 }
@@ -773,10 +937,10 @@ export function decodeTown<T extends SaveTown>(encoded: string, create: (map: Wo
     endian = u32.read(a),
     appearanceSize = u32.read(a);
   let climateSize = 0;
-  if (version >= 2 && version <= 12) climateSize = u32.read(a);
+  if (version >= 2 && version <= 17) climateSize = u32.read(a);
   if (
     version < 2 ||
-    version > 12 ||
+    version > 17 ||
     endian !== 0x01020304 ||
     appearanceSize !== nativeAppearanceSize ||
     climateSize !== nativeClimateSize

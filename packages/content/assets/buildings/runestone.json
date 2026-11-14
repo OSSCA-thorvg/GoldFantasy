@@ -1,0 +1,223 @@
+{
+  "format": "building-asset",
+  "version": 1,
+  "id": "runestone",
+  "name": "Runestone",
+  "footprint": 0.8,
+  "variants": [
+    {
+      "patches": [
+        {
+          "bounds": [
+            0.1,
+            0.1,
+            0.7,
+            0.7
+          ],
+          "color": [
+            133,
+            154,
+            102
+          ],
+          "furrows": 0,
+          "furrow": [
+            0,
+            0,
+            0
+          ],
+          "delay": 0
+        }
+      ],
+      "blocks": [
+        {
+          "bounds": [
+            0.2,
+            0.25,
+            0.6,
+            0.55
+          ],
+          "wall": 3,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            150,
+            152,
+            154
+          ],
+          "wallShade": [
+            117,
+            117,
+            132
+          ],
+          "roofLit": [
+            160,
+            163,
+            165
+          ],
+          "roofShade": [
+            160,
+            163,
+            165
+          ],
+          "base": 0,
+          "delay": 0,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.3,
+            0.34,
+            0.5,
+            0.46
+          ],
+          "wall": 22,
+          "roof": 5,
+          "shape": "pyramid",
+          "wallLit": [
+            202,
+            198,
+            182
+          ],
+          "wallShade": [
+            152,
+            149,
+            151
+          ],
+          "roofLit": [
+            224,
+            216,
+            190
+          ],
+          "roofShade": [
+            167,
+            161,
+            156
+          ],
+          "base": 3,
+          "delay": 3,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.29,
+            0.33,
+            0.51,
+            0.47
+          ],
+          "wall": 2,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            184,
+            72,
+            64
+          ],
+          "wallShade": [
+            140,
+            63,
+            70
+          ],
+          "roofLit": [
+            197,
+            77,
+            68
+          ],
+          "roofShade": [
+            197,
+            77,
+            68
+          ],
+          "base": 17,
+          "delay": 5,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        },
+        {
+          "bounds": [
+            0.29,
+            0.33,
+            0.51,
+            0.47
+          ],
+          "wall": 1.5,
+          "roof": 0,
+          "shape": "flat",
+          "wallLit": [
+            184,
+            72,
+            64
+          ],
+          "wallShade": [
+            140,
+            63,
+            70
+          ],
+          "roofLit": [
+            197,
+            77,
+            68
+          ],
+          "roofShade": [
+            197,
+            77,
+            68
+          ],
+          "base": 10,
+          "delay": 5,
+          "windows": 0,
+          "door": false,
+          "trim": "none",
+          "glass": [
+            250,
+            206,
+            128
+          ],
+          "ornament": "none",
+          "accent": [
+            186,
+            72,
+            62
+          ]
+        }
+      ]
+    }
+  ]
+}

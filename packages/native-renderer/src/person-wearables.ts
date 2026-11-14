@@ -1,7 +1,6 @@
 import type { Person } from '../../engine/src/person';
 import { equippedItem } from '../../engine/src/equipment';
-import type { Point } from '../../engine/src/geometry';
-import { SceneNode, ShapeNode } from './paint';
+import { SceneNode } from './paint';
 import { poly, oval, stroke } from './sprite-primitives';
 import type { PersonParts } from './world-sprites';
 
@@ -131,40 +130,4 @@ export function wearableBody(
       );
     });
   }
-}
-export function wearableHead(sprite: SceneNode, person: Person, head: Point): void {
-  const item = equippedItem(person, 'head')?.id;
-  if (item !== 'cap' && item !== 'helmet') return;
-  const metal = item === 'helmet',
-    cap = new ShapeNode();
-  cap
-    .moveTo(head.x - 3.55, head.y - 0.25)
-    .cubicTo(head.x - 3.8, head.y - 5.1, head.x + 3.3, head.y - 5.3, head.x + 3.5, head.y - 0.35)
-    .lineTo(head.x + 1.2, head.y - 1)
-    .lineTo(head.x - 1.4, head.y - 0.7)
-    .close()
-    .fill(...((metal ? [134, 145, 149] : [124, 85, 54]) as [number, number, number]));
-  sprite.add(cap);
-  sprite.add(
-    stroke(
-      [head.x - 3.4, head.y - 0.3],
-      [head.x + 3.45, head.y - 0.35],
-      0.7,
-      metal ? [69, 82, 91] : [79, 52, 35],
-    ),
-  );
-  if (metal) {
-    sprite.add(stroke([head.x, head.y - 3.9], [head.x + 0.3, head.y - 0.55], 0.7, [201, 207, 201]));
-    sprite.add(
-      poly(
-        [
-          [head.x + 1.3, head.y - 0.8],
-          [head.x + 2, head.y - 0.8],
-          [head.x + 2, head.y + 1.4],
-          [head.x + 1.5, head.y + 1.5],
-        ],
-        [104, 116, 123],
-      ),
-    );
-  } else sprite.add(stroke([head.x - 1.5, head.y - 3.4], [head.x - 0.9, head.y - 0.7], 0.5, [179, 136, 86]));
 }

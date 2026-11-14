@@ -1,4 +1,5 @@
 import type { WebCanvas } from './types';
+import { koreanFont } from '../../localization/src/index';
 
 export interface FontMetrics {
   unitsPerEm: number;
@@ -41,14 +42,62 @@ export async function loadNativeFonts(
   base = `${import.meta.env?.BASE_URL ?? '/'}assets/native-fonts`,
 ): Promise<NativeFontMetrics> {
   const metrics: Record<string, FontMetrics> = {};
-  await Promise.all(
-    ['DejaVuSans', 'DejaVuSans-Bold'].map(async (name) => {
+  await Promise.all([
+    ...['DejaVuSans', 'DejaVuSans-Bold'].map(async (name) => {
       const response = await fetch(`${base}/${name}.ttf`);
       if (!response.ok) throw new Error(`Cannot load native font ${name}: ${response.status}.`);
       const data = new Uint8Array(await response.arrayBuffer());
       metrics[name] = parseFontMetrics(data);
       tvg.Font.load(name, data);
     }),
-  );
+    loadCombatFont(tvg, base, metrics),
+  ]);
+  loaded.set(metrics, { metrics, base, extra: new Map() });
   return metrics;
+}
+
+/** Heavy Cinzel instance for combat numbers (OFL, see public/licenses/Cinzel-OFL.txt). */
+export const combatFontName = 'Cinzel-Black';
+const combatFaces = new WeakSet<object>();
+/** The combat face once loaded into this ThorVG instance, else the bold UI face. */
+export function combatFace(tvg: object): string {
+  return combatFaces.has(tvg) ? combatFontName : 'DejaVuSans-Bold';
+}
+// Optional: a missing or broken file only falls back to the UI face.
+async function loadCombatFont(tvg: WebCanvas, base: string, metrics: Record<string, FontMetrics>) {
+  try {
+    const response = await fetch(`${base}/${combatFontName}.ttf`);
+    if (!response.ok) return;
+    const data = new Uint8Array(await response.arrayBuffer());
+    metrics[combatFontName] = parseFontMetrics(data);
+    tvg.Font.load(combatFontName, data);
+    combatFaces.add(tvg);
+  } catch {
+    // Keep the fallback face.
+  }
+}
+
+const loaded = new WeakMap<
+  NativeFontMetrics,
+  { metrics: Record<string, FontMetrics>; base: string; extra: Map<string, Promise<void>> }
+>();
+/** Fetched only when Korean is chosen, so English players never download it. */
+export function loadKoreanFont(tvg: WebCanvas, fonts: NativeFontMetrics): Promise<void> {
+  const set = loaded.get(fonts);
+  if (!set) return Promise.reject(new Error('Native fonts are not loaded.'));
+  let pending = set.extra.get(koreanFont);
+  if (!pending) {
+    pending = Promise.all(
+      [koreanFont, `${koreanFont}-Bold`].map(async (name) => {
+        const response = await fetch(`${set.base}/${name}.ttf`);
+        if (!response.ok) throw new Error(`Cannot load native font ${name}: ${response.status}.`);
+        const data = new Uint8Array(await response.arrayBuffer());
+        set.metrics[name] = parseFontMetrics(data);
+        tvg.Font.load(name, data);
+      }),
+    ).then(() => undefined);
+    pending.catch(() => set.extra.delete(koreanFont));
+    set.extra.set(koreanFont, pending);
+  }
+  return pending;
 }

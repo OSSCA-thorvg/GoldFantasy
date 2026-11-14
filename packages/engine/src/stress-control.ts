@@ -15,7 +15,7 @@ export const stressPolicy = {
 
 /** True consumes work/combat scheduling; the caller still advances doorway/walking. */
 export function updateStress(this: Town, p: Person, dt: number): boolean {
-  if (p.faction !== 0 || p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition)
+  if (p.faction !== 0 || p.role !== Role.Resident || p.health <= 0 || p.activity === Activity.Expedition || this.inRealm(p.position))
     return false;
   // Finish accepted road work before starting a breakdown. Stress still grows
   // normally and is reconsidered on completion; combat can still interrupt now.

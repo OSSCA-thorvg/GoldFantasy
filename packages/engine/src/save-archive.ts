@@ -22,11 +22,32 @@ export class SaveArchive {
   // The initial native v6 writer tagged monsters as well as wildlife. Read-only compatibility.
   legacyV6MonsterTags = false;
   private bytes: Uint8Array;
+  // One view for every scalar; allocating a view per field dominated save time.
+  private view: DataView;
   constructor(
     readonly reading = false,
     bytes: Uint8Array = new Uint8Array(1024),
   ) {
     this.bytes = bytes;
+    this.view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  }
+  /** Reserves length bytes and returns their offset in data(). */
+  reserve(length: number): number {
+    const start = this.cursor,
+      end = start + length;
+    if (this.reading && end > this.bytes.length) throw new Error('Truncated save');
+    if (!this.reading && end > this.bytes.length) this.grow(end);
+    this.cursor = end;
+    return start;
+  }
+  data(): DataView {
+    return this.view;
+  }
+  private grow(end: number): void {
+    const next = new Uint8Array(Math.max(end, this.bytes.length * 2, 1024));
+    next.set(this.bytes);
+    this.bytes = next;
+    this.view = new DataView(next.buffer);
   }
   buffer(): Uint8Array {
     return this.bytes.subarray(0, this.cursor);
@@ -38,11 +59,7 @@ export class SaveArchive {
     if (!Number.isSafeInteger(length) || length < 0) throw new Error('Invalid save length');
     const end = this.cursor + length;
     if (this.reading && end > this.bytes.length) throw new Error('Truncated save');
-    if (!this.reading && end > this.bytes.length) {
-      const next = new Uint8Array(Math.max(end, this.bytes.length * 2, 1024));
-      next.set(this.bytes);
-      this.bytes = next;
-    }
+    if (!this.reading && end > this.bytes.length) this.grow(end);
     const result = this.bytes.subarray(this.cursor, end);
     this.cursor = end;
     return result;
@@ -61,64 +78,64 @@ export class SaveArchive {
 }
 function scalar<T>(
   bytes: number,
-  read: (view: DataView) => T,
-  write: (view: DataView, value: unknown) => void,
+  read: (view: DataView, at: number) => T,
+  write: (view: DataView, at: number, value: unknown) => void,
 ): Codec<T> {
   return {
     read: (a) => {
-      const data = a.take(bytes);
-      return read(new DataView(data.buffer, data.byteOffset, data.byteLength));
+      const at = a.reserve(bytes);
+      return read(a.data(), at);
     },
     write: (a, v) => {
-      const data = a.take(bytes);
-      write(new DataView(data.buffer, data.byteOffset, data.byteLength), v);
+      const at = a.reserve(bytes);
+      write(a.data(), at, v);
     },
   };
 }
 export const u8 = scalar(
   1,
-  (v) => v.getUint8(0),
-  (v, n) => v.setUint8(0, numeric(n)),
+  (v, at) => v.getUint8(at),
+  (v, at, n) => v.setUint8(at, numeric(n)),
 );
 export const i8 = scalar(
   1,
-  (v) => v.getInt8(0),
-  (v, n) => v.setInt8(0, numeric(n)),
+  (v, at) => v.getInt8(at),
+  (v, at, n) => v.setInt8(at, numeric(n)),
 );
 export const i32 = scalar(
   4,
-  (v) => v.getInt32(0, true),
-  (v, n) => v.setInt32(0, numeric(n), true),
+  (v, at) => v.getInt32(at, true),
+  (v, at, n) => v.setInt32(at, numeric(n), true),
 );
 export const u32 = scalar(
   4,
-  (v) => v.getUint32(0, true),
-  (v, n) => v.setUint32(0, numeric(n), true),
+  (v, at) => v.getUint32(at, true),
+  (v, at, n) => v.setUint32(at, numeric(n), true),
 );
 export const u64 = scalar(
   8,
-  (v) => v.getBigUint64(0, true),
-  (v, n) => {
+  (v, at) => v.getBigUint64(at, true),
+  (v, at, n) => {
     if (typeof n !== 'bigint') throw new Error('Invalid 64-bit save field');
-    v.setBigUint64(0, n, true);
+    v.setBigUint64(at, n, true);
   },
 );
 export const f32 = scalar(
   4,
-  (v) => v.getFloat32(0, true),
-  (v, n) => v.setFloat32(0, numeric(n), true),
+  (v, at) => v.getFloat32(at, true),
+  (v, at, n) => v.setFloat32(at, numeric(n), true),
 );
 export const f64 = scalar(
   8,
-  (v) => v.getFloat64(0, true),
-  (v, n) => v.setFloat64(0, numeric(n), true),
+  (v, at) => v.getFloat64(at, true),
+  (v, at, n) => v.setFloat64(at, numeric(n), true),
 );
 export const boolean = scalar(
   1,
-  (v) => v.getUint8(0) !== 0,
-  (v, b) => {
+  (v, at) => v.getUint8(at) !== 0,
+  (v, at, b) => {
     if (typeof b !== 'boolean') throw new Error('Invalid boolean save field');
-    v.setUint8(0, b ? 1 : 0);
+    v.setUint8(at, b ? 1 : 0);
   },
 );
 export const string: Codec<string> = {
@@ -135,6 +152,14 @@ export const string: Codec<string> = {
     a.take(bytes.length).set(bytes);
   },
 };
+/** A length-prefixed f32 run, byte-identical to vector(f32) without a codec call per value. */
+export function writeFloats(a: SaveArchive, values: Float32Array): void {
+  if (values.length > 2000000) throw new Error('Save collection too large');
+  u32.write(a, values.length);
+  const at = a.reserve(values.length * 4),
+    view = a.data();
+  for (let i = 0; i < values.length; ++i) view.setFloat32(at + i * 4, values[i], true);
+}
 export function vector<T>(item: Codec<T>, limit = 2000000): Codec<T[]> {
   return {
     read(a) {
@@ -214,6 +239,46 @@ function readRaw(name: string, bytes: Uint8Array): Record<string, unknown> {
     Object.defineProperty(value, rawBytes, { value: new Uint8Array(bytes), enumerable: true });
   return value;
 }
+// Writes straight through one view: a tile map is tens of thousands of records.
+function writeRawFields(type: RawLayout, target: object, view: DataView, base: number): void {
+  for (const field of type.fields) {
+    const current: unknown = Reflect.get(target, field.name),
+      at = base + field.offset;
+    switch (field.type) {
+      case 'u8':
+        view.setUint8(at, numeric(current));
+        break;
+      case 'i8':
+        view.setInt8(at, numeric(current));
+        break;
+      case 'i32':
+        view.setInt32(at, numeric(current), true);
+        break;
+      case 'u32':
+        view.setUint32(at, numeric(current), true);
+        break;
+      case 'f32':
+        view.setFloat32(at, numeric(current), true);
+        break;
+      case 'f64':
+        view.setFloat64(at, numeric(current), true);
+        break;
+      case 'u64':
+        if (typeof current !== 'bigint') throw new Error('Invalid 64-bit save field');
+        view.setBigUint64(at, current, true);
+        break;
+      case 'bool':
+        if (typeof current !== 'boolean') throw new Error('Invalid boolean save field');
+        view.setUint8(at, current ? 1 : 0);
+        break;
+      default: {
+        const nested = types[field.type];
+        if (!nested) throw new Error('Unknown save ABI record');
+        writeRawFields(nested, object(current), view, at);
+      }
+    }
+  }
+}
 function writeRaw(name: string, value: unknown, bytes: Uint8Array): void {
   const target = object(value),
     type = types[name];
@@ -221,12 +286,7 @@ function writeRaw(name: string, value: unknown, bytes: Uint8Array): void {
   const padding: unknown = Reflect.get(target, rawBytes);
   if (padding instanceof Uint8Array && padding.length === bytes.length) bytes.set(padding);
   else bytes.fill(0);
-  for (const field of type.fields) {
-    const data = bytes.subarray(field.offset, field.offset + field.size),
-      current: unknown = Reflect.get(target, field.name);
-    if (scalars[field.type]) scalars[field.type].write(new SaveArchive(false, data), current);
-    else writeRaw(field.type, current, data);
-  }
+  writeRawFields(type, target, new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), 0);
 }
 export function raw<T extends object>(name: string, factory: () => T): Codec<T> {
   const type = types[name];
@@ -239,7 +299,31 @@ export function raw<T extends object>(name: string, factory: () => T): Codec<T> 
 export const nativeAppearanceSize = layouts.Appearance.size,
   nativeClimateSize = layouts.Climate.size;
 export function digest(bytes: Uint8Array): bigint {
-  let hash = 14695981039346656037n;
-  for (const byte of bytes) hash = BigInt.asUintN(64, (hash ^ BigInt(byte)) * 1099511628211n);
-  return hash;
+  // FNV-1a 64 in two 32-bit halves; a BigInt per byte took most of a save.
+  let low = 0x84222325,
+    high = 0xcbf29ce4;
+  for (let i = 0; i < bytes.length; ++i) {
+    low = (low ^ bytes[i]) >>> 0;
+    // The prime is 2^40 + 0x1b3; the low word multiplies in 16-bit halves to stay in integers.
+    const bottom = (low & 0xffff) * 0x1b3,
+      top = (low >>> 16) * 0x1b3 + (bottom >>> 16);
+    high = (Math.imul(high, 0x1b3) + (top >>> 16) + (low << 8)) >>> 0;
+    low = (((top & 0xffff) << 16) | (bottom & 0xffff)) >>> 0;
+  }
+  return (BigInt(high) << 32n) | BigInt(low);
+}
+const hexDigits = textEncoder.encode('0123456789abcdef'),
+  saveHeader = 'GoldFantasy-save\n';
+/** Appends the checksum to a save payload and returns the stored text. Safe to run off the main thread. */
+export function sealSave(payload: Uint8Array): string {
+  const sum = digest(payload),
+    digits = new Uint8Array((payload.length + 8) * 2);
+  let at = 0;
+  const put = (byte: number) => {
+    digits[at++] = hexDigits[byte >> 4];
+    digits[at++] = hexDigits[byte & 15];
+  };
+  for (let i = 0; i < payload.length; ++i) put(payload[i]);
+  for (let i = 0n; i < 8n; ++i) put(Number((sum >> (i * 8n)) & 0xffn));
+  return saveHeader + textDecoder.decode(digits);
 }

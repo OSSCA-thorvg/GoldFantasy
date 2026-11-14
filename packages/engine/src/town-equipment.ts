@@ -1,20 +1,26 @@
 import type { Town } from './town';
 import { Activity, type Person } from './person';
-import { Product, Structure, isSeat } from './building-catalog';
+import { Product, Resources, Structure, isSeat } from './building-catalog';
+import { heldAmount, takeHeld } from './carried-resources';
 import { canControl } from './faction';
-import { distance } from './geometry';
-import { resourceAmount, resourceBundle } from './construction-materials';
+import { add, distance, normalized, point, scale, sub, type Point } from './geometry';
+import type { Building } from './town-models';
+import { constructionProducts, resourceAmount, resourceBundle } from './construction-materials';
 import { harvestDuration } from './work-timing';
+import { Boon, boon, boonRules } from './gate-boons';
 import {
   addInventory,
   backpackSize,
+  craftsAt,
   equipmentSlots,
+  gearEffect,
   inventoryRoom,
   itemCatalog,
   itemSpec,
   productItem,
   workEfficiency,
   type EquipmentSlot,
+  type ItemSpec,
 } from './equipment';
 
 function activeHarvestDuration(person: Person): number {
@@ -196,41 +202,74 @@ export function depositInventory(this: Town, personId: number, slot: number, qua
   ++this.changes;
   return true;
 }
+const craftProducts = [Product.Goods, ...constructionProducts];
+/** Recipes draw on the settlement store first, then on what the crafter carries. */
+export function craftCovered(stock: Resources, p: Person, cost: Resources): boolean {
+  return craftProducts.every(
+    (product) => resourceAmount(stock, product) + heldAmount(p, product) >= resourceAmount(cost, product),
+  );
+}
+function payCraft(stock: Resources, p: Person, cost: Resources): void {
+  for (const product of craftProducts) {
+    const need = resourceAmount(cost, product),
+      stored = Math.min(need, resourceAmount(stock, product));
+    stock.subtract(resourceBundle(product, stored));
+    takeHeld(p, product, need - stored);
+  }
+}
 export function craftReason(this: Town, personId: number, workshopId: number, itemId: string): string {
   const p = this.person(personId),
     workshop = this.building(workshopId),
     item = itemSpec(itemId);
   if (!p || !canControl(p, this.controlFaction)) return 'Select a controllable resident';
   if (!item || item.workshop === null) return 'This item cannot be crafted';
-  if (!workshop || !workshop.built() || workshop.kind !== item.workshop)
-    return 'A completed matching workshop is required';
+  if (!workshop || !workshop.built() || !craftsAt(item, workshop.kind))
+    return item.workshop === Structure.Workbench ? 'Build a workbench first' : 'A completed matching workshop is required';
   if (workshop.faction !== p.faction || this.settlementOf(workshop) !== this.settlementOf(p))
     return 'Use a workshop in this resident’s settlement';
   if (p.craftItem && (p.craftItem !== itemId || p.craftWorkshop !== workshopId))
     return 'Finish or cancel the current crafting order';
   if (inventoryRoom(p, itemId) < 1) return 'The inventory is full';
-  if (!this.stock(this.settlementOf(workshop)).covers(item.cost)) return 'Not enough settlement materials';
+  if (!craftCovered(this.stock(this.settlementOf(workshop)), p, item.cost)) return 'Not enough settlement materials';
   return '';
 }
 export function craftOptions(this: Town, personId: number, workshopId: number) {
   const workshop = this.building(workshopId);
   return itemCatalog
-    .filter((item) => item.workshop !== null && item.workshop === workshop?.kind)
+    .filter((item) => !!workshop && craftsAt(item, workshop.kind))
     .map((item) => ({ item, reason: this.craftReason(personId, workshopId, item.id) }));
+}
+/** Where the crafter stands: in the open at the door, facing the building's centre. */
+export function craftSpot(workshop: Building): Point {
+  return workshop.door();
+}
+/** Where a resident waits for a busy station: a pace to the side of the work spot. */
+export function craftWaitSpot(this: Town, workshop: Building): Point {
+  const door = workshop.door(),
+    out = normalized(sub(door, workshop.center));
+  return this.grid.nearestWalkable(add(door, scale(point(-out.y, out.x), 0.7)));
+}
+const crafting = (p: Person, id: number): boolean =>
+  p.health > 0 && p.task === Activity.Crafting && p.craftWorkshop === id;
+/** The resident working the station now, or null. One works a station at a time. */
+export function craftingAt(this: Town, workshopId: number): Person | null {
+  return this.folk.find((p) => crafting(p, workshopId) && p.activity === Activity.Crafting) ?? null;
+}
+/** Residents with an order at the station who are on their way or waiting their turn. */
+export function craftQueue(this: Town, workshopId: number): Person[] {
+  return this.folk.filter((p) => crafting(p, workshopId) && p.activity !== Activity.Crafting);
 }
 export function orderCraft(this: Town, personId: number, workshopId: number, itemId: string): boolean {
   if (this.craftReason(personId, workshopId, itemId)) return false;
   const p = this.person(personId)!,
     workshop = this.building(workshopId)!;
   if (p.craftItem === itemId && p.craftWorkshop === workshopId && p.task === Activity.Crafting) return false;
-  if (!this.walkTo(p, workshop.door())) return false;
+  if (!this.walkTo(p, craftSpot(workshop))) return false;
   this.setOrder(p, Activity.Crafting, workshopId);
   p.craftItem = itemId;
   p.craftWorkshop = workshopId;
   p.craftProgress = 0;
-  p.activity = Activity.Crafting;
-  p.target = workshopId;
-  if (!p.moving()) this.arrive(p);
+  this.resumeCraftOrder(p);
   return true;
 }
 export function finishCraftOrder(this: Town, p: Person): void {
@@ -244,60 +283,83 @@ export function finishCraftOrder(this: Town, p: Person): void {
   p.activity = Activity.Idle;
   p.until = this.time;
 }
+function stationValid(town: Town, p: Person, workshop: Building | null, item: ItemSpec | null): workshop is Building {
+  return (
+    !!workshop &&
+    workshop.built() &&
+    !!item &&
+    craftsAt(item, workshop.kind) &&
+    workshop.faction === p.faction &&
+    town.settlementOf(workshop) === town.settlementOf(p)
+  );
+}
+/** Walks to the station, waits beside it while another resident works it, then takes the work spot. */
 export function resumeCraftOrder(this: Town, p: Person): boolean {
   if (p.task !== Activity.Crafting) return false;
   const workshop = this.building(p.craftWorkshop),
-    item = p.craftItem && itemSpec(p.craftItem);
-  if (
-    !workshop ||
-    !workshop.built() ||
-    !item ||
-    workshop.kind !== item.workshop ||
-    workshop.faction !== p.faction ||
-    this.settlementOf(workshop) !== this.settlementOf(p)
-  ) {
+    item = p.craftItem ? itemSpec(p.craftItem) : null;
+  if (!stationValid(this, p, workshop, item)) {
     this.finishCraftOrder(p);
     return false;
   }
-  if (!this.walkTo(p, workshop.door())) {
+  const other = this.craftingAt(workshop.id),
+    taken = !!other && other.id !== p.id,
+    spot = taken ? this.craftWaitSpot(workshop) : craftSpot(workshop);
+  p.target = workshop.id;
+  if (p.inside || distance(p.position, spot) > 0.05) {
+    if (!this.walkTo(p, spot)) {
+      p.activity = Activity.Holding;
+      p.path = [];
+      p.until = this.time + 1;
+    } else p.activity = Activity.Moving;
+    return true;
+  }
+  p.path = [];
+  if (taken) {
     p.activity = Activity.Holding;
-    p.until = this.time + 1;
+    p.until = this.time + 0.5;
     return true;
   }
   p.activity = Activity.Crafting;
-  p.target = workshop.id;
-  if (!p.moving()) this.arrive(p);
+  p.until = this.time;
   return true;
 }
 export function advanceCrafting(this: Town, p: Person, dt: number): void {
   if (p.task !== Activity.Crafting || !p.craftItem || p.moving() || p.crossingDoorway()) return;
   const workshop = this.building(p.craftWorkshop),
     item = itemSpec(p.craftItem);
-  if (
-    !workshop ||
-    !workshop.built() ||
-    !item ||
-    workshop.kind !== item.workshop ||
-    workshop.faction !== p.faction ||
-    this.settlementOf(workshop) !== this.settlementOf(p)
-  ) {
+  if (!item || !stationValid(this, p, workshop, item)) {
     this.finishCraftOrder(p);
     return;
   }
-  if (!p.inside && distance(p.position, workshop.door()) > 0.03) {
+  if (p.inside || distance(p.position, craftSpot(workshop)) > 0.05) {
     this.resumeCraftOrder(p);
     return;
   }
   const stock = this.stock(this.settlementOf(workshop));
-  if (!stock.covers(item.cost) || inventoryRoom(p, item.id) < 1) {
+  if (!craftCovered(stock, p, item.cost) || inventoryRoom(p, item.id) < 1) {
     p.until = this.time + 1;
     return;
   }
-  p.craftProgress += Math.max(0, dt) * workEfficiency(p, 'crafting');
+  // Progress stays in item seconds; the Forge boon makes it run faster.
+  p.craftProgress +=
+    (Math.max(0, dt) * workEfficiency(p, 'crafting')) / (boon(this, Boon.Forge) ? boonRules.forgeSeconds : 1);
   if (p.craftProgress + 1e-6 < item.seconds) return;
+  payCraft(stock, p, item.cost);
   if (!addInventory(p, item.id)) return;
-  stock.subtract(item.cost);
+  // Only the smith forges; whittled bench weapons do not count.
+  if (item.category === 'weapon' && item.workshop === Structure.Weaponsmith) ++this.chronicle.weaponsForged;
   this.notify(`${p.name} crafted ${item.name}`);
   ++this.changes;
   this.finishCraftOrder(p);
+  if (takeUpCrafted(this, p, item.id)) this.notify(`${item.name} in hand · ${gearEffect(item)}`);
+}
+/** New gear goes straight into a free slot it fits, so its effect is felt at once. */
+function takeUpCrafted(town: Town, p: Person, id: string): boolean {
+  const item = itemSpec(id),
+    index = p.inventory.findIndex(
+      (stack, i) => stack?.item === id && !equipmentSlots.some((slot) => p.equipment[slot] === i + 1),
+    ),
+    slot = item?.slots.find((s) => p.equipment[s] < 0);
+  return !!item && index >= 0 && !!slot && item.minimumLevel <= p.level && town.equipItem(p.id, index + 1, slot);
 }

@@ -28,6 +28,7 @@ import * as units from './game-unit-panel';
 import * as roster from './game-roster';
 import * as worldSelection from './game-selection-panel';
 import * as objectives from './game-objectives';
+import * as realmPanel from './game-realm-panel';
 import * as skyHud from './game-sky-hud';
 import * as speech from './game-speech';
 import * as soundscape from './game-soundscape';
@@ -60,6 +61,7 @@ const methods = {
   ...roster,
   ...worldSelection,
   ...objectives,
+  ...realmPanel,
   ...skyHud,
   ...speechMethods,
   ...soundscape,
@@ -90,6 +92,8 @@ export class GameApp extends GameAppState implements GameRuntime {
   ) {
     const source = typeof seedOrSource === 'number' ? null : seedOrSource,
       town = source ? copyNative(source.town) : new Town(typeof seedOrSource === 'number' ? seedOrSource : 5);
+    // A new game waits for the player: the founders stand where they woke until the first order.
+    if (!source) town.awaiting = true;
     super(town, services.createRenderer(), services.createContext());
     this.editorServices = services;
     this.traffic = source ? copyNative(source.traffic) : new Traffic(town.map().seed());
@@ -247,6 +251,7 @@ export class GameApp extends GameAppState implements GameRuntime {
     this.dockGhost?.dispose();
     for (const portrait of this.dockPortraits.values()) portrait.paint.dispose();
     this.dockPortraits.clear();
+    this.combatHud.dispose();
     this.skyArtwork?.dispose();
     this.renderer.dispose();
   }

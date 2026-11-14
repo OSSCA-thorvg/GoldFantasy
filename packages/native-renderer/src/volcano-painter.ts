@@ -1,8 +1,9 @@
-import { type Point, tileHalfWidth } from '../../engine/src/geometry';
+import { point, unproject, type Point, tileHalfWidth } from '../../engine/src/geometry';
 import { hash01 } from '../../engine/src/numeric';
 import { lavaBearing } from '../../engine/src/world-map';
 import { volcanoFoot } from '../../engine/src/world-types';
-import { ShapeNode, SceneNode, type Rgb } from './paint';
+import { ShapeNode, SceneNode, type PaintNode, type Rgb } from './paint';
+import { appendBlob } from './flat-forms';
 import { appendPolygon, appendStrip, fill, opaque, mix, polygon, ellipse, glow } from './vector-paint';
 const f = Math.fround;
 const basaltLit: Rgb = [46, 38, 38],
@@ -12,12 +13,23 @@ const basaltLit: Rgb = [46, 38, 38],
   lava: Rgb = [214, 76, 30],
   molten: Rgb = [255, 172, 70],
   smoke: Rgb = [70, 66, 70],
-  smokeLit: Rgb = [116, 110, 112];
+  smokeLit: Rgb = [116, 110, 112],
+  swell: Rgb = [255, 196, 96];
 export const volcanoHeight = 560,
   volcanoSmoke = 260;
 export interface VolcanoLight {
   crater: Point;
   flows: Point[];
+  /** The volcano's tile, for the sight test. */
+  heart: Point;
+  /** Molten strips that breathe, and crust floes that crawl down the flows. */
+  hot: ShapeNode[];
+  floes: Floe[];
+  /** The flows' outline, cut through the night veil while the volcano is seen. */
+  cut?: ShapeNode;
+  lights?: { cut: PaintNode; hole: PaintNode; tint: PaintNode };
+  shown?: boolean;
+  cutShown?: boolean;
 }
 export function lightVolcano(lights: SceneNode, light: VolcanoLight): void {
   lights.add(glow(light.crater, 200, 110, [255, 120, 40], 80));
@@ -70,7 +82,13 @@ const footRadius = f(f(volcanoFoot * tileHalfWidth) * f(1.4142)),
   heights = [0, f(0.16), f(0.36), f(0.58), f(0.8), 1],
   around = 16;
 export function paintVolcano(objects: SceneNode, b: Point, seed: number): VolcanoLight {
-  const light: VolcanoLight = { crater: { x: 0, y: 0 }, flows: [] },
+  const light: VolcanoLight = {
+      crater: { x: 0, y: 0 },
+      flows: [],
+      heart: unproject(b.x, b.y),
+      hot: [],
+      floes: [],
+    },
     screen = (v: Vec): Point => ({ x: f(b.x + v.x), y: f(f(b.y - v.y) + f(v.z * f(0.5))) });
   const radius = (t: number) => f(lipRadius + f(f(footRadius - lipRadius) * f(Math.pow(f(1 - t), f(1.7))))),
     rings = heights.length,
@@ -161,6 +179,7 @@ export function paintVolcano(objects: SceneNode, b: Point, seed: number): Volcan
     objects.add(shape);
   }
   const crusts = new ShapeNode(),
+    cut = new ShapeNode(),
     streams = new ShapeNode(),
     cores = new ShapeNode(),
     widths = [f(0.85), 1, f(0.75)],
@@ -189,14 +208,23 @@ export function paintVolcano(objects: SceneNode, b: Point, seed: number): Volcan
     }
     const w = widths[k];
     appendStrip(crusts, path, f(9 * w), f(72 * w));
+    appendStrip(cut, path, f(9 * w), f(72 * w));
     appendStrip(streams, path, f(6 * w), f(52 * w));
     appendStrip(cores, path, f(f(2.5) * w), f(18 * w));
+    const breathing = new ShapeNode();
+    appendStrip(breathing, path, f(f(1.6) * w), f(12 * w));
+    light.hot.push(breathing.fill(...opaque(swell)).opacity(0));
+    light.floes.push(...floesAlong(path, crust, seed + k, 4));
     light.flows[k] = path[10];
   }
   fill(crusts, opaque(crust));
   fill(streams, opaque(lava));
   fill(cores, opaque(molten));
   objects.add(crusts).add(streams).add(cores);
+  for (const node of light.hot) objects.add(node);
+  for (const floe of light.floes) objects.add(floe.node);
+  cut.appendCircle(lake.x, f(lake.y + 2), f(lipRadius * f(0.5)), f(lipRadius * f(0.2))).fill(255, 255, 255);
+  light.cut = cut;
   for (let i = 0; i < 6; i++) {
     const t = f(i / 5),
       r = f(36 + f(50 * t)),
@@ -220,4 +248,56 @@ export function paintVolcano(objects: SceneNode, b: Point, seed: number): Volcan
     );
   }
   return light;
+}
+export interface Floe {
+  node: ShapeNode;
+  path: Point[];
+  lengths: number[];
+  start: number;
+  speed: number;
+}
+function along(path: readonly Point[], lengths: readonly number[], u: number): [number, number] {
+  const total = lengths[lengths.length - 1],
+    goal = f(u * total);
+  let k = 1;
+  while (k < lengths.length - 1 && lengths[k] < goal) ++k;
+  const span = f(lengths[k] - lengths[k - 1]),
+    t = span > 0 ? f(f(goal - lengths[k - 1]) / span) : 0;
+  return [
+    f(path[k - 1].x + f(f(path[k].x - path[k - 1].x) * t)),
+    f(path[k - 1].y + f(f(path[k].y - path[k - 1].y) * t)),
+  ];
+}
+export function placeFloe(
+  floe: Floe,
+  u: number,
+): [number, number, number, number, number, number, number, number, number] {
+  const [x, y] = along(floe.path, floe.lengths, u);
+  return [1, 0, x, 0, 1, y, 0, 0, 1];
+}
+/** Crust floes riding a flow down the cone, at a crawl. */
+export function floesAlong(path: readonly Point[], color: Rgb, salt: number, count: number): Floe[] {
+  const lengths = [0];
+  for (let i = 1; i < path.length; i++)
+    lengths.push(f(lengths[i - 1] + Math.hypot(path[i].x - path[i - 1].x, path[i].y - path[i - 1].y)));
+  const total = lengths[lengths.length - 1];
+  return Array.from({ length: count }, (_, k) => {
+    const node = appendBlob(new ShapeNode(), point(), [
+      [-3.2, 0],
+      [-1, -1.6],
+      [2.6, -1.1],
+      [3.4, 0.6],
+      [0, 1.5],
+    ]).fill(...opaque(color, 220));
+    const floe: Floe = {
+      node,
+      path: [...path],
+      lengths,
+      start: f(f(k + f(f(0.6) * hash01(salt, k, 1, 878))) / count),
+      // About ten pixels a second whatever the flow's length.
+      speed: total > 0 ? f(10 / total) : 0,
+    };
+    node.transform(placeFloe(floe, floe.start));
+    return floe;
+  });
 }

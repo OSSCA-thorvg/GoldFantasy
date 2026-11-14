@@ -2,6 +2,7 @@ import type { Paint, Scene, Matrix } from '@thorvg/webcanvas';
 import type { NativeFontMetrics } from './fonts';
 import { FrameStyle, Theme } from './theme';
 import { lerpFloat } from './numeric';
+import { hasHangul, koreanFont, translate } from '../../localization/src/index';
 const f = Math.fround;
 import {
   Align,
@@ -568,7 +569,8 @@ export class Context {
     horizontalOffset = 0,
   ): void {
     if (bounds.w <= 0 || bounds.h <= 0 || !value) return;
-    const font = this.fontFor?.(value, bold) || (bold ? this.tokens.boldFont : this.tokens.font),
+    value = translate(value);
+    const font = this.fontFor?.(value, bold) || this.scriptFont(value, bold),
       logicalSize = size > 0 ? size : this.tokens.fontSize,
       points = Math.fround(logicalSize * 0.75);
     this.paint(JSON.stringify(['T', bounds, color, points, align, horizontalOffset, font, value]), () => {
@@ -606,10 +608,19 @@ export class Context {
       return group;
     });
   }
+  /** DejaVu has no Hangul, so Korean text takes the Korean face once it is loaded. */
+  private scriptFont(value: string, bold: boolean): string {
+    if (hasHangul(value)) {
+      const korean = bold ? `${koreanFont}-Bold` : koreanFont;
+      if (this.metrics[korean]) return korean;
+      if (this.metrics[koreanFont]) return koreanFont;
+    }
+    return bold ? this.tokens.boldFont : this.tokens.font;
+  }
   textWidth(value: string, size = 0, bold = false, fontContext = ''): number {
     if (!value) return 0;
-    const font =
-      this.fontFor?.(fontContext || value, bold) || (bold ? this.tokens.boldFont : this.tokens.font);
+    value = translate(value);
+    const font = this.fontFor?.(fontContext || value, bold) || this.scriptFont(fontContext || value, bold);
     const label = new this.tvg.Text()
       .font(font)
       .fontSize((size > 0 ? size : this.tokens.fontSize) * 0.75)
@@ -622,6 +633,7 @@ export class Context {
   }
   elideText(value: string, width: number, size = 0, bold = false, suffix = ''): string {
     if (width <= 0 || !value) return '';
+    value = translate(value);
     const full = value + suffix;
     if (this.textWidth(full, size, bold) <= width) return full;
     const points = Array.from(value),

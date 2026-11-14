@@ -18,6 +18,7 @@ import {
   EffectManager,
 } from '../../../../packages/native-audio/src';
 import { Align, Rect } from '../../../../packages/native-ui/src';
+import { translate } from '../../../../packages/localization/src/index';
 export class SpeakerState {
   speech = new PersonSpeech();
   heard = 0n;
@@ -44,6 +45,17 @@ export function speakerState(app: GameSpeechApp, id: number): SpeakerState {
     app.speakers.set(id, state);
   }
   return state;
+}
+/**
+ * A bubble fills in as the line is spoken. The part spoken so far is not a phrase any language
+ * table knows, so the whole line is translated and the same share of it is shown.
+ */
+export function captionShown(spoken: string, line: string): string {
+  if (!spoken || !line) return spoken;
+  const told = translate(line);
+  if (told === line) return spoken;
+  const letters = [...told];
+  return letters.slice(0, Math.max(1, Math.ceil((letters.length * spoken.length) / line.length))).join('');
 }
 export function sayPerson(this: GameSpeechApp, id: number, text: string): boolean {
   const person = this.town.person(id);
@@ -162,7 +174,8 @@ export function speechBubbles(this: GameSpeechApp, width: number, height: number
   for (const person of this.town.people()) {
     const found = this.speakers.get(person.id);
     if (!found || person.visibility() <= 0 || !this.renderer.visible(person.position)) continue;
-    const caption = found.speech.caption(this.context.time()),
+    const spoken = found.speech.caption(this.context.time()),
+      caption = captionShown(spoken, found.speech.text()),
       opacity = f(found.speech.captionOpacity(this.context.time()) * person.visibility());
     if (!caption || opacity <= 0) continue;
     const feet = this.toScreen(person.position),

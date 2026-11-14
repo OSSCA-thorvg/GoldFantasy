@@ -10,7 +10,7 @@ import type { GameHudApp } from '../../apps/web/src/native/game-hud-contract';
 function fixture() {
   const p = new Person(0, 'Askr', Role.Resident, Calling.Settler, Race.Human, 5, point(10, 10));
   const app = new GameAppState(
-    { person: () => p } as any,
+    { person: () => p, abilityOf: () => null, skillsOf: () => [] } as any,
     {} as any,
     { time: () => 1, cancelPointer() {}, requestAnimationFrame() {} } as any,
   ) as GameHudApp;

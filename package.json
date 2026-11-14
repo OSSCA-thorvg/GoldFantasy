@@ -27,7 +27,14 @@
     "test:splash": "node tests/regression/splash-runtime.browser.mjs",
     "test:work": "node tests/regression/work-contact.browser.mjs",
     "test:picking": "node tests/regression/picking.browser.mjs",
-    "test:mobile": "node tests/regression/mobile.browser.mjs"
+    "test:realm": "node tests/regression/realm.browser.mjs",
+    "test:field": "node tests/regression/field.browser.mjs",
+    "test:progression": "node tests/regression/progression.browser.mjs",
+    "test:mobile": "node tests/regression/mobile.browser.mjs",
+    "test:combat-effects": "node tests/regression/combat-effects.browser.mjs",
+    "test:combat-loop": "node tests/regression/combat-loop.browser.mjs",
+    "test:environment": "node tests/regression/environment.browser.mjs",
+    "test:progress-hud": "node tests/regression/progress-hud.browser.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

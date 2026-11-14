@@ -28,6 +28,7 @@ interface Entry {
   dataVersion?: number;
   childPaints?: Paint[];
   pathVersion?: number;
+  styleVersion?: number;
   gradient?: Gradient;
   matrix?: Matrix;
   opacity?: number;
@@ -120,12 +121,29 @@ export class WebCanvasAdapter {
       entry.maskMethod = undefined;
     }
     if (node instanceof SceneNode) {
-      const children = node.children.map((child) => this.sync(child));
+      // A fully transparent child is switched off: not attached natively, nor even visited,
+      // until it shows again. Most of a figure is tools and loads it is not holding.
+      const shown = node.children.some((child) => child.alpha === 0)
+          ? node.children.filter((child) => child.alpha !== 0)
+          : node.children,
+        reordered =
+          !entry.children ||
+          entry.children.length !== shown.length ||
+          entry.children.some((child, i) => child !== shown[i]);
+      // Empty a changed scene BEFORE its children are synced. ThorVG traps ("null
+      // function") when an attached scene is cleared while a nested scene already
+      // holds paints it has never prepared, which is what syncing the children first
+      // produced whenever a kept layer received new shapes in the same pass.
+      if (reordered && entry.childPaints?.length && entry.paint instanceof this.tvg.Scene) {
+        for (const previous of entry.childPaints)
+          if (this.parents.get(previous) === entry) this.parents.delete(previous);
+        entry.paint.clear();
+        entry.children = undefined;
+        entry.childPaints = [];
+      }
+      const children = shown.map((child) => this.sync(child));
       if (
-        (!entry.children ||
-          entry.children.length !== node.children.length ||
-          entry.children.some((child, i) => child !== node.children[i]) ||
-          entry.childPaints?.some((paint, i) => paint !== children[i])) &&
+        (reordered || !entry.children || entry.childPaints?.some((paint, i) => paint !== children[i])) &&
         entry.paint instanceof this.tvg.Scene
       ) {
         for (const previous of entry.childPaints ?? [])
@@ -142,7 +160,7 @@ export class WebCanvasAdapter {
           entry.paint.add(child);
           this.parents.set(child, entry);
         }
-        entry.children = [...node.children];
+        entry.children = [...shown];
         entry.childPaints = children;
       }
     }
@@ -156,9 +174,14 @@ export class WebCanvasAdapter {
       node.displayHeight !== undefined
     )
       (entry.paint as Picture).size(node.displayWidth, node.displayHeight);
-    if (node instanceof ShapeNode && entry.paint instanceof this.tvg.Shape)
-      this.shape(entry.paint, node, entry.pathVersion !== node.pathVersion, entry);
-    if (node instanceof ShapeNode) entry.pathVersion = node.pathVersion;
+    if (node instanceof ShapeNode) {
+      // Only a changed outline or style is sent again; a moved or faded shape keeps both.
+      const path = entry.pathVersion !== node.pathVersion;
+      if (entry.paint instanceof this.tvg.Shape && (path || entry.styleVersion !== node.styleVersion))
+        this.shape(entry.paint, node, path, entry);
+      entry.pathVersion = node.pathVersion;
+      entry.styleVersion = node.styleVersion;
+    }
     if (node instanceof TextNode && entry.paint instanceof this.tvg.Text) this.text(entry.paint, node);
     const previousMatrix = entry.matrix ?? identity;
     if (node.matrix.some((value, i) => value !== previousMatrix[i]))

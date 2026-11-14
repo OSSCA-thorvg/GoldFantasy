@@ -64,6 +64,9 @@ function audioSession(existingContext?: AudioContext): AudioSession {
   return current;
 }
 /** Prepare authored audio independently of the first visible frame. Failures leave the game playable. */
+/** The game's one audio context once it exists, for one-off playback beside the mixer. */
+export const sharedAudioContext = (): AudioContext | null =>
+  session && !session.closed ? session.context : null;
 export function prepareNativeAudio(existingContext?: AudioContext): Promise<void> {
   return audioSession(existingContext).ready;
 }

@@ -192,6 +192,378 @@
     "channels": 1
   },
   {
+    "name": "sfx/combat/aimed_01",
+    "frames": 6214,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/aimed_02",
+    "frames": 6328,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/aimed_03",
+    "frames": 6278,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/brood_break_01",
+    "frames": 70825,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/brood_break_02",
+    "frames": 70825,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/burst_01",
+    "frames": 9417,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/burst_02",
+    "frames": 8938,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/burst_03",
+    "frames": 8944,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/challenge_01",
+    "frames": 13941,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/challenge_02",
+    "frames": 13500,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/challenge_03",
+    "frames": 13100,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/cleave_01",
+    "frames": 9109,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/cleave_02",
+    "frames": 8254,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/cleave_03",
+    "frames": 7497,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/cleave_04",
+    "frames": 6821,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/crush_01",
+    "frames": 7169,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/crush_02",
+    "frames": 7179,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/crush_03",
+    "frames": 7086,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/crush_04",
+    "frames": 7108,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/den_fall_01",
+    "frames": 37240,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/den_fall_02",
+    "frames": 37204,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/dirge_01",
+    "frames": 26647,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/dirge_02",
+    "frames": 26640,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/frost_01",
+    "frames": 18134,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/frost_02",
+    "frames": 17161,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/frost_03",
+    "frames": 17531,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/mend_01",
+    "frames": 17846,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/mend_02",
+    "frames": 17840,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/mend_03",
+    "frames": 17824,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/pierce_01",
+    "frames": 3350,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/pierce_02",
+    "frames": 3597,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/pierce_03",
+    "frames": 3791,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/pierce_04",
+    "frames": 4008,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/rally_01",
+    "frames": 14329,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/rally_02",
+    "frames": 13185,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/sanctuary_01",
+    "frames": 26666,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/sanctuary_02",
+    "frames": 26649,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/spawn_01",
+    "frames": 11449,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/spawn_02",
+    "frames": 11561,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/spawn_03",
+    "frames": 11125,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/spawn_04",
+    "frames": 10628,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/splash_01",
+    "frames": 4955,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/splash_02",
+    "frames": 4755,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/splash_03",
+    "frames": 4870,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/splash_04",
+    "frames": 4973,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_bed_01",
+    "frames": 176400,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_01",
+    "frames": 2904,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_02",
+    "frames": 2908,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_03",
+    "frames": 2908,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_04",
+    "frames": 2906,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_05",
+    "frames": 2882,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_06",
+    "frames": 2892,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_07",
+    "frames": 2888,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/swarm_death_08",
+    "frames": 2907,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/volley_01",
+    "frames": 22143,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/volley_02",
+    "frames": 21097,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/volley_03",
+    "frames": 21518,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/wave_horn_01",
+    "frames": 26648,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/wave_horn_02",
+    "frames": 47855,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/whirl_01",
+    "frames": 17894,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/whirl_02",
+    "frames": 17469,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
+    "name": "sfx/combat/whirl_03",
+    "frames": 17072,
+    "rate": 22050,
+    "channels": 1
+  },
+  {
     "name": "ui/cancel_01",
     "frames": 5737,
     "rate": 22050,

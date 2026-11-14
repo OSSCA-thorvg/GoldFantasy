@@ -1,4 +1,5 @@
 // Native town_people.cpp resident creation, navigation, housing and guest arrival rules.
+import { burdenPace } from './carried-resources';
 import { TownState } from './town-state';
 import { Building } from './town-models';
 import { Person, Role, Race, Calling, Activity, adventurer, callingName } from './person';
@@ -9,6 +10,7 @@ import { CampReceipt } from './camp-economy';
 import { CharacterPreset, applyCharacter } from './character-preset';
 import { sameFaction } from './faction';
 export interface ResidentTown extends TownState {
+  rallied(p: Person): boolean;
   camp(id?: number): Building | null;
   settlementAt(at: Point): number;
   settlementOf(p: Person | Building): number;
@@ -103,10 +105,21 @@ export function nearest(this: ResidentTown, from: Point, match: (b: Building) =>
 export function site(this: ResidentTown, id: number): Building | null {
   return this.placed.find((item) => item.id === id) ?? null;
 }
+/** Tiles within which a clear straight line beats a planned route. */
+const shortHop = 1.5;
 export function walkTo(this: ResidentTown, p: Person, to: Point): boolean {
   this.refreshShelter(p);
   const from = p.inside || p.doorway > 0 ? p.entrance : p.position,
-    path = this.grid.path(from, to);
+    // A short hop over open ground goes straight. The planner would route it by the
+    // nearest lane, which makes someone shuffling to a nearby spot double back first.
+    direct =
+      !p.inside &&
+      p.doorway <= 0 &&
+      distance(from, to) <= shortHop &&
+      this.grid.walkable(from) &&
+      this.grid.walkable(to) &&
+      this.grid.clear(from, to, Infinity),
+    path = direct ? [from, to] : this.grid.path(from, to);
   if (!path.length) return false;
   p.path = path.slice(1);
   p.inside = false;
@@ -127,7 +140,8 @@ export function walkingSpeed(this: ResidentTown, p: Person): number {
   let speed = this.grid.speedAt(p.position);
   speed = f(speed * f(1 - f(f(0.35) * this.climate().snow)));
   if (p.health < f(0.4)) speed = f(speed * f(0.7));
-  return speed;
+  if (this.rallied(p)) speed = f(speed * f(1.2));
+  return f(speed * burdenPace(p));
 }
 export function walk(this: ResidentTown, p: Person, dt: number): void {
   let step = f(this.walkingSpeed(p) * f(dt));

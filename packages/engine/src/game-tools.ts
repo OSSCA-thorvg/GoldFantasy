@@ -33,6 +33,10 @@ export enum Tool {
   WoodStore,
   Granary,
   StoneStore,
+  Watchtower,
+  TrainingYard,
+  Runestone,
+  Workbench,
   Count,
 }
 export enum PointerButton {
@@ -70,6 +74,10 @@ export function toolStructure(tool: Tool): Structure | undefined {
     case Tool.WoodStore: return Structure.WoodStore;
     case Tool.Granary: return Structure.Granary;
     case Tool.StoneStore: return Structure.StoneStore;
+    case Tool.Watchtower: return Structure.Watchtower;
+    case Tool.TrainingYard: return Structure.TrainingYard;
+    case Tool.Runestone: return Structure.Runestone;
+    case Tool.Workbench: return Structure.Workbench;
     case Tool.Torch:
       return Structure.Torch;
     case Tool.Camp:

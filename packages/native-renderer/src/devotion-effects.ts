@@ -1,7 +1,7 @@
 import { project, type Point } from '../../engine/src/geometry';
 import type { Town } from '../../engine/src/town';
 import { SceneNode, ShapeNode, type Matrix } from './paint';
-import { reachArm } from './idle-gesture';
+import { reachArm } from './person-arm';
 import type { PersonParts } from './world-sprites';
 import type { WorldRendererState } from './world-renderer-state';
 
@@ -16,9 +16,11 @@ export function animatePrayer(parts: PersonParts, elapsed: number, duration: num
   const bow = smooth(elapsed / 0.65) * smooth((duration - elapsed) / 0.55),
     breath = Math.sin(elapsed * 2.1) * 0.008 * bow;
   const chest = (parts.arms[0].shoulder.y + parts.arms[1].shoulder.y) / 2 + 1.4;
-  reachArm(parts.arms[0], { x: -0.35, y: chest }, -1, bow, 0, 0);
-  reachArm(parts.arms[1], { x: 0.35, y: chest }, 1, bow, 0, 0);
-  parts.body?.transform([1, -0.035 * bow, 0.3 * bow, 0, 1 - 0.13 * bow + breath, 0, 0, 0, 1]);
+  reachArm(parts.arms[0], { x: -0.35, y: chest }, bow, 0, 0);
+  reachArm(parts.arms[1], { x: 0.35, y: chest }, bow, 0, 0);
+  // The worshipper bows from the waist and lowers the head; nothing is squashed.
+  parts.body?.transform([1, -0.06 * bow, 0.3 * bow, 0, 1 - 0.07 * bow + breath, 0, 0, 0, 1]);
+  parts.nod = 0.3 * bow;
   parts.feet[0]?.translate(0, 0);
   parts.feet[1]?.translate(0, 0);
   parts.shadow?.transform([1, 0, 0, 0, 1, 0, 0, 0, 1]);

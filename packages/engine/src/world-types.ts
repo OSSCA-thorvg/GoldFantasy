@@ -11,7 +11,7 @@ export function lavaLevel(land: number, heat: number, ridge: number): number { r
 export interface Tile { terrain: Terrain; shade: number; trees: number; wild: number; revealed: boolean; dungeon: number; quarried: boolean; }
 export const makeTile = (): Tile => ({ terrain: Terrain.Grass, shade: 0, trees: 0, wild: 0, revealed: false, dungeon: -1, quarried: false });
 export interface TileCoord { x: number; y: number; }
-export enum DungeonKind { Cave, Crypt, Portal, Ruin, GiantHall }
+export enum DungeonKind { Cave, Crypt, Portal, Ruin, GiantHall, /** The way home from the world beyond a gate; exists only while a party is there. */ Return }
 export interface Dungeon { name: string; kind: DungeonKind; origin: TileCoord; discovered: boolean; }
 export enum Layer { Land, Elevation, Moisture, Shade, Beach, Ridge, Heat, Count }
 export interface River { path: Point[]; width: number[]; }

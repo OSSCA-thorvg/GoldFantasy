@@ -11,18 +11,20 @@ import {
   isOutfitter,
   isSeat,
 } from '../../engine/src/building-catalog';
-import { Terrain, Layer, DungeonKind, isWater, type Dungeon } from '../../engine/src/world-types';
+import { Terrain, Layer, DungeonKind, isWater, World, type Dungeon } from '../../engine/src/world-types';
 import type { Building } from '../../engine/src/town-models';
 import type { Climate } from '../../engine/src/climate';
 import { SceneNode, ShapeNode, AnimationNode, type Rgb } from './paint';
-import { ellipse, glow, opaque, detach } from './vector-paint';
+import { ellipse, glow, opaque, detach, mix } from './vector-paint';
+import { worldGlimpse } from './realm-palette';
 import { buildingAppearanceRevision, riseAnimation } from './building-assets';
 import { WorldRendererState, pool, type Pool, type Landmark, type Visual } from './world-renderer-state';
 import { rowOf, drawRow, giantFootprint, volcanoFootprint, registerDepth } from './world-depth';
 import { lightYmir, paintYmir } from './ymir-statue';
 import { lightVolcano, paintVolcano, paintSteam } from './volcano-painter';
 import { Flicker } from './light-flicker';
-import { dungeonSprite, dungeonBody } from './world-sprites';
+import { gateSprite, gateBody, gateBounds } from './gate-sprites';
+import { gateSealed } from '../../engine/src/gate-seals';
 import { registerPick } from './world-pick-registry';
 import { paintOrnaments } from './world-ground';
 import { sprout, buildTreeRow } from './world-trees';
@@ -31,6 +33,7 @@ import { damagePaint } from './building-damage';
 const arcaneWisp: Rgb = [130, 240, 220],
   violetWisp: Rgb = [200, 150, 255],
   warmLight: Rgb = [232, 150, 64];
+const worldWisp = (world: World): Rgb => mix(worldGlimpse(world), [255, 244, 220], f32(0.45));
 function renew(landmark: Landmark, key: bigint): boolean {
   if (landmark.paint && landmark.key === key) return false;
   landmark.paint = new SceneNode();
@@ -191,8 +194,6 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       });
       here.add(s.volcanoPaint.paint!);
       lightVolcano(s.lights, s.volcanoLight!);
-      addPool(s, pool(s.volcanoLight!.crater, 260, 130, [200, 80, 30], Flicker.Fire));
-      for (const flow of s.volcanoLight!.flows) addPool(s, pool(flow, 70, 35, [170, 64, 26], Flicker.Hearth));
       s.fireRow = row;
     }
     if (row === springRow) {
@@ -298,28 +299,30 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
       }
     }
     for (const site of dungeonRows[row]) {
-      const here = new SceneNode();
+      const here = new SceneNode(),
+        index = map.dungeons().indexOf(site),
+        sealed = gateSealed(town, index),
+        homeward = site.kind === DungeonKind.Return && town.realmGate >= 0,
+        world = map.destination(homeward ? map.dungeons()[town.realmGate] : site);
       s.rowBuildings[row].add(here);
+      const pulse = gateSprite(here, s.lights, { site, world, sealed });
       registerDepth(
         here,
         point(site.origin.x + 1, site.origin.y + 1),
         `dungeon:${site.origin.x}:${site.origin.y}`,
+        gateBounds(here),
       );
-      const pulse = dungeonSprite(here, s.lights, site, s.measureText);
       registerPick(here, {
-        ref: { kind: 'dungeon', id: map.dungeons().indexOf(site) },
-        body: dungeonBody(here),
+        ref: { kind: 'dungeon', id: index },
+        body: gateBody(here),
         foot: point(site.origin.x + 1, site.origin.y + 1),
         ellipse: { rx: 48, ry: 18 },
       });
-      if (pulse) s.pulses.push(pulse);
+      // A sealed gate is shut for good: no light, no pulse, no wisps.
+      if (!pulse) continue;
+      s.pulses.push(pulse);
       addPool(s, pool(project(f32(site.origin.x + 1), f32(site.origin.y + 1)), 90, 45));
-      const tint =
-        site.kind === DungeonKind.Cave
-          ? arcaneWisp
-          : site.kind === DungeonKind.Ruin
-            ? ([170, 250, 130] as Rgb)
-            : violetWisp;
+      const tint = site.kind === DungeonKind.Return ? warmLight : worldWisp(world);
       for (let i = 0; i < 3; i++)
         s.wisps.push({
           center: project(f32(site.origin.x + 1), f32(site.origin.y + 1)),
@@ -350,18 +353,6 @@ export function buildObjects(s: WorldRendererState, town: Town, climate: Readonl
           project(f32(x + f32(0.35)), f32(y + f32(0.35))),
           (map.seed() ^ Math.imul(x, 73856093) ^ Math.imul(y, 19349663)) >>> 0,
         );
-    }
-    for (
-      let x = Math.max(0, f32(f32(row - map.height()) + 1));
-      x <= Math.min(row, f32(map.width() - 1));
-      x++
-    ) {
-      const y = f32(row - x);
-      if (x % 3 || y % 3 || !map.at(x, y).revealed || map.at(x, y).terrain !== Terrain.Lava) continue;
-      const at = project(f32(x + f32(0.5)), f32(y + f32(0.5))),
-        heat = glow(at, 96, 48, [255, 120, 40], 42);
-      s.lights.add(heat);
-      addPool(s, pool(at, 120, 60, [150, 60, 24], Flicker.Hearth, heat));
     }
     let key = look;
     for (

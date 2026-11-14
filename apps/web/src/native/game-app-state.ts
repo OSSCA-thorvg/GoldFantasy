@@ -1,4 +1,5 @@
 import type { Paint, Scene } from '@thorvg/webcanvas';
+import { GoalBranch } from '../../../../packages/engine/src/settlement-progression';
 import { Town } from '../../../../packages/engine/src/town';
 import { Camera, point, type Outline, type Point } from '../../../../packages/engine/src/geometry';
 import { Resources, type Structure } from '../../../../packages/engine/src/building-catalog';
@@ -10,6 +11,9 @@ import type { Strike } from '../../../../packages/engine/src/thunderstorm';
 import type { Building } from '../../../../packages/engine/src/town-models';
 import { CampResourceHud } from './camp-resource-hud';
 import { gameTheme } from './game-theme';
+import { CombatHudState } from './game-combat-hud';
+import { ArmyState } from './army-state';
+import { GuideState } from './game-guide';
 import type { WorldObjectRef } from './world-targets';
 import type { PrayerDialog } from './game-prayer';
 import type {
@@ -33,6 +37,7 @@ export interface WorldRenderer {
   buildingRoof(building: Building): Point | null | undefined;
   animating(): boolean;
   invalidateMap(): void;
+  reducedMotion: boolean;
   setSceneView(value: boolean): void;
   lightning(strike: Strike): void;
   dispose(): void;
@@ -72,7 +77,6 @@ export class GameAppState {
   cursor = point(-1, -1);
   pan = point();
   roadStroke: Point[] = [];
-  roadStart = point();
   roadPress: Point | null = null;
   roadMoved = false;
   outline: Outline = [];
@@ -153,12 +157,27 @@ export class GameAppState {
   current = new Plan();
   status = '';
   notice = '';
+  noticeFrom = 0;
   noticeUntil = 0;
   objectivesCollapsed = false;
+  questBranch = GoalBranch.Trade;
+  sagaDismissed = false;
+  realmCollapsed = false;
+  realmSeen = 0;
+  realmGateSeen = -1;
+  /** Floor the next party sent to each gate will enter. */
+  gateFloor = new Map<number, number>();
   questsInitialized = false;
   questsAnimating = false;
   questsSeen = 0;
   questPulseAt = -1;
+  /** Build-menu unlocks: the town last read, tools already announced, tools marked new, new tools on the open page. */
+  unlockTown: Town | null = null;
+  unlockKnown = new Set<Tool>();
+  unlockFresh = new Set<Tool>();
+  unlockViewed = new Set<Tool>();
+  /** A locked build card whose requirements stay listed after a tap. */
+  buildHint: Tool | null = null;
   skyArtwork: Paint | null = null;
   skyBounds = new Rect();
   timeToggleBounds = new Rect();
@@ -171,6 +190,12 @@ export class GameAppState {
   sceneDragAt: Point | null = null;
   sceneDragOrigin: Point | null = null;
   nextSpeechAt = [0, 0];
+  /** Combat HUD: heard combat cues, the memorial queue, the auto-pause banner. */
+  combatHud = new CombatHudState();
+  /** Control groups, skill aiming and the swarm moments of the army HUD. */
+  army = new ArmyState();
+  /** First-time moments: what was told, the card on screen and the guide log. */
+  guide = new GuideState();
   constructor(
     public town: Town,
     public renderer: WorldRenderer,

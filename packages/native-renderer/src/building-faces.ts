@@ -28,7 +28,17 @@ export interface Face {
   style: FaceStyle;
   width: number;
   opacity: OpacityKeys;
+  /** Stroke of an outlined face; without one the face keeps a soft edge in its own tone. */
+  edge?: Rgb;
 }
+/** Shade falls toward dusk indigo rather than black, as on the people who live here. */
+export const duskTone = (c: Rgb, depth: number): Rgb => [
+  Math.trunc(c[0] + (46 - c[0]) * depth) & 255,
+  Math.trunc(c[1] + (44 - c[1]) * depth) & 255,
+  Math.trunc(c[2] + (84 - c[2]) * depth) & 255,
+];
+/** The stroke that closes the hairline seams between flat faces without drawing a hard outline. */
+export const softEdge = (face: Face): Rgb => face.edge ?? duskTone(face.color, 0.16);
 // The native crystal uses ten fixed authored angles (i * .628f). These float32
 // directions preserve native cosf/sinf rounding before radius animation and BSP.
 const crystalRingDirections: readonly (readonly [number, number])[] = [
@@ -43,9 +53,21 @@ const crystalRingDirections: readonly (readonly [number, number])[] = [
   [0.30659264326095581, -0.95184081792831421],
   [0.80732887983322144, -0.59010177850723267],
 ];
-const timberLine: Rgb = [40, 30, 24],
-  doorWood: Rgb = [44, 30, 24],
-  pole: Rgb = [36, 30, 28];
+const timberLine: Rgb = [84, 62, 48],
+  doorWood: Rgb = [92, 64, 46],
+  doorFrame: Rgb = [150, 118, 84],
+  windowFrame: Rgb = [112, 86, 68],
+  footing: Rgb = [156, 152, 142],
+  pole: Rgb = [70, 56, 48];
+const lightened = (c: Rgb, k: number): Rgb => [
+  Math.min(255, Math.trunc(c[0] * k)),
+  Math.min(255, Math.trunc(c[1] * k)),
+  Math.min(255, Math.trunc(c[2] * k)),
+];
+/** Only a real roof on a real room earns eaves, a ridge and crossed gable boards. */
+const roomy = (b: Block): boolean =>
+  b.shape !== RoofShape.Flat && b.roof >= 6 && Math.min(b.x1 - b.x0, b.y1 - b.y0) >= 0.26;
+const eave = (b: Block): number => (roomy(b) ? 0.045 : 0);
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 function outBack(t: number): number {
   const c1 = f32(1.70158),
@@ -72,8 +94,9 @@ function face(
   style: FaceStyle,
   width: number,
   opacity: OpacityKeys,
+  edge?: Rgb,
 ): Face {
-  return { shape: (frame) => shape(f32(frame)), color, style, width: f32(width), opacity };
+  return { shape: (frame) => shape(f32(frame)), color, style, width: f32(width), opacity, edge };
 }
 export class Motion {
   start = 0;
@@ -160,44 +183,115 @@ class Shell {
 }
 function roofFaces(back: Face[], front: Face[], s: Shell): void {
   const body = s.motion.body(s.b.delay),
-    corner = (x: number, y: number) => (frame: number) => s.at(x, y, s.top(frame)),
-    A = corner(s.b.x0, s.b.y0),
-    B = corner(s.b.x1, s.b.y0),
-    C = corner(s.b.x1, s.b.y1),
-    D = corner(s.b.x0, s.b.y1),
-    b = s.b;
+    b = s.b,
+    e = eave(b),
+    // The roof runs on past the walls, dropping along its own pitch.
+    drop = (f: number, half: number) => f32(f32(e * s.motion.roof(b, f)) / Math.max(f32(0.01), half)),
+    halfX = f32(f32(b.x1 - b.x0) / 2),
+    halfY = f32(f32(b.y1 - b.y0) / 2),
+    at = (x: number, y: number, z: number) => s.at(x, y, z);
   const add = (into: Face[], shape: (frame: number) => Polygon, color: Rgb) =>
-    into.push(face(shape, color, FaceStyle.Outlined, f32(1.2), body));
+    into.push(face(shape, color, FaceStyle.Outlined, f32(0.9), body));
+  const line = (into: Face[], shape: (frame: number) => Polygon, color: Rgb, width: number) =>
+    into.push(face(shape, color, FaceStyle.Line, width, body));
+  const boards: Rgb = [
+      Math.trunc((b.roofShade[0] + timberLine[0]) / 2),
+      Math.trunc((b.roofShade[1] + timberLine[1]) / 2),
+      Math.trunc((b.roofShade[2] + timberLine[2]) / 2),
+    ],
+    cap = lightened(b.roofLit, f32(1.2));
   switch (b.shape) {
-    case RoofShape.Flat:
-      add(front, (f) => [A(f), B(f), C(f), D(f)], b.roofLit);
-      break;
-    case RoofShape.GableX:
-      add(
-        back,
-        (f) => [A(f), B(f), s.at(b.x1, s.ym(), s.peak(f)), s.at(b.x0, s.ym(), s.peak(f))],
-        b.roofShade,
-      );
+    case RoofShape.Flat: {
+      const corner = (x: number, y: number) => (frame: number) => at(x, y, s.top(frame));
       add(
         front,
-        (f) => [D(f), C(f), s.at(b.x1, s.ym(), s.peak(f)), s.at(b.x0, s.ym(), s.peak(f))],
+        (f) => [corner(b.x0, b.y0)(f), corner(b.x1, b.y0)(f), corner(b.x1, b.y1)(f), corner(b.x0, b.y1)(f)],
         b.roofLit,
       );
       break;
-    case RoofShape.GableY:
-      add(back, (f) => [A(f), D(f), s.at(s.xm(), b.y1, s.peak(f)), s.at(s.xm(), b.y0, s.peak(f))], b.roofLit);
+    }
+    case RoofShape.GableX: {
+      const low = (f: number) => f32(s.top(f) - drop(f, halfY)),
+        x0 = f32(b.x0 - e),
+        x1 = f32(b.x1 + e),
+        y0 = f32(b.y0 - e),
+        y1 = f32(b.y1 + e);
       add(
-        front,
-        (f) => [B(f), C(f), s.at(s.xm(), b.y1, s.peak(f)), s.at(s.xm(), b.y0, s.peak(f))],
+        back,
+        (f) => [at(x0, y0, low(f)), at(x1, y0, low(f)), at(x1, s.ym(), s.peak(f)), at(x0, s.ym(), s.peak(f))],
         b.roofShade,
       );
+      add(
+        front,
+        (f) => [at(x0, y1, low(f)), at(x1, y1, low(f)), at(x1, s.ym(), s.peak(f)), at(x0, s.ym(), s.peak(f))],
+        b.roofLit,
+      );
+      if (roomy(b)) {
+        line(front, (f) => [at(x0, s.ym(), s.peak(f)), at(x1, s.ym(), s.peak(f))], cap, f32(1.3));
+        // Gable boards cross at the ridge and run on past it, the mark of a northern hall.
+        for (const y of [y0, y1])
+          line(
+            front,
+            (f) => {
+              const rise = f32(s.peak(f) - low(f));
+              return [
+                at(x1, y, low(f)),
+                at(x1, f32(s.ym() + f32(f32(s.ym() - y) * f32(0.2))), f32(s.peak(f) + f32(rise * f32(0.2)))),
+              ];
+            },
+            boards,
+            f32(1.7),
+          );
+      }
       break;
-    case RoofShape.Pyramid:
-      add(back, (f) => [A(f), B(f), s.at(s.xm(), s.ym(), s.peak(f))], b.roofShade);
-      add(back, (f) => [A(f), D(f), s.at(s.xm(), s.ym(), s.peak(f))], b.roofLit);
-      add(front, (f) => [D(f), C(f), s.at(s.xm(), s.ym(), s.peak(f))], b.roofLit);
-      add(front, (f) => [C(f), B(f), s.at(s.xm(), s.ym(), s.peak(f))], b.roofShade);
+    }
+    case RoofShape.GableY: {
+      const low = (f: number) => f32(s.top(f) - drop(f, halfX)),
+        x0 = f32(b.x0 - e),
+        x1 = f32(b.x1 + e),
+        y0 = f32(b.y0 - e),
+        y1 = f32(b.y1 + e);
+      add(
+        back,
+        (f) => [at(x0, y0, low(f)), at(x0, y1, low(f)), at(s.xm(), y1, s.peak(f)), at(s.xm(), y0, s.peak(f))],
+        b.roofLit,
+      );
+      add(
+        front,
+        (f) => [at(x1, y0, low(f)), at(x1, y1, low(f)), at(s.xm(), y1, s.peak(f)), at(s.xm(), y0, s.peak(f))],
+        b.roofShade,
+      );
+      if (roomy(b)) {
+        line(front, (f) => [at(s.xm(), y0, s.peak(f)), at(s.xm(), y1, s.peak(f))], cap, f32(1.3));
+        for (const x of [x0, x1])
+          line(
+            front,
+            (f) => {
+              const rise = f32(s.peak(f) - low(f));
+              return [
+                at(x, y1, low(f)),
+                at(f32(s.xm() + f32(f32(s.xm() - x) * f32(0.2))), y1, f32(s.peak(f) + f32(rise * f32(0.2)))),
+              ];
+            },
+            boards,
+            f32(1.7),
+          );
+      }
       break;
+    }
+    case RoofShape.Pyramid: {
+      const low = (f: number) => f32(s.top(f) - drop(f, Math.min(halfX, halfY))),
+        x0 = f32(b.x0 - e),
+        x1 = f32(b.x1 + e),
+        y0 = f32(b.y0 - e),
+        y1 = f32(b.y1 + e),
+        apex = (f: number) => at(s.xm(), s.ym(), s.peak(f));
+      add(back, (f) => [at(x0, y0, low(f)), at(x1, y0, low(f)), apex(f)], b.roofShade);
+      add(back, (f) => [at(x0, y0, low(f)), at(x0, y1, low(f)), apex(f)], b.roofLit);
+      add(front, (f) => [at(x0, y1, low(f)), at(x1, y1, low(f)), apex(f)], b.roofLit);
+      add(front, (f) => [at(x1, y1, low(f)), at(x1, y0, low(f)), apex(f)], b.roofShade);
+      break;
+    }
   }
 }
 function wallFaces(faces: Face[], s: Shell): void {
@@ -220,11 +314,47 @@ function wallFaces(faces: Face[], s: Shell): void {
         },
         frontLeft ? b.wallLit : b.wallShade,
         FaceStyle.Outlined,
-        f32(1.2),
+        f32(0.9),
         body,
       ),
     );
   }
+  const strip = (frontLeft: boolean, z0: (f: number) => number, z1: (f: number) => number, color: Rgb) =>
+    faces.push(
+      face(
+        (f) => [
+          s.wall(frontLeft, 0, z0(f)),
+          s.wall(frontLeft, 1, z0(f)),
+          s.wall(frontLeft, 1, z1(f)),
+          s.wall(frontLeft, 0, z1(f)),
+        ],
+        color,
+        FaceStyle.Filled,
+        f32(1),
+        body,
+      ),
+    );
+  if (roomy(b) && b.wall >= 8)
+    for (const frontLeft of [true, false]) {
+      // The eaves throw a band of shadow along the wall they overhang.
+      const gableEnd = frontLeft ? b.shape === RoofShape.GableY : b.shape === RoofShape.GableX;
+      if (gableEnd) continue;
+      strip(
+        frontLeft,
+        (f) => f32(s.top(f) - Math.min(f32(2.6), f32(s.motion.wall(b, f) * f32(0.2)))),
+        (f) => s.top(f),
+        duskTone(frontLeft ? b.wallLit : b.wallShade, f32(0.34)),
+      );
+    }
+  if (roomy(b) && b.wall >= 12 && b.base === 0 && b.trim !== Trim.Crenels && b.trim !== Trim.Stakes)
+    for (const frontLeft of [true, false])
+      // A course of fieldstone keeps the timber off the wet ground.
+      strip(
+        frontLeft,
+        () => 0,
+        (f) => Math.min(f32(2.4), s.motion.wall(b, f)),
+        frontLeft ? footing : duskTone(footing, f32(0.3)),
+      );
   if (b.trim === Trim.Timber)
     for (const frontLeft of [true, false]) {
       for (const t of [f32(0.04), f32(0.96)])
@@ -271,6 +401,7 @@ function wallFaces(faces: Face[], s: Shell): void {
     z1: number,
     color: Rgb,
     keys: OpacityKeys,
+    frame: Rgb,
   ) =>
     faces.push(
       face(
@@ -284,9 +415,10 @@ function wallFaces(faces: Face[], s: Shell): void {
           ];
         },
         color,
-        FaceStyle.Filled,
-        f32(1.2),
+        FaceStyle.Outlined,
+        f32(1.3),
         keys,
+        frame,
       ),
     );
   for (const frontLeft of [true, false]) {
@@ -300,10 +432,11 @@ function wallFaces(faces: Face[], s: Shell): void {
         frontLeft,
         along,
         half,
-        f32(0.4),
-        f32(0.74),
+        f32(0.42),
+        f32(0.72),
         b.glass,
         s.motion.late(b.delay, f32(28 + f32(i * 2))),
+        windowFrame,
       );
     }
   }
@@ -318,6 +451,7 @@ function wallFaces(faces: Face[], s: Shell): void {
       b.wall > 8 ? f32(0.58) : f32(0.9),
       doorWood,
       body,
+      doorFrame,
     );
   }
 }
@@ -358,7 +492,7 @@ function battlements(faces: Face[], s: Shell): void {
             },
             edge.color,
             FaceStyle.Outlined,
-            f32(1.2),
+            f32(0.9),
             body,
           ),
         );
@@ -372,7 +506,7 @@ function battlements(faces: Face[], s: Shell): void {
             },
             edge.color,
             FaceStyle.Outlined,
-            f32(1.2),
+            f32(0.9),
             body,
           ),
         );
@@ -411,7 +545,7 @@ function ornaments(faces: Face[], s: Shell): void {
         },
         b.accent,
         FaceStyle.Outlined,
-        f32(1.2),
+        f32(0.9),
         keys,
       ),
     );
@@ -460,7 +594,7 @@ function ornaments(faces: Face[], s: Shell): void {
           },
           left ? b.accent : scaled(b.accent, f32(0.58)),
           FaceStyle.Outlined,
-          f32(1.2),
+          f32(0.9),
           keys,
         ),
       );

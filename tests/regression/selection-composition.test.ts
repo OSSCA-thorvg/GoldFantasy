@@ -260,6 +260,8 @@ it('composes ground selection before world objects and keeps labels beneath HUD 
       map: () => map,
       person: () => null,
       isTitleAutoplay: () => false,
+      realmRevision: 0,
+      realmGate: -1,
     },
     renderer = {
       visible: () => true,

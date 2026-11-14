@@ -49,6 +49,7 @@ export interface SynthesisState {
   songAt: number;
   songPan: number;
   song: number[];
+  swarmBed: Clip;
   noise(): number;
 }
 const nativeDouble = <T>(value: T): T => value;
@@ -279,6 +280,17 @@ export function ambient(this: SynthesisState, out: Stereo): void {
       }
     }
   }
+  if (this.level.swarm > f32(0.001)) swarmBed(this, out);
+}
+/** The pack bed, read round and round: its end was authored to flow into its start. */
+function swarmBed(state: SynthesisState, out: Stereo): void {
+  const bed = state.swarmBed;
+  if (!bed.pcm || bed.frames < 2) return;
+  const at = (state.clock * bed.rate) % bed.frames,
+    i = Math.trunc(at),
+    next = i + 1 < bed.frames ? i + 1 : 0,
+    sample = (bed.pcm[i] + (bed.pcm[next] - bed.pcm[i]) * (at - i)) / 32768;
+  place(f32(f32(sample * f32(0.6)) * state.level.swarm), state.level.swarmPan, out);
 }
 export function voice(this: SynthesisState, v: Voice): number {
   let a = v.age;
@@ -292,7 +304,13 @@ export function voice(this: SynthesisState, v: Voice): number {
         return f32(v.clip.at(a, v.rate) * clamp(Math.min(a / 0.008, (end - a) / 0.045), 0, 1));
       if (v.sound.cue === Cue.Chop)
         return f32(woodImpact(v, v.clip.at(a, v.rate)) * clamp(Math.min(a / 0.002, (end - a) / 0.035), 0, 1));
-      if (v.sound.cue === Cue.Hammer || v.sound.cue === Cue.TreeFall)
+      if (
+        v.sound.cue === Cue.Hammer ||
+        v.sound.cue === Cue.TreeFall ||
+        v.sound.cue === Cue.Slam ||
+        v.sound.cue === Cue.Fall ||
+        v.sound.cue === Cue.Downed
+      )
         return f32(v.clip.at(a, v.rate) * clamp(Math.min(a / 0.002, (end - a) / 0.045), 0, 1));
       return f32(v.clip.at(a, v.rate) * clamp(f32(f32(end - a) / fade), 0, 1));
     }

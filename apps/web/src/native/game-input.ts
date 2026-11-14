@@ -14,9 +14,7 @@ import {
   point,
   add,
   sub,
-  scale,
   distance,
-  length,
   project,
   unproject,
   rotated,
@@ -24,12 +22,7 @@ import {
   Footprint,
 } from '../../../../packages/engine/src/geometry';
 import { f32 as f, clamp, lround } from '../../../../packages/engine/src/numeric';
-import {
-  type RoadPath,
-  flatten,
-  freehandRoad,
-  sharpAnchor,
-} from '../../../../packages/engine/src/road-network';
+import type { RoadPath } from '../../../../packages/engine/src/road-network';
 import { structureSpec } from '../../../../packages/engine/src/building-catalog';
 import type { Check } from '../../../../packages/engine/src/town-models';
 import { buildingUnlock, toolAvailable } from '../../../../packages/engine/src/settlement-progression';
@@ -45,6 +38,10 @@ import { Key } from '../../../../packages/native-ui/src';
 import type { AppEvent } from './application-contracts';
 import { targetsInBox, hoveredTarget, cachedWorldHit, refreshHoveredTarget } from './world-targets';
 import { placementMapBounds } from './mobile-layout';
+import { draftRoad } from './road-stroke';
+import { toolRequirements } from './build-menu-tools';
+import { cancelSkill, currentAim, releaseSkill } from './skill-commands';
+import { callingOnScreen } from './army-orders';
 
 export interface GameInputApp extends GameAppState {
   cue(sound: Cue): void;
@@ -119,120 +116,15 @@ export function sampleRoad(this: GameInputApp): void {
   this.roadStroke.push({ ...this.cursor });
 }
 export function roadDraft(this: GameInputApp): RoadPath {
-  if (!this.roadPress || !this.roadStroke.length) return [];
-  let points = this.roadStroke.map((p) => ({ ...p }));
-  if (points.length > 1 && distance(this.toScreen(points[points.length - 1]), this.mouse) < 3)
-    points[points.length - 1] = { ...this.cursor };
-  else if (points[points.length - 1].x !== this.cursor.x || points[points.length - 1].y !== this.cursor.y)
-    points.push({ ...this.cursor });
-  if (points.length < 2) return [];
-  const covered = (p: Point) => this.town.roads().distance(p).distance <= f(0.12);
-  // Sparse pointer events can land on existing roads while crossing new ground.
-  // Check between those samples before treating the gesture as a retrace.
-  if (points.every(covered) && flatten(points.map(sharpAnchor), f(0.2)).every(covered)) return [];
-  const nearSameRoad = (p: Point, road: number) => {
-    const nearest = this.town.roads().distance(p);
-    return nearest.distance <= Town.joinReach && nearest.id === road;
-  };
-  const start = this.town.roads().distance(points[0]);
-  let end = this.roadPoint();
-  const endRoad = this.town.roads().distance(end).id ?? -1;
-  if (start.distance <= Town.joinReach) {
-    while (
-      points.length > 2 &&
-      nearSameRoad(points[0], start.id ?? -1) &&
-      nearSameRoad(points[1], start.id ?? -1)
-    )
-      points.shift();
-    points[0] = this.town.roads().distance(points[0]).onRoad ?? point();
-  }
-  if (covered(end)) {
-    let arrival = -1;
-    for (let i = points.length - 2; i > 0; --i) {
-      if (!nearSameRoad(points[i], endRoad) || !nearSameRoad(points[i + 1], endRoad)) break;
-      if (
-        !flatten([sharpAnchor(points[i]), sharpAnchor(points[i + 1])], f(0.2)).every((p) =>
-          nearSameRoad(p, endRoad),
-        )
-      )
-        break;
-      const incoming = sub(points[i], points[i - 1]),
-        outgoing = sub(points[i + 1], points[i]);
-      const product = length(incoming) * length(outgoing);
-      const cosine = product > 0 ? (incoming.x * outgoing.x + incoming.y * outgoing.y) / product : 1;
-      // A clear corner followed along a snapped road is an arrival, even if
-      // the hand-drawn stroke sits beside its centerline. Short endpoint
-      // adjustments and reversals still collapse to the final cursor.
-      if (
-        Math.abs(cosine) <= Math.SQRT1_2 &&
-        distance(this.toScreen(points[i]), this.toScreen(points[points.length - 1])) >= 12
-      ) {
-        arrival = i;
-        break;
-      }
-    }
-    if (arrival >= 0) {
-      points.length = arrival + 1;
-      end = this.town.roads().distance(points[arrival]).onRoad ?? end;
-    } else {
-      let retraced = false;
-      while (points.length > 2) {
-        const previous = points[points.length - 2],
-          last = points[points.length - 1];
-        if (
-          !covered(previous) ||
-          !covered(last) ||
-          !flatten([sharpAnchor(previous), sharpAnchor(last)], f(0.2)).every(covered)
-        )
-          break;
-        points.pop();
-        retraced = true;
-      }
-      if (retraced) {
-        // Following an existing road after arriving must not turn an L or loop
-        // into a diagonal. End the new segment at its actual arrival point.
-        end = this.town.roads().distance(points[points.length - 1]).onRoad ?? end;
-      } else {
-        while (
-          points.length > 2 &&
-          nearSameRoad(points[points.length - 2], endRoad) &&
-          nearSameRoad(points[points.length - 1], endRoad)
-        )
-          points.pop();
-      }
-    }
-    points[points.length - 1] = end;
-  }
-  const origin = points[0],
-    screen = (p: Point) => {
-      const delta = sub(p, origin);
-      return scale(project(delta.x, delta.y), this.camera.zoom);
-    };
-  points = points.map(screen);
-  const startOffset = sub(screen(covered(origin) ? origin : this.roadStart), points[0]),
-    endOffset = sub(screen(end), points[points.length - 1]);
-  let total = 0;
-  for (let i = 1; i < points.length; ++i) total = f(total + distance(points[i - 1], points[i]));
-  if (total <= 0) return [];
-  const blend = Math.min(total, Math.max(24, f(3 * Math.max(length(startOffset), length(endOffset)))));
-  const weight = (along: number) => {
-    const t = clamp(f(along / blend), 0, 1);
-    return f(1 - f(f(t * t) * f(3 - f(2 * t))));
-  };
-  let walked = 0,
-    previous = points[0];
-  points = points.map((raw) => {
-    walked = f(walked + distance(previous, raw));
-    previous = raw;
-    return add(add(raw, scale(startOffset, weight(walked))), scale(endOffset, weight(f(total - walked))));
+  if (!this.roadPress) return [];
+  return draftRoad({
+    town: this.town,
+    stroke: this.roadStroke,
+    cursor: this.cursor,
+    mouse: this.mouse,
+    zoom: this.camera.zoom,
+    toScreen: (world) => this.toScreen(world),
   });
-  const path = freehandRoad(points, 5);
-  for (const anchor of path)
-    for (const key of ['point', 'in', 'out'] as const) {
-      const p = anchor[key];
-      anchor[key] = add(origin, unproject(f(p.x / this.camera.zoom), f(p.y / this.camera.zoom)));
-    }
-  return path;
 }
 export function finishRoad(this: GameInputApp): void {
   if (!this.roadPress) return;
@@ -342,7 +234,8 @@ export function plan(this: GameInputApp): Plan {
 }
 export function selectTool(this: GameInputApp, value: Tool, useSelection = false): void {
   if (!toolAvailable(this.town, value)) {
-    this.status = 'Complete the earlier settlement quests first';
+    this.status =
+      toolRequirements(this.town, value).find((r) => !r.done)?.text ?? 'Complete the earlier settlement quests first';
     return;
   }
   if (this.tool !== value) this.cue(Cue.Click);
@@ -411,6 +304,7 @@ export function cancel(this: GameInputApp): void {
     this.cancelStroke();
     return;
   }
+  if (cancelSkill(this)) return;
   if (this.pending !== Order.None) {
     this.pending = Order.None;
     return;
@@ -497,8 +391,19 @@ export function select(this: GameInputApp): void {
       -1;
   const target = hoveredTarget(this as unknown as import('./game-commands').GameCommandApp);
   if (!target) return;
-  if (target.kind === 'person') this.selectPeople([target.id]);
-  else if (target.kind === 'building') this.selected = target.id;
+  if (target.kind === 'person') {
+    // A second click on the same resident soon after takes every one of their calling on screen.
+    const now = this.context.time(),
+      last = this.army.lastPick,
+      p = this.town.person(target.id);
+    if (last.id === target.id && now - last.at < 0.4 && now >= last.at && p && isPlayerResident(p)) {
+      this.selectPeople(callingOnScreen(this, p.calling));
+      this.army.lastPick = { id: -1, at: -1 };
+    } else {
+      this.selectPeople([target.id]);
+      this.army.lastPick = { id: target.id, at: now };
+    }
+  } else if (target.kind === 'building') this.selected = target.id;
   else if (target.kind === 'animal') this.selectedAnimal = target.id;
   else if (target.kind === 'tree') {
     this.selectedTree = target.id;
@@ -516,6 +421,8 @@ export function pointerDown(this: GameInputApp, x: number, y: number, button: Po
     this.timeExpanded = false;
   if (button === PointerButton.Secondary) {
     if (this.context.controlAt(x, y)) return;
+    // Right-click puts an aimed skill down; it gives no order.
+    if (cancelSkill(this)) return;
     if (this.roadPress) {
       this.cancelStroke();
       return;
@@ -532,7 +439,7 @@ export function pointerDown(this: GameInputApp, x: number, y: number, button: Po
     return;
   }
   this.dismissBuildDrawer();
-  if (this.pending !== Order.None && this.chosen.length) return;
+  if (currentAim(this) || (this.pending !== Order.None && this.chosen.length)) return;
   this.pending = Order.None;
   this.press();
 }
@@ -543,7 +450,6 @@ export function press(this: GameInputApp): void {
       this.boxFrom = { ...this.mouse };
       return;
     case Tool.Road:
-      this.roadStart = this.roadPoint();
       this.roadStroke = [{ ...this.cursor }];
       this.roadPress = { ...this.mouse };
       this.roadMoved = false;
@@ -625,6 +531,10 @@ export function pointerUp(this: GameInputApp, x: number, y: number, button: Poin
   if (this.hudPointer) {
     this.context.pointerUp(x, y);
     this.hudPointer = false;
+    return;
+  }
+  if (currentAim(this) && !this.context.controlAt(x, y)) {
+    releaseSkill(this);
     return;
   }
   if (this.pending !== Order.None && this.chosen.length && !this.context.controlAt(x, y)) {

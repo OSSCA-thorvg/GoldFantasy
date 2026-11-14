@@ -1,6 +1,7 @@
 // Native town.cpp placement, construction, staffing and land rules. No tutorial policy is added here.
 import { TownState } from './town-state';
 import { Building, Field, Check, Placement } from './town-models';
+import type { WalkGrid } from './walk-paths';
 import {
   Resources,
   Structure,
@@ -14,6 +15,7 @@ import {
 import { Activity, Person, Role, TreeWorkKind } from './person';
 import { CampEconomy } from './camp-economy';
 import { Tile, Terrain, DungeonKind, isWater, isStone } from './world-types';
+import { inArea } from './realm-layout';
 import {
   Point,
   Outline,
@@ -240,7 +242,8 @@ export function groundProblem(this: ConstructionTown, points: Point[]): string {
   for (const p of points) {
     const tile = this.world.cell(p);
     if (!tile || !this.world.revealed(p)) return 'Unexplored land';
-    if (this.world.giant()?.covers(p)) return "Ymir's stone";
+    if (this.world.giant()?.covers(p)) return "Odin's statue";
+    if (inArea(this.realmArea, p)) return 'Another world';
     const terrain = this.world.terrainAt(p);
     if (isWater(terrain)) return 'Water';
     if (terrain === Terrain.Mountain) return 'Mountains';
@@ -309,6 +312,19 @@ export function fit(this: ConstructionTown, kind: Structure, cursor: Point, free
   }
   return best;
 }
+// The placement preview asks every frame; the answer only changes when the grid is rebuilt.
+const doorways = new WeakMap<Float32Array, Map<string, boolean>>();
+function doorReached(grid: WalkGrid, from: Point, door: Point): boolean {
+  let known = doorways.get(grid.costs);
+  if (!known) doorways.set(grid.costs, (known = new Map()));
+  const key = `${from.x},${from.y}>${Math.round(door.x * 4)},${Math.round(door.y * 4)}`;
+  let reached = known.get(key);
+  if (reached === undefined) {
+    if (known.size > 512) known.clear();
+    known.set(key, (reached = grid.path(from, door).length > 0));
+  }
+  return reached;
+}
 export function canPlace(this: ConstructionTown, kind: Structure, center: Point, angle: number): Check {
   const spec = structureSpec(kind),
     check = new Check(false, '', spec.cost.clone()),
@@ -357,11 +373,18 @@ export function canPlace(this: ConstructionTown, kind: Structure, center: Point,
     return refuse(check, 'Needs forest within 4 paces');
   if (kind === Structure.Quarry && !this.nearbyTiles(center, f32(3.5), (t) => isStone(t.terrain)))
     return refuse(check, 'Needs rocky ground within 3 paces');
+  // Builders work from the doorway, so a plot nobody can walk to would stand unbuilt for good.
+  const seat = founding ? null : this.camp(village);
+  if (seat && this.grid.costs.length) {
+    const door = new Building(-1, kind, { ...center }, angle, placementVariant(this.world, kind, center)).door();
+    if (!doorReached(this.grid, seat.door(), door)) return refuse(check, 'Builders cannot reach its door');
+  }
   check.ok = true;
   return check;
 }
 export function place(this: ConstructionTown, kind: Structure, center: Point, angle: number): boolean {
   if (!this.canPlace(kind, center, angle).ok) return false;
+  this.commanded();
   const spec = structureSpec(kind),
     village = this.settlementAt(center);
   const variant = placementVariant(this.world, kind, center),
@@ -476,6 +499,7 @@ export function canBuildRoad(this: ConstructionTown, path: RoadPath): Check {
 export function buildRoad(this: ConstructionTown, path: RoadPath): boolean {
   const check = this.canBuildRoad(path);
   if (!check.ok) return false;
+  this.commanded();
   const village = this.roadSettlement(path);
   const id = this.network.add(path),
     road = this.network.road(id)!;
@@ -563,9 +587,11 @@ export function canPlantField(this: ConstructionTown, outline: Outline): Check {
 }
 export function plantField(this: ConstructionTown, outline: Outline): boolean {
   if (!this.canPlantField(outline).ok) return false;
+  this.commanded();
   const village = this.settlementAt(centroid(outline));
   const field = new Field(this.nextId++, structuredClone(outline), village);
   field.faction = this.controlFaction;
+  field.tilled = 0;
   this.farmland.push(field);
   this.credit(new Resources(0, this.clearTrees(samples(outline))), village);
   ++this.changes;

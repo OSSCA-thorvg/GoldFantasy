@@ -130,6 +130,254 @@
       "sha256": "efe57e03f50f3c938f7795106a3ee1867b1db8cdf1b4151627952242368feff7"
     },
     {
+      "path": "sfx/combat/aimed_01.ogg",
+      "sha256": "9efcd5f4dc11c46f130ad16b47eec8c674618c48be0e5a0558eff0f74ac6a72f"
+    },
+    {
+      "path": "sfx/combat/aimed_02.ogg",
+      "sha256": "985be51d5ac6fc2fdad6427084b8904164464f61b748ce1c3e6b47ecc5bb6514"
+    },
+    {
+      "path": "sfx/combat/aimed_03.ogg",
+      "sha256": "83dd54171d8fd87b693f94653a38293f8fafb3dd4feaff9ba4bdb4e8fb2801de"
+    },
+    {
+      "path": "sfx/combat/brood_break_01.ogg",
+      "sha256": "ac7cfdc6450c875c2a00a1ac17cdcd3d991cc52217b48f0f5be9ff27eae53cc2"
+    },
+    {
+      "path": "sfx/combat/brood_break_02.ogg",
+      "sha256": "60a413f06a6ccf209ab0653619398dc2e6bd6501675fbd0f69e5688b6afe1c51"
+    },
+    {
+      "path": "sfx/combat/burst_01.ogg",
+      "sha256": "bf80219e1e06aba0a6ec5f4824b01a491f818ca5bf43441ddf1c35dbc9a1c2d9"
+    },
+    {
+      "path": "sfx/combat/burst_02.ogg",
+      "sha256": "e35ca54f09e1b9552a2096becc48c129d885de7f2ed8420ef1f437be3c2b549e"
+    },
+    {
+      "path": "sfx/combat/burst_03.ogg",
+      "sha256": "da9e7bfe3a4a13f1006b2d758cdfb93a26092bde7453614f546b51e80ca59ccd"
+    },
+    {
+      "path": "sfx/combat/challenge_01.ogg",
+      "sha256": "6faff2674a066b374a2b3123927287cddc80e663a5e877efca94015bff925b70"
+    },
+    {
+      "path": "sfx/combat/challenge_02.ogg",
+      "sha256": "87501fabb3c6ce338cf5f4980324e57c9b20275cf9f9c7f6bef3c5eef716165e"
+    },
+    {
+      "path": "sfx/combat/challenge_03.ogg",
+      "sha256": "97c5fed86f86de47aefd2f767c3c9e109995147206ac22d935abe859ffc4c782"
+    },
+    {
+      "path": "sfx/combat/cleave_01.ogg",
+      "sha256": "ccb7a59abd74d18d8129577ea54954f632b95f621b8e5654385bf19add208ab4"
+    },
+    {
+      "path": "sfx/combat/cleave_02.ogg",
+      "sha256": "52c976abb6ed9b9d9bd1c101c1787a5a2fe526e4e09f8d5fd17a95550cb6113f"
+    },
+    {
+      "path": "sfx/combat/cleave_03.ogg",
+      "sha256": "d2d1d5ef87e5973ffe4fda04cc2a0f2216adfa0c210e29572b3bde653ff74fa2"
+    },
+    {
+      "path": "sfx/combat/cleave_04.ogg",
+      "sha256": "6e42ed4d5ee990a1d82c8239160e7457f5b7ee256f47fc43cb2bf97efc6e8833"
+    },
+    {
+      "path": "sfx/combat/crush_01.ogg",
+      "sha256": "6071206193fad1b840afce3b737bcdb04f6753bbafff177642cb518c77997d1f"
+    },
+    {
+      "path": "sfx/combat/crush_02.ogg",
+      "sha256": "c2170ed202fffa3c2fc445d351450cb5b27310e5e5df66f9e8f045f2318e728b"
+    },
+    {
+      "path": "sfx/combat/crush_03.ogg",
+      "sha256": "0b2f5dc9546824b0e0e3e0b9e75f667a1a1c5fd6577c192f632c137f4d1772de"
+    },
+    {
+      "path": "sfx/combat/crush_04.ogg",
+      "sha256": "d3539c6b69843b95207a804224103349da4bbb06f65a2ad18c7cdbb3ef9faae2"
+    },
+    {
+      "path": "sfx/combat/den_fall_01.ogg",
+      "sha256": "4ff6c3af463ebae9b720fc37b92e8eb1b70848ff81570312937776662bbc8ad5"
+    },
+    {
+      "path": "sfx/combat/den_fall_02.ogg",
+      "sha256": "8e31067b349bf60d3ab3f0031ef785d1dbfad5f41f2d71cabf40cc2b996fd69a"
+    },
+    {
+      "path": "sfx/combat/dirge_01.ogg",
+      "sha256": "555b6925bb85e725e947fdc9f54a87deeb3f91d4bd90a54fca8016ee1e9f70ec"
+    },
+    {
+      "path": "sfx/combat/dirge_02.ogg",
+      "sha256": "facc1a57501efce322994b3054b1c596bc54de836019858e5daccc2791c17aa7"
+    },
+    {
+      "path": "sfx/combat/frost_01.ogg",
+      "sha256": "6c598258b2b4f8800f6e7a2803c0737c5e9e87db309b298fdb3b65de4e3ebe14"
+    },
+    {
+      "path": "sfx/combat/frost_02.ogg",
+      "sha256": "92b5018a167647cc9752bc3cee4dc8b450567be4860ee18faf5737e3b9b01a71"
+    },
+    {
+      "path": "sfx/combat/frost_03.ogg",
+      "sha256": "20c4c6cd6ccd29290ff54209b242bc401151ef7306495160b9074b25d8bdae8e"
+    },
+    {
+      "path": "sfx/combat/mend_01.ogg",
+      "sha256": "9b9978cde457a9dce0df6d567ed83829ec2f7d45747b42bc6ad8858e371bbddc"
+    },
+    {
+      "path": "sfx/combat/mend_02.ogg",
+      "sha256": "0baa083d158b9a000b95b6136b166544f5cd410c33c8521bd1d432102a99a8fc"
+    },
+    {
+      "path": "sfx/combat/mend_03.ogg",
+      "sha256": "040870ac1c749d921506d1d56f11e4d0ea5cf2324c332ad1cb3b2fb12c5fe027"
+    },
+    {
+      "path": "sfx/combat/pierce_01.ogg",
+      "sha256": "2d0a7ea98e3c603624ff7039e3cad2e0ffb6cfef28ce30f3292bd679d9c427db"
+    },
+    {
+      "path": "sfx/combat/pierce_02.ogg",
+      "sha256": "2f7f201575e44f372e8ab960c80e37155bf763e9e24c4da13a2985043b2607d0"
+    },
+    {
+      "path": "sfx/combat/pierce_03.ogg",
+      "sha256": "7e8f4ddea945a0677f82285625e7371babcab45d1ebc1b20c2ea900783455acb"
+    },
+    {
+      "path": "sfx/combat/pierce_04.ogg",
+      "sha256": "9252eea81be5952635ea8694ea3c3b76c34e823bc4577e633fb18db5be3509a7"
+    },
+    {
+      "path": "sfx/combat/rally_01.ogg",
+      "sha256": "c691e0844c443632375322100d773eb582d1d15066bfc3b377502a4ca17355fa"
+    },
+    {
+      "path": "sfx/combat/rally_02.ogg",
+      "sha256": "e267bd8d284c6ba2e6ed7c9c477b18c65cad36c5d761027138fc81f3030bfd10"
+    },
+    {
+      "path": "sfx/combat/sanctuary_01.ogg",
+      "sha256": "96be6119814cf97d7f26646db6cf76c7ce8d78593a55acf322a30a02405d510d"
+    },
+    {
+      "path": "sfx/combat/sanctuary_02.ogg",
+      "sha256": "b958fda94e8a2cdc36144f83750ff7109881eed4c1e657325b78dd1b20e4edd5"
+    },
+    {
+      "path": "sfx/combat/spawn_01.ogg",
+      "sha256": "9437d8e1ce4bb3ffe517a5189565e45dbee94bcee8c1af5f56e643586b4f4848"
+    },
+    {
+      "path": "sfx/combat/spawn_02.ogg",
+      "sha256": "3d0fd38496e6c9e97b3df6faa3663cdf27eb69b31e087a82f41525d2f8a4d190"
+    },
+    {
+      "path": "sfx/combat/spawn_03.ogg",
+      "sha256": "b643d5f14ed30387a1eca838e09bbd2a263a2824b6fa126717da836e35f974fe"
+    },
+    {
+      "path": "sfx/combat/spawn_04.ogg",
+      "sha256": "cf780130fe3e2a9d00cf431958733b781b556273b8967a5f7dc7cbb464a67148"
+    },
+    {
+      "path": "sfx/combat/splash_01.ogg",
+      "sha256": "634717f60263e1f6ee6b0093af04dd891d50185b99d4c5994c837330eb9c1bdf"
+    },
+    {
+      "path": "sfx/combat/splash_02.ogg",
+      "sha256": "d046c554c01b49e5711485a88eba0a46fd0a5abb30d5e905eb0d6e4f19f01d90"
+    },
+    {
+      "path": "sfx/combat/splash_03.ogg",
+      "sha256": "0ec47e136a528421480c90d7557da32f39ee74efb59da40a4baaf5bcefedd36d"
+    },
+    {
+      "path": "sfx/combat/splash_04.ogg",
+      "sha256": "a78359b48f26d8c22adc2dd345542aa391d34a5df847bdb272e640368958cfe7"
+    },
+    {
+      "path": "sfx/combat/swarm_bed_01.ogg",
+      "sha256": "f811cd5dbf35bbc954ec4ca4e069a0904a89ee741d8cc538fa1c18b02a55f201"
+    },
+    {
+      "path": "sfx/combat/swarm_death_01.ogg",
+      "sha256": "66da63b04822bcdce641940450e059b1f15a73417dffe0fdea50956b5ea0b925"
+    },
+    {
+      "path": "sfx/combat/swarm_death_02.ogg",
+      "sha256": "7b38063c0355e5cb75ba91c5c0751d4742ca19bcb154ea27c00a7be366897c6e"
+    },
+    {
+      "path": "sfx/combat/swarm_death_03.ogg",
+      "sha256": "7261e127b9af85367f92d1c4f8d742407883e8603647dfb7d4e7e44a6b554e2b"
+    },
+    {
+      "path": "sfx/combat/swarm_death_04.ogg",
+      "sha256": "11958fd7a0df7b34b9c3a6b083302288d52db3b61799e7c854e171514db257ed"
+    },
+    {
+      "path": "sfx/combat/swarm_death_05.ogg",
+      "sha256": "99a5f000fe0f21c63dbca288cdfe414cad873f066d95cad81e90114c78bcfc34"
+    },
+    {
+      "path": "sfx/combat/swarm_death_06.ogg",
+      "sha256": "2a7bd24e687e1a3e7408807f7b16d7eab32c7277137e2e38fcd167d9ec6c669c"
+    },
+    {
+      "path": "sfx/combat/swarm_death_07.ogg",
+      "sha256": "1e8a20ce30ffa9a9bdd3b7623c33c33f8448d8f6be388ebfb14c5d36f1effb5f"
+    },
+    {
+      "path": "sfx/combat/swarm_death_08.ogg",
+      "sha256": "bc31ed1d387185448b1ce26b6d855a181f7d2c713823cc51af5edc11d7e5f861"
+    },
+    {
+      "path": "sfx/combat/volley_01.ogg",
+      "sha256": "6cb0e652873a77d726544bc2097d5f595e4db1bca461c5ae7f8dadae173aaf9f"
+    },
+    {
+      "path": "sfx/combat/volley_02.ogg",
+      "sha256": "523c9a21358bbb14937405e5b2b3987d4deef763fca48605d0031b6b01810cc5"
+    },
+    {
+      "path": "sfx/combat/volley_03.ogg",
+      "sha256": "6cabd0180a9b0bfccc124c380ff8bc49ba25f3fad1a3e1a8ac73ab97520a9ad0"
+    },
+    {
+      "path": "sfx/combat/wave_horn_01.ogg",
+      "sha256": "3f5d1b6d9df9e3498b2b889d253362ab0d1a7e26b9fa499231dfab30c48978b1"
+    },
+    {
+      "path": "sfx/combat/wave_horn_02.ogg",
+      "sha256": "7c4138e91b2e0a2edb660177ffb38ecfcf238626712e4eb689174adb459ae6e8"
+    },
+    {
+      "path": "sfx/combat/whirl_01.ogg",
+      "sha256": "e815a8b4f0abfbed6332a4af13814343bcdc68f5b22363ef5dbc61df5858780d"
+    },
+    {
+      "path": "sfx/combat/whirl_02.ogg",
+      "sha256": "6a3bb31f74244c561f7eda372e77c0de14e2b6d8da5b47e464454ad06a701205"
+    },
+    {
+      "path": "sfx/combat/whirl_03.ogg",
+      "sha256": "bf80564c4bb3fd422d7f12f123d5c496d141eb12f8b2e0d84321bf93d7211ff0"
+    },
+    {
       "path": "ui/cancel_01.ogg",
       "sha256": "2bbfd483caa4a626573edf41c7ad44a26e9f26abb67d7afa842dcf68cde2885a"
     },
@@ -1366,7 +1614,7 @@
       "sha256": "a7c37187b3de0e3fd216c375aacf97554acd8915b4201a56a93776c058fddf0d"
     }
   ],
-  "endingsSha256": "41db0ce9a829e291ef87bd28419dea3af50d8573d27fc8159eec9955b9eaddf6",
+  "endingsSha256": "b2ba7a86b7e7c91c5e47627a500b32a1fbd8b6d4d0cb3e5c5764c629379c85a9",
   "weatherVoiceProvenance": {
     "source": "Synthetic speech generated offline; no human voice recordings or model runtime shipped",
     "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",

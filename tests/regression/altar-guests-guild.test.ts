@@ -182,16 +182,31 @@ describe('altar prayer and immediate residents', () => {
     expect(town.stock(0).food).toBe(food);
   });
 
+  // The altar asks for a home and a farm of the settlement's own faction.
+  const homeAndFarm = (town: Town, faction = 0) => {
+    for (const [kind, at] of [
+      [Structure.Tent, point(4, 4)],
+      [Structure.Farm, point(4, 12)],
+    ] as const) {
+      const b = new Building(town.nextId++, kind, at, 0, 0);
+      b.faction = faction;
+      town.placed.push(b);
+    }
+    town.migrateSettlements();
+  };
   it("does not unlock player construction from another faction's facilities", () => {
     const town = fixture();
     town.placed[0].faction = 1;
+    homeAndFarm(town, 1);
     expect(buildingUnlock(town, Structure.Shrine).available).toBe(false);
     town.controlFaction = 1;
     expect(buildingUnlock(town, Structure.Shrine).available).toBe(true);
   });
 
-  it('is available to the two-founder settlement without advanced materials', () => {
+  it('opens for the two founders once a tent and a farmhouse stand, without advanced materials', () => {
     const town = fixture();
+    expect(buildingUnlock(town, Structure.Shrine).reason).toBe('Complete Tent');
+    homeAndFarm(town);
     expect(buildingUnlock(town, Structure.Shrine).available).toBe(true);
     const cost = structureSpec(Structure.Shrine).cost;
     expect(cost.planks + cost.cutStone).toBe(0);

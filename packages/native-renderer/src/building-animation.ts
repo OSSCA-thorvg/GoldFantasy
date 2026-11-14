@@ -4,7 +4,15 @@ import { point, type Point } from '../../engine/src/geometry';
 import { f32 } from '../../engine/src/numeric';
 import { BuildingProjection, orientModel, splitAngle, type Model } from './building-model';
 import { validateBuildingAsset } from './building-asset';
-import { buildingFaces, FaceStyle, Motion, type Face, type Polygon } from './building-faces';
+import {
+  buildingFaces,
+  duskTone,
+  FaceStyle,
+  Motion,
+  softEdge,
+  type Face,
+  type Polygon,
+} from './building-faces';
 import { depthBatches, faceOpacity } from './building-depth';
 import type { Rgb } from './paint';
 export interface RiseAnimation {
@@ -24,8 +32,7 @@ export interface BuildingStage {
 }
 const padding = 12,
   sinkFrames = 10,
-  outline: Rgb = [20, 18, 24],
-  soil: Rgb = [40, 34, 28];
+  soil: Rgb = [124, 110, 84];
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 const constant = (k: Json): Json => ({ a: 0, k });
 // Native ostream's max_digits10 serializes float32 values with nine digits.
@@ -287,19 +294,21 @@ function animation(
     const shaded = f32(bottom - top) > 2,
       color = face.color,
       channel = (c: number, scale: number) => Math.min(1, f32(f32(c * scale) / 255));
-    const gradient =
-      '[0,' +
-      color.map((c) => fixed(channel(c, shaded ? f32(1.18) : 1))).join(',') +
-      ',1,' +
-      color.map((c) => fixed(channel(c, shaded ? f32(0.78) : 1))).join(',') +
-      ']';
-    const stroke = face.style === FaceStyle.Outlined ? outline : color;
+    // Lit at the top, settling into dusk toward the ground: one soft tone per face.
+    const foot = shaded ? duskTone(color, f32(0.2)) : color,
+      gradient =
+        '[0,' +
+        color.map((c) => fixed(channel(c, shaded ? f32(1.08) : 1))).join(',') +
+        ',1,' +
+        foot.map((c) => fixed(channel(c, 1))).join(',') +
+        ']';
+    const stroke = face.style === FaceStyle.Outlined ? softEdge(face) : color;
     return {
       gradient,
       start: vector([offset.x, f32(top + offset.y)]),
       end: vector([offset.x, f32((shaded ? bottom : f32(top + 1)) + offset.y)]),
       stroke: '[' + stroke.map((c) => fixed(f32(c / 255))).join(',') + ',1]',
-      width: fixed(face.style === FaceStyle.Outlined ? f32(1.2) : face.width),
+      width: fixed(face.width),
     };
   });
   const opacities = faces.map((face) => times.map((time) => fixed(faceOpacity(face, time)))),

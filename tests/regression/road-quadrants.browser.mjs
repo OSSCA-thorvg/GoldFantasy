@@ -101,7 +101,7 @@ try {
   page.on('console', (message) => {
     if (message.type() === 'error') report.errors.push(message.text());
   });
-  await page.goto(`http://127.0.0.1:${address.port}/?test&renderer=sw&seed=5`, {
+  await page.goto(`http://127.0.0.1:${address.port}/?test&renderer=gl&seed=5`, {
     waitUntil: 'domcontentloaded',
     timeout: 120000,
   });
@@ -140,7 +140,10 @@ try {
         const app = window.goldfantasy.app,
           context = title ? app.overlay : app.gameSession.game.context;
         const c = context.controls.find((c) => c.id === id && c.enabled);
-        if (!c) throw Error(`Missing enabled UI control ${id}`);
+        if (!c)
+          throw Error(
+            `Missing enabled UI control ${id}; shown: ${context.controls.map((k) => k.id).join(', ')}; dock ${app.gameSession.game.dockView}`,
+          );
         return { x: c.bounds.x + c.bounds.w / 2, y: c.bounds.y + c.bounds.h / 2 };
       },
       { id, title },
@@ -149,6 +152,7 @@ try {
     await frames(2);
   };
   await control('new-game', true);
+  await page.evaluate(() => window.goldfantasy.app.command('scene.skip-saga'));
   await frames(30);
   report.initial = await page.evaluate(async () => {
     const game = window.goldfantasy.app.gameSession.game,
@@ -309,12 +313,14 @@ try {
           game.renderer.invalidateMap();
         }, selected);
         await frames(2);
-        await control('quest-action/1');
+        // The road tool by its key: no crew selected makes a global request, as the quest button once did.
+        await page.keyboard.press('d');
+        await frames();
         await control('objectives-toggle');
         // Objectives intentionally create global requests. The real shortcut
         // honors the selected crew, so selected cases exercise direct orders.
         if (selected) {
-          await page.keyboard.press('1');
+          await page.keyboard.press('d');
           await frames();
         }
         result.fixture = await page.evaluate(
@@ -506,14 +512,14 @@ try {
         if (!game.paused) game.togglePause();
         game.renderer.invalidateMap();
         const town = game.state();
-        // This case tests work continuity, not discovery of a distant stone deposit.
-        // Supply exactly the missing Altar cost to the camp; workers must still
+        // This case tests work continuity, not gathering.
+        // Supply exactly the missing Workbench cost to the camp; workers must still
         // fetch and deliver it normally after the real road gestures.
         const stockBefore = { ...town.stock() },
-          altarCost = E.structureSpec(E.Structure.Shrine).cost;
+          benchCost = E.structureSpec(E.Structure.Workbench).cost;
         const stockAdded = new E.Resources();
         for (const resource of E.resourceKeys)
-          stockAdded[resource] = Math.max(0, altarCost[resource] - stockBefore[resource]);
+          stockAdded[resource] = Math.max(0, benchCost[resource] - stockBefore[resource]);
         town.reward(stockAdded);
         const fixtureStock = { before: stockBefore, added: { ...stockAdded }, after: { ...town.stock() } };
         const snapshot = () => ({
@@ -645,7 +651,9 @@ try {
         record('fixture');
       }, selected);
       await frames(2);
-      await control('quest-action/1');
+      // The road tool by its key: no crew selected makes a global request, as the quest button once did.
+      await page.keyboard.press('d');
+      await frames();
       await control('objectives-toggle');
       result.fixture = await page.evaluate(() => {
         const E = window.roadEngine,
@@ -691,7 +699,7 @@ try {
         throw Error('No dry connected-road fixture on the actual seed-5 world');
       });
       const stroke = async (path) => {
-        if (selected) await page.keyboard.press('1');
+        if (selected) await page.keyboard.press('d');
         await frames();
         const points = await page.evaluate(
           ({ path, selected }) => {
@@ -753,7 +761,9 @@ try {
         return path;
       }, result.fixture.children);
       await control('objectives-toggle');
-      await control('quest-action/1');
+      // The road tool by its key: no crew selected makes a global request, as the quest button once did.
+      await page.keyboard.press('d');
+      await frames();
       await control('objectives-toggle');
       result.childPointer = await stroke(result.fixture.child);
       const connected = await snapshot();
@@ -785,29 +795,34 @@ try {
       await frames();
       await page.mouse.move(640, 775);
       await frames(4);
-      await control('build-handle');
+      // Hovering the handle may already have opened the build menu; click the handle only while it is shown.
+      const shown = (id) =>
+        page.evaluate((id) => window.goldfantasy.app.gameSession.game.context.controls.some((c) => c.id === id && c.enabled), id);
+      for (let i = 0; i < 20 && !(await shown('build-handle')) && !(await shown('global/card-group-Housing')); ++i)
+        await frames(2);
+      if (!(await shown('global/card-group-Housing'))) await control('build-handle');
       await frames(2);
-      await control('global/card-group-Faith & arcane');
+      await control('global/card-group-Housing');
       await frames(2);
-      await control('global/card-pick-Shrine');
+      await control('global/card-pick-Workbench');
       await frames(2);
       result.fixture.building = await page.evaluate(() => {
         const E = window.roadEngine,
           game = window.goldfantasy.app.gameSession.game,
           town = game.state(),
           c = town.camp().center;
-        if (game.tool !== E.Tool.Shrine || game.selectedPeople().length)
-          throw Error('Build UI did not activate a global Altar placement');
+        if (game.tool !== E.Tool.Workbench || game.selectedPeople().length)
+          throw Error('Build UI did not activate a global Workbench placement');
         for (const radius of [2.5, 3, 4, 5, 6])
           for (let turn = 0; turn < 16; ++turn) {
             const cursor = E.point(
                 c.x + Math.cos((turn * Math.PI) / 8) * radius,
                 c.y + Math.sin((turn * Math.PI) / 8) * radius,
               ),
-              spot = town.fit(E.Structure.Shrine, cursor, 0),
+              spot = town.fit(E.Structure.Workbench, cursor, 0),
               screen = game.toScreen(cursor);
             if (
-              town.canPlace(E.Structure.Shrine, spot.center, spot.angle).ok &&
+              town.canPlace(E.Structure.Workbench, spot.center, spot.angle).ok &&
               screen.x > 20 &&
               screen.x < 1260 &&
               screen.y > 80 &&
@@ -816,14 +831,14 @@ try {
             )
               return { cursor, center: spot.center, angle: spot.angle, screen };
           }
-        throw Error('No legal global Altar placement on the unchanged first-camp terrain');
+        throw Error('No legal global Workbench placement on the unchanged first-camp terrain');
       });
       await page.mouse.click(result.fixture.building.screen.x, result.fixture.building.screen.y);
       await frames();
       const queued = await snapshot();
       result.snapshots.push(queued);
-      const altar = queued.buildings.find((b) => b.kind === 'Shrine');
-      assert(altar && altar.progress < 1, 'Global Altar request did not create an unfinished building');
+      const altar = queued.buildings.find((b) => b.kind === 'Workbench');
+      assert(altar && altar.progress < 1, 'Global Workbench request did not create an unfinished building');
       assert(
         queued.queue.some((work) => work.name === 'Building' && work.target === altar.id),
         'Intervening building must enter the actual global construction queue',
@@ -858,7 +873,7 @@ try {
           return [`road-${id}`, finished ? finished.clock - queued.clock : null];
         }),
         [
-          `altar-${altar.id}`,
+          `bench-${altar.id}`,
           result.snapshots.find((state) => state.buildings.some((b) => b.id === altar.id && b.progress === 1))
             ?.clock - queued.clock,
         ],
@@ -881,7 +896,7 @@ try {
       const roadsFinishedAt = result.snapshots.find(
         (state) => state.roads.length === 2 && state.roads.every((road) => road.built === 1),
       ).clock;
-      // Distant raids and later encounters during the additional Altar job do
+      // Distant raids and later encounters during the additional Workbench job do
       // not invalidate an already finished, uninterrupted road transaction.
       assert(
         result.snapshots

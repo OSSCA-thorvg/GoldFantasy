@@ -168,7 +168,9 @@ export function tendedFieldAcres(this: SettlementTown, id: number): number {
   for (const b of this.placed)
     if (b.built() && b.kind === Structure.Farm && this.settlementOf(b) === id)
       total = f(total + f(f(b.workers * b.attendance) * structureSpec(b.kind).perWorker));
-  return Math.min(lround(total), this.fieldAcres(id));
+  let tilled = 0;
+  for (const field of this.farmland) if (field.village === id) tilled += field.tilledAcres();
+  return Math.min(lround(total), tilled);
 }
 export function roadSettlement(this: SettlementTown, path: RoadPath, ignore: number): number {
   const existing = this.network.road(ignore);

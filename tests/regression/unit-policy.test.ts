@@ -16,6 +16,7 @@ import { copyNative } from '../../packages/engine/src/native-copy';
 import { deposit } from '../../packages/engine/src/mining';
 import { separatePeople } from '../../packages/engine/src/person-navigation';
 import { enter } from '../../packages/engine/src/town-residents';
+import { packAmount } from '../../packages/engine/src/carried-resources';
 let base: Town;
 beforeAll(() => {
   const doc = new MapDocument(WorldMap.generate(5, 64, 64));
@@ -116,9 +117,14 @@ describe('resident automatic policy', () => {
     for(let i=0;i<20;++i) { town.advance(.1);expect(p.position.x).toBeGreaterThanOrEqual(last-.001);last=p.position.x; }
     expect(footBoxesOverlap(p.position,other.position)).toBe(false);
   });
-  it('actually damages a friendly person on an explicit Attack order', () => {
+  it('refuses an Attack order on a companion and leaves them unharmed', () => {
     const town=fixture(),p=town.people()[0],other=copyNative(p);other.id=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
-    town.orderStop([other.id]);expect(town.orderAttackPerson([p.id],other.id)).toBe(true);step(town,1.1);
+    town.orderStop([other.id]);expect(town.orderAttackPerson([p.id],other.id)).toBe(false);step(town,1.1);
+    expect(p.attackPerson).toBe(-1);expect(other.health).toBe(1);expect(town.hits().some(h=>h.onPerson&&h.person===other.id)).toBe(false);
+  });
+  it('still strikes a resident of another settlement on an explicit Attack order', () => {
+    const town=fixture(),p=town.people()[0],other=copyNative(p);other.id=1;other.faction=1;other.position=add(p.position,point(.5,0));town.folk.push(other);
+    expect(town.orderAttackPerson([p.id],other.id)).toBe(true);step(town,1.1);
     expect(other.health).toBeLessThan(.95);expect(town.hits().some(h=>h.onPerson&&h.person===other.id)).toBe(true);
   });
   it('hunts for an empty pantry, eats one portion and carries surplus to storage', () => {
@@ -212,13 +218,15 @@ describe('resident automatic policy', () => {
     for(let i=0;i<600&&r.built<1;++i){town.advance(.1);if(p.activity===Activity.Roadwork&&other.activity===Activity.Roadwork)separated ||= distance(p.position,other.position)>.3;}
     expect(r.built).toBe(1);expect(separated).toBe(true);
   });
-  it('interrupts a direct Move for an active enemy and resumes the same destination', () => {
+  it('keeps a direct Move going past an active enemy; attack-move stops to fight it', () => {
     const town=fixture(),p=town.people()[0],destination=point(37,33);
     town.orderMove([p.id],destination);const foe=new Monster(88,-1,add(p.position,point(.5,0)));
     foe.animal=AnimalKind.Wolf;foe.angry=true;foe.health=1;foe.home={...foe.position};foe.provokedBy=p.id;town.animals.push(foe);
-    town.advance(.1);expect(p.activity).toBe(Activity.Fighting);expect(p.task).toBe(Activity.Moving);expect(p.goal).toEqual(destination);
-    for(let i=0;i<100&&p.ordered;++i)town.advance(.1);
-    expect(p.ordered).toBe(false);expect(p.autoMode).toBe(true);expect(distance(p.position,destination)).toBeLessThan(.3);
+    town.advance(.1);expect(p.activity).toBe(Activity.Moving);expect(p.task).toBe(Activity.Moving);expect(p.goal).toEqual(destination);
+    for(let i=0;i<100&&p.ordered;++i){town.advance(.1);if(p.ordered)expect(p.activity).not.toBe(Activity.Fighting);}
+    expect(p.ordered).toBe(false);expect(p.autoMode).toBe(true);expect(distance(p.position,destination)).toBeLessThan(.3);expect(foe.health).toBe(1);
+    foe.position=add(p.position,point(.5,0));foe.home={...foe.position};foe.angry=true;foe.provokedBy=p.id;
+    town.orderAttackMove([p.id],point(33,33));town.advance(.1);expect(p.activity).toBe(Activity.Fighting);
   });
   it('recovers critical health at its own home and exits only once after dawn', () => {
     const town=fixture(),p=town.people()[0],home=town.camp()!;p.health=.3;
@@ -245,11 +253,11 @@ describe('resident automatic policy', () => {
     expect(distance(p.position,foe.position)).toBeLessThan(.91);expect(distance(other.position,foe.position)).toBeLessThan(.91);
     expect(foe.health).toBeLessThanOrEqual(92);
   });
-  it('finishes a clicked gathering target and delivery, then returns to Auto', () => {
+  it('finishes a clicked gathering target, keeps the wood in the pack, then returns to Auto', () => {
     const town=fixture(),p=town.people()[0];town.stock().wood=0;town.map().at(33,32).trees=1;town.setAuto(p.id,false);
     expect(town.orderChop([p.id],32*64+33)).toBe(true);
     for(let i=0;i<300&&(!p.autoMode||p.carrying>0);++i)town.advance(.1);
-    expect(town.map().at(33,32).trees).toBe(0);expect(town.stock().wood).toBe(3);expect(p.autoMode).toBe(true);expect(p.ordered).toBe(false);
+    expect(town.map().at(33,32).trees).toBe(0);expect(town.stock().wood).toBe(0);expect(packAmount(p,Product.Wood)).toBe(3);expect(p.autoMode).toBe(true);expect(p.ordered).toBe(false);
   });
   it('keeps its construction target while taking a meal before gathering available supplies', () => {
     const town=fixture(),p=town.people()[0],b=new Building(1,Structure.Tent,point(36,34),0,0);b.progress=0;b.materials.required.wood=3;town.placed.push(b);town.stock().wood=0;
@@ -336,11 +344,11 @@ describe('resident automatic policy', () => {
     const well=new Building(1,Structure.Well,point(34,34),0,0);well.village=0;town.placed.push(well);
     expect(town.takeBreak(p)).toBe(true);expect(p.activity).toBe(Activity.Drinking);
   });
-  it('never overwrites an undeliverable non-food cargo when hungry', () => {
+  it('puts non-food cargo in the pack instead of overwriting it when hungry', () => {
     const town=fixture(),p=town.people()[0];p.food=.2;p.carrying=3;p.carriedProduct=Product.Wood;
     town.stock().wood=1000;town.stock().food=0;
     const animal=new Monster(88,-1,add(p.position,point(.5,0)));animal.animal=AnimalKind.Chicken;animal.health=1;town.animals.push(animal);
-    expect(town.huntFood(p)).toBe(false);expect(p.carrying).toBe(3);expect(p.carriedProduct).toBe(Product.Wood);expect(p.hunting).toBe(false);
+    expect(town.huntFood(p)).toBe(true);expect(p.carrying).toBe(0);expect(packAmount(p,Product.Wood)).toBe(3);expect(p.hunting).toBe(false);
   });
   it('returns to Auto after a timed direct visit completes', () => {
     const town=fixture(),p=town.people()[0],tavern=new Building(1,Structure.Tavern,point(35,34),0,0);tavern.village=0;town.placed.push(tavern);
@@ -367,12 +375,12 @@ describe('resident automatic policy', () => {
       expect(p.autoMode,JSON.stringify({activity:Activity[p.activity],task:Activity[p.task],ordered:p.ordered,site:p.taskSite})).toBe(true);
       expect(p.ordered).toBe(false);
     });
-  it('returns to Auto after direct mining and its delivery complete', () => {
+  it('returns to Auto after direct mining with the stone kept in the pack', () => {
     const town=fixture(),p=town.people()[0];town.stock().stone=0;
     let cell=-1;for(let x=32;x<39;++x){town.map().at(x,33).terrain=Terrain.Rock;town.map().at(x,33).quarried=false;if(deposit(town.map(),x,33)){cell=33*64+x;break;}}
     expect(cell).toBeGreaterThan(0);++town.changes;town.setAuto(p.id,false);expect(town.orderMine([p.id],cell)).toBe(true);
     for(let i=0;i<500&&(!p.autoMode||p.carrying>0);++i)town.advance(.1);
-    expect(town.map().at(cell%64,Math.floor(cell/64)).quarried).toBe(true);expect(town.stock().stone).toBe(3);expect(p.autoMode).toBe(true);expect(p.ordered).toBe(false);
+    expect(town.map().at(cell%64,Math.floor(cell/64)).quarried).toBe(true);expect(town.stock().stone).toBe(0);expect(packAmount(p,Product.Stone)).toBe(3);expect(p.autoMode).toBe(true);expect(p.ordered).toBe(false);
   });
   it('returns to Auto after the explicit attack target dies', () => {
     const town=fixture(),p=town.people()[0],animal=new Monster(88,-1,add(p.position,point(.5,0)));animal.animal=AnimalKind.Chicken;animal.health=1;animal.home={...animal.position};town.animals.push(animal);

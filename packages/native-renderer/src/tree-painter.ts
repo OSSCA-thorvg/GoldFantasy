@@ -48,6 +48,15 @@ const canopyLit: Rgb = [38, 70, 52],
   deadwood: Rgb = [96, 88, 84],
   snowLit: Rgb = [214, 222, 232],
   snowShade: Rgb = [180, 190, 206];
+/** Height scale against the old painter: a grown fir stands about three residents tall. */
+const tall = f(2.42);
+/**
+ * How tall a tree of this size stands, in units of the old painter's size: young trees stay slight and
+ * old ones tower, but less than in proportion so a forest's skyline is ragged without spires.
+ */
+const stature = (size: number): number => f(f(2.55) * f(Math.pow(size, f(0.75))));
+/** Width grows less than height, so trees read tall rather than fat. */
+const broad = f(1.5);
 const Dead = 0,
   Stems = 1,
   Lit = 2,
@@ -73,10 +82,11 @@ export class TreeBatch {
         [70, 78, 86],
         f(f(0.3) * this.climate.snow),
       );
-    verticalShade(this.parts[Dead], deadwood, f(base - 80), base, f(1.3), f(0.75));
+    // The shading spans grow with the trees, so a tree's tip and foot keep their colours.
+    verticalShade(this.parts[Dead], deadwood, f(base - f(80 * tall)), base, f(1.3), f(0.75));
     fill(this.parts[Stems], opaque(stem));
-    verticalShade(this.parts[Lit], canopy(canopyLit), f(base - 50), base, f(1.35), f(0.8));
-    verticalShade(this.parts[Shade], canopy(canopyShade), f(base - 50), base, f(1.3), f(0.75));
+    verticalShade(this.parts[Lit], canopy(canopyLit), f(base - f(50 * tall)), base, f(1.35), f(0.8));
+    verticalShade(this.parts[Shade], canopy(canopyShade), f(base - f(50 * tall)), base, f(1.3), f(0.75));
     fill(this.parts[SnowShade], opaque(snowShade));
     fill(this.parts[SnowLit], opaque(snowLit));
     const drawn = this.parts.filter((part) => part.commands.length > 0);
@@ -85,8 +95,8 @@ export class TreeBatch {
   }
   private fir(b: Point, tree: Tree): void {
     const s = tree.size,
-      w = f(9 * s),
-      top = f(f(30 * s) * tree.slender),
+      w = f(f(9 * s) * broad),
+      top = f(f(30 * stature(s)) * tree.slender),
       foot = f(b.y - f(5 * s));
     this.parts[Stems].appendRect(f(b.x - f(f(1.6) * s)), f(b.y - f(6 * s)), f(f(3.2) * s), f(6 * s));
     appendPolygon(this.parts[Lit], [
@@ -118,10 +128,10 @@ export class TreeBatch {
   }
   private spruce(b: Point, tree: Tree): void {
     const s = tree.size,
-      height = f(f(36 * s) * tree.slender),
-      width = f(f(7.2) * s);
+      height = f(f(36 * stature(s)) * tree.slender),
+      width = f(f(f(7.2) * s) * broad);
     this.parts[Stems].appendRect(f(b.x - f(f(1.3) * s)), f(b.y - f(4 * s)), f(f(2.6) * s), f(4 * s));
-    const tiers = s < f(0.8) ? 3 : 4,
+    const tiers = s < f(0.8) ? 4 : 5,
       bottom = f(b.y - f(3 * s)),
       step = f(f(height - f(3 * s)) / f(tiers + f(1.2))),
       droop = f(f(1.6) * s);
@@ -146,7 +156,8 @@ export class TreeBatch {
     const s = f(tree.size * f(1.15)),
       lean = f(tree.lean * s),
       snapped = tree.variant < f(0.3);
-    let height = f(f(30 * s) * tree.slender);
+    // Dead trees stand a little lower than living ones.
+    let height = f(f(f(f(26 * stature(tree.size)) * f(1.15))) * tree.slender);
     if (snapped) height = f(height * f(0.62));
     appendPolygon(this.parts[Dead], [
       { x: f(b.x - f(f(2.2) * s)), y: b.y },
@@ -158,7 +169,7 @@ export class TreeBatch {
     for (let k = 0; k < boughs; k++) {
       const fraction = f(f(0.42) + f(k * f(0.14))),
         side = (k + Math.trunc(tree.variant * 7)) % 2 ? 1 : -1,
-        reach = f(f(11 - f(5 * fraction)) * s);
+        reach = f(f(f(11 - f(5 * fraction)) * s) * broad);
       const from = { x: f(b.x + f(lean * fraction)), y: f(b.y - f(height * fraction)) },
         tip = { x: f(from.x + f(f(side * reach) * f(0.8))), y: f(from.y - f(reach * f(0.75))) };
       appendPolygon(this.parts[Dead], [

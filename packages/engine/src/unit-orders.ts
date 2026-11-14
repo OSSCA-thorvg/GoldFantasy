@@ -1,17 +1,20 @@
 // Explicit resident commands. Absolute order timers remain double precision.
 import { TownState } from './town-state';
 import { Building } from './town-models';
-import { Activity, Person, Role, Monster } from './person';
+import { Activity, Calling, Person, Role, Monster } from './person';
 import { Product, Resources, Structure, structureSpec, isHome } from './building-catalog';
-import { Point, point, add, rotated, distance, segmentDistance } from './geometry';
+import { Point, point, add, rotated, distance, segmentDistance, sub, scale, normalized } from './geometry';
+import { combatItem } from './equipment';
+import { StrikeKind, strikeOf } from './skill-catalog';
 import { f32 as f } from './numeric';
 import { treePosition } from './world-map';
 import * as mining from './mining';
 import { prepareFarmWork } from './farm-work';
 import { roadWorkSpot, buildingWorkSpot } from './person-navigation';
 import type { Town } from './town';
-import { canControl } from './faction';
+import { beyondOrders, canControl, sameFaction } from './faction';
 import { clearAutomaticConstruction } from './automatic-work';
+import { healthCap } from './resident-wounds';
 export interface OrderTown extends TownState {
   resumeDevotionOrder(p: Person): boolean;
   resumeCraftOrder(p: Person): boolean;
@@ -36,18 +39,22 @@ export interface OrderTown extends TownState {
   orderChop(ids: number[], cell: number): boolean;
   orderMine(ids: number[], cell: number): boolean;
   moveOrder(ids: number[], to: Point, attack: boolean): void;
+  orderStop(ids: number[]): void;
   prepareConstruction(p: Person, work: Activity, id: number): boolean;
   collectConstructionSurplus(p: Person, work: Activity, id: number): boolean;
   storageFoundation(p: Person): boolean;
   haulCargo(p: Person): boolean;
+  keepCargo(p: Person): boolean;
   harvest(p: Person, cell: number, kind: Product): boolean;
   startHarvest(p: Person, around: Point, reach: number, kind?: Product): boolean;
   resourceNearby(around: Point, reach: number, kind: Product): boolean;
   layRoadFirst(p: Person, id: number): boolean;
   constructionTree(p: Person, activity: Activity, target: number): number;
   fellTree(p: Person, cell: number): boolean;
+  tend(p: Person): void;
 }
 export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1): void {
+  this.commanded();
   clearAutomaticConstruction(p);
   if (task !== Activity.Training) p.trainingCalling = -1;
   if (task !== Activity.Crafting) { p.craftItem = null; p.craftWorkshop = -1; p.craftProgress = 0; }
@@ -64,10 +71,12 @@ export function setOrder(this: OrderTown, p: Person, task: Activity, site = -1):
   p.tree = -1;
   p.aggressive = true;
   p.target = site;
+  p.holding = false;
 }
 export function orderStop(this: OrderTown, ids: number[]): void {
+  this.commanded();
   for (const p of this.folk) {
-    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || beyondOrders(p) || !ids.includes(p.id)) continue;
     p.approachingOrder = false;
     p.hunting = false; p.attackPerson = p.workField = -1;
     p.recoveringRest = p.recoveringHealth = false;
@@ -83,16 +92,27 @@ export function orderStop(this: OrderTown, ids: number[]): void {
     p.path = [];
     p.tree = p.foe = p.target = -1;
     p.aggressive = false;
+    p.holding = false;
     p.activity = Activity.Holding;
     p.until = Infinity;
   }
   this.recount();
   ++this.changes;
 }
+/** The chosen residents hold their ground: they stand, strike whatever comes into reach and never chase;
+ * skills left on auto still fire. Any other order ends it. Returns how many hold. */
+export function orderHold(this: OrderTown, ids: number[]): number {
+  const chosen = this.folk.filter((p) => canControl(p, this.controlFaction) && !beyondOrders(p) && ids.includes(p.id));
+  this.orderStop(chosen.map((p) => p.id));
+  for (const p of chosen) p.holding = true;
+  return chosen.length;
+}
 export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
+  this.commanded();
   for (const p of this.folk) {
-    if (p.id !== id || !canControl(p, this.controlFaction) || p.activity === Activity.Expedition) continue;
+    if (p.id !== id || !canControl(p, this.controlFaction) || beyondOrders(p)) continue;
     p.autoMode = enabled;
+    p.holding = false;
     p.recoveringRest = p.recoveringHealth = false;
     if (enabled || !p.ordered) {
       if (!enabled) p.job = -1;
@@ -115,15 +135,52 @@ export function setAuto(this: OrderTown, id: number, enabled: boolean): void {
   this.staff();
   ++this.changes;
 }
+/** Formation rows: blades and maces in front, bards and clerics behind them, bows and staves at the back. */
+function formationRow(p: Person): number {
+  const kind = strikeOf(combatItem(p)?.visual).kind;
+  if (kind === StrikeKind.Pierce || kind === StrikeKind.Splash) return 2;
+  if (p.calling === Calling.Cleric || p.calling === Calling.Bard) return 1;
+  if (kind === StrikeKind.Cleave || kind === StrikeKind.Crush || p.calling === Calling.Warrior) return 0;
+  return p.calling === Calling.Ranger || p.calling === Calling.Mage ? 2 : 1;
+}
+const formationSpacing = 0.7;
+/** A slot for each resident around `to`, rows across the way they travel, in a fixed order. */
+function formationSlots(group: readonly Person[], to: Point): Map<number, Point> {
+  const slots = new Map<number, Point>();
+  if (!group.length) return slots;
+  const middle = scale(
+      group.reduce((sum, p) => add(sum, p.position), point()),
+      1 / group.length,
+    ),
+    heading = distance(middle, to) > 0.05 ? normalized(sub(to, middle)) : point(0, 1),
+    side = point(-heading.y, heading.x),
+    across = (p: Person) => p.position.x * side.x + p.position.y * side.y,
+    rows = [0, 1, 2]
+      .map((row) => group.filter((p) => formationRow(p) === row))
+      .filter((row) => row.length);
+  rows.forEach((row, r) => {
+    const along = ((rows.length - 1) / 2 - r) * formationSpacing;
+    // Left to right as they stand, so nobody crosses the line to reach a slot.
+    row
+      .slice()
+      .sort((a, b) => across(a) - across(b) || a.id - b.id)
+      .forEach((p, i) =>
+        slots.set(
+          p.id,
+          add(to, add(scale(heading, along), scale(side, (i - (row.length - 1) / 2) * formationSpacing))),
+        ),
+      );
+  });
+  return slots;
+}
 export function moveOrder(this: OrderTown, ids: number[], to: Point, attack: boolean): void {
-  let k = 0;
-  for (const p of this.folk) {
-    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
-    const spot = k
-      ? add(to, rotated(point(f(f(0.6) + f(f(0.25) * Math.trunc(k / 6))), 0), f(k * f(1.047))))
-      : to;
-    ++k;
-    if (!this.walkTo(p, this.grid.nearestWalkable(spot))) continue;
+  const group = this.folk.filter((p) => canControl(p, this.controlFaction) && !beyondOrders(p) && ids.includes(p.id)),
+    slots = group.length > 1 ? formationSlots(group, to) : new Map<number, Point>();
+  for (const p of group) {
+    const slot = slots.get(p.id),
+      spot = slot && this.grid.walkable(slot) ? slot : slot ? this.grid.nearestWalkable(slot) : to;
+    if (!this.walkTo(p, this.grid.nearestWalkable(spot)) && !(slot && this.walkTo(p, this.grid.nearestWalkable(to))))
+      continue;
     this.setOrder(p, Activity.Moving);
     p.aggressive = attack;
     p.goal = { ...(p.path.length ? p.path[p.path.length - 1] : p.position) };
@@ -154,6 +211,8 @@ export function orderAttackPerson(this: OrderTown, ids: number[], target: number
   let accepted = false;
   for (const p of this.folk) {
     if (!canControl(p, this.controlFaction) || !ids.includes(p.id) || p.id === target) continue;
+    // Companions are never attacked, not even on an explicit order.
+    if (other.role === Role.Resident && sameFaction(other, p)) continue;
     if (!this.walkTo(p, other.inside ? other.entrance : other.position)) continue;
     this.setOrder(p, Activity.Fighting, target);
     p.attackPerson = target; p.activity = Activity.Fighting; accepted = true;
@@ -194,7 +253,7 @@ export function orderHarvest(this: OrderTown, ids: number[], cell: number, kind:
   if (!this.world.revealed(foot)) return false;
   let any = false;
   for (const p of this.folk) {
-    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || beyondOrders(p) || !ids.includes(p.id)) continue;
     if (
       this.folk.some(
         (other) =>
@@ -218,7 +277,7 @@ export function orderBuild(this: OrderTown, ids: number[], id: number): boolean 
   if (!place || place.faction !== this.controlFaction || (place.built() && place.health >= 1)) return false;
   let any = false;
   for (const p of this.folk) {
-    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || beyondOrders(p) || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, place.door())) continue;
     this.setOrder(p, Activity.Building, id);
     any = true;
@@ -236,7 +295,7 @@ export function assignJob(this: OrderTown, ids: number[], id: number): boolean {
   for (const p of this.folk) {
     if (
       !canControl(p, this.controlFaction) ||
-      p.activity === Activity.Expedition ||
+      beyondOrders(p) ||
       p.health <= 0 ||
       !ids.includes(p.id)
     )
@@ -263,7 +322,7 @@ export function orderRoadwork(this: OrderTown, ids: number[], id: number): boole
   if (wanted.faction !== this.controlFaction) return false;
   let any = false;
   for (const p of this.folk) {
-    if (!canControl(p, this.controlFaction) || p.activity === Activity.Expedition || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || beyondOrders(p) || !ids.includes(p.id)) continue;
     if (!this.walkTo(p, roadWorkSpot(this,p,road))) continue;
     this.setOrder(p, Activity.Roadwork, id);
     p.activity = Activity.Roadwork;
@@ -346,6 +405,10 @@ export function orderRelax(this: OrderTown, ids: number[], id: number): boolean 
 export function resumeOrder(this: OrderTown, p: Person): boolean {
   if (p.stressRecovery || p.faction !== this.controlFaction) return false;
   if (p.task === Activity.Idle) return false;
+  if (p.task === Activity.Tending) {
+    this.tend(p);
+    return true;
+  }
   if (p.approachingOrder && distance(p.position, p.goal) > f(.2)) {
     if (this.walkTo(p, p.goal)) p.activity = Activity.Moving;
     return true;
@@ -388,7 +451,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
     return true;
   }
   const construction = p.task === Activity.Building || p.task === Activity.Roadwork;
-  if (p.carrying > 0 && !construction) {
+  if (p.carrying > 0 && !construction && !this.keepCargo(p)) {
     if (!this.haulCargo(p)) {
       // A completed gather order cannot wait forever for a depot that does not
       // exist yet. Retain the cargo for the next automatic construction task.
@@ -409,7 +472,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
   switch (p.task) {
     case Activity.Sleeping: {
       const home = this.building(p.taskSite);
-      if (home && home.built() && isHome(home.kind) && p.home === home.id && (p.rest < f(.95) || p.health < 1)) {
+      if (home && home.built() && isHome(home.kind) && p.home === home.id && (p.rest < f(.95) || p.health < healthCap(p))) {
         start(Activity.Sleeping, home.id, home.door());
         return true;
       }
@@ -453,7 +516,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
         start(Activity.Building, place.id, buildingWorkSpot(this,p,place));
         return true;
       }
-      if (p.carrying && this.haulCargo(p)) return true;
+      if (p.carrying && !this.keepCargo(p) && this.haulCargo(p)) return true;
       if (!p.carrying && this.collectConstructionSurplus(p, Activity.Building, p.taskSite)) return true;
       break;
     }
@@ -471,7 +534,7 @@ export function resumeOrder(this: OrderTown, p: Person): boolean {
         } else wait();
         return true;
       }
-      if (p.carrying && this.haulCargo(p)) return true;
+      if (p.carrying && !this.keepCargo(p) && this.haulCargo(p)) return true;
       if (!p.carrying && this.collectConstructionSurplus(p, Activity.Roadwork, p.taskSite)) return true;
       break;
     }

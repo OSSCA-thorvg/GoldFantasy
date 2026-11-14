@@ -4,11 +4,11 @@ import {
   ButtonStyle,
   Icon,
   button,
-  type Context,
   type Color,
 } from '../../../../packages/native-ui/src';
 import { Tool, Order, toolStructure } from '../../../../packages/engine/src/game-tools';
-import { toolAvailable } from '../../../../packages/engine/src/settlement-progression';
+import { noticeToast } from './notice-toast';
+import { toolInfo, buildMenuGroups, toolRequirements, type BuildGroup } from './build-menu-tools';
 import {
   Structure,
   Product,
@@ -36,112 +36,37 @@ import type { GameHudApp } from './game-hud-contract';
 import { canControl, isPlayerBuilding } from '../../../../packages/engine/src/faction';
 import { civicInspector } from './game-civic-panel';
 import { hudPaint } from './hud-paint';
-import type { CampMarker } from './camp-resource-hud';
-import { actionButton, type HudGlyph } from './hud-actions';
-import { touchPlacementHeight, touchCommandColumns } from './mobile-layout';
-interface ToolInfo {
-  label: string;
-  key: string;
-  hint: string;
-}
-const tools: ToolInfo[] = [
-  {
-    label: 'Select',
-    key: 'Q',
-    hint: 'Click or drag to select units. Right-click their own housing with units selected to rest. Right-click gives a contextual order.',
-  },
-  { label: 'Road', key: '1', hint: 'Hold and draw a road in one stroke. Release to build; Esc cancels.' },
-  {
-    label: 'Pave',
-    key: 'P',
-    hint: 'Click a laid road to pave it with stone: people walk faster on cobbles.',
-  },
-  {
-    label: 'Fields',
-    key: '2',
-    hint: 'Drag a rectangle beside a road near a farmhouse, or click corners to outline any shape.',
-  },
-  { label: 'Camp', key: 'C', hint: '' },
-  { label: 'Tent', key: '3', hint: '' },
-  { label: 'Farm', key: '4', hint: '' },
-  { label: 'Wood', key: '5', hint: '' },
-  { label: 'Quarry', key: '6', hint: '' },
-  { label: 'Well', key: 'W', hint: '' },
-  { label: 'Store', key: 'J', hint: '' },
-  { label: 'Market', key: '7', hint: '' },
-  { label: 'Tavern', key: '8', hint: '' },
-  { label: 'Inn', key: '9', hint: '' },
-  { label: 'Guild', key: '0', hint: '' },
-  { label: 'Chapel', key: 'G', hint: '' },
-  { label: 'Smith', key: 'B', hint: '' },
-  { label: 'Armor', key: 'N', hint: '' },
-  { label: 'Potion', key: 'O', hint: '' },
-  { label: 'Altar', key: 'H', hint: '' },
-  { label: 'Mage', key: 'K', hint: '' },
-  { label: 'Portal', key: 'V', hint: '' },
-  { label: 'Clear', key: 'X', hint: 'Demolish a building, a field or a road.' },
-  { label: 'Torch', key: '', hint: 'Place a torch on a completed road.' },
-  { label: 'Sawmill', key: '', hint: '' },
-  { label: 'Stoneworks', key: '', hint: '' },
-  { label: 'Timber store', key: '', hint: '' },
-  { label: 'Granary', key: '', hint: '' },
-  { label: 'Stone store', key: '', hint: '' },
-];
-interface Group {
-  name: string;
-  glyph: HudGlyph;
-  tools: Tool[];
-}
-const groups: Group[] = [
-  { name: 'Roads', glyph: 'roads', tools: [Tool.Road, Tool.Pave, Tool.Torch] },
-  { name: 'Housing', glyph: 'housing', tools: [Tool.Camp, Tool.Tent] },
-  {
-    name: 'Food & materials',
-    glyph: 'materials',
-    tools: [Tool.Farm, Tool.Field, Tool.Lumberyard, Tool.Quarry, Tool.Sawmill, Tool.Stoneworks],
-  },
-  {
-    name: 'Water & storage',
-    glyph: 'storage',
-    tools: [Tool.Well, Tool.Storehouse, Tool.WoodStore, Tool.Granary, Tool.StoneStore],
-  },
-  {
-    name: 'Trade & outfitters',
-    glyph: 'trade',
-    tools: [Tool.Market, Tool.Weaponsmith, Tool.Armorer, Tool.Apothecary],
-  },
-  { name: 'Lodging & leisure', glyph: 'lodging', tools: [Tool.Inn, Tool.Tavern, Tool.Guild] },
-  { name: 'Faith & arcane', glyph: 'faith', tools: [Tool.Chapel, Tool.Shrine, Tool.MageTower, Tool.Portal] },
-];
-export function buildGroups(town: Town): Group[] {
-  return groups
-    .map((group) => ({ ...group, tools: group.tools.filter((tool) => toolAvailable(town, tool)) }))
-    .filter((group) => group.tools.length);
+import { winterOutlookLine, winterLineHeight, type CampMarker } from './camp-resource-hud';
+import { actionButton } from './hud-actions';
+import {
+  wrapText,
+  trackUnlocks,
+  noteBuildPage,
+  freshGroup,
+  freshMark,
+  lockMark,
+  requirementTip,
+  progressInspector,
+  type InspectorRows,
+} from './game-progress-hud';
+import { touchPlacementHeight } from './mobile-layout';
+import { combatOverlays } from './game-combat-hud';
+import { guideHud } from './game-guide-panel';
+import { unitOrdersCard } from './unit-orders-card';
+import { groupTabs } from './control-groups';
+import { aimPrompt, currentAim } from './skill-commands';
+import { floorForecast } from './swarm-hud';
+const tools = toolInfo;
+/** Every group with every building: locked ones stay in the menu, greyed, with what they need. */
+export function buildGroups(_town: Town): BuildGroup[] {
+  return [...buildMenuGroups];
 }
 const dungeonKind = (kind: DungeonKind) =>
-  ['Cave', 'Crypt', 'Rift portal', 'Ruined tower', 'Coastal giant hall'][kind] ?? '';
-function wrap(context: Context, text: string, width: number, size: number, lines = 3): string[] {
-  const rows: string[] = [];
-  let row = '',
-    word = '';
-  const flush = () => {
-    const candidate = row ? `${row} ${word}` : word;
-    if (row && context.textWidth(candidate, size) > width) {
-      rows.push(row);
-      row = word;
-    } else row = candidate;
-    word = '';
-  };
-  for (const c of text) {
-    if (c === ' ') flush();
-    else word = `${word}${c}`;
-  }
-  flush();
-  if (row) rows.push(row);
-  return rows.slice(0, lines);
-}
+  ['Cave', 'Crypt', 'Rift portal', 'Ruined tower', 'Coastal giant hall', 'Rift'][kind] ?? '';
+const wrap = wrapText;
 export function hud(this: GameHudApp, width: number, height: number): void {
   this.updateContextDock(width, height);
+  trackUnlocks(this);
   const c = this.context,
     t = this.theme;
   this.skyMural(width);
@@ -187,6 +112,8 @@ export function hud(this: GameHudApp, width: number, height: number): void {
       true,
       Align.Center,
     );
+  else if (currentAim(this))
+    c.text(new Rect(12, f32(this.dockBounds.y - 34), f32(width - 24), 22), aimPrompt(this), t.accent, 13, true, Align.Center);
   if (!this.touchMode && width > 640 && !this.town.camp() && this.town.map().dungeons().length) {
     const lair = this.town.map().dungeons()[0].origin,
       start = this.town.map().camp(),
@@ -203,25 +130,18 @@ export function hud(this: GameHudApp, width: number, height: number): void {
       y = f32(y + 17);
     }
   }
-  if (this.notice && c.time() < this.noticeUntil && height >= 540) {
-    const w = Math.min(560, f32(width - 24), Math.max(360, f32(c.textWidth(this.notice, 13, true) + 36))),
-      toast = new Rect(f32(f32(width - w) / 2), f32(this.dockBounds.y - 46), w, 36);
-    c.rect(toast, t.raised, t.radius, t.accent);
-    c.text(
-      new Rect(f32(toast.x + 12), toast.y, f32(toast.w - 24), toast.h),
-      c.elideText(this.notice, f32(w - 24), 13, true),
-      t.text,
-      13,
-      true,
-      Align.Center,
-    );
-    c.requestFrameAt(this.noticeUntil);
-  }
+  noticeToast(this, width, height);
   this.objectives(width, height, this.touchMode ? (this.timeExpanded ? 116 : 64) : width < 900 ? 104 : 64);
+  this.realmPanel(width, height);
   this.timeControls(width);
   this.campSupplies(width, height);
   this.calendarDetails(width);
   this.taskbar(width, height);
+  if (!this.town.isTitleAutoplay()) groupTabs(this, height);
+  combatOverlays(this, width, height);
+  this.realmRewardBanner(width, height);
+  this.sagaBanner(width, height);
+  guideHud(this, width, height);
 }
 export function campSupplies(this: GameHudApp, width: number, height: number): void {
   const markers: CampMarker[] = [];
@@ -270,15 +190,16 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     building = this.selected >= 0 ? this.town.building(this.selected) : null;
   if (!building && this.selectedDungeon < 0) return 0;
   if (this.touchMode && building?.built() && isSeat(building.kind)) {
+    const stores = 180 + (winterOutlookLine(this.town, building.id) ? winterLineHeight : 0);
     if (draw)
       this.campResources.drawStores(
         c,
         t,
         this.town,
         building.id,
-        new Rect(panel.x + 8, panel.y + 8, panel.w - 16, 180),
+        new Rect(panel.x + 8, panel.y + 8, panel.w - 16, stores),
       );
-    return 196;
+    return stores + 16;
   }
   if (building?.built() && [Structure.Shrine, Structure.Guild, Structure.GuildHall].includes(building.kind))
     return civicInspector.call(this, building, panel, draw);
@@ -306,51 +227,6 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
       );
     for (const line of wrap(c, spec.description, inner, 12)) textRow(line, t.muted, 12);
     y = f32(y + 4);
-    if (building.built() && [Structure.Weaponsmith, Structure.Armorer].includes(building.kind)) {
-      const at = y,
-        crafter = () => {
-          const village = this.town.settlementOf(building);
-          return this.town
-            .people()
-            .filter(
-              (p) =>
-                village >= 0 &&
-                canControl(p) &&
-                p.faction === building.faction &&
-                this.town.settlementOf(p) === village,
-            )
-            .sort(
-              (a, b) =>
-                Number(this.chosen.includes(b.id)) - Number(this.chosen.includes(a.id)) ||
-                distance(a.position, building.center) - distance(b.position, building.center) ||
-                a.id - b.id,
-            )[0];
-        };
-      rows.push(() =>
-        actionButton(
-          c,
-          'workshop-craft',
-          new Rect(left, top + at, 54, 28),
-          'craft',
-          'Choose a resident and craft equipment',
-          () => {
-            const p = crafter();
-            if (p) {
-              this.selectPeople([p.id]);
-              this.equipmentTab = 'craft';
-              this.craftPage = 0;
-              this.craftWorkshopFilter = building.kind;
-              this.rosterOpen = true;
-              this.rosterTab = 'units';
-              this.rosterSelected = `units:${p.id}`;
-            }
-          },
-          false,
-          isPlayerBuilding(building) && !!crafter(),
-        ),
-      );
-      y += 34;
-    }
     if (!building.built()) {
       textRow(`Under construction: ${Math.trunc(f32(building.progress * 100))}%`, t.accent, 13, true);
       textRow('On site: ' + describe(building.materials.delivered), t.text, 12);
@@ -577,6 +453,9 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
           12,
         );
     }
+    const progress: InspectorRows = { rows, left, inner, top, y };
+    progressInspector(this, building, -1, progress);
+    y = progress.y;
     const growth = this.town.growthStatus(building);
     if (growth.grows) {
       y = f32(y + 4);
@@ -597,18 +476,71 @@ export function inspector(this: GameHudApp, panel: Rect, draw = true): number {
     const site = this.town.map().dungeons()[this.selectedDungeon];
     textRow(site.name, t.text, 16, true);
     textRow(
-      `${dungeonKind(site.kind)}  -  a way to ${worldName(this.town.map().destination(site))}`,
+      site.kind === DungeonKind.Return
+        ? 'Rift  -  the way back to Midgard'
+        : `${dungeonKind(site.kind)}  -  a way to ${worldName(this.town.map().destination(site))}`,
       t.accent,
       13,
     );
-    const about =
-      site.kind === DungeonKind.GiantHall
-        ? 'Neutral stone giants live on the eastern coast. They leave their hall by day and return at dusk. They retaliate only when attacked.'
-        : this.town.opened(this.selectedDungeon)
-          ? 'The dungeon is open. Select residents and right-click it to send an expedition. Entry is never automatic.'
-          : 'Monsters lurk inside and come out to raid by night. Select residents and right-click this dungeon to send an expedition.';
-    for (const line of wrap(c, about, inner, 12))
-      textRow(line, this.town.opened(this.selectedDungeon) ? t.success : t.muted, 12);
+    if (site.kind === DungeonKind.Return) {
+      for (const line of wrap(
+        c,
+        'The way back to Midgard. Gather the whole party here, then choose Go home. After the guardian falls the way opens from anywhere.',
+        inner,
+        12,
+      ))
+        textRow(line, t.muted, 12);
+    } else if (site.kind === DungeonKind.GiantHall) {
+      for (const line of wrap(
+        c,
+        'Neutral stone giants live on the eastern coast. They leave their hall by day and return at dusk. They retaliate only when attacked.',
+        inner,
+        12,
+      ))
+        textRow(line, t.muted, 12);
+    } else {
+      const gate = this.selectedDungeon,
+        floors = this.town.gateFloors(gate),
+        chosen = Math.min(this.gateFloor.get(gate) ?? this.town.deepestOpenFloor(gate), this.town.deepestOpenFloor(gate));
+      textRow(
+        floors.sealed ? 'Sealed: no raid leaves this gate' : `Floors cleared: ${floors.cleared} of ${floors.total}`,
+        floors.sealed ? t.success : t.text,
+        12,
+        true,
+      );
+      const at = y;
+      rows.push(() => {
+        const span = f32(f32(inner - 8 * (floors.total - 1)) / floors.total);
+        for (let floor = 0; floor < floors.total; ++floor)
+          button(
+            c,
+            'gate-floor/' + floor,
+            new Rect(f32(left + f32((span + 8) * floor)), f32(f32(top + at) + 2), span, 26),
+            `Floor ${floor + 1}` + (floor < floors.cleared ? ' *' : ''),
+            () => this.gateFloor.set(gate, floor),
+            ButtonStyle.Default,
+            this.town.floorOpen(gate, floor),
+            undefined,
+            floor === chosen,
+          );
+      });
+      y = f32(y + 34);
+      floorForecast(this, gate, chosen).forEach((line, i) => {
+        for (const row of wrap(c, line, inner, 12)) textRow(row, i === 0 ? t.text : t.muted, 12);
+      });
+      const problem = this.town.expeditionProblem(gate, chosen);
+      for (const line of wrap(
+        c,
+        problem ||
+          `Select residents and right-click this gate to lead them to floor ${chosen + 1}. * marks a cleared floor that can be fought again. Clear floor ${floors.total} to seal the gate.`,
+        inner,
+        12,
+      ))
+        textRow(line, problem ? t.danger : t.muted, 12);
+      const progress: InspectorRows = { rows, left, inner, top, y };
+      progressInspector(this, null, gate, progress);
+      y = progress.y;
+    }
   }
   const h = Math.max(126, f32(y + 10));
   if (!draw) return h;
@@ -666,30 +598,8 @@ export function commandCard(
       activate: () => void,
       style = ButtonStyle.Default,
       enabled = true,
+      look: { fill?: Color } = {},
     ) => {
-      if (!buildMenu) {
-        const glyphs: Record<string, HudGlyph> = {
-          'card-build': 'build',
-          'card-move': 'move',
-          'card-attack': 'attack',
-          'card-work': 'work',
-          'card-stop': 'stop',
-          'card-clear': 'close',
-          'card-select': 'unit',
-          'card-leave': 'back',
-        };
-        actionButton(
-          c,
-          `${global ? 'global/' : 'unit/'}${id}`,
-          bounds,
-          glyphs[id] ?? 'unit',
-          label,
-          activate,
-          style === ButtonStyle.Primary,
-          enabled,
-        );
-        return;
-      }
       button(
         c,
         `${global ? 'global/' : 'unit/'}${id}`,
@@ -700,60 +610,11 @@ export function commandCard(
         enabled,
         Icon.None,
         false,
-        appearance,
+        { ...appearance, ...look },
       );
     };
   if (!buildMenu) {
-    const leave = this.shelteredSelection(),
-      count = leave ? 8 : 7,
-      gap = f32(6 * scale),
-      columns = this.touchMode ? touchCommandColumns(area.w, count) : count,
-      w = f32(f32(area.w - f32(f32(columns - 1) * gap)) / columns),
-      cell = (i: number) =>
-        new Rect(
-          f32(area.x + f32((i % columns) * f32(w + gap))),
-          area.y + Math.floor(i / columns) * (44 + gap),
-          w,
-          this.touchMode ? 44 : area.h,
-        );
-    drawButton('card-build', cell(0), 'Build', () => this.openUnitBuild());
-    drawButton(
-      'card-move',
-      cell(1),
-      'Move  M',
-      () => this.prepare(Order.Move),
-      this.pending === Order.Move ? ButtonStyle.Primary : ButtonStyle.Default,
-    );
-    drawButton(
-      'card-attack',
-      cell(2),
-      'Attack  A',
-      () => this.prepare(Order.Attack),
-      this.pending === Order.Attack ? ButtonStyle.Primary : ButtonStyle.Default,
-    );
-    drawButton(
-      'card-work',
-      cell(3),
-      'Work  W',
-      () => this.prepare(Order.Work),
-      this.pending === Order.Work ? ButtonStyle.Primary : ButtonStyle.Default,
-    );
-    drawButton('card-stop', cell(4), 'Stop  S', () => this.stopSelected());
-    drawButton(
-      'card-clear',
-      cell(5),
-      'Clear  X',
-      () => this.selectTool(Tool.Demolish),
-      this.tool === Tool.Demolish ? ButtonStyle.Primary : ButtonStyle.Default,
-    );
-    drawButton(
-      'card-select',
-      cell(6),
-      'Select  Q',
-      () => this.selectTool(Tool.Select),
-      this.tool === Tool.Select ? ButtonStyle.Primary : ButtonStyle.Default,
-    );
-    if (leave) drawButton('card-leave', cell(7), 'Leave', () => this.leaveSelected());
+    unitOrdersCard(this, area, scale, global);
     return;
   }
   const groups = buildGroups(this.town),
@@ -763,7 +624,9 @@ export function commandCard(
       this.drawerBridge = new Rect(d.x, d.y, d.w, d.h);
       if (global) this.globalCard = next;
       else this.card = next;
+      this.buildHint = null;
     };
+  noteBuildPage(this, page === 0 ? [] : groups[f32(page - 1)].tools);
   actionButton(
     c,
     `${global ? 'global/' : 'unit/'}card-back`,
@@ -804,10 +667,11 @@ export function commandCard(
       );
   if (page === 0) {
     for (let i = 0; i < count; i++) {
-      const { name, glyph } = groups[i];
+      const { name, glyph, tools: members } = groups[i];
       actionButton(c, `${global ? 'global/' : 'unit/'}card-group-${name}`, cell(i), glyph, name, () =>
         setPage(f32(i + 1)),
       );
+      if (freshGroup(this, members)) freshMark(this, cell(i), false);
     }
     return;
   }
@@ -819,17 +683,22 @@ export function commandCard(
       bounds = cell(i),
       kind = toolStructure(id),
       hasIcon = kind !== undefined || id === Tool.Road || id === Tool.Pave || id === Tool.Field;
-    let why = '';
-    if (id !== Tool.Camp && !this.town.camp()) why = 'Found the camp first';
-    else if (kind !== undefined && this.town.population() < structureSpec(kind).requiredPopulation)
-      why = `Needs ${structureSpec(kind).requiredPopulation} people`;
+    // Locked cards stay in the menu: a press lists what they need instead of picking them.
+    const needs = toolRequirements(this.town, id),
+      missing = needs.filter((need) => !need.done),
+      why = missing.length ? 'Locked: ' + missing.map((need) => need.text).join(' · ') : '',
+      cardId = `${global ? 'global/' : 'unit/'}card-pick-${tools[id].label}`;
     drawButton(
       'card-pick-' + tools[id].label,
       bounds,
       hasIcon ? '' : tools[id].label,
-      () => this.selectTool(id, !global),
+      () => {
+        if (!missing.length) this.selectTool(id, !global);
+        else this.buildHint = this.buildHint === id ? null : id;
+      },
       this.tool === id ? ButtonStyle.Primary : ButtonStyle.Default,
-      !why,
+      true,
+      missing.length ? { fill: t.surface } : {},
     );
     if (hasIcon) {
       const dim = !!why,
@@ -855,7 +724,13 @@ export function commandCard(
         Align.Center,
       );
     }
-    if (bounds.contains(this.mouse.x, this.mouse.y)) {
+    if (missing.length) {
+      lockMark(this, bounds);
+      if (this.buildHint === id || bounds.contains(this.mouse.x, this.mouse.y) || c.focused() === cardId)
+        requirementTip(this, cardId, id, needs);
+    }
+    if (this.unlockFresh.has(id)) freshMark(this, bounds, true);
+    if (bounds.contains(this.mouse.x, this.mouse.y) || this.buildHint === id) {
       detail =
         why ||
         (kind !== undefined ? `${describe(structureSpec(kind).cost)} · ${tools[id].key}` : tools[id].hint);

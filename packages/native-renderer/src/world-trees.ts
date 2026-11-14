@@ -130,6 +130,7 @@ export function buildTreeRow(
     Math.max(...bounds.map((b) => b.y + b.h)) - top,
   );
 }
+const distantTreesZoom = f32(0.33);
 export function cullTrees(s: WorldRendererState): void {
   const padding = f32(2 / s.view.zoom),
     visible = new Rect(
@@ -138,9 +139,11 @@ export function cullTrees(s: WorldRendererState): void {
       f32(f32(s.viewWidth + 4) / s.view.zoom),
       f32(f32(s.viewHeight + 4) / s.view.zoom),
     );
+  // This far out a tree is a few pixels, yet most of the map's trees are in view.
+  const distant = s.editorView && s.view.zoom < distantTreesZoom;
   for (let i = 0; i < s.rowTrees.length; i++) {
     const overlap = s.treeBounds[i].intersect(visible);
-    s.rowTrees[i].opacity(overlap.w > 0 && overlap.h > 0 ? 255 : 0);
+    s.rowTrees[i].opacity(!distant && overlap.w > 0 && overlap.h > 0 ? 255 : 0);
   }
 }
 export function swayTrees(s: WorldRendererState, wind: number, seconds: number): void {
@@ -211,7 +214,8 @@ export function sprout(
     body = new SceneNode(),
     batch = new TreeBatch(climate);
   batch.add(tree);
-  for (const shape of batch.finish(foot.y)) body.add(shape);
+  const shapes = batch.finish(foot.y);
+  for (const shape of shapes) body.add(shape);
   const leaves = new ShapeNode();
   for (let i = 0; i < 6; i++) {
     const a = f32(-f32(2.9) + f32(i * f32(0.52)));
@@ -224,7 +228,8 @@ export function sprout(
   }
   leaves.fill(126, 156, 98).opacity(0);
   paint.add(leaves).add(body);
-  registerDepth(paint, tree.foot, `sprout:${x}:${y}:${index}`);
+  // A grown tree is taller than the default culling box.
+  registerDepth(paint, tree.foot, `sprout:${x}:${y}:${index}`, shapesBounds(shapes));
   registerPick(paint, {
     ref: { kind: 'tree', id: y * map.width() + x, instanceIndex: index },
     body: [body],
@@ -320,7 +325,10 @@ export function updateFelling(s: WorldRendererState, town: Town): void {
       body = new SceneNode(),
       batch = new TreeBatch(town.climate());
     batch.add(tree);
-    for (const shape of batch.finish(pivot.y)) body.add(shape);
+    const shapes = batch.finish(pivot.y),
+      standing = shapesBounds(shapes),
+      reach = f32(pivot.y - standing.y);
+    for (const shape of shapes) body.add(shape);
     const dust = new ShapeNode();
     for (let i = 0; i < 6; i++)
       dust.appendCircle(
@@ -332,7 +340,13 @@ export function updateFelling(s: WorldRendererState, town: Town): void {
     dust.fill(160, 132, 88).opacity(0);
     paint.add(body).add(dust);
     const row = clamp(f32(x + y), 0, f32(s.rows.length - 1));
-    registerDepth(paint, tree.foot, `fall:${event.serial}`);
+    // The whole arc of the fall: a tree's height to either side of its foot.
+    registerDepth(
+      paint,
+      tree.foot,
+      `fall:${event.serial}`,
+      new Rect(f32(pivot.x - f32(reach + 12)), standing.y, f32(f32(2 * reach) + 24), f32(reach + 24)),
+    );
     s.rows[row].add(paint);
     const worker = project(event.worker.x, event.worker.y);
     s.fallingTrees.push({ paint, body, dust, pivot, row, at: event.at, side: pivot.x < worker.x ? -1 : 1 });

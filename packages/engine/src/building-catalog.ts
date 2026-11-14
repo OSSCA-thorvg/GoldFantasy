@@ -36,6 +36,10 @@ export enum Structure {
   WoodStore,
   Granary,
   StoneStore,
+  Watchtower,
+  TrainingYard,
+  Runestone,
+  Workbench,
   Count,
 }
 export const resourceKeys = ['gold', 'wood', 'stone', 'food', 'mana', 'water', 'planks', 'cutStone', 'bones'] as const;

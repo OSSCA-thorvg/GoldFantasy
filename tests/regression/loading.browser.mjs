@@ -84,7 +84,7 @@ try {
       await page.route('**/assets/branding/powered-by-thorvg.json', (route) =>
         route.fulfill({ status: 404, body: 'Missing test asset' }),
       );
-    await page.goto(`${origin}/?test&renderer=sw&seed=5`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.goto(`${origin}/?test&renderer=gl&seed=5`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await until('testAudioContexts.length === 1');
     assert.equal(await read('navigator.userActivation.hasBeenActive'), false);
     assert.equal(await read('testAudioContexts[0].state'), 'suspended');

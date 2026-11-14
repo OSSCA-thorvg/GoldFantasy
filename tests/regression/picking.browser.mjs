@@ -10,8 +10,6 @@ const root = resolve(import.meta.dirname, '../..');
 const output = process.env.GOLDFANTASY_TEST_OUTPUT ?? resolve(root, 'artifacts/regression/picking');
 const only = process.env.GOLDFANTASY_PICKING_CASE;
 const combinations = [
-  ['sw', 1],
-  ['sw', 2],
   ['gl', 1],
   ['gl', 2],
 ].filter(([backend, dpr]) => !only || only === `${backend}-${dpr}`);

@@ -12,15 +12,29 @@ import { CampEconomy } from './camp-economy';
 import { animalSpec } from './wildlife';
 import { spreadFighter } from './person-navigation';
 import { planRaiderApproach } from './monster-navigation';
-import { dungeonThreat } from './raid-progression';
-import { attackDamage, attackReach, armorProtection } from './equipment';
+import { campTier, dungeonThreat, raidKind, raidMuster, raidShape, RaidKind } from './raid-progression';
+import { gateSealed, sealable } from './gate-seals';
+import { attackDamage, attackReach, armorProtection, combatItem, equippedItem } from './equipment';
+import { songOf, wardOf } from './calling-auras';
+import { CombatCue, MonsterRank, combatRules } from './combat-events';
+import { Boon, boon, boonRules } from './gate-boons';
+import { inArea } from './realm-layout';
+import { rankMonster, rankPause, rankRules, rankWorth, skillEffects, slowedBy } from './monster-ranks';
+import { StrikeKind, strikeOf } from './skill-catalog';
+/** The mage tower's ward rite: monster blows near the resident's own seat. */
+const wardRite = { factor: 0.7, reach: 2 * TownState.campReach };
 export interface CombatTown extends TownState {
+  strikeDown(p: Person, cause: string, notice?: string): void;
+  blowStrength(p: Person): number;
+  hurtCreature(foe: Monster, damage: number, by: Person | null): boolean;
+  blowAgainst(foe: Monster, damage: number): number;
+  rallied(p: Person): boolean;
   walk(p: Person, dt: number): void;
   reveal(x: number, y: number, radius: number): void;
   walkTo(p: Person, at: Point): boolean;
   staffed(kind: Structure): boolean;
   camp(id?: number): Building | null;
-  canSendExpedition(ids: number[], dungeon: number): Check;
+  canSendExpedition(ids: number[], dungeon: number, floor?: number): Check;
   walkTo(p: Person, at: Point): boolean;
   power(p: Person): number;
   settlementOf(p: Person | Building): number;
@@ -36,6 +50,15 @@ export interface CombatTown extends TownState {
   resumeOrder(p: Person): boolean;
   changeRenown(village: number, amount: number): void;
   raze(id: number): void;
+  expeditionProblem(dungeon: number, floor: number): string;
+  deepestOpenFloor(dungeon: number): number;
+  watchtowerManned(id: number): boolean;
+}
+export interface BiteTown extends TownState {
+  hurtGuest(p: Person, killed: boolean): void;
+  strikeDown(p: Person, cause: string, notice?: string): void;
+  camp(id?: number): Building | null;
+  settlementOf(p: Person | Building): number;
 }
 export const lairOf = (site: Dungeon): Point => point(f(site.origin.x + 1), f(site.origin.y + 1));
 export const monsterEntrance = (site: Dungeon): Point =>
@@ -46,20 +69,22 @@ export interface Breed {
   speed: number;
   pause: number;
 }
+// Long fights by design: monsters soak many unarmed blows and bite gently, so
+// crafted weapons and numbers decide how fast a fight ends.
 export function breedOf(kind: DungeonKind): Breed {
   switch (kind) {
     case DungeonKind.Cave:
-      return { health: f(4.5), bite: f(0.055), speed: f(1.45), pause: 1 };
+      return { health: f(13.5), bite: f(0.028), speed: f(1.45), pause: 1 };
     case DungeonKind.Crypt:
-      return { health: 7, bite: f(0.045), speed: f(0.9), pause: f(1.3) };
+      return { health: 21, bite: f(0.023), speed: f(0.9), pause: f(1.3) };
     case DungeonKind.Portal:
-      return { health: f(3.5), bite: f(0.08), speed: f(1.25), pause: f(0.9) };
+      return { health: f(10.5), bite: f(0.04), speed: f(1.25), pause: f(0.9) };
     case DungeonKind.Ruin:
-      return { health: f(5.5), bite: f(0.05), speed: f(1.1), pause: 1 };
+      return { health: f(16.5), bite: f(0.025), speed: f(1.1), pause: 1 };
     case DungeonKind.GiantHall:
-      return { health: 24, bite: f(0.12), speed: f(0.85), pause: f(1.6) };
+      return { health: 48, bite: f(0.06), speed: f(0.85), pause: f(1.6) };
     default:
-      return { health: 6, bite: f(0.08), speed: 1, pause: 1 };
+      return { health: 18, bite: f(0.04), speed: 1, pause: 1 };
   }
 }
 export function steps(map: WorldMap, to: Point): boolean {
@@ -74,156 +99,189 @@ export function power(this: CombatTown, p: Person): number {
 export function raiding(this: TownState): boolean {
   return this.beasts.some((m) => m.raider);
 }
-export function summonRaid(this: CombatTown): void {
+/** What a raid weighs itself against: the residents at home, their arms and levels, manned towers and walls. */
+function settlementMight(town: CombatTown): number {
+  let might = 0;
+  for (const p of town.folk)
+    if (
+      p.role === Role.Resident && p.faction === town.controlFaction && p.health > 0 && p.downedAt < 0 &&
+      p.activity !== Activity.Expedition && p.activity !== Activity.Leaving && !(town.realmGate >= 0 && inArea(town.realmArea, p.position))
+    )
+      might += raidMuster.perBlow * f(attackDamage(p)) * p.vitalityMultiplier();
+  for (const b of town.placed) {
+    if (!b.built() || b.faction !== town.controlFaction) continue;
+    if (b.kind === Structure.Watchtower && town.watchtowerManned(b.id)) might += raidMuster.perTower;
+    if (isSeat(b.kind)) might += raidMuster.perTier * campTier(b.kind);
+  }
+  return might;
+}
+export function summonRaid(this: CombatTown, kind = raidKind(this.world.seed(), this.days)): void {
   const fire = this.camp();
   if (!fire) return;
-  let lair = -1;
-  for (let d = 0; d < this.world.dungeons().length; ++d)
-    if (
-      this.world.dungeons()[d].kind !== DungeonKind.GiantHall &&
-      this.world.dungeons()[d].discovered &&
-      (lair < 0 ||
-        distance(lairOf(this.world.dungeons()[d]), fire.center) <
-          distance(lairOf(this.world.dungeons()[lair]), fire.center))
-    )
-      lair = d;
-  if (lair < 0) return;
-  const site = this.world.dungeons()[lair],
-    prowling = this.beasts.filter((m) => m.raider).length,
-    pressure = dungeonThreat(this.days, lairOf(site), this.placed),
-    count = Math.min(pressure.count, TownState.maxRaiders - prowling);
-  if (count <= 0) return;
-  for (let i = 0; i < count; ++i) {
-    const beast = new Monster(
-      this.nextMonster++,
-      lair,
-      this.grid.nearestWalkable(add(monsterEntrance(site), rotated(point(0.6, 0), f(i * f(1.3))))),
+  const gates = this.world
+    .dungeons()
+    .map((site, index) => ({ site, index }))
+    .filter((gate) => sealable(gate.site) && gate.site.discovered && !gateSealed(this, gate.index))
+    .sort(
+      (a, b) =>
+        distance(lairOf(a.site), fire.center) - distance(lairOf(b.site), fire.center) || a.index - b.index,
     );
+  if (!gates.length) return;
+  if (kind === RaidKind.Pincer && gates.length < 2) kind = RaidKind.Pack;
+  const sources = gates.slice(0, kind === RaidKind.Pincer ? 2 : 1),
+    prowling = this.beasts.filter((m) => m.raider).length,
+    pressure = dungeonThreat(this.days, lairOf(gates[0].site), this.placed),
+    shape = raidShape(kind, settlementMight(this) + raidMuster.perWeek * pressure.week),
+    // Leaders first, then the few brutes, then the swarm: a full settlement loses swarmers first.
+    ranks = [
+      ...Array<MonsterRank>(shape.count).fill(kind === RaidKind.Brutes ? MonsterRank.Brute : MonsterRank.Grunt),
+      ...Array<MonsterRank>(shape.brutes).fill(MonsterRank.Brute),
+      ...Array<MonsterRank>(shape.swarm).fill(MonsterRank.Swarmer),
+    ].slice(0, Math.max(0, TownState.maxRaiders - prowling));
+  if (!ranks.length) return;
+  ranks.forEach((rank, i) => {
+    const source = sources[i % sources.length],
+      beast = new Monster(
+        this.nextMonster++,
+        source.index,
+        this.grid.nearestWalkable(
+          add(monsterEntrance(source.site), rotated(point(f(0.6 + 0.35 * Math.floor(i / 8)), 0), f(i * f(1.3)))),
+        ),
+      );
     beast.raider = true;
-    beast.health = f(breedOf(site.kind).health * pressure.health);
-    beast.strength = pressure.damage;
+    const leader = i < shape.count;
+    beast.health = f(breedOf(source.site.kind).health * pressure.health * (leader ? shape.health : 1));
+    beast.strength = f(pressure.damage * (leader ? shape.damage : 1));
+    // The shape already makes leading brutes tough; the rank gives them their gait and look.
+    rankMonster(beast, rank, !leader);
+    if (rank === MonsterRank.Swarmer) beast.strength = f(beast.strength * raidMuster.swarmBite);
     this.beasts.push(beast);
     planRaiderApproach(this, beast);
-  }
+  });
   ++this.raidCount;
-  this.notify('Monsters from ' + site.name + ' raid the settlement!');
-}
-export function canSendExpedition(this: CombatTown, ids: number[], dungeon: number): Check {
-  const check = new Check();
-  if (dungeon < 0 || dungeon >= this.world.dungeons().length || !this.world.dungeons()[dungeon].discovered) {
-    check.reason = 'No known dungeon there';
-    return check;
-  }
-  if (this.world.dungeons()[dungeon].kind === DungeonKind.GiantHall) {
-    check.reason = 'A neutral giant dwelling';
-    return check;
-  }
-  const any = this.folk.some(
-    (p) => canControl(p, this.controlFaction) && ids.includes(p.id),
+  this.emit(CombatCue.Wave, monsterEntrance(sources[0].site), { amount: ranks.length });
+  const from = sources[0].site.name;
+  this.notify(
+    kind === RaidKind.Horde
+      ? 'A horde pours out of ' + from + '!'
+      : kind === RaidKind.Brutes
+        ? 'Great brutes from ' + from + ' march on the settlement!'
+        : kind === RaidKind.Pincer
+          ? 'Raiders close in from ' + from + ' and ' + sources[1].site.name + '!'
+          : 'Monsters from ' + from + ' raid the settlement!',
   );
-  if (!any) {
+}
+export function canSendExpedition(
+  this: CombatTown,
+  ids: number[],
+  dungeon: number,
+  floor = this.deepestOpenFloor(dungeon),
+): Check {
+  const check = new Check();
+  check.reason = this.expeditionProblem(dungeon, floor);
+  if (check.reason) return check;
+  if (!this.folk.some((p) => canControl(p, this.controlFaction) && ids.includes(p.id))) {
     check.reason = 'Select residents to send';
     return check;
   }
   check.ok = true;
   return check;
 }
-export function sendExpedition(this: CombatTown, ids: number[], dungeon: number): boolean {
-  if (!this.canSendExpedition(ids, dungeon).ok) return false;
-  const party: Expedition = { dungeon, members: [], returnAt: -1 };
+/** The chosen residents walk to the gate; the world beyond is raised once all have stepped in. */
+export function sendExpedition(
+  this: CombatTown,
+  ids: number[],
+  dungeon: number,
+  floor = this.deepestOpenFloor(dungeon),
+): boolean {
+  if (!this.canSendExpedition(ids, dungeon, floor).ok) return false;
+  if (this.realmGate === dungeon) floor = this.realmFloor;
+  const party: Expedition = this.parties.find((other) => other.dungeon === dungeon) ?? {
+    dungeon,
+    members: [],
+    floor,
+  };
+  party.floor = floor;
   for (const p of this.folk) {
-    if (!canControl(p, this.controlFaction) || !ids.includes(p.id)) continue;
+    if (!canControl(p, this.controlFaction) || !ids.includes(p.id) || party.members.includes(p.id)) continue;
     if (!this.walkTo(p, monsterEntrance(this.world.dungeons()[dungeon]))) continue;
     p.activity = Activity.Expedition;
     p.target = dungeon;
-    p.ordered = false;
+    p.ordered = p.holding = false;
     p.task = Activity.Idle;
     party.members.push(p.id);
   }
   if (!party.members.length) return false;
   this.open[dungeon] = 1;
-  this.parties.push(party);
-  this.notify(party.members.length + ' set out for ' + this.world.dungeons()[dungeon].name);
+  if (!this.parties.includes(party)) this.parties.push(party);
+  this.notify(
+    `${party.members.length} set out for floor ${floor + 1} beyond ${this.world.dungeons()[dungeon].name}`,
+  );
   ++this.changes;
   return true;
 }
-export function returnFrom(this: CombatTown, party: Expedition): void {
-  const site = this.world.dungeons()[party.dungeon];
-  while (this.depth.length < this.world.dungeons().length) this.depth.push(0);
-  let danger = f(f(5 + site.kind) + this.depth[party.dungeon] * 2);
-  const fire = this.camp();
-  if (fire) danger = f(danger + f(distance(lairOf(site), fire.center) / 25));
-  let strength = 0;
-  for (const id of party.members) {
-    const p = this.person(id);
-    if (p) strength = f(strength + this.power(p));
+/** One monster blow against a resident, shared by the overworld and the worlds beyond. */
+export function monsterBite(
+  town: BiteTown,
+  beast: Monster,
+  prey: Person,
+  breed: Breed,
+  power = 1,
+  area = false,
+  ranged = false,
+): void {
+  const slowed = slowedBy(town, beast);
+  beast.ready = town.time + (breed.pause * rankPause(beast)) / slowed;
+  beast.swingAt = town.time;
+  if (!area && equippedItem(prey, 'offhand')?.id === 'shield' && town.roll() < combatRules.blockChance) {
+    town.blows.push({
+      serial: town.nextBlow++,
+      from: { ...beast.position },
+      to: { ...prey.position },
+      damage: 0,
+      onPerson: true,
+      ranged,
+      at: town.time,
+      person: prey.id,
+      blocked: true,
+      strike: StrikeKind.Single,
+      primary: true,
+    });
+    town.emit(CombatCue.Block, prey.position, { person: prey.id, creature: beast.id });
+    return;
   }
-  const won = f(strength * f(f(0.6) + f(this.roll() * f(0.8)))) >= danger;
-  let outcome: string;
-  if (won) {
-    const loot = new Resources(
-        Math.trunc(f(12 * danger)),
-        0,
-        Math.trunc(f(2 * danger)),
-        0,
-        site.kind === DungeonKind.Portal || site.kind === DungeonKind.Crypt ? Math.trunc(f(3 * danger)) : 0,
-      ),
-      shares = new Map<number, number>();
-    let total = 0;
-    for (const id of party.members) {
-      const member = this.person(id);
-      if (member) {
-        const village = this.settlementOf(member);
-        shares.set(village, (shares.get(village) ?? 0) + 1);
-        ++total;
-      }
-    }
-    let assigned = 0;
-    for (const [village, members] of [...shares].sort((a, b) => a[0] - b[0])) {
-      const share = (amount: number): number =>
-        Number(
-          (BigInt(amount) * BigInt(assigned + members)) / BigInt(total) -
-            (BigInt(amount) * BigInt(assigned)) / BigInt(total),
-        );
-      this.credit(
-        new Resources(
-          share(loot.gold),
-          share(loot.wood),
-          share(loot.stone),
-          share(loot.food),
-          share(loot.mana),
-          share(loot.water),
-        ),
-        village,
-      );
-      assigned += members;
-    }
-    ++this.depth[party.dungeon];
-    outcome = 'The expedition returns from ' + site.name + ' with ' + describe(loot);
-  } else outcome = 'The expedition is driven out of ' + site.name;
-  this.notify(outcome);
-  for (const p of this.folk) {
-    if (!party.members.includes(p.id)) continue;
-    p.health = f(
-      p.health -
-        f(
-          f(
-            (won ? f(this.roll() * f(0.25)) : f(f(0.3) + f(this.roll() * f(0.4)))) *
-              (this.staffed(Structure.Apothecary) ? f(0.6) : 1),
-          ) / p.vitalityMultiplier(),
-        ),
+  const seat = prey.role === Role.Resident ? town.camp(town.settlementOf(prey)) : null,
+    warded = town.time < town.wardUntil && !!seat && distance(seat.center, prey.position) <= wardRite.reach,
+    challenged = prey.calling === Calling.Warrior && prey.abilityUntil > town.time,
+    soak = area ? 1 - armorProtection(prey) / 2 : 1 - armorProtection(prey),
+    disheartened = (town.combatState.dirged.get(beast.id) ?? -1) > town.time,
+    bite = f(
+      breed.bite * beast.strength * power * soak * wardOf(town.folk, prey) *
+        (warded ? wardRite.factor : 1) * (challenged ? 0.5 : 1) * (disheartened ? skillEffects.dirgeBite : 1),
     );
-    p.stress = Math.min(1, f(p.stress + (won ? f(0.05) : f(0.25))));
-    p.inside = false;
-    p.activity = Activity.Idle;
-    p.until = this.time;
-    if (p.health <= 0) {
-      this.notify(p.name + ' fell in ' + site.name);
-      p.activity = Activity.Leaving;
-      p.health = -1;
-    } else if (won) this.rewardExperience(p, lround(f(danger * 6)));
+  prey.health = f(prey.health - f(bite / prey.vitalityMultiplier()));
+  town.blows.push({
+    serial: town.nextBlow++,
+    from: { ...beast.position },
+    to: { ...prey.position },
+    damage: Math.max(1, lround(f(bite * 100))),
+    onPerson: true,
+    ranged,
+    at: town.time,
+    person: prey.id,
+    strike: StrikeKind.Single,
+    primary: true,
+  });
+  prey.stress = Math.min(1, f(prey.stress + f(0.03)));
+  town.hurtGuest(prey, prey.health <= 0);
+  if (prey.health <= 0) {
+    const cause = beast.giant()
+      ? 'Killed by a provoked giant'
+      : beast.rank === MonsterRank.Guardian
+        ? 'Killed by the guardian'
+        : 'Killed by monsters';
+    town.strikeDown(prey, cause, prey.name + ' was ' + cause.toLowerCase());
   }
-  party.members = [];
 }
 export function monsterAt(this: TownState, p: Point, reach: number): number {
   let best: Monster | null = null;
@@ -239,12 +297,126 @@ export function monsterAt(this: TownState, p: Point, reach: number): number {
   return best?.id ?? -1;
 }
 export function rewardExperience(this: TownState, p: Person, points: number): void {
-  if (p.gainExperience(points) > 0) this.notify(p.name + ' reached level ' + p.level + '!');
+  if (boon(this, Boon.Lore)) points = Math.round(points * boonRules.loreExperience);
+  if (p.gainExperience(points) > 0) {
+    this.notify(p.name + ' reached level ' + p.level + '!');
+    this.emit(CombatCue.LevelUp, p.position, { person: p.id, amount: p.level });
+  }
+}
+/** A resident's blow before crits: weapon, level and calling, with song, rally and the Valor boon. */
+export function blowStrength(this: CombatTown, p: Person): number {
+  return f(
+    blowOf(p) * songOf(this.folk, p) * (this.rallied(p) ? 1.25 : 1) *
+      (boon(this, Boon.Valor) ? boonRules.valorAttack : 1),
+  );
+}
+/** What a blow of `damage` leaves after the hide of a monster beyond a gate. */
+export function blowAgainst(this: TownState, foe: Monster, damage: number): number {
+  if (foe.animal !== null || this.realmGate < 0 || !inArea(this.realmArea, foe.home)) return damage;
+  return f(Math.max(damage * 0.2, damage - rankRules.hide));
+}
+/** Damages a creature; the resident who lands the killing blow earns the kill and its experience. */
+export function hurtCreature(this: CombatTown, foe: Monster, damage: number, by: Person | null): boolean {
+  if (foe.health <= 0) return false;
+  if (foe.rank === MonsterRank.Den) this.combatState.struckAt.set(foe.id, this.time);
+  foe.health = f(foe.health - damage);
+  if (foe.health > 0) return false;
+  if (!by) return true;
+  this.combatState.slayers.set(foe.id, by.id);
+  if (foe.animal === null) {
+    const remains = new Resources();
+    // A swarm leaves scraps: one bone for every few small ones.
+    remains.bones = foe.giant() ? 6 : rankWorth(foe) >= 1 ? 2 : foe.id % 3 === 0 ? 1 : 0;
+    if (remains.bones) this.store(remains, this.settlementOf(by));
+  }
+  const health =
+      foe.animal !== null ? animalSpec(foe.animal).health : breedOf(this.world.dungeons()[foe.lair].kind).health,
+    points = lround(
+      f(health * (foe.animal !== null ? 2 : rankWorth(foe) * (foe.raider ? f(1.33) : 1))),
+    );
+  for (const ally of this.folk)
+    if (
+      ally.health > 0 &&
+      (ally.id === by.id ||
+        (!ally.inside && ally.activity === Activity.Fighting && distance(ally.position, foe.position) <= 6))
+    )
+      this.rewardExperience(ally, points);
+  return true;
+}
+/** Counts a dead creature once, for the killer, the chronicle and the presentation. */
+export function tallyKill(this: TownState, foe: Monster): void {
+  const by = this.combatState.slayers.get(foe.id) ?? -1,
+    killer = by >= 0 ? this.person(by) : null;
+  this.combatState.slayers.delete(foe.id);
+  this.combatState.taunts.delete(foe.id);
+  this.combatState.slamAt.delete(foe.id);
+  this.combatState.chilled.delete(foe.id);
+  this.combatState.dirged.delete(foe.id);
+  if (killer) ++killer.kills;
+  if (foe.animal === null) ++this.chronicle.monstersSlain;
+  this.emit(CombatCue.Kill, foe.position, { person: killer?.id ?? -1, creature: foe.id });
+  if (foe.rank === MonsterRank.Den)
+    this.emit(CombatCue.DenDestroyed, foe.position, { person: killer?.id ?? -1, creature: foe.id });
+}
+/** An Aimed Shot breaks a guardian's wind-up; the slam comes again later. */
+export function breakWindup(this: TownState, beast: Monster): void {
+  beast.windupUntil = -1;
+  this.combatState.slamAt.set(beast.id, this.time + rankRules.slamBroken);
+}
+/** Enemies a shaped blow also catches besides its target, nearest first. */
+function caughtBy(town: CombatTown, p: Person, foe: Monster, spec: ReturnType<typeof strikeOf>): Monster[] {
+  if (spec.most <= 1 || spec.reach <= 0) return [];
+  const along = sub(foe.position, p.position),
+    span = Math.max(f(0.001), distance(foe.position, p.position)),
+    out: { beast: Monster; gap: number }[] = [];
+  for (const m of town.beasts) {
+    if (m === foe || m.health <= 0 || m.insideLair || (m.giant() && !m.angry)) continue;
+    const gap = distance(m.position, foe.position);
+    if (gap > spec.reach + (spec.kind === StrikeKind.Pierce ? 0.5 : 0)) continue;
+    if (spec.kind === StrikeKind.Pierce) {
+      // Behind the target, close to the line of flight.
+      const ahead = ((m.position.x - foe.position.x) * along.x + (m.position.y - foe.position.y) * along.y) / span,
+        aside = Math.abs((m.position.x - foe.position.x) * along.y - (m.position.y - foe.position.y) * along.x) / span;
+      if (ahead <= 0 || ahead > spec.reach || aside > 0.55) continue;
+    } else if (spec.kind === StrikeKind.Cleave && distance(m.position, p.position) > reachOf(p) + 0.6) continue;
+    out.push({ beast: m, gap });
+  }
+  return out
+    .sort((a, b) => a.gap - b.gap || a.beast.id - b.beast.id)
+    .slice(0, spec.most - 1)
+    .map((entry) => entry.beast);
 }
 export function strike(this: CombatTown, p: Person, foe: Monster): void {
   if (foe.health <= 0 || foe.insideLair) return;
-  const blow = blowOf(p);
-  foe.health = f(foe.health - blow);
+  const critChance =
+      combatRules.critChance * (p.calling === Calling.Ranger ? 2 : 1) + (boon(this, Boon.Ember) ? boonRules.emberCrit : 0),
+    crit = this.roll() < critChance,
+    blow = this.blowAgainst(foe, f(this.blowStrength(p) * (crit ? combatRules.critDamage : 1))),
+    spec = strikeOf(combatItem(p)?.visual),
+    ranged = reachOf(p) > 1,
+    others = caughtBy(this, p, foe, spec);
+  p.swingAt = this.time;
+  this.hurtCreature(foe, blow, p);
+  if (spec.stagger > 0 && foe.health > 0) foe.ready = Math.max(foe.ready, this.time) + spec.stagger;
+  for (const other of others) {
+    const share = this.blowAgainst(other, f(this.blowStrength(p) * (crit ? combatRules.critDamage : 1) * spec.share));
+    this.hurtCreature(other, share, p);
+    if (!other.raider) other.angry = true;
+    if (other.giant()) other.provokedBy = p.id;
+    this.blows.push({
+      serial: this.nextBlow++,
+      from: { ...(spec.kind === StrikeKind.Pierce ? foe.position : p.position) },
+      to: { ...other.position },
+      damage: lround(f(share * 10)),
+      onPerson: false,
+      ranged,
+      at: this.time,
+      person: p.id,
+      attacker: p.id,
+      strike: spec.kind,
+      primary: false,
+    });
+  }
   if (foe.animal !== null && (!foe.angry || foe.health <= 0))
     this.animalCalls.push({
       serial: this.nextAnimalCall++,
@@ -256,7 +428,6 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
   if (!foe.raider) foe.angry = true;
   if (foe.giant() || foe.animal !== null) foe.provokedBy = p.id;
   p.ready = this.time + 1;
-  const ranged = reachOf(p) > 1;
   this.blows.push({
     serial: this.nextBlow++,
     from: { ...p.position },
@@ -267,26 +438,34 @@ export function strike(this: CombatTown, p: Person, foe: Monster): void {
     at: this.time,
     person: p.id,
     attacker: p.id,
+    strike: spec.kind,
+    primary: true,
+    ...(crit ? { crit: true } : {}),
   });
-  if (foe.health <= 0) {
-    if (foe.animal === null) {
-      const remains = new Resources();
-      remains.bones = foe.giant() ? 6 : 2;
-      this.store(remains, this.settlementOf(p));
+  if (crit) this.emit(CombatCue.Crit, foe.position, { person: p.id, creature: foe.id, amount: lround(f(blow * 10)) });
+}
+/** Hold position: strike the nearest enemy within reach, never step toward one. */
+function holdGround(town: CombatTown, p: Person, dt: number): void {
+  const reach = reachOf(p);
+  let foe: Monster | null = null;
+  for (const group of [town.beasts, town.animals])
+    for (const m of group) {
+      if (m.health <= 0 || m.insideLair || (m.giant() && !m.angry)) continue;
+      if (m.animal !== null && !(m.angry && animalSpec(m.animal).defends)) continue;
+      const gap = distance(m.position, p.position);
+      if (gap > reach || !town.world.revealed(m.position)) continue;
+      if (!foe || gap < distance(foe.position, p.position) || (m.id === p.foe && gap <= distance(foe.position, p.position) + 0.3))
+        foe = m;
     }
-    const health =
-        foe.animal !== null
-          ? animalSpec(foe.animal).health
-          : breedOf(this.world.dungeons()[foe.lair].kind).health,
-      points = lround(f(health * (foe.animal !== null ? 2 : foe.raider ? 4 : 3)));
-    for (const ally of this.folk)
-      if (
-        ally.health > 0 &&
-        (ally.id === p.id ||
-          (!ally.inside && ally.activity === Activity.Fighting && distance(ally.position, foe.position) <= 6))
-      )
-        this.rewardExperience(ally, points);
+  p.path = [];
+  if (!foe) {
+    p.foe = -1;
+    if (p.activity === Activity.Fighting) p.activity = Activity.Holding;
+    return;
   }
+  p.foe = foe.id;
+  p.activity = Activity.Fighting;
+  if (town.time >= p.ready) town.strike(p, foe);
 }
 // Threats interrupt an order without replacing its task/site. When combat ends,
 // the original move, resource or construction transaction resumes.
@@ -295,14 +474,26 @@ export function fight(this: CombatTown, p: Person, dt: number): void {
     p.faction !== this.controlFaction || p.stressRecovery || p.health <= 0 ||
     p.activity === Activity.Expedition || p.activity === Activity.Leaving || p.crossingDoorway()
   ) return;
+  // The player's Move outranks self-defence: a unit told to go, goes. Attack-move
+  // (aggressive) and every other order still answer a threat.
+  if (p.ordered && (p.task === Activity.Moving || p.task === Activity.Tending) && !p.aggressive) {
+    p.foe = -1;
+    if (p.activity === Activity.Fighting) p.activity = Activity.Moving;
+    return;
+  }
+  if (p.holding) return holdGround(this, p, dt);
   const notice = this.raiding() ? 10 : 5;
+  // Distance first: the fog test walks every sight circle on the map.
   const threats = [...this.beasts, ...this.animals].filter(m =>
-    m.health > 0 && !m.insideLair && (!m.giant() || m.angry) &&
+    m.health > 0 && !m.insideLair && distance(m.position, p.position) <= notice && (!m.giant() || m.angry) &&
     (m.animal === null || (m.angry && animalSpec(m.animal).defends)) &&
-    this.world.revealed(m.position) && distance(m.position, p.position) <= notice &&
-    (m.raider || m.angry || distance(m.position,p.position) < 2.5));
+    (m.raider || m.angry || distance(m.position,p.position) < 2.5) && this.world.revealed(m.position));
   threats.sort((a,b) => distance(a.position,p.position)-distance(b.position,p.position) || a.id-b.id);
-  let foe: Monster | null = threats.find(m => m.id === p.foe) ?? threats[0] ?? null;
+  // A target the player picked is fought before whatever happens to stand closer.
+  const chosen = p.ordered && p.task === Activity.Fighting && p.attackPerson < 0 ? this.creatureTarget(p.taskSite) : null;
+  let foe: Monster | null =
+    (chosen && chosen.health > 0 && !chosen.insideLair ? chosen : null) ??
+    threats.find(m => m.id === p.foe) ?? threats[0] ?? null;
   let person: Person | null = null;
   if (foe && p.hunting && foe.id !== p.foe) p.hunting = false;
   if (!foe && p.ordered && p.task === Activity.Fighting) {
@@ -338,7 +529,7 @@ export function fight(this: CombatTown, p: Person, dt: number): void {
     if (!p.path.length || distance(p.path[p.path.length-1],at) > .7) {
       if (!this.walkTo(p, at)) { p.foe = -1; p.activity = Activity.Idle; p.until = this.time + .5; return; }
     }
-    this.walk(p,dt);
+    this.walk(p, dt);
     if (!this.world.revealedWithin(p.position, f(3.5))) this.reveal(p.position.x,p.position.y,f(7.5));
     return;
   }
@@ -347,19 +538,21 @@ export function fight(this: CombatTown, p: Person, dt: number): void {
   if (this.time < p.ready) return;
   if (foe) this.strike(p,foe);
   else {
-    const damage = f(blowOf(p) * .1 * (1 - armorProtection(person!)) / person!.vitalityMultiplier());
+    const damage = f(this.blowStrength(p) * .1 * (1 - armorProtection(person!)) / person!.vitalityMultiplier());
     person!.health = f(person!.health - damage);
     p.ready = this.time + 1;
-    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:reachOf(p)>1,at:this.time,person:person!.id,attacker:p.id});
+    p.swingAt = this.time;
+    this.blows.push({serial:this.nextBlow++,from:{...p.position},to:{...person!.position},damage:lround(damage*100),onPerson:true,ranged:reachOf(p)>1,at:this.time,person:person!.id,attacker:p.id,strike:StrikeKind.Single,primary:true});
     this.hurtGuest(person!,person!.health <= 0);
-    if (person!.health <= 0) { person!.health = -1; person!.activity = Activity.Leaving; this.notify(person!.name + ' was killed'); }
+    if (person!.health <= 0) this.strikeDown(person!, 'Killed by ' + p.name, person!.name + ' was killed');
   }
 }
 export function releaseMonster(this: CombatTown, at: Point): void {
   let lair = -1;
   for (let d = 0; d < this.world.dungeons().length; ++d)
     if (
-      this.world.dungeons()[d].kind !== DungeonKind.GiantHall &&
+      sealable(this.world.dungeons()[d]) &&
+      !gateSealed(this, d) &&
       (lair < 0 ||
         distance(lairOf(this.world.dungeons()[d]), at) < distance(lairOf(this.world.dungeons()[lair]), at))
     )
@@ -370,6 +563,7 @@ export function releaseMonster(this: CombatTown, at: Point): void {
   beast.health = f(breedOf(this.world.dungeons()[lair].kind).health * pressure.health);
   beast.strength = pressure.damage;
   beast.home = { ...beast.position };
+  rankMonster(beast, MonsterRank.Grunt);
   this.beasts.push(beast);
 }
 export function hurtGuest(this: CombatTown, p: Person, killed: boolean): void {
@@ -396,8 +590,9 @@ export function wreck(this: CombatTown, beast: Monster, dt: number): void {
   const nearby = target ? [target, ...this.placed.filter(item => item !== target)] : this.placed;
   for (const item of nearby) {
     if (!item.footprint().contains(beast.position, f(0.7))) continue;
-    const blow = f(breed.bite * beast.strength * f(0.25));
+    const blow = f(breed.bite * beast.strength * f(0.25) * (boon(this, Boon.Bulwark) ? boonRules.bulwarkBuildingDamage : 1));
     beast.ready = this.time + breed.pause;
+    beast.swingAt = this.time;
     this.blows.push({
       serial: this.nextBlow++,
       from: { ...beast.position },
@@ -407,6 +602,8 @@ export function wreck(this: CombatTown, beast: Monster, dt: number): void {
       ranged: false,
       at: this.time,
       person: -1,
+      strike: StrikeKind.Single,
+      primary: true,
     });
     if (!item.built()) {
       item.progress = f(item.progress - blow);

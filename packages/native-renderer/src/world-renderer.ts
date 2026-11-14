@@ -23,10 +23,13 @@ import { buildingCatalogGeneration } from './building-assets';
 import { resize, fitToView, paintMapName, buildPreview, updateGroundChunks } from './world-ground';
 import { paintGround, tintGround, paintFields } from './terrain-painter';
 import { paintRoads } from './road-painter';
+import { moveWater } from './water-motion';
+import { updateLava } from './lava-motion';
 import { syncVisuals, buildObjects, buildRoadLights } from './world-objects';
 import { buildDarkness, updateVision } from './world-vision';
 import { cullTrees, swayTrees, updateFelling, updateGrowth } from './world-trees';
-import { moveAgents, tread, sparkle, markDamage } from './world-people';
+import { moveAgents, tread, markDamage } from './world-people';
+import { updateCombatPresentation, worldShake } from './combat-presentation';
 import { animate } from './world-animation';
 import { paintStorm } from './world-weather';
 import { ymirHeight } from './ymir-statue';
@@ -52,6 +55,7 @@ const samePreview = (a: Preview, b: Preview): boolean =>
 const intersects = (a: TileRegion, b: TileRegion) =>
   a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
+const terrainSettle = 0.15;
 export class WorldRenderer extends WorldRendererState {
   private readonly picker = new WorldPicker(this);
   private readonly groundSelection = new GroundSelection(this);
@@ -140,9 +144,8 @@ export class WorldRenderer extends WorldRendererState {
     this.vision = [];
     this.groundSelection.clear();
     this.combat.remove();
+    this.combatGround.remove();
     this.damageBack = this.damageLeft = null;
-    this.sparks = [];
-    this.nextSpark = 0n;
     this.prints.remove();
     this.footprints = [];
     this.lastStep.clear();
@@ -155,8 +158,18 @@ export class WorldRenderer extends WorldRendererState {
     this.nameDirty = true;
     const whole =
       area.left <= 0 && area.top <= 0 && area.right >= this.groundWidth && area.bottom >= this.groundHeight;
+    // A chunk's tile box is far larger than its screen rectangle; the edit's own
+    // screen box, grown by the two tiles a chunk repaint reads around itself, leaves most alone.
+    const reach = 2,
+      left = (area.left - area.bottom - 2 * reach) * 32,
+      right = (area.right - area.top + 2 * reach) * 32,
+      top = (area.left + area.top - 2 * reach) * 16,
+      bottom = (area.right + area.bottom + 2 * reach) * 16;
+    this.terrainEditFocus = { x: (left + right) / 2, y: (top + bottom) / 2 };
+    const touched = (bounds: { x: number; y: number; w: number; h: number }) =>
+      bounds.x <= right && bounds.x + bounds.w >= left && bounds.y <= bottom && bounds.y + bounds.h >= top;
     for (const chunk of this.groundChunks)
-      if (intersects(chunk.area, area)) {
+      if (intersects(chunk.area, area) && (whole || touched(chunk.bounds))) {
         chunk.dirty = true;
         chunk.edited = !whole;
       }
@@ -166,6 +179,7 @@ export class WorldRenderer extends WorldRendererState {
     for (let row = first; row < last; row++) this.treeKeys[row] = -1n;
     this.revision = this.roadRevision = -1n;
     this.ornamentLook = -1n;
+    this.terrainEditPending = true;
   }
   finishTerrainEdits(): void {
     if (this.groundChunks.filter((chunk) => chunk.edited).length < 32) return;
@@ -230,13 +244,14 @@ export class WorldRenderer extends WorldRendererState {
     this.view = new Camera(camera.x, camera.y, camera.zoom);
     this.renderedAt = seconds;
     fitToView(this);
+    const shake = worldShake(this, town);
     this.world.transform([
       camera.zoom,
       0,
-      f(f(width / 2) - f(camera.x * camera.zoom)),
+      f(f(f(width / 2) - f(camera.x * camera.zoom)) + shake.x),
       0,
       camera.zoom,
-      f(f(height / 2) - f(camera.y * camera.zoom)),
+      f(f(f(height / 2) - f(camera.y * camera.zoom)) + shake.y),
       0,
       0,
       1,
@@ -250,12 +265,20 @@ export class WorldRenderer extends WorldRendererState {
       (Math.trunc(f(climate.snow * 10)) << 8) |
       (Math.trunc(f(climate.frost * 4)) << 12);
     if (this.editorView) updateGroundChunks(this, town.map(), climate, key !== this.climateKey);
+    if (this.terrainEditPending) {
+      this.terrainEditPending = false;
+      this.terrainEditedAt = seconds;
+    }
+    // Ground repaints follow the brush every frame; whole-map objects wait for it to pause.
+    const settling = this.editorView && this.terrainEditedAt >= 0 && seconds - this.terrainEditedAt < terrainSettle;
+    if (!settling) this.terrainEditedAt = -1;
     const generation = buildingCatalogGeneration(),
       objectsChanged =
-        town.objectRevision() !== this.revision ||
-        key !== this.climateKey ||
-        generation !== this.appearanceGeneration;
-    const roadsChanged = town.roadRevision() !== this.roadRevision;
+        !settling &&
+        (town.objectRevision() !== this.revision ||
+          key !== this.climateKey ||
+          generation !== this.appearanceGeneration);
+    const roadsChanged = !settling && town.roadRevision() !== this.roadRevision;
     if (objectsChanged) {
       this.appearanceGeneration = generation;
       this.revision = town.objectRevision();
@@ -291,6 +314,15 @@ export class WorldRenderer extends WorldRendererState {
       this.shownPreview = structuredClone(preview);
       buildPreview(this, preview);
     }
+    moveWater(
+      this,
+      [this.groundTints, ...[...this.groundChunks, ...this.overviewChunks].filter((c) => c.scene.alpha).map((c) => c.tints)],
+      seconds,
+      climate,
+      this.reducedMotion,
+      camera.zoom,
+    );
+    updateLava(this, seconds, climate, this.reducedMotion, camera.zoom);
     cullTrees(this);
     swayTrees(this, climate.wind, seconds);
     if (this.editorView) {
@@ -323,9 +355,9 @@ export class WorldRenderer extends WorldRendererState {
     } else {
       updateVision(this, town);
       tread(this, town, seconds);
-      sparkle(this, town, seconds);
       markDamage(this, town);
       moveAgents(this, town, traffic, seconds, selected);
+      updateCombatPresentation(this, town, selected);
       updateFelling(this, town);
       updateGrowth(this, town, seconds);
       updateResourceHits(this, town);
