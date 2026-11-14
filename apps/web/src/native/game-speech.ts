@@ -213,17 +213,35 @@ export function speechBubbles(this: GameSpeechApp, width: number, height: number
       ink = { ...this.theme.text };
     surface.a = border.a = ink.a = Math.trunc(f(255 * clamp(bubble.alpha, 0, 1)));
     const box = bubble.box,
-      stem = clamp(bubble.anchor.x, f(box.x + 9), f(f(box.x + box.w) - 9));
-    this.context.paint(JSON.stringify(['b', box, bubble.anchor, surface]), () =>
-      new this.context.tvg.Shape()
-        .moveTo(f(stem - 5), f(f(box.y + box.h) - 1))
-        .lineTo(bubble.anchor.x, bubble.anchor.y)
-        .lineTo(f(stem + 5), f(f(box.y + box.h) - 1))
+      stem = clamp(bubble.anchor.x, f(box.x + 14), f(f(box.x + box.w) - 14));
+    // One outline for body and tail, so no border crosses where they meet.
+    this.context.paint(JSON.stringify(['b', box, bubble.anchor, surface, border]), () => {
+      const r = Math.min(this.theme.radius, f(box.h / 2), f(box.w / 2)),
+        k = f(r * 0.5523),
+        left = box.x,
+        top = box.y,
+        right = f(box.x + box.w),
+        bottom = f(box.y + box.h),
+        half = Math.min(6, f(box.w / 2 - r)),
+        tip = bubble.anchor;
+      return new this.context.tvg.Shape()
+        .moveTo(f(left + r), top)
+        .lineTo(f(right - r), top)
+        .cubicTo(f(right - r + k), top, right, f(top + r - k), right, f(top + r))
+        .lineTo(right, f(bottom - r))
+        .cubicTo(right, f(bottom - r + k), f(right - r + k), bottom, f(right - r), bottom)
+        .lineTo(f(stem + half), bottom)
+        // The tail swells out of the body and narrows to its point.
+        .cubicTo(f(stem + half * 0.45), bottom, f(tip.x + 1.5), f(bottom + (tip.y - bottom) * 0.55), tip.x, tip.y)
+        .cubicTo(f(tip.x - 1.5), f(bottom + (tip.y - bottom) * 0.55), f(stem - half * 0.45), bottom, f(stem - half), bottom)
+        .lineTo(f(left + r), bottom)
+        .cubicTo(f(left + r - k), bottom, left, f(bottom - r + k), left, f(bottom - r))
+        .lineTo(left, f(top + r))
+        .cubicTo(left, f(top + r - k), f(left + r - k), top, f(left + r), top)
         .close()
         .fill(surface.r, surface.g, surface.b, surface.a)
-        .stroke({ width: 1, color: [border.r, border.g, border.b, border.a] }),
-    );
-    this.context.rect(box, surface, this.theme.radius, border);
+        .stroke({ width: 1, color: [border.r, border.g, border.b, border.a] });
+    });
     const text = this.context.elideText(bubble.text, f(box.w - 16), 13);
     this.context.text(
       new Rect(f(box.x + 8), f(box.y + 3), f(box.w - 16), f(box.h - 6)),
