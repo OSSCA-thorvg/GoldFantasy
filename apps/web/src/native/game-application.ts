@@ -464,7 +464,8 @@ export class GameApplication implements Application {
     );
   }
   takesTyping(): boolean {
-    return this.authoringTool() || this.editorAttached || !!this.scriptContext.focused();
+    // The offering dialog has number fields of its own.
+    return this.authoringTool() || this.editorAttached || !!this.game.prayer || !!this.scriptContext.focused();
   }
   /** Changes whenever the settlement passes a point worth an autosave. */
   private milestoneMark(): string {

@@ -123,7 +123,7 @@ export function openPrayer(this: GameAppState, altar: number): void {
     error: '',
     offering,
     inputs: Object.fromEntries(
-      offeringKeys.map((key) => [key, new TextInput(String(offering[key]))]),
+      offeringKeys.map((key) => [key, new TextInput(offering[key] ? String(offering[key]) : '')]),
     ) as Record<OfferingKey, TextInput>,
     scene: new OfferingScene(climate, people, portraitBackdrop(this.town.map(), place.center, climate)),
     adapter: new WebCanvasAdapter(this.context.tvg),
@@ -304,7 +304,7 @@ export function renderPrayer(this: GameAppState, width: number, height: number):
       textField(
         c,
         `offering-${key}`,
-        new Rect(controlsX + 28, y + 2, 74, rowH - 4),
+        new Rect(controlsX + 28, y + 2, 44, rowH - 4),
         state.inputs[key],
         '0',
         true,
@@ -315,11 +315,23 @@ export function renderPrayer(this: GameAppState, width: number, height: number):
       button(
         c,
         `offering-more-${key}`,
-        new Rect(controlsX + 106, y + 2, 25, rowH - 4),
+        new Rect(controlsX + 75, y + 2, 25, rowH - 4),
         '+',
         () => step(1),
         ButtonStyle.Quiet,
         state.offering[key] < Math.min(9999, stock[key]),
+      );
+      button(
+        c,
+        `offering-more10-${key}`,
+        new Rect(controlsX + 103, y + 2, 29, rowH - 4),
+        '+10',
+        () => step(10),
+        ButtonStyle.Quiet,
+        state.offering[key] < Math.min(9999, stock[key]),
+        undefined,
+        false,
+        { fontSize: 10 },
       );
     });
     const y = form.y + rowH * 5 + 5;
