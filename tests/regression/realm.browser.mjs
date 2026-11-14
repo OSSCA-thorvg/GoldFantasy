@@ -50,6 +50,7 @@ try {
       { Structure },
       { decodeTown, encodeTown },
       { Town },
+      { openExpedition },
     ] = await Promise.all([
       import('/apps/web/src/native/startup-canvas.ts'),
       import('/packages/native-ui/src/index.ts'),
@@ -63,6 +64,7 @@ try {
       import('/packages/engine/src/building-catalog.ts'),
       import('/packages/engine/src/save-game.ts'),
       import('/packages/engine/src/town.ts'),
+      import('/apps/web/src/native/expedition-window.ts'),
     ]);
     const tvg = await initializeWebCanvas('gl'),
       element = document.createElement('canvas');
@@ -98,14 +100,11 @@ try {
     }
     for (const p of town.folk) {
       p.level = 22;
-      p.position = { ...monsterEntrance(site) };
-      p.activity = Activity.Expedition;
-      p.inside = true;
+      p.position = town.grid.nearestWalkable({ x: monsterEntrance(site).x + 1.5, y: monsterEntrance(site).y + 1.5 });
       p.food = p.rest = p.hydration = 1;
       // Both skills on auto, as a player who uses them would.
       p.abilityAuto = p.abilityAuto2 = 1;
     }
-    town.parties.push({ dungeon: gate, members: town.folk.map((p) => p.id), floor: 0 });
     const focus = project(site.origin.x + 1, site.origin.y + 1);
     game.camera = new Camera(focus.x, focus.y, 1.6);
     window.realmProbe = {
@@ -174,7 +173,18 @@ try {
       realmProbe.frame();
     });
     for (let i = 0; i < 6; ++i) realmProbe.frame();
+    // The party is chosen and sent in the gate's expedition window, the one way through a gate.
+    const key = (text) => ({ type: 'KeyDown', text, key: 0, x: 0, y: 0, delta: 0, button: 0, shift: false, control: false, alt: false, meta: false });
+    if (!openExpedition(game, gate, town.folk.map((p) => p.id))) throw new Error('The gate has no expedition window');
+    realmProbe.frame();
+    realmProbe.window = { party: game.expedition.party.length, paused: game.paused };
+    game.handleExpeditionEvent(key('return'));
+    if (game.expedition) throw new Error('Enter did not set out');
+    for (let t = 0; t < 60 && !game.town.realmActive(); t += 0.2) game.town.advance(0.2);
   });
+  const opened = await page.evaluate(() => realmProbe.window);
+  assert.equal(opened.party, 5, 'The window opened with the five chosen');
+  assert(opened.paused, 'The window paused the settlement');
   const snapshot = () => page.evaluate(() => realmProbe.snapshot());
   const frames = (count) => page.evaluate((count) => { for (let i = 0; i < count; ++i) realmProbe.frame(); }, count);
   const click = async (id) => {

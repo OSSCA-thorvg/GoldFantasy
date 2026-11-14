@@ -382,15 +382,16 @@ describe('quest panel', () => {
       questPanel(ui);
       expect(ui.words()).toContain('0 / 1 raids beaten off');
       expect(ui.control(`quest-action/${goal}`)).toBeUndefined();
-      // Gate deeds jump to the nearest found gate and select it.
+      // Gate deeds open the expedition window of the nearest found gate.
       const index = gate(town);
       goal = goalIndex('Slay a floor guardian');
       goalPick.branch = (branch) => (branch === GoalBranch.Saga ? goal : -1);
       ui.app.questBranch = GoalBranch.Saga;
       questPanel(ui);
-      expect(ui.words()).toEqual(expect.arrayContaining(['0 / 1 guardians slain', 'Find the nearest open gate']));
+      expect(ui.words()).toEqual(expect.arrayContaining(['0 / 1 guardians slain', 'Plan an expedition']));
       ui.click(`quest-action/${goal}`);
-      expect(ui.app.selectedDungeon).toBe(index);
+      expect(ui.app.expedition?.gate).toBe(index);
+      expect(ui.app.paused).toBe(true);
     } finally {
       ui.dispose();
     }

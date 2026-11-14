@@ -169,16 +169,13 @@ describe('target input and group commands', () => {
     expect(app.town.orderAttackMove).not.toHaveBeenCalled();
     expect(app.chosen).toEqual([0]);
   });
-  it('contextual dungeon targeting uses the same front hit and falls back to movement if rejected', () => {
+  it('right-clicking a gate never sends a party at once, and moves there when no window can open', () => {
     const { app } = fixture();
+    // No such gate on this map: nothing opens, so the order falls back to a walk. The window itself is covered in expedition-window.test.ts.
     app.hoveredWorldTarget!.hit = presentedHit('dungeon', 2);
     issueOrder.call(app, Order.Work);
-    expect(app.town.sendExpedition).toHaveBeenCalledWith([0, 1], 2, 1);
-    expect(app.town.orderMove).not.toHaveBeenCalled();
-    app.town.sendExpedition = vi.fn(() => false);
-    issueOrder.call(app, Order.Work);
+    expect(app.town.sendExpedition).not.toHaveBeenCalled();
     expect(app.town.orderMove).toHaveBeenCalledWith([0, 1], app.cursor);
-    expect(app.status).toBe('Another party is on its way to a gate');
   });
   it('right-clicking a companion approaches without friendly fire', () => {
     const { app, people } = fixture();

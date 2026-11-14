@@ -1,5 +1,5 @@
 // New speech catalog entries must reach the worklet after an application update.
-const processorUrl = `${import.meta.env?.BASE_URL ?? '/'}vendor/goldfantasy-audio.js?v=weather-voices-1`;
+const processorUrl = `${import.meta.env?.BASE_URL ?? '/'}vendor/goldfantasy-audio.js?v=realm-music-1`;
 import { SoundLibrary } from './sound-library';
 import effectEndings from './data/effect-endings.json';
 import { Playback } from './sound-board';

@@ -46,7 +46,10 @@ export interface MusicTrack {
 }
 export class MusicStream {
   private done = 0;
-  constructor(private readonly track: MusicTrack | null) {}
+  constructor(
+    private readonly track: MusicTrack | null,
+    readonly loop = false,
+  ) {}
   valid(): boolean {
     return !!this.track && this.track.rate === 44100;
   }
@@ -58,9 +61,17 @@ export class MusicStream {
   }
   read(stereo: Float32Array, frames: number): number {
     if (!this.valid() || frames <= 0) return 0;
-    const got = Math.min(frames, this.track!.frames - this.done);
+    let got = Math.min(frames, this.track!.frames - this.done);
     stereo.set(this.track!.pcm.subarray(this.done * 2, (this.done + got) * 2));
     this.done += got;
+    // A loop is authored seamless: its first frame follows its last.
+    while (this.loop && got < frames && this.track!.frames > 0) {
+      if (this.done >= this.track!.frames) this.done = 0;
+      const more = Math.min(frames - got, this.track!.frames - this.done);
+      stereo.set(this.track!.pcm.subarray(this.done * 2, (this.done + more) * 2), got * 2);
+      this.done += more;
+      got += more;
+    }
     return got;
   }
 }
@@ -162,8 +173,8 @@ export class SoundLibrary {
     this.tracks.set(name, track);
     while (this.tracks.size > 3) this.tracks.delete(this.tracks.keys().next().value!);
   }
-  music(name: string): MusicStream {
-    return new MusicStream(this.tracks.get(name) ?? null);
+  music(name: string, loop = false): MusicStream {
+    return new MusicStream(this.tracks.get(name) ?? null, loop);
   }
   async load(
     context: BaseAudioContext | undefined,

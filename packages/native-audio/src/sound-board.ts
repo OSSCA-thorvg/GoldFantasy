@@ -18,8 +18,15 @@ const rate = 44100,
   musicFall = f(1 / f(rate * f(2.5))),
   musicEnding = 6,
   thunderReleaseFrames = (rate * 3) / 4,
-  thunderRainFloor = f(0.15);
-const interfaceCue = (cue: Cue) =>
+  thunderRainFloor = f(0.15),
+  // Music gives way to a pressing swarm and, for a moment, to the stings of a fight.
+  swarmDuck = f(0.4),
+  stingDuck = f(0.45),
+  stingSeconds = 2.5,
+  duckFall = f(1 / f(rate * f(0.3))),
+  duckRise = f(1 / f(rate * f(1.5)));
+const stingCue = (cue: Cue) => cue === Cue.DenFall || cue === Cue.BroodBreak || cue === Cue.WaveHorn,
+  interfaceCue = (cue: Cue) =>
     [Cue.Click, Cue.Order, Cue.Place, Cue.Refuse, Cue.Open, Cue.Notice].includes(cue),
   thunderCue = (cue: Cue) => cue >= Cue.ThunderCrack && cue <= Cue.ThunderRumble;
 function makeVoice(sound: Sound, age = 0, token = 0n): Voice {
@@ -56,6 +63,8 @@ export class SoundBoard {
   private musicOn = false;
   private musicLevel = 0;
   private fadingLevel = 0;
+  private duck = 1;
+  private stingUntil = -1;
   private tune = new Float32Array(2048);
   private tuneFading = new Float32Array(2048);
   private lastTake = new Uint8Array(128);
@@ -103,7 +112,7 @@ export class SoundBoard {
   }
   play(sound: Sound): void {
     if (sound.cue === Cue.Music) {
-      const track = sound.track ? this.library.music(sound.track) : null;
+      const track = sound.track ? this.library.music(sound.track, sound.loop) : null;
       if (this.state !== Playback.Playing || this.fadeTarget !== Playback.Playing) return;
       this.silence = !track || !track.valid();
       this.pending = this.silence ? null : track;
@@ -119,6 +128,7 @@ export class SoundBoard {
     if (this.state !== Playback.Playing || this.fadeTarget !== Playback.Playing) return;
     const token = this.effects.request(sound);
     if (!token) return;
+    if (stingCue(sound.cue)) this.stingUntil = this.clock + stingSeconds;
     this.voices = this.voices.filter((v) => this.effects.active(v.token));
     const age =
         sound.cue === Cue.Speech
@@ -279,7 +289,11 @@ export class SoundBoard {
         const track = this[key],
           got = track ? track.read(into, count) : 0;
         into.fill(0, 2 * got, 2 * count);
-        const ending = track ? clamp(f(f(track.duration() - track.played()) / musicEnding), 0, 1) : 0;
+        const ending = !track
+          ? 0
+          : track.loop
+            ? 1
+            : clamp(f(f(track.duration() - track.played()) / musicEnding), 0, 1);
         if (track && got < count) this[key] = null;
         return ending;
       };
@@ -320,11 +334,17 @@ export class SoundBoard {
           frame.left = f(frame.left + f(tune.left * this.level.music));
           frame.right = f(frame.right + f(tune.right * this.level.music));
         }
+        const duckTo = this.clock < this.stingUntil ? stingDuck : f(1 - f(swarmDuck * this.level.swarm));
+        if (Math.abs(duckTo - this.duck) < 1e-4) this.duck = duckTo;
+        else
+          this.duck = f(
+            this.duck + f(f(duckTo - this.duck) * f(4 * (duckTo < this.duck ? duckFall : duckRise))),
+          );
         this.musicLevel = Math.min(1, f(this.musicLevel + musicRise));
         this.fadingLevel = Math.max(0, f(this.fadingLevel - musicFall));
         const at = 2 * (i - first),
-          now = f(f(this.musicLevel * ending) * musicGain),
-          then = f(f(this.fadingLevel * fadingEnding) * musicGain);
+          now = f(f(f(this.musicLevel * ending) * musicGain) * this.duck),
+          then = f(f(f(this.fadingLevel * fadingEnding) * musicGain) * this.duck);
         frame.left = f(frame.left + f(f(this.tune[at] * now) + f(this.tuneFading[at] * then)));
         frame.right = f(frame.right + f(f(this.tune[at + 1] * now) + f(this.tuneFading[at + 1] * then)));
         if (this.fadeSamples > 0) {

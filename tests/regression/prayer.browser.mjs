@@ -38,7 +38,7 @@ try {
   await page.evaluate(async (renderer) => {
     const [
       { initializeWebCanvas },
-      { loadNativeFonts, Key },
+      { loadNativeFonts, loadKoreanFont, Key },
       { BrowserFiles },
       { createNativeServices },
       { Town },
@@ -53,6 +53,7 @@ try {
       { encodeTown },
       { Cue },
       { setLocale },
+      { altarCap },
     ] = await Promise.all([
       import('/apps/web/src/native/startup-canvas.ts'),
       import('/packages/native-ui/src/index.ts'),
@@ -70,6 +71,7 @@ try {
       import('/packages/engine/src/save-game.ts'),
       import('/packages/native-audio/src/sound-types.ts'),
       import('/packages/localization/src/index.ts'),
+      import('/packages/engine/src/altar-cap.ts'),
     ]);
     const tvg = await initializeWebCanvas(renderer),
       element = document.createElement('canvas');
@@ -129,7 +131,23 @@ try {
       width: 1024,
       height: 768,
       heard: [],
-      setLocale,
+      rollValue: 0,
+      async setLocale(locale) {
+        if (locale === 'KR') await loadKoreanFont(tvg, fonts);
+        setLocale(locale);
+        game.invalidatePresentation?.();
+      },
+      altarCap,
+      rollWith(value) {
+        this.rollValue = value;
+      },
+      fillTo(count) {
+        while (game.town.population() < count) {
+          const p = copyNative(game.town.people()[0]);
+          p.id = game.town.nextPerson++;
+          game.town.folk.push(p);
+        }
+      },
       frame(dt = 0) {
         this.now += dt;
         game.render(this.width, this.height, this.now, true, 0.25, this.now);
@@ -147,6 +165,7 @@ try {
       },
       reset(weather, hour, paused = false) {
         game.town = copyNative(base);
+        game.town.roll = () => this.rollValue;
         game.selected = -1;
         game.chosen = [];
         game.town.editHour(hour);
@@ -173,6 +192,8 @@ try {
           rite: d?.rite ? { ...d.rite } : null,
           committed: d?.committed,
           finished: d?.finished,
+          refused: d?.refused,
+          cap: d && d.town ? prayerProbe.altarCap(d.town) : null,
           born: d?.born
             ? {
                 name: d.born.name,
@@ -290,7 +311,7 @@ try {
     assert.deepEqual(praying.stock, before.stock);
     assert.equal(praying.clock, before.clock);
     await page.screenshot({ path: `${output}/${weather.toLowerCase()}-prayer.png` });
-    for (let i = 0; i < 80; ++i) await frame(0.05);
+    await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().release + 0.3));
     await page.requestGC();
     await frame(0.2);
     const born = await snapshot();
@@ -303,7 +324,7 @@ try {
     assert.equal(born.clock, before.clock);
     assert.deepEqual(born.tasks, before.tasks);
     await page.screenshot({ path: `${output}/${weather.toLowerCase()}-transformation.png` });
-    await frame(2.5);
+    await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().end + 0.1));
     const finished = await snapshot();
     assert(finished.finished);
     assert.equal(finished.count, born.count);
@@ -327,12 +348,13 @@ try {
     for (const key of ['water', 'bones', 'gold', 'food', 'stone']) await fill(key, gift[key] ?? 0);
   };
   const heard = () => page.evaluate(() => prayerProbe.heard);
-  const names = (list) => list.map((h) => h.cue);
+  // The town's own notice and the newcomer's first words are not part of the rite.
+  const names = (list) => list.map((h) => h.cue).filter((cue) => cue !== 'Notice' && cue !== 'Speech');
   const expectedCues = {
     Humble: ['Click', 'Discover', 'Mend'],
-    Worthy: ['Click', 'Discover', 'Raven', 'Mend'],
-    Bountiful: ['Click', 'Discover', 'Raven', 'Fall', 'Sanctuary'],
-    Kingly: ['Click', 'Discover', 'Raven', 'Fall', 'Sanctuary', 'Rally'],
+    Worthy: ['Click', 'Coins', 'Discover', 'Raven', 'Mend'],
+    Bountiful: ['Click', 'Coins', 'Discover', 'Raven', 'Fall', 'Sanctuary'],
+    Kingly: ['Click', 'Coins', 'Discover', 'Raven', 'Fall', 'Sanctuary', 'Rally'],
   };
   const lengths = {};
   for (const [grade, gift] of Object.entries(gifts)) {
@@ -383,9 +405,48 @@ try {
   // Louder and fuller for higher grades.
   const loud = (grade, cue) => Math.max(...report.cues[grade].heard.filter((h) => h.cue === cue).map((h) => h.gain));
   assert(loud('Kingly', 'Discover') > loud('Humble', 'Discover'));
+  // A refused offering: the gifts go, no one comes, and the ending is its own.
+  await open('Clear', 12, gifts.Humble);
+  await page.evaluate(() => prayerProbe.rollWith(0.99));
+  const beforeRefusal = await snapshot();
+  await click('prayer-confirm');
+  await page.evaluate(() => (prayerProbe.heard.length = 0));
+  const refusalRite = await page.evaluate(() => prayerProbe.rite());
+  await page.evaluate((at) => prayerProbe.advanceTo(at), refusalRite.answer + 0.4);
+  await page.screenshot({ path: `${output}/refused-answer.png` });
+  await page.evaluate((at) => prayerProbe.advanceTo(at), refusalRite.release + 0.45);
+  await page.screenshot({ path: `${output}/refused-release.png` });
+  await page.evaluate((at) => prayerProbe.advanceTo(at), refusalRite.end + 0.1);
+  await page.screenshot({ path: `${output}/refused-result.png` });
+  const refusedState = await snapshot();
+  assert(refusedState.refused && !refusedState.born && refusedState.finished);
+  assert.equal(refusedState.count, beforeRefusal.count);
+  assert.equal(refusedState.stock.food, beforeRefusal.stock.food - 4);
+  const refusedCues = names(await heard());
+  assert(refusedCues.includes('Fall') && !refusedCues.includes('Mend') && !refusedCues.includes('Sanctuary'), refusedCues.join());
+  await page.evaluate(() => prayerProbe.setLocale('KR'));
+  await frame(0.1);
+  await page.screenshot({ path: `${output}/refused-result-ko.png` });
+  await page.evaluate(() => prayerProbe.setLocale('ENG'));
+  await click('prayer-return');
+  await page.evaluate(() => prayerProbe.rollWith(0));
+  // At the cap Odin sends no more, and nothing is spent.
+  await page.evaluate(() => prayerProbe.reset('Clear', 12, false));
+  await click('altar-pray');
+  await page.evaluate(() => prayerProbe.fillTo(prayerProbe.altarCap(prayerProbe.game.town)));
+  await fill('food', 8);
+  await page.screenshot({ path: `${output}/cap-reached.png` });
+  const capped = await snapshot();
+  assert(!capped.controls.find((c) => c.id.endsWith('prayer-confirm')).enabled);
+  await page.evaluate(() => prayerProbe.setLocale('KR'));
+  await frame(0.1);
+  await page.screenshot({ path: `${output}/cap-reached-ko.png` });
+  await page.evaluate(() => prayerProbe.setLocale('ENG'));
+  await page.keyboard.press('Escape');
+  assert.equal((await snapshot()).stock.food, capped.stock.food);
   // Korean: the dialog, then a kingly rite at its result.
   await open('Clear', 12, gifts.Kingly);
-  await page.evaluate(() => prayerProbe.setLocale('ko'));
+  await page.evaluate(() => prayerProbe.setLocale('KR'));
   await frame(0.1);
   await page.screenshot({ path: `${output}/grade-kingly-ko.png` });
   await click('prayer-confirm');
@@ -394,7 +455,7 @@ try {
   await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().end + 0.1));
   await page.screenshot({ path: `${output}/rite-kingly-result-ko.png` });
   await click('prayer-return');
-  await page.evaluate(() => prayerProbe.setLocale('en'));
+  await page.evaluate(() => prayerProbe.setLocale('ENG'));
   // A reduced-motion rite must still run to the end.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await open('Clear', 12, gifts.Kingly);

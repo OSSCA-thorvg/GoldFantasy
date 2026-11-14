@@ -66,6 +66,102 @@
       "sha256": "b9b67b2c5cacb8303c0f99b4ed8174ee92e21c5f57b5148573e99fb22f62dd09"
     },
     {
+      "path": "music/realm/asgard_1.ogg",
+      "sha256": "c02224155f4d9ab4376c620eef51b275fc2124a5f39f6d0faadaeacbefb8b457"
+    },
+    {
+      "path": "music/realm/asgard_2.ogg",
+      "sha256": "25c8a531ee5601e7bb576a8f8d06bcf818b963e973d61fda884b35fc24b65bbd"
+    },
+    {
+      "path": "music/realm/asgard_3.ogg",
+      "sha256": "b7438735cb120cc6b9564f4169ef0e7e6439954df13060bf2cc64794f7af9d41"
+    },
+    {
+      "path": "music/realm/vanaheim_1.ogg",
+      "sha256": "c83275e3d0c523c52bd6e731289a1e8042f3a53384fd7891395b13b831eb607b"
+    },
+    {
+      "path": "music/realm/vanaheim_2.ogg",
+      "sha256": "2a26d349f7f8c879c9035c0c1da7548022d976af9a8d7bb2af171b2157d63f92"
+    },
+    {
+      "path": "music/realm/vanaheim_3.ogg",
+      "sha256": "59b4528961f90a7c924e3232d18db8828f2bbbc35cc608ab5dd58e4bf2c41eb5"
+    },
+    {
+      "path": "music/realm/alfheim_1.ogg",
+      "sha256": "54efbe399b2a92681de3bcf448c7bf0a30c3ba7007e1849f102c07131e3489fa"
+    },
+    {
+      "path": "music/realm/alfheim_2.ogg",
+      "sha256": "74d379987200986b183f4188f8f3c645c4838a50f5b0268051917a943b324512"
+    },
+    {
+      "path": "music/realm/alfheim_3.ogg",
+      "sha256": "02dbb93e4d65bc30e5f6564d913f0db18347e7d1f2d6c0c2e62c59fc6bcd76e2"
+    },
+    {
+      "path": "music/realm/jotunheim_1.ogg",
+      "sha256": "6463e6509e4d0f84939550261191a2c438d6f3581ff420003095811bb3604e0a"
+    },
+    {
+      "path": "music/realm/jotunheim_2.ogg",
+      "sha256": "368ea6c96d7d9fd2aa110841ad1e568102de15b60ea9f5d5de09c827b7eacd35"
+    },
+    {
+      "path": "music/realm/jotunheim_3.ogg",
+      "sha256": "2b5b7687e481432ef86e68be89f875595fcfd18e240e66fa54edebdc164dff44"
+    },
+    {
+      "path": "music/realm/svartalfheim_1.ogg",
+      "sha256": "a88a749d928e944959fa4a9992d60aca75dae6049fb8ad088f1d9b6c4dd79550"
+    },
+    {
+      "path": "music/realm/svartalfheim_2.ogg",
+      "sha256": "d84e58b7217d9d86e9f931f853119e0244b8faf8b6c83e5d6498d3ef614df0bb"
+    },
+    {
+      "path": "music/realm/svartalfheim_3.ogg",
+      "sha256": "f142c60f7cad3b3651b9a3485bdf6b9c187aa265f58600424a3a161733d9e81d"
+    },
+    {
+      "path": "music/realm/niflheim_1.ogg",
+      "sha256": "23b07bd5d22e84ab9f8b416da785983416107889779c157e6775d14739d59107"
+    },
+    {
+      "path": "music/realm/niflheim_2.ogg",
+      "sha256": "a2b44d5633f765a0460dc5f83aa8c315b47ae3997624aacc2f9e2aab47c1831b"
+    },
+    {
+      "path": "music/realm/niflheim_3.ogg",
+      "sha256": "d5deb8f933dd812e1dfdbd44bc915f100b03871e72ee5ab65c2bda1f45805405"
+    },
+    {
+      "path": "music/realm/muspelheim_1.ogg",
+      "sha256": "f1063b84c8e415fcb332acc80a71fc72474b99415cfba7764b30dabff0f5fdcd"
+    },
+    {
+      "path": "music/realm/muspelheim_2.ogg",
+      "sha256": "50e1745be2965384b926e33d7760f7c0e584d5da3b39d549624ce461d2407690"
+    },
+    {
+      "path": "music/realm/muspelheim_3.ogg",
+      "sha256": "72ad733eb0be62895d569fb2ce975fc7fb3887c603c03c120a1d3aaeaa827737"
+    },
+    {
+      "path": "music/realm/helheim_1.ogg",
+      "sha256": "a674c685e5132f2ce335982289ca574bc9de0ab238f1110e62128b4244ba93a7"
+    },
+    {
+      "path": "music/realm/helheim_2.ogg",
+      "sha256": "4b497bf5a2fcbd8b159c30765a4ad8661291b79b44d5a8bc356ca00e3eb0b6d8"
+    },
+    {
+      "path": "music/realm/helheim_3.ogg",
+      "sha256": "9c669406a677fc50951378babe8c3a8be360ef8a7e2efbb49e7a0adc925954bc"
+    },
+    {
       "path": "sfx/block_01.ogg",
       "sha256": "502f5661ce3320c94018e0f5d3edd40579ba9613448bfdc6f7c786b1bb9af7ee"
     },

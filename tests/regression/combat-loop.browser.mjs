@@ -106,14 +106,6 @@ try {
         p.equipment.weapon = 1;
       }
     }
-    window.enterGate = () => {
-      for (const p of town.folk) {
-        p.position = { ...monsterEntrance(site) };
-        p.activity = Activity.Expedition;
-        p.inside = true;
-      }
-      town.parties.push({ dungeon: gate, members: town.folk.map((p) => p.id), floor: 0 });
-    };
     window.gate = gate;
     window.loop = {
       app,
@@ -129,6 +121,15 @@ try {
       },
       screen(p) {
         return game.toScreen(p);
+      },
+      /** A screen point over the gate that the picker takes for it. */
+      gateScreen() {
+        const o = game.town.map().dungeons()[gate].origin;
+        for (const [dx, dy] of [[1, 1], [1, 0.6], [1, 1.5], [0.6, 1], [1.4, 1], [1, 2], [0.5, 0.5], [1.5, 1.5]]) {
+          const at = game.toScreen({ x: o.x + dx, y: o.y + dy });
+          if (game.renderer.pick(at)?.kind === 'dungeon') return at;
+        }
+        return null;
       },
       member(calling) {
         return game.town.realmParty().find((p) => p.calling === calling);
@@ -197,21 +198,27 @@ try {
     await frames(2, 0.001);
     await settle();
   };
-  // The gate's dialog says what the floor holds before anyone goes in.
+  // The party is chosen in the gate's expedition window: a right-click on the gate with the five selected opens it.
   await page.evaluate(() => {
     const t = loop.game.town,
       site = t.map().dungeons()[window.gate];
-    loop.game.selectPeople([]);
-    loop.game.selectedDungeon = window.gate;
     for (const p of t.folk) p.position = { x: site.origin.x + 2, y: site.origin.y + 3 };
     loop.look({ x: site.origin.x + 1, y: site.origin.y + 2 }, 1.3);
+    loop.game.selectPeople(t.folk.map((p) => p.id));
   });
   await frames(8);
-  await shot('expedition-forecast');
-  await page.evaluate(() => {
-    loop.game.selectedDungeon = -1;
-    window.enterGate();
-  });
+  const gateAt = await page.evaluate(() => loop.gateScreen());
+  assert(gateAt, 'The gate can be pointed at');
+  await page.mouse.click(gateAt.x, gateAt.y, { button: 'right' });
+  await frames(2, 0.001);
+  let opened = await page.evaluate(() => ({ party: loop.game.expedition?.party.length ?? -1, paused: loop.game.paused }));
+  assert.equal(opened.party, 5, 'Right-clicking the gate opens the window with the selection chosen');
+  assert(opened.paused, 'The window pauses the settlement');
+  await shot('expedition-window');
+  await click('expedition-set-out');
+  opened = await page.evaluate(() => ({ open: !!loop.game.expedition, paused: loop.game.paused, marching: loop.game.town.parties.length }));
+  assert(!opened.open && !opened.paused && opened.marching === 1, 'Set out sends the party and the game runs on');
+  for (let i = 0; i < 40 && !(await snapshot()).active; ++i) await frames(4, 0.25);
   // Arrival: the party is beyond the gate and selected.
   await frames(6);
   let state = await snapshot();

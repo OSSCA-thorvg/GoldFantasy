@@ -5,7 +5,26 @@ import { Layer, Terrain, DungeonKind } from '../../packages/engine/src/world-typ
 import { Building } from '../../packages/engine/src/town-models';
 import { Activity, Calling, Person, Race, Role, Monster, AnimalKind } from '../../packages/engine/src/person';
 import { Product, Resources, Structure } from '../../packages/engine/src/building-catalog';
-import { offeringKeys, offeringOutcome, offeringProfile } from '../../packages/engine/src/prayer-offering';
+import {
+  offeringKeys,
+  offeringOutcome,
+  offeringProfile,
+  offeringGradeOf,
+  offeringScore,
+  gradeOfScore,
+  offeringAcceptedText,
+  OfferingGrade,
+  refusalChances,
+  offeringRefused,
+  refusalWord,
+} from '../../packages/engine/src/prayer-offering';
+import { altarCap, altarBaseCap, altarCapReason, altarCapLine } from '../../packages/engine/src/altar-cap';
+import { riteTimeline } from '../../packages/native-renderer/src/offering-rite';
+import { riteCues, riteEnding } from '../../apps/web/src/native/offering-rite-sound';
+import { offeringPhrases } from '../../packages/localization/src/korean/offering';
+import { korean } from '../../packages/localization/src/korean';
+import { hasHangul } from '../../packages/localization/src/index';
+import { Cue } from '../../packages/native-audio/src/sound-types';
 import { point } from '../../packages/engine/src/geometry';
 import { copyNative } from '../../packages/engine/src/native-copy';
 import { encodeTown, decodeTown } from '../../packages/engine/src/save-game';
@@ -71,6 +90,7 @@ describe('offerings shape an unarmed resident', () => {
   });
   it('pays all five configured resources once and preserves existing residents and simulation time', () => {
     const town = fixture();
+    town.depth = [3];
     fillBeds(town, 1);
     const before = town.stock().clone(),
       gift = offering(),
@@ -219,5 +239,202 @@ describe('bones are stored spoils', () => {
     expect(town.stock().bones).toBe(limit);
     expect(town.receipts().at(-1)!.gain.bones).toBe(limit - 100);
     expect(new Resources(0, 0, 0, 0, 0, 0, 0, 0, 4).clone().bones).toBe(4);
+  });
+});
+
+const gift = (water = 0, bones = 0, gold = 0, food = 0, stone = 0): Resources => {
+  const r = new Resources();
+  Object.assign(r, { water, bones, gold, food, stone });
+  return r;
+};
+
+describe('offering grades', () => {
+  it('cut the score at 3, 5 and 7', () => {
+    expect([2.99, 3, 4.99, 5, 6.99, 7, 10.5].map(gradeOfScore)).toEqual([0, 1, 1, 2, 2, 3, 3]);
+  });
+  it('read a bare, a middling, a rich and a kingly gift', () => {
+    expect(offeringGradeOf(gift(0, 0, 0, 4)).name).toBe('Humble');
+    expect(offeringGradeOf(gift(4, 0, 4, 8, 4)).name).toBe('Worthy');
+    expect(offeringGradeOf(gift(8, 12, 10, 16, 6)).name).toBe('Bountiful');
+    expect(offeringGradeOf(gift(60, 60, 60, 60, 60)).name).toBe('Kingly');
+  });
+  it('never change the profile, and only rise as gifts are added', () => {
+    const base = gift(5, 5, 5, 5, 5),
+      before = JSON.stringify(offeringProfile(base));
+    offeringGradeOf(base, gift(60, 60, 60, 60, 60));
+    expect(JSON.stringify(offeringProfile(base))).toBe(before);
+    let last = -1;
+    for (let n = 0; n <= 60; n += 3) {
+      const grade = offeringGradeOf(gift(n, n, n, n, n)).grade;
+      expect(grade).toBeGreaterThanOrEqual(last);
+      last = grade;
+    }
+  });
+  it('name the quickest resource for the next grade, within the stores', () => {
+    const humble = offeringGradeOf(gift(0, 0, 0, 4)),
+      next = humble.next!;
+    expect(next.grade).toBe(OfferingGrade.Worthy);
+    const raised = gift(0, 0, 0, 4);
+    for (let extra = 1; extra < 9999; ++extra) {
+      raised[next.resource] += 1;
+      if (offeringGradeOf(raised).grade >= OfferingGrade.Worthy) break;
+    }
+    expect(offeringGradeOf(raised).grade).toBe(OfferingGrade.Worthy);
+    expect(offeringGradeOf(gift(0, 0, 0, 4), gift(0, 0, 0, 4)).next).toBeNull();
+    expect(offeringGradeOf(gift(60, 60, 60, 60, 60)).next).toBeNull();
+  });
+  it('say what was accepted in plain words', () => {
+    expect(offeringAcceptedText(OfferingGrade.Humble)).toBe('A humble offering was accepted.');
+    expect(offeringAcceptedText(OfferingGrade.Kingly)).toBe('A kingly offering was accepted.');
+  });
+});
+
+describe('the rite per grade', () => {
+  it('is longer and fuller for higher grades', () => {
+    const lengths = [0, 1, 2, 3].map((g) => riteTimeline(g, 3, 3).end);
+    expect([...lengths].sort((a, b) => a - b)).toEqual(lengths);
+    expect(lengths[3] - lengths[0]).toBeGreaterThan(2);
+    expect(riteTimeline(3, 5, 3).end).toBeLessThan(11);
+  });
+  it('asks for a cue at each beat, louder for higher grades, with no bells', () => {
+    const keys = ['water', 'gold', 'stone'] as const,
+      low = riteCues(riteTimeline(0, 3, 2), keys, 2),
+      high = riteCues(riteTimeline(3, 3, 2), keys, 2),
+      loudest = (list: ReturnType<typeof riteCues>, cue: Cue) =>
+        Math.max(...list.filter((c) => c.cue === cue).map((c) => c.gain));
+    expect(low.filter((c) => c.cue === Cue.Coins)).toHaveLength(1);
+    expect(low.filter((c) => c.cue === Cue.Click)).toHaveLength(2 + 2);
+    expect(loudest(high, Cue.Discover)).toBeGreaterThan(loudest(low, Cue.Discover));
+    expect(low.some((c) => c.cue === Cue.Raven)).toBe(false);
+    expect(high.some((c) => c.cue === Cue.Raven)).toBe(true);
+    expect([...low, ...high].some((c) => c.cue === Cue.Complete || c.cue === Cue.Notice)).toBe(false);
+    const tl = riteTimeline(3, 3, 2);
+    expect(riteEnding(tl, false).map((c) => c.cue)).toEqual([Cue.Fall, Cue.Sanctuary, Cue.Rally]);
+    expect(riteEnding(tl, true).map((c) => c.cue)).toEqual([Cue.Fall, Cue.Click]);
+  });
+});
+
+describe('refused offerings', () => {
+  it('fail by grade: often, sometimes, rarely, never', () => {
+    expect(refusalChances).toEqual([0.35, 0.15, 0.05, 0]);
+    expect([0, 1, 2, 3].map(refusalWord)).toEqual([
+      'Often refused',
+      'Sometimes refused',
+      'Rarely refused',
+      'Never refused',
+    ]);
+    expect(offeringRefused(0, 0.64)).toBe(false);
+    expect(offeringRefused(0, 0.65)).toBe(true);
+    expect(offeringRefused(3, 0.999999)).toBe(false);
+    expect(offeringRefused(1, 0)).toBe(false);
+  });
+  it('spend the gifts, send no one and use one roll', () => {
+    const town = fixture(),
+      before = town.stock().clone(),
+      people = town.population(),
+      small = gift(0, 0, 0, 4);
+    vi.spyOn(town, 'roll').mockReturnValue(0.99);
+    const result = town.offerAtAltar(1, small);
+    expect(result).toEqual({ born: null, refused: true });
+    expect(town.population()).toBe(people);
+    expect(town.stock().food).toBe(before.food - 4);
+    expect(town.roll).toHaveBeenCalledTimes(1);
+  });
+  it('lets a kingly gift through whatever the roll', () => {
+    const town = fixture();
+    vi.spyOn(town, 'roll').mockReturnValue(0.999999);
+    expect(town.offerAtAltar(1, gift(60, 60, 60, 60, 60)).born).not.toBeNull();
+  });
+  it('is deterministic for one seed and saves like any other town', () => {
+    const run = () => {
+      const town = fixture();
+      return town.offerAtAltar(1, gift(0, 0, 0, 4)).refused;
+    };
+    expect(run()).toBe(run());
+    const town = fixture();
+    vi.spyOn(town, 'roll').mockReturnValue(0.99);
+    town.offerAtAltar(1, gift(0, 0, 0, 4));
+    const loaded = decodeTown(encodeTown(town), (map) => new Town(map, 32, false, true))!;
+    expect(loaded.stock().food).toBe(town.stock().food);
+    expect(loaded.population()).toBe(town.population());
+  });
+});
+
+describe('the altar cap', () => {
+  const withDepth = (depth: number[]) => {
+    const town = fixture();
+    town.depth = depth;
+    return town;
+  };
+  it('starts at four and rises by two a floor and two more for a seal', () => {
+    expect(altarBaseCap).toBe(4);
+    expect([[], [0], [1], [2], [3]].map((d) => altarCap(withDepth(d)))).toEqual([4, 4, 6, 8, 12]);
+  });
+  it('refuses at the cap and spends nothing', () => {
+    const town = fixture();
+    while (town.population() < altarCap(town)) {
+      const p = copyNative(town.people()[0]);
+      p.id = town.nextPerson++;
+      town.folk.push(p);
+    }
+    fillBeds(town, 1);
+    const stock = town.stock().clone(),
+      people = town.population(),
+      rolls = vi.spyOn(town, 'roll');
+    expect(town.altarOfferingReason(1, gift(0, 0, 0, 8))).toBe(altarCapReason);
+    expect(town.summonFromOffering(1, gift(0, 0, 0, 8))).toBeNull();
+    expect(town.stock()).toEqual(stock);
+    expect(town.population()).toBe(people);
+    expect(rolls).not.toHaveBeenCalled();
+    expect(altarCapReason).toBe('Odin sends no more until another floor beyond a gate is cleared.');
+    town.depth = [1];
+    fillBeds(town, 1);
+    expect(town.altarOfferingReason(1, gift(0, 0, 0, 8))).toBe('');
+  });
+  it('shows the raise in the reward lines text', () => {
+    expect(altarCapLine(6)).toBe('Odin will now send up to 6 residents.');
+  });
+  it('is read from the saved depth, so a loaded town keeps it', () => {
+    const town = withDepth([2]),
+      loaded = decodeTown(encodeTown(town), (map) => new Town(map, 32, false, true))!;
+    expect(altarCap(loaded)).toBe(altarCap(town));
+  });
+});
+
+describe('the offering words in Korean', () => {
+  it('use only KS X 1001 syllables, keep placeholders and cover every runtime line', () => {
+    const decoder = new TextDecoder('euc-kr'),
+      carried = new Set<string>();
+    for (let lead = 0xb0; lead < 0xc9; ++lead)
+      for (let trail = 0xa1; trail < 0xff; ++trail)
+        carried.add(decoder.decode(new Uint8Array([lead, trail])));
+    const used = [...Object.values(offeringPhrases).join('')].filter((c) => /[\uac00-\ud7a3]/.test(c));
+    expect(used.filter((c) => !carried.has(c))).toEqual([]);
+    const marks = (text: string) => [...text.matchAll(/\{(\d+)\}/g)].map((hit) => hit[1]).sort();
+    for (const [key, value] of Object.entries(offeringPhrases)) expect(marks(value), key).toEqual(marks(key));
+    const lines = [
+      ...[0, 1, 2, 3].flatMap((g) => [
+        offeringAcceptedText(g),
+        offeringGradeOf(gift(0, 0, 0, 4)).line,
+        refusalWord(g),
+      ]),
+      ...['Humble', 'Worthy', 'Bountiful', 'Kingly'].map((name) => `${name} offering`),
+      ...offeringKeys.flatMap((key) =>
+        ['worthy', 'bountiful', 'kingly'].map((g) => `Lay more ${key} to reach a ${g} offering.`),
+      ),
+      altarCapLine(6),
+      altarCapReason,
+      'Odin sends up to 6 residents; 2 live here.',
+      'Leans toward Warriors.',
+      'Odin turned the offering away. The gifts are gone.',
+    ];
+    for (const line of lines) expect(hasHangul(korean.translate(line)), line).toBe(true);
+    for (const g of [1, 2, 3])
+      expect(hasHangul(korean.translate(offeringGradeOf(gift(60, 60, 60, 60, 60)).line))).toBe(true);
+    for (const line of [
+      'A fair gift. It tends to bring a settler with some skill.',
+      'A rich gift. It tends to bring a gifted and hardy resident.',
+    ])
+      expect(hasHangul(korean.translate(line)), line).toBe(true);
   });
 });

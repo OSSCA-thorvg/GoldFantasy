@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Town } from '../../packages/engine/src/town';
 import { WorldMap } from '../../packages/engine/src/world-map';
-import { Terrain, Layer } from '../../packages/engine/src/world-types';
+import { Terrain, Layer, DungeonKind } from '../../packages/engine/src/world-types';
 import { Building } from '../../packages/engine/src/town-models';
 import { Person, Role, Calling, Race, Activity } from '../../packages/engine/src/person';
 import { Structure, Resources, structureSpec } from '../../packages/engine/src/building-catalog';
@@ -222,7 +222,7 @@ describe('altar prayer and immediate residents', () => {
     expect(town.completeAltarPrayer(p)).toBe(false);
     expect(town.population(0)).toBe(1);
     expect(town.stock(0).food).toBe(food);
-    for (let i = 0; i < 250 && town.population(0) < 2; i++) advance(town, .1);
+    for (let i = 0; i < 250 && town.population(0) < 2; i++) advance(town, 0.1);
     expect(altar.devotionDueDay).toBe(-1);
     expect(town.stock(0).food).toBe(food - 4);
     expect(p.task).toBe(Activity.Idle);
@@ -242,6 +242,10 @@ describe('altar prayer and immediate residents', () => {
   it('reserves one same-settlement home across simultaneous altar orders and holds arrival if housing is lost', () => {
     const town = fixture(),
       altar = town.building(1)!;
+    town.world.sites = [
+      { name: 'Test cave', kind: DungeonKind.Cave, origin: point(28, 28), discovered: false },
+    ];
+    town.depth = [3];
     town.recruit(Role.Resident, Calling.Settler, 3, 0);
     const second = new Building(town.nextId++, Structure.Shrine, point(16, 8), 0, 0);
     second.village = 0;

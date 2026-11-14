@@ -96,6 +96,150 @@
     "channels": 2
   },
   {
+    "name": "music/realm/asgard_1",
+    "frames": 3136000,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/asgard_2",
+    "frames": 3015385,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/asgard_3",
+    "frames": 2903704,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/vanaheim_1",
+    "frames": 3207273,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/vanaheim_2",
+    "frames": 3083916,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/vanaheim_3",
+    "frames": 2969697,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/alfheim_1",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/alfheim_2",
+    "frames": 3053077,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/alfheim_3",
+    "frames": 2940000,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/jotunheim_1",
+    "frames": 3221217,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/jotunheim_2",
+    "frames": 3097324,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/jotunheim_3",
+    "frames": 2982609,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/svartalfheim_1",
+    "frames": 3342316,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/svartalfheim_2",
+    "frames": 3213765,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/svartalfheim_3",
+    "frames": 3094737,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/niflheim_1",
+    "frames": 3127091,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/niflheim_2",
+    "frames": 3006818,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/niflheim_3",
+    "frames": 2895455,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/muspelheim_1",
+    "frames": 3276000,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/muspelheim_2",
+    "frames": 3150000,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/muspelheim_3",
+    "frames": 3033333,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/helheim_1",
+    "frames": 3175200,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/helheim_2",
+    "frames": 3053077,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
+    "name": "music/realm/helheim_3",
+    "frames": 2940000,
+    "rate": 44100,
+    "channels": 2
+  },
+  {
     "name": "sfx/block_01",
     "frames": 13904,
     "rate": 22050,

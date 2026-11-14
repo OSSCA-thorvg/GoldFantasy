@@ -127,6 +127,8 @@ export class Sound {
   speaker = -2;
   speechChannel = SpeechChannel.Selected;
   track = '';
+  /** Music only: the track starts over at its end instead of fading out. */
+  loop = false;
   constructor(
     public cue: Cue,
     gain = 1,
