@@ -12,16 +12,39 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
   let worker: Worker | undefined,
     closed = false;
   let disposeFallback: (() => void) | undefined;
-  let resizeFallback: (() => void) | undefined;
-  const ratio = Math.min(1.5, devicePixelRatio || 1);
-  const dimensions = () => ({
-    width: Math.max(1, Math.round(innerWidth * ratio)),
-    height: Math.max(1, Math.round(innerHeight * ratio)),
-  });
-  const resize = () => {
-    worker?.postMessage({ kind: 'resize', ...dimensions() });
-    resizeFallback?.();
+  let resizeFallback: ((width: number, height: number) => void) | undefined;
+  const dimensions = () => {
+    const ratio = devicePixelRatio || 1;
+    return {
+      width: Math.max(1, Math.round(target.clientWidth * ratio)),
+      height: Math.max(1, Math.round(target.clientHeight * ratio)),
+    };
   };
+  let size = dimensions();
+  const resize = () => {
+    if (closed) return;
+    const next = dimensions();
+    if (next.width === size.width && next.height === size.height) return;
+    size = next;
+    worker?.postMessage({ kind: 'resize', ...size });
+    resizeFallback?.(size.width, size.height);
+  };
+  // Observe from the start: loading the worker/WASM must not lose a resize.
+  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver.observe(target);
+  window.addEventListener('resize', resize);
+  window.visualViewport?.addEventListener('resize', resize);
+  let resolutionQuery: MediaQueryList;
+  const watchResolution = () => {
+    resolutionQuery?.removeEventListener('change', resolutionChanged);
+    resolutionQuery = matchMedia(`(resolution: ${devicePixelRatio || 1}dppx)`);
+    resolutionQuery.addEventListener('change', resolutionChanged);
+  };
+  function resolutionChanged() {
+    watchResolution();
+    resize();
+  }
+  watchResolution();
   let releasePlayback!: () => void;
   const playback = new Promise<void>((resolve) => {
     releasePlayback = resolve;
@@ -34,20 +57,19 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
     if (closed) return;
     const animation = new tvg.Animation().load(json),
       picture = animation.picture!;
-    const canvas = new tvg.Canvas(target, { ...dimensions(), enableDevicePixelRatio: false });
-    const size = picture.size();
-    resizeFallback = () => {
-      const { width, height } = dimensions();
+    resize();
+    const canvas = new tvg.Canvas(target, { ...size, enableDevicePixelRatio: false });
+    const source = picture.size();
+    resizeFallback = (width, height) => {
       canvas.resize(width, height);
-      const scale = Math.min(width / size.width, height / size.height);
+      const scale = Math.min(width / source.width, height / source.height);
       picture
-        .size(size.width * scale, size.height * scale)
-        .translate((width - size.width * scale) / 2, (height - size.height * scale) / 2);
+        .size(source.width * scale, source.height * scale)
+        .translate((width - source.width * scale) / 2, (height - source.height * scale) / 2);
       canvas.update().render();
     };
     canvas.add(picture);
-    resizeFallback();
-    window.addEventListener('resize', resize);
+    resizeFallback(size.width, size.height);
     const info = animation.info()!,
       lastFrame = Math.max(0, Math.ceil(info.totalFrames) - 1),
       interval = 1000 / info.fps;
@@ -105,8 +127,10 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
         worker = undefined;
         if (transferred) {
           const replacement = target.cloneNode(false) as HTMLCanvasElement;
+          resizeObserver.unobserve(target);
           target.replaceWith(replacement);
           target = replacement;
+          resizeObserver.observe(target);
         }
         // Keep playback pending: a failed worker must not silently skip the animation.
         void startFallback().catch((cause) => {
@@ -132,7 +156,7 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
         transferred = true;
         worker.postMessage(
           {
-            kind: 'start', canvas, ...dimensions(), assetUrl,
+            kind: 'start', canvas, ...size, assetUrl,
             wasmUrl: new URL(`${import.meta.env.BASE_URL}vendor/thorvg.wasm`, document.baseURI).href,
             reducedMotion,
           },
@@ -142,7 +166,6 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
         fail(error);
       }
     });
-    if (!closed) window.addEventListener('resize', resize);
   })().catch((error) => {
     console.warn('Splash animation is unavailable:', error);
     worker?.terminate();
@@ -156,7 +179,10 @@ export function showStartupSplash(element: HTMLElement, tvgReady: Promise<ThorVG
     releasePlayback();
     worker?.terminate();
     disposeFallback?.();
+    resizeObserver.disconnect();
+    resolutionQuery.removeEventListener('change', resolutionChanged);
     window.removeEventListener('resize', resize);
+    window.visualViewport?.removeEventListener('resize', resize);
     window.removeEventListener('pagehide', dispose);
     element.remove();
   }

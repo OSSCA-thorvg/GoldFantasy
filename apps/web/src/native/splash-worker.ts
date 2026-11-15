@@ -2,6 +2,7 @@ import ThorVG, { type Animation, type Canvas, type ThorVGNamespace } from '@thor
 
 let tvg: ThorVGNamespace | undefined, animation: Animation | undefined, canvas: Canvas | undefined;
 let timer: ReturnType<typeof setTimeout> | undefined;
+let viewport = { width: 1, height: 1 }, sourceSize = { width: 1, height: 1 };
 let nextFrame = 0,
   displayedFrame = 0,
   nextFrameAt = 0,
@@ -15,11 +16,10 @@ function render(frame: number) {
 }
 function resize(width: number, height: number) {
   canvas!.resize(width, height);
-  const size = animation!.picture!.size(),
-    scale = Math.min(width / size.width, height / size.height);
+  const scale = Math.min(width / sourceSize.width, height / sourceSize.height);
   animation!
-    .picture!.size(size.width * scale, size.height * scale)
-    .translate((width - size.width * scale) / 2, (height - size.height * scale) / 2);
+    .picture!.size(sourceSize.width * scale, sourceSize.height * scale)
+    .translate((width - sourceSize.width * scale) / 2, (height - sourceSize.height * scale) / 2);
 }
 function tick() {
   if (finished) return;
@@ -41,6 +41,7 @@ function tick() {
 self.onmessage = async ({ data }) => {
   try {
     if (data.kind === 'start') {
+      viewport = { width: data.width, height: data.height };
       const [namespace, json] = await Promise.all([
         ThorVG.init({ renderer: 'gl', locateFile: () => data.wasmUrl }),
         fetch(data.assetUrl).then(async (response) => {
@@ -51,23 +52,26 @@ self.onmessage = async ({ data }) => {
       tvg = namespace;
       animation = new tvg.Animation().load(json);
       if (!animation.picture) throw Error('Cannot decode ThorVG splash.');
+      sourceSize = animation.picture.size();
       const info = animation.info()!;
       totalFrames = Math.max(1, Math.ceil(info.totalFrames));
       fps = info.fps;
       reducedMotion = data.reducedMotion;
       canvas = new tvg.Canvas(data.canvas, {
-        width: data.width,
-        height: data.height,
+        ...viewport,
         enableDevicePixelRatio: false,
       });
       canvas.add(animation.picture);
-      resize(data.width, data.height);
+      resize(viewport.width, viewport.height);
       nextFrameAt = performance.now();
       tick();
       self.postMessage({ kind: 'ready' });
-    } else if (data.kind === 'resize' && canvas) {
-      resize(data.width, data.height);
-      render(displayedFrame);
+    } else if (data.kind === 'resize') {
+      viewport = { width: data.width, height: data.height };
+      if (canvas) {
+        resize(viewport.width, viewport.height);
+        render(displayedFrame);
+      }
     }
   } catch (error) {
     clearTimeout(timer);
