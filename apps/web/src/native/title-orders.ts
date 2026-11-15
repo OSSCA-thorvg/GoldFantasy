@@ -1,6 +1,5 @@
 // What the title player may call on the town: the orders a player's clicks go through, and the readings the
 // panels show. A refused order is not tried again for a while, so the player never hammers a refusal.
-import type { Town } from '../../../../packages/engine/src/town';
 
 /** Town methods that change the game; each is one a player's order goes through. */
 export const titleOrders = [
@@ -41,6 +40,7 @@ export const titleReadings = [
   'map',
   'roads',
   'clock',
+  'dayFraction',
   'climate',
   'raiding',
   'monsters',
@@ -80,40 +80,21 @@ export const titleReadings = [
 ] as const;
 export type TitleOrder = (typeof titleOrders)[number];
 
-interface Refusal {
-  until: number;
-  revision: bigint;
-}
-/** Remembers refused orders by key; one refused is held back until the time has passed and the town has changed. */
+/** Remembers refused orders by key (the order and its arguments); a refused order is never given again. */
 export class OrderLedger {
-  private refused = new Map<string, Refusal>();
+  private refused = new Set<string>();
   issued = 0;
   refusals = 0;
-  constructor(private holdSeconds = 90) {}
-  blocked(key: string, now: number, revision: bigint): boolean {
-    const r = this.refused.get(key);
-    if (!r) return false;
-    if (now >= r.until && revision !== r.revision) {
-      this.refused.delete(key);
-      return false;
-    }
-    return true;
+  blocked(key: string): boolean {
+    return this.refused.has(key);
   }
-  /** Runs the order unless `key` was refused lately; true when the town accepted it. */
-  issue(town: Town, key: string, order: () => boolean): boolean {
-    const now = town.clock(),
-      revision = town.changes;
-    if (this.blocked(key, now, revision)) return false;
+  /** Runs the order unless `key` was refused before; true when the town accepted it. */
+  issue(key: string, order: () => boolean): boolean {
+    if (this.refused.has(key)) return false;
     ++this.issued;
-    if (order()) {
-      this.refused.delete(key);
-      return true;
-    }
+    if (order()) return true;
     ++this.refusals;
-    this.refused.set(key, { until: now + this.holdSeconds, revision: town.changes });
-    // Old refusals are forgotten so a long session stays small.
-    if (this.refused.size > 400)
-      for (const [k, r] of this.refused) if (now >= r.until) this.refused.delete(k);
+    this.refused.add(key);
     return false;
   }
 }

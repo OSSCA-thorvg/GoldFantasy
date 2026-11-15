@@ -1,7 +1,7 @@
 // Who the title player can give an order to this step, and the shared state its behaviours decide with.
 import type { Town } from '../../../../packages/engine/src/town';
 import { Activity, Role, type Person } from '../../../../packages/engine/src/person';
-import { isPlayerResident } from '../../../../packages/engine/src/faction';
+import { canControl, isPlayerResident } from '../../../../packages/engine/src/faction';
 import type { OrderLedger } from './title-orders';
 
 export interface TitleContext {
@@ -15,6 +15,8 @@ export interface TitleContext {
   step: number;
   /** Decisions put off until a later step, by key; kept by the player across steps. */
   later: Map<string, number>;
+  /** Staff counts the player last set per workplace; the town may move workers between them on its own. */
+  staffed: Map<number, number>;
 }
 /** True while `key` is put off. */
 export const waiting = (ctx: TitleContext, key: string): boolean => (ctx.later.get(key) ?? -1) > ctx.step;
@@ -42,7 +44,7 @@ export function beyond(town: Town, p: Person): boolean {
 }
 /** Can take a new order now: home, awake, fed and rested enough, and not in the middle of a committed task. */
 export function available(town: Town, p: Person): boolean {
-  if (beyond(town, p) || resting.includes(p.activity) || p.recoveringRest || p.recoveringHealth) return false;
+  if (!canControl(p) || beyond(town, p) || resting.includes(p.activity) || p.recoveringRest || p.recoveringHealth) return false;
   if (committed.includes(p.task)) return false;
   return p.rest > 0.2 && p.food > 0.15 && p.hydration > 0.15 && p.health > 0.3;
 }
@@ -52,7 +54,8 @@ export function take(ctx: TitleContext, p: Person): void {
 }
 /** Runs an order through the ledger; on success the residents in `who` are taken for this step. */
 export function order(ctx: TitleContext, key: string, who: readonly Person[], run: () => boolean): boolean {
-  if (!ctx.ledger.issue(ctx.town, key, run)) return false;
+  if (who.some((p) => !canControl(p))) return false;
+  if (!ctx.ledger.issue(key, run)) return false;
   for (const p of who) take(ctx, p);
   return true;
 }

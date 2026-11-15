@@ -21,6 +21,12 @@ export const titleSessionRules = {
   /** Title seconds the end of a saga stays on screen before the restart. */
   lingerAtEnd: 12,
 };
+/** Game seconds per title second right now. */
+export function titlePace(town: Town): number {
+  if (town.realmActive() || town.raiding()) return titleSessionRules.fightPace;
+  const outside = living(town).some((p) => !p.inside);
+  return town.climate().night > 0.6 && !outside ? titleSessionRules.nightPace : titleSessionRules.pace;
+}
 export interface TitlePlay {
   advance(seconds: number): void;
   camera(width: number, height: number, seconds: number, reducedMotion: boolean): Camera;
@@ -44,12 +50,8 @@ export class TitleSession implements TitlePlay {
     if (holdSky) town.titleSky = { year: town.yearFraction(), day: town.dayFraction() };
     this.player = new TitlePlayer(seed >>> 0);
   }
-  /** Game seconds per title second right now. */
   pace(): number {
-    const town = this.town;
-    if (town.realmActive() || town.raiding()) return titleSessionRules.fightPace;
-    const outside = living(town).some((p) => !p.inside);
-    return town.climate().night > 0.6 && !outside ? titleSessionRules.nightPace : titleSessionRules.pace;
+    return titlePace(this.town);
   }
   advance(seconds: number): void {
     if (!Number.isFinite(seconds) || seconds <= 0) return;

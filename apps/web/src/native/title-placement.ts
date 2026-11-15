@@ -9,7 +9,6 @@ import { Footprint, add, distance, normalized, point, scale, sub, type Outline, 
 import { freehandRoad, sharpAnchor, type RoadPath } from '../../../../packages/engine/src/road-network';
 import { hash01 } from '../../../../packages/engine/src/numeric';
 import { isPlayerBuilding } from '../../../../packages/engine/src/faction';
-import { placementVariant } from '../../../../packages/engine/src/town-construction';
 
 /** Candidate plots tried per search; each is one `fit` and one `canPlace`. */
 const plotBudget = 160;
@@ -103,10 +102,6 @@ export function plotFor(town: Town, kind: Structure, seed: number, salt = 0): Pl
 /** True when a plot's footprint reaches a road, so its door needs no road of its own. */
 export function besideRoad(town: Town, kind: Structure, spot: Placement): boolean {
   return town.roadAccess(new Footprint(spot.center, structureSpec(kind).size / 2, spot.angle));
-}
-/** The door a building of `kind` would have at `spot`, as `canPlace` measures it. */
-export function doorAt(town: Town, kind: Structure, spot: Placement): Point {
-  return new Building(-1, kind, { ...spot.center }, spot.angle, placementVariant(town.map(), kind, spot.center)).door();
 }
 /** A road from `from` to `to`: straight when it fits, else along the walking path between the buildings. */
 export function routedRoad(town: Town, from: Point, to: Point): RoadPath | null {

@@ -15,8 +15,8 @@ import {
   settlementGoals,
   type SettlementGoal,
 } from '../../../../packages/engine/src/settlement-progression';
-import { bestGear, makeable, stationBusy } from './title-gear';
-import { besideRoad, branchRoad, fieldBeside, firstRoad, plotFor, roadToDoor } from './title-placement';
+import { bestGear, isFighter, makeable, stationBusy } from './title-gear';
+import { besideRoad, branchRoad, fieldBeside, firstRoad, plotFor, roadToDoor, routedRoad } from './title-placement';
 import { living, order, putOff, waiting, type TitleContext } from './title-roster';
 import type { Town } from '../../../../packages/engine/src/town';
 
@@ -100,25 +100,33 @@ function upgradeStation(ctx: TitleContext, kind: Structure): Shortfall {
   if (!stationBusy(town, station)) {
     const crafter = ctx.free.find((p) => !town.stationUpgradeReason(p.id, station.id));
     if (crafter)
-      order(ctx, `upgrade:${crafter.id}:${station.id}`, [crafter], () => town.orderStationUpgrade(crafter.id, station.id));
+      order(ctx, `upgrade:${crafter.id}:${station.id}:${stationLevel(station)}`, [crafter], () => town.orderStationUpgrade(crafter.id, station.id));
   }
   const step = stationStep(station.kind, stationLevel(station) + 1);
   return step ? shortfallOf(town, step.cost) : { wood: 0, stone: 0 };
 }
 function plantField(ctx: TitleContext): void {
-  const { town } = ctx,
-    farm = own(town, Structure.Farm);
-  if (!farm) return;
-  const outline = fieldBeside(town, farm, ctx.seed, ctx.step);
-  if (outline)
+  const { town } = ctx;
+  if (waiting(ctx, 'field')) return;
+  let outline = null;
+  for (const farm of town.buildings().filter((b) => isPlayerBuilding(b) && b.kind === Structure.Farm && b.built()))
+    if ((outline = fieldBeside(town, farm, ctx.seed, ctx.step))) break;
+  // No room beside any farmhouse: the search waits instead of running every step.
+  if (!outline) putOff(ctx, 'field', 30);
+  else
     order(ctx, `field:${Math.round(outline[0].x * 4)}:${Math.round(outline[0].y * 4)}`, [], () => town.plantField(outline));
 }
 const roadUnderWay = (town: Town) => town.roads().roads().some((r) => r.faction === 0 && r.built < 1);
 function layRoad(ctx: TitleContext): void {
-  const { town } = ctx;
-  if (roadUnderWay(town) || town.roads().roads().some((r) => r.faction === 0)) return;
-  const path = firstRoad(town, ctx.seed);
+  const { town } = ctx,
+    seat = town.camp();
+  if (!seat || waiting(ctx, 'street') || roadUnderWay(town) || town.roads().roads().some((r) => r.faction === 0)) return;
+  // Straight out of the door, else along the walking path to the nearest building.
+  let path = firstRoad(town, ctx.seed);
+  for (const b of town.buildings().filter((b) => isPlayerBuilding(b) && b !== seat && b.built()).slice(0, 4))
+    path ??= routedRoad(town, seat.door(), b.door());
   if (path) order(ctx, `street:${ctx.step}`, [], () => town.buildRoad(path));
+  else putOff(ctx, 'street', 40);
 }
 /** Lays a branch street unless one is still being built; true when one is under way. */
 function extendStreets(ctx: TitleContext): boolean {
@@ -166,10 +174,12 @@ function keepUp(ctx: TitleContext): Shortfall {
     !sites(town).some((b) => structureSpec(b.kind).residents > 0)
   )
     want = Structure.Tent;
+  const farms = town.buildings().filter((b) => isPlayerBuilding(b) && b.kind === Structure.Farm).length;
+  if (want === null && population >= 8 && farms < 2 && town.stock().food < population * 3) want = Structure.Farm;
   // A tavern before the settlement works itself into breakdowns.
   if (want === null && population >= 5 && !own(town, Structure.Tavern) && !own(town, Structure.Tavern, false))
     want = Structure.Tavern;
-  if (own(town, Structure.Farm) && town.fieldAcres() < Math.min(30, 6 + population * 2)) plantField(ctx);
+  if (own(town, Structure.Farm) && town.fieldAcres() < Math.min(40, 8 + population * 3)) plantField(ctx);
   connectDoors(ctx);
   if (want !== null && startBuilding(ctx, want)) return shortfallOf(town, structureSpec(want).cost);
   return { wood: 0, stone: 0 };
@@ -188,7 +198,10 @@ export function planSettlement(ctx: TitleContext): PlanReport {
   // The main street goes down once there are hands to spare, so the village grows along it.
   if (town.camp()!.built() && town.population() >= 3) layRoad(ctx);
   const needs = keepUp(ctx),
-    goal = chosenGoal(town, (g) => g.kind === GoalKind.Building && waiting(ctx, `plot:${g.building}`));
+    goal = chosenGoal(
+      town,
+      (g) => (g.kind === GoalKind.Building && waiting(ctx, `plot:${g.building}`)) || (g.kind === GoalKind.Road && waiting(ctx, 'street')),
+    );
   let shortfall: Shortfall = { wood: 0, stone: 0 };
   if (goal)
     switch (goal.kind) {
@@ -206,7 +219,6 @@ export function planSettlement(ctx: TitleContext): PlanReport {
         plantField(ctx);
         break;
       case GoalKind.Road:
-        layRoad(ctx);
         break;
       default:
         break;
@@ -222,10 +234,11 @@ export function planSettlement(ctx: TitleContext): PlanReport {
     shortfall: { wood: shortfall.wood + needs.wood, stone: shortfall.stone + needs.stone },
   };
 }
-/** Free residents not needed elsewhere get the gear that helps them most. */
-export function equipFree(ctx: TitleContext): void {
+/** Free residents not needed elsewhere get the gear that helps them most; what it would cost is remembered so the
+ * gatherers fetch it. Returns the materials the most wanted piece still lacks. */
+export function equipFree(ctx: TitleContext, last: Shortfall): Shortfall {
   // Reading every recipe for everyone is the dearest look the player takes; it takes it now and then.
-  if (ctx.step % 4) return;
+  if (ctx.step % 4) return last;
   const { town } = ctx,
     folk = ctx.free.filter((p: Person) => p.task === Activity.Idle || p.job >= 0);
   const choice = bestGear(town, folk);
@@ -233,4 +246,7 @@ export function equipFree(ctx: TitleContext): void {
     order(ctx, `craft:${choice.person.id}:${choice.station.id}:${choice.item.id}`, [choice.person], () =>
       town.orderCraft(choice.person.id, choice.station.id, choice.item.id),
     );
+  if (ctx.step % 8) return last;
+  const wish = bestGear(town, living(town).filter(isFighter), undefined, true);
+  return wish && wish.worth >= 25 ? shortfallOf(town, wish.item.cost) : { wood: 0, stone: 0 };
 }

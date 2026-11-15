@@ -12,7 +12,7 @@ import { scoutPoint, unsourcedMaterial } from '../../../../packages/engine/src/s
 import { isFighter } from './title-gear';
 import { living, order, take, type TitleContext } from './title-roster';
 
-const reach = 16;
+const reach = 24;
 /** The nearest tree or rock in sight that nobody is already working, or -1. */
 export function harvestCell(town: Town, from: Point, stone: boolean): number {
   const map = town.map(),
@@ -84,15 +84,15 @@ function staffWanted(town: Town, kind: Structure, population: number): number {
     jobs = structureSpec(kind).jobs;
   switch (kind) {
     case Structure.Farm:
+      // Meals cost little; the farm's surplus is what the altar asks for.
       if (!town.fieldAcres()) return 0;
-      if (population <= 3) return 1;
-      return Math.min(jobs, stock.food > population * 14 ? 1 : Math.max(1, Math.ceil(population / 3)));
+      return Math.min(jobs, stock.food < population * 4 ? 3 : population >= 6 && stock.food < 80 ? 2 : 1);
     case Structure.Well:
-      return population >= 3 && stock.water < population * 6 ? 1 : 0;
+      return population >= 3 && stock.water < population * 3 ? 1 : 0;
     case Structure.Lumberyard:
-      return population >= 5 ? (population >= 9 ? 2 : 1) : 0;
+      return population >= 7 ? 1 : 0;
     case Structure.Quarry:
-      return population >= 5 ? 1 : 0;
+      return population >= 7 ? 1 : 0;
     case Structure.Sawmill:
     case Structure.Stoneworks:
       return population >= 7 ? 1 : 0;
@@ -107,6 +107,13 @@ function staffWanted(town: Town, kind: Structure, population: number): number {
       return 0;
   }
 }
+/** Sets a workplace's staff count when the player's own wish for it changes; the town's later shuffles stand. */
+function setStaff(ctx: TitleContext, id: number, count: number): void {
+  if (ctx.staffed.get(id) === count) return;
+  ctx.staffed.set(id, count);
+  // The panel's count always takes; whether someone is free to fill it shows only later.
+  order(ctx, `staff:${id}:${count}:${ctx.step}`, [], () => (ctx.town.setWorkers(id, count), true));
+}
 /** Sets each workplace's wanted staff, as the building panel's count does; the town fills it from idle hands.
  * Fighters below the drill cap are sent to a training yard instead. */
 export function staffJobs(ctx: TitleContext): void {
@@ -119,16 +126,13 @@ export function staffJobs(ctx: TitleContext): void {
       const eligible = folk.filter((p) => isFighter(p) && p.level < 10 && !ctx.party.has(p.id)).length,
         seats = Math.min(structureSpec(b.kind).jobs, eligible),
         drilling = folk.filter((p) => p.job === b.id).length;
-      if (b.wanted !== seats) order(ctx, `staff:${b.id}:${seats}`, [], () => (town.setWorkers(b.id, seats), true));
+      setStaff(ctx, b.id, seats);
       if (drilling >= seats) continue;
       const fighter = ctx.free.find((p) => isFighter(p) && p.job !== b.id && p.level < 10 && !ctx.party.has(p.id));
       if (fighter) order(ctx, `drill:${fighter.id}:${b.id}`, [fighter], () => town.assignJob([fighter.id], b.id));
       continue;
     }
-    const wanted = staffWanted(town, b.kind, population);
-    if (b.wanted === wanted) continue;
-    // The panel's count always takes; whether someone is free to fill it shows only later.
-    order(ctx, `staff:${b.id}:${wanted}:${population}`, [], () => (town.setWorkers(b.id, wanted), true));
+    setStaff(ctx, b.id, staffWanted(town, b.kind, population));
   }
 }
 const prey = [AnimalKind.Chicken, AnimalKind.Pig, AnimalKind.Cow];

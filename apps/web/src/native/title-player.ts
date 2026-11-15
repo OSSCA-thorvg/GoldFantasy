@@ -7,7 +7,7 @@ import { commandRealm, defend, partyState, sendParty } from './title-party';
 import { equipFree, planSettlement, type Shortfall } from './title-settlement-plan';
 import { callResidents } from './title-altar';
 import { keepWell } from './title-wellbeing';
-import { gatherShortfall, staffJobs, staffSites } from './title-workforce';
+import { gatherShortfall, hunt, staffJobs, staffSites } from './title-workforce';
 
 export const titlePlayerRules = {
   /** Game seconds between decisions at home, and beyond a gate where a fight moves faster. */
@@ -22,8 +22,10 @@ export class TitlePlayer {
   goal = '';
   altar = '';
   shortfall: Shortfall = { wood: 0, stone: 0 };
+  private gearShort: Shortfall = { wood: 0, stone: 0 };
   private nextAt = -1;
   private later = new Map<string, number>();
+  private staffed = new Map<number, number>();
   constructor(readonly seed: number) {}
   goalTitle(): string {
     return this.goal;
@@ -44,6 +46,7 @@ export class TitlePlayer {
       party: new Set(),
       step: ++this.steps,
       later: this.later,
+      staffed: this.staffed,
     };
     if (town.realmActive() || this.party.members.length) commandRealm(ctx, this.party);
     const raided = defend(ctx, this.party);
@@ -54,8 +57,10 @@ export class TitlePlayer {
     this.shortfall = plan.shortfall;
     staffSites(ctx);
     this.altar = callResidents(ctx);
+    if (town.stock().food < town.population() * 2) hunt(ctx);
+    if (town.stock().food < town.population()) hunt(ctx);
     staffJobs(ctx);
-    equipFree(ctx);
-    gatherShortfall(ctx, plan.shortfall.wood, plan.shortfall.stone);
+    this.gearShort = equipFree(ctx, this.gearShort);
+    gatherShortfall(ctx, plan.shortfall.wood + this.gearShort.wood, plan.shortfall.stone + this.gearShort.stone);
   }
 }

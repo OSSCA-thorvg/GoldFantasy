@@ -23,6 +23,8 @@ const weaponShapes: Partial<Record<Calling, readonly string[]>> = {
 };
 const plainShapes = ['sword', 'mace', 'spear'];
 export const isFighter = (p: Person): boolean => p.calling >= Calling.Warrior;
+/** The station's answer when only the materials are missing. */
+const shortOfMaterials = 'Not enough settlement materials';
 
 export function ownStations(town: Town): Building[] {
   return town.buildings().filter((b) => isPlayerBuilding(b) && b.built() && isCraftStation(b.kind));
@@ -62,7 +64,7 @@ export function gearWorth(town: Town, p: Person, item: ItemSpec): number {
   }
   if (item.category === 'armor' && item.slots.length) {
     if (!isFighter(p) && item.visual !== 'basket') return 0;
-    if (item.visual === 'basket') return equippedItem(p, 'accessory') ? 0 : 6;
+    if (item.visual === 'basket') return equippedItem(p, 'accessory') || isFighter(p) ? 0 : 3;
     const slot = item.slots[0],
       held = equippedItem(p, slot);
     if (item.block > 0) {
@@ -85,14 +87,15 @@ export interface GearChoice {
   item: ItemSpec;
   worth: number;
 }
-/** The most useful item some free resident can have made now at a free station, or null. */
-export function bestGear(town: Town, free: readonly Person[], wanted?: readonly string[]): GearChoice | null {
+/** The most useful item some free resident can have made now at a free station, or null. With `wish`, the most
+ * useful one that only lacks materials, so the gatherers know what to fetch. */
+export function bestGear(town: Town, free: readonly Person[], wanted?: readonly string[], wish = false): GearChoice | null {
   let best: GearChoice | null = null;
   for (const station of ownStations(town)) {
-    if (stationBusy(town, station)) continue;
+    if (!wish && stationBusy(town, station)) continue;
     for (const p of free)
       for (const { item, reason } of town.craftOptions(p.id, station.id)) {
-        if (reason) continue;
+        if (wish ? reason !== shortOfMaterials : reason) continue;
         const worth = wanted ? (wanted.includes(item.id) && !owns(p, item.id) ? 100 - item.cost.wood : 0) : gearWorth(town, p, item);
         if (worth > 0 && (!best || worth > best.worth)) best = { person: p, station, item, worth };
       }
@@ -104,6 +107,6 @@ export function makeable(town: Town, someone: Person, wanted: readonly string[])
   const out: ItemSpec[] = [];
   for (const station of ownStations(town))
     for (const { item, reason } of town.craftOptions(someone.id, station.id))
-      if (wanted.includes(item.id) && (!reason || reason === 'Not enough settlement materials')) out.push(item);
+      if (wanted.includes(item.id) && (!reason || reason === shortOfMaterials)) out.push(item);
   return out.sort((a, b) => a.cost.wood + a.cost.stone - (b.cost.wood + b.cost.stone));
 }

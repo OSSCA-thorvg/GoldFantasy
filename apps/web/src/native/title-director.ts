@@ -48,7 +48,8 @@ export function watchable(town: Town, at: Point): boolean {
 export function subjects(town: Town): Subject[] {
   const out: Subject[] = [],
     zoom = directorRules.zoom,
-    folk = town.people().filter((p) => isPlayerResident(p) && p.role === Role.Resident && outdoors(p) && p.downedAt < 0),
+    // Home subjects only; the party beyond a gate is its own subject.
+    folk = town.people().filter((p) => isPlayerResident(p) && p.role === Role.Resident && outdoors(p) && p.downedAt < 0 && !town.inRealm(p.position)),
     seat = town.camp();
   const add = (s: Subject) => {
     if (watchable(town, s.at)) out.push(s);
@@ -90,7 +91,7 @@ export function subjects(town: Town): Subject[] {
   }
   const work = [Activity.Felling, Activity.Mining, Activity.Working, Activity.Roadwork, Activity.Hauling];
   for (const p of folk)
-    if (work.includes(p.activity) && !town.inRealm(p.position))
+    if (work.includes(p.activity))
       add({ key: `work:${p.id}`, label: `${p.name} at work`, interest: 20 + (p.id % 7), at: p.position, person: p, zoom });
   if (seat) {
     const storm = town.climate().weather === Weather.Storm;
@@ -98,6 +99,33 @@ export function subjects(town: Town): Subject[] {
   } else if (folk.length)
     add({ key: `walk:${folk[0].id}`, label: `Following ${folk[0].name}`, interest: 10, at: folk[0].position, person: folk[0], zoom });
   return out.sort((a, b) => b.interest - a.interest);
+}
+/** Share of the title's visible picture (left of the menu) that lies on unexplored ground around `at`. */
+export function darkShare(town: Town, at: Point, width: number, height: number, zoom: number): number {
+  const centre = project(at.x, at.y, 12),
+    // The view centre sits right of the subject by the framing offset; sample the picture left of the menu.
+    cx = centre.x + (width * 0.15) / zoom,
+    cy = centre.y - (height * 0.08) / zoom;
+  let dark = 0,
+    count = 0;
+  for (const fx of [-0.45, -0.25, -0.05, 0.12])
+    for (const fy of [-0.4, -0.15, 0.15, 0.4]) {
+      const p = unproject(cx + (fx * width) / zoom, cy + (fy * height) / zoom + 12);
+      ++count;
+      if (!town.map().inside(p) || !town.map().revealed(p)) ++dark;
+    }
+  return dark / count;
+}
+/** Where to look so the subject stays in the picture but the picture leans toward explored land and the fire. */
+function framed(town: Town, at: Point, width: number, height: number, zoom: number): Point {
+  const home = town.realmActive() && town.inRealm(at) ? town.realmPlan()?.entry : (town.camp()?.center ?? null);
+  if (!home) return at;
+  let look = at;
+  for (let step = 1; step <= 4 && darkShare(town, look, width, height, zoom) > 0.2; ++step)
+    look = point(at.x + ((home.x - at.x) * step) / 10, at.y + ((home.y - at.y) * step) / 10);
+  // Never so far that the subject leaves the picture.
+  const gap = distance(look, at);
+  return gap > 5 ? point(at.x + ((look.x - at.x) * 5) / gap, at.y + ((look.y - at.y) * 5) / gap) : look;
 }
 export class TitleDirector {
   private view = new Camera();
@@ -139,7 +167,8 @@ export class TitleDirector {
     if (!next) return;
     if (next.interest >= this.current.interest + directorRules.urgent && held >= 1.5) this.cut(next);
     else if (held >= directorRules.hold && next.interest >= this.current.interest - 10 && next.key !== this.current.key) this.cut(next);
-    else if (held >= directorRules.most && next.key !== this.current.key) this.cut(next);
+    // A long hold gives way for variety, but never from a fight to idle work.
+    else if (held >= directorRules.most && next.key !== this.current.key && next.interest >= this.current.interest - 30) this.cut(next);
   }
   private cut(next: Subject | null): void {
     if (this.current) this.seen.set(this.current.key, this.clock);
@@ -158,7 +187,8 @@ export class TitleDirector {
     const subject = this.current,
       at = subject ? (subject.person && this.still(town, subject) ? subject.person.position : subject.at) : (town.camp()?.center ?? town.map().camp()),
       zoom = subject?.zoom ?? directorRules.zoom,
-      projected = project(at.x, at.y, 12),
+      look = framed(town, at, width, height, zoom),
+      projected = project(look.x, look.y, 12),
       target = point(f(projected.x + f(f(width * f(0.15)) / zoom)), f(projected.y - f(f(height * f(0.08)) / zoom)));
     if (!this.ready || reducedMotion) {
       this.view = new Camera(target.x, target.y, zoom);
@@ -193,7 +223,10 @@ export class TitleDirector {
   still(town: Town, s: Subject): boolean {
     const p = s.person;
     if (p && (!outdoors(p) || p.downedAt >= 0 || !town.people().includes(p))) return false;
-    return watchable(town, p ? p.position : s.at);
+    const at = p ? p.position : s.at;
+    // Someone stepping through a gate leaves a home subject; the party beyond is its own.
+    if (s.key !== 'realm' && town.inRealm(at)) return false;
+    return watchable(town, at);
   }
   /** Where in the world the view looks now, without the title's framing offset. */
   private worldOf(width: number, height: number): Point {

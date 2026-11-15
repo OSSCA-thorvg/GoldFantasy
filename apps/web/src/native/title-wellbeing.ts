@@ -19,6 +19,8 @@ export function keepWell(ctx: TitleContext): void {
       spent = p.worked >= TownState.secondsPerDay * wellbeingRules.shift;
     if (!strained && !spent) continue;
     take(ctx, p);
-    if (strained && tavern) order(ctx, `relax:${p.id}:${town.clock() / 150 | 0}`, [p], () => town.orderRelax([p.id], tavern.id));
+    const from = p.inside ? p.entrance : p.position;
+    if (strained && tavern && town.grid.path(from, tavern.door()).length)
+      order(ctx, `relax:${p.id}:${tavern.id}:${town.days}`, [p], () => town.orderRelax([p.id], tavern.id));
   }
 }
