@@ -16,6 +16,9 @@ the files; it needs neither Loach nor any model, recording or network service.
   given a long echo with ffmpeg.
 - `voice/<kind>/` holds the Norse pack's villager and combat voice banks, one folder per voice: takes
   generated with Qwen3-TTS (Apache-2.0), trimmed and levelled by Loach.
+- Three of the reference speakers those weather voices were cloned from (huntress, veteran, young) are
+  themselves synthetic: generated with Dia 1.6B (`nari-labs/Dia-1.6B-0626`, Apache-2.0). Model revisions, seeds
+  and settings are recorded in `packages/native-audio/src/data/audio-sources.json`.
 
 Sounds not dedicated to CC0 above (the Norse pack's procedural sounds, the generated voices and narration, and
 the mixed `sfx/saga/` and `sfx/combat/` cues) are original works made for this project with Loach and are
