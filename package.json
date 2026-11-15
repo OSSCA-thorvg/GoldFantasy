@@ -25,6 +25,7 @@
     "test:lifetime": "node tests/regression/webcanvas-lifetime.browser.mjs",
     "test:editor": "node tests/regression/map-editor-lifecycle.browser.mjs",
     "test:splash": "node tests/regression/splash-runtime.browser.mjs",
+    "test:intro-performance": "node tests/regression/intro-performance.browser.mjs",
     "test:work": "node tests/regression/work-contact.browser.mjs",
     "test:picking": "node tests/regression/picking.browser.mjs",
     "test:realm": "node tests/regression/realm.browser.mjs",

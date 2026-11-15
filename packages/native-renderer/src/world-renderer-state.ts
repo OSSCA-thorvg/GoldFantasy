@@ -242,8 +242,7 @@ export class WorldRendererState {
   renderedAt = 0;
   seenTreeEvent = 0n;
   /** Keeps water and other ambient motion still; the app may set it from its own preference. */
-  reducedMotion =
-    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  reducedMotion = false;
   waterAt = -1;
   waterStill = false;
   constructor(readonly tvg: ThorVGNamespace) {

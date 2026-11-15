@@ -55,6 +55,7 @@ try {
       deviceScaleFactor: dpr,
       reducedMotion: 'reduce',
     });
+    await context.addInitScript(() => localStorage.setItem('midgard.motion', 'Off'));
     page = await context.newPage();
     page.on('pageerror', (error) => report.errors.push({ name, error: error.stack ?? String(error) }));
     page.on('console', (message) => {

@@ -64,6 +64,7 @@ const tileSpan = (width: number, height: number): number => f32(f32(2.8284271) /
 const fromLogo = (p: Point): Point => point(f32((f32(p.x - f32(86.16))) * f32(.0043)), f32(f32(f32((f32(p.y - f32(92.5))) * f32(.0043)) * f32(1.7)) + f32(.1455)));
 const springLogo = point(72, 24), fireLogo = point(89, 142), ymirShoreLogo = point(140, f32(52.9));
 const spines = [[point(96, 71), point(80, 86), point(58, 101)], [point(130, 110), point(89, 142), point(70, 172)]];
+const spinePoints = spines.map((spine) => spine.map(fromLogo));
 const centreLogos = [point(110, 20), point(95, 80), point(88, 152)];
 const bolt = (() => {
     const outline: Point[] = [], bay: Point[] = [];
@@ -325,16 +326,39 @@ export class WorldMap {
         lastGenerated = { seed, width, height, map: copyNative(map) };
         return map;
     }
+    /** Warm the ordinary generation cache without holding the browser's main thread for seconds. */
+    static async prepare(seed: number, width = 176, height = 176): Promise<void> {
+        if (lastGenerated?.seed === seed && lastGenerated.width === width && lastGenerated.height === height)
+            return;
+        const generation = WorldMap.generateMap(seed, width, height), lattices = new Map<number, NoiseLattice>();
+        let step: IteratorResult<void, WorldMap>;
+        do {
+            const until = performance.now() + 8, previous = generationNoiseLattices;
+            generationNoiseLattices = lattices;
+            try {
+                do { step = generation.next(); } while (!step.done && performance.now() < until);
+            } finally {
+                // Other maps and ordinary noise sampling must never inherit a paused generation's cache.
+                generationNoiseLattices = previous;
+            }
+            if (!step.done) await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        } while (!step.done);
+        // The prepared map is private; callers receive independent value copies through generate().
+        lastGenerated = { seed, width, height, map: step.value };
+    }
     private static generateFresh(seed: number, width: number, height: number): WorldMap {
         const previous = generationNoiseLattices;
         generationNoiseLattices = new Map();
         try {
-            return WorldMap.generateMap(seed, width, height);
+            const generation = WorldMap.generateMap(seed, width, height);
+            let step = generation.next();
+            while (!step.done) step = generation.next();
+            return step.value;
         } finally {
             generationNoiseLattices = previous;
         }
     }
-    private static generateMap(seed: number, width: number, height: number): WorldMap {
+    private static *generateMap(seed: number, width: number, height: number): Generator<void, WorldMap> {
         const map = new WorldMap();
         map.columns = width;
         map.rows = height;
@@ -348,9 +372,9 @@ export class WorldMap {
         const heart = map.ymir.center(), spring = mapOf(fromLogo(springLogo), width, height), fire = mapOf(fromLogo(fireLogo), width, height), lake = Math.max(f32(2.5), f32(f32(.045) / tile));
         map.fire = Volcano.around(fire);
         const mereWide = 6, mereFront = f32(5.5), mereBack = clamp(f32((f32(width + height)) * f32(.037)), f32(8.5), 13);
-        for (let j = 0; j <= f32(height * 2); j++)
+        for (let j = 0; j <= f32(height * 2); j++) {
             for (let i = 0; i <= f32(width * 2); i++) {
-                const x = f32(i / 2), y = f32(j / 2), depth = depthOf(seed, screenOf(point(x, y), width, height));
+                const x = f32(i / 2), y = f32(j / 2), here = screenOf(point(x, y), width, height), depth = depthOf(seed, here);
                 const cold = seam(depth.north), hot = seam(depth.south), mild = f32((f32(1 - cold)) * (f32(1 - hot))), north = Math.max(0, depth.north), south = Math.max(0, depth.south);
                 const n = f32(fractalNoise(u32(seed + 600), f32(x * f32(.05)), f32(y * f32(.05))) - f32(.5));
                 let heat = f32(f32(f32((f32(f32(.45) + f32(n * f32(.12)))) * mild) + f32((f32(f32(f32(.245) - f32(north * f32(.5))) + f32(n * f32(.03)))) * cold)) + f32(Math.min(f32(f32(f32(.7) + f32(south * f32(.9))) + f32(n * f32(.1))), f32(lavaFloor - f32(.025))) * hot));
@@ -358,10 +382,10 @@ export class WorldMap {
                 elevation = f32(elevation + f32(hot * Math.max(0, f32(f32(.34) - elevation))));
                 let moisture = f32(fractalNoise(u32(seed + 77), f32(f32(x * f32(.09)) + 40), f32(f32(y * f32(.09)) + 40)) - f32(hot * f32(.3)));
                 let ridge = f32(f32(f32(ridged(seed, x, y) - f32(f32(.16) * mild)) - f32(f32(.06) * cold)) - f32(f32(.1) * hot));
-                const here = screenOf(point(x, y), width, height);
-                for (const spine of spines) {
-                    const gap = Math.min(segmentDistance(here, fromLogo(spine[0]), fromLogo(spine[1])), segmentDistance(here, fromLogo(spine[1]), fromLogo(spine[2])));
-                    const pass = smooth(clamp(f32((f32(fractalNoise(u32(seed + 850), f32(x * f32(.09)), f32(y * f32(.09))) - f32(.3))) * 6), 0, 1)), crest = f32(f32(.04) + f32(f32(.16) * fractalNoise(u32(seed + 860), f32(x * f32(.15)), f32(y * f32(.15)))));
+                // The terrain sample chooses the pass and crest once, shared by every spine.
+                const pass = smooth(clamp(f32((f32(fractalNoise(u32(seed + 850), f32(x * f32(.09)), f32(y * f32(.09))) - f32(.3))) * 6), 0, 1)), crest = f32(f32(.04) + f32(f32(.16) * fractalNoise(u32(seed + 860), f32(x * f32(.15)), f32(y * f32(.15)))));
+                for (const spine of spinePoints) {
+                    const gap = Math.min(segmentDistance(here, spine[0], spine[1]), segmentDistance(here, spine[1], spine[2]));
                     ridge = f32(ridge + f32(f32((f32(crest - ridge)) * within(gap, f32(.016), f32(.022))) * pass));
                 }
                 elevation = f32(elevation + f32(Math.max(0, f32(ridge + f32(.3))) * f32(.55)));
@@ -409,9 +433,13 @@ export class WorldMap {
                 layer(Layer.Ridge)[at] = ridge;
                 layer(Layer.Heat)[at] = heat;
             }
+            yield;
+        }
         map.stream = elivagar(seed, width, height);
+        yield;
         map.carveLava();
-        map.finishGeneration();
+        yield;
+        yield* map.finishGeneration();
         return map;
     }
     private carveLava(): void {
@@ -481,9 +509,9 @@ export class WorldMap {
                 }
         }
     }
-    private finishGeneration(): void {
+    private *finishGeneration(): Generator<void> {
         const width = this.columns, height = this.rows, seed = this.mapSeed, heart = this.ymir!.center();
-        for (let y = 0; y < height; y++)
+        for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 const center = point(f32(x + f32(.5)), f32(y + f32(.5))), tile = makeTile();
                 tile.terrain = this.terrainAt(center);
@@ -491,14 +519,18 @@ export class WorldMap {
                 this.tiles[f32(f32(y * width) + x)] = tile;
                 tile.wild = tile.trees = wildTrees(this, x, y);
             }
+            yield;
+        }
         const settleable = (terrain: Terrain): boolean => !isWater(terrain) && !isStone(terrain) && !impassable(terrain) && terrain !== Terrain.Ash && terrain !== Terrain.Frost;
         const open = new Int32Array(f32((f32(width + 1)) * (f32(height + 1)))), dry = new Int32Array(open.length);
-        for (let y = 0; y < height; y++)
+        for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 const at = f32(f32(f32((f32(y + 1)) * (f32(width + 1))) + x) + 1), up = f32(f32(f32(y * (f32(width + 1))) + x) + 1), left = f32(at - 1), corner = f32(up - 1);
                 open[at] = f32(f32(f32(Number(settleable(this.at(x, y).terrain)) + open[up]) + open[left]) - open[corner]);
                 dry[at] = f32(f32(f32(Number(this.at(x, y).terrain !== Terrain.Sea) + dry[up]) + dry[left]) - dry[corner]);
             }
+            yield;
+        }
         const count = (sums: Int32Array, cx: number, cy: number, r: number): number => {
             const x0 = Math.max(0, f32(cx - r)), y0 = Math.max(0, f32(cy - r)), x1 = Math.min(width, f32(f32(cx + r) + 1)), y1 = Math.min(height, f32(f32(cy + r) + 1));
             return f32(f32(f32(sums[f32(f32(y1 * (f32(width + 1))) + x1)] - sums[f32(f32(y0 * (f32(width + 1))) + x1)]) - sums[f32(f32(y1 * (f32(width + 1))) + x0)]) + sums[f32(f32(y0 * (f32(width + 1))) + x0)]);
@@ -518,7 +550,7 @@ export class WorldMap {
                     continue;
                 let nearest = 3.4028234663852886e38;
                 const margin = Math.min(10, f32(clear + 2));
-                for (let y = margin; y < f32(height - margin); y++)
+                for (let y = margin; y < f32(height - margin); y++) {
                     for (let x = margin; x < f32(width - margin); x++) {
                         const before = distance(point(f32(x + f32(.5)), f32(y + f32(.5))), heart) <= 13 && f32(f32(f32(f32(x + y) + 1) - heart.x) - heart.y) > 4;
                         if (near && !before || !clearing(this, x, y, clear) || landShare(x, y, room) < f32(.5))
@@ -529,6 +561,8 @@ export class WorldMap {
                             best = { x, y };
                         }
                     }
+                    yield;
+                }
                 found = nearest < 3.4028234663852886e38;
             }
         this.origin = best;

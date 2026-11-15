@@ -123,13 +123,15 @@ export class WebCanvasAdapter {
     if (node instanceof SceneNode) {
       // A fully transparent child is switched off: not attached natively, nor even visited,
       // until it shows again. Most of a figure is tools and loads it is not holding.
-      const shown = node.children.some((child) => child.alpha === 0)
-          ? node.children.filter((child) => child.alpha !== 0)
-          : node.children,
-        reordered =
-          !entry.children ||
-          entry.children.length !== shown.length ||
-          entry.children.some((child, i) => child !== shown[i]);
+      let visible = 0, reordered = !entry.children;
+      for (const child of node.children)
+        if (child.alpha !== 0) {
+          if (child !== entry.children?.[visible]) reordered = true;
+          visible++;
+        }
+      if (visible !== entry.children?.length) reordered = true;
+      // Reuse the retained list while only poses change; a figure has many scenes with hidden tools.
+      const shown = reordered ? node.children.filter((child) => child.alpha !== 0) : entry.children!;
       // Empty a changed scene BEFORE its children are synced. ThorVG traps ("null
       // function") when an attached scene is cleared while a nested scene already
       // holds paints it has never prepared, which is what syncing the children first
@@ -141,15 +143,23 @@ export class WebCanvasAdapter {
         entry.children = undefined;
         entry.childPaints = [];
       }
-      const children = shown.map((child) => this.sync(child));
+      let children: Paint[] | undefined;
+      for (let i = 0; i < shown.length; i++) {
+        const paint = this.sync(shown[i]);
+        if (paint !== entry.childPaints?.[i]) {
+          children ??= [...(entry.childPaints ?? [])];
+          children[i] = paint;
+        }
+      }
       if (
-        (reordered || !entry.children || entry.childPaints?.some((paint, i) => paint !== children[i])) &&
+        (reordered || !entry.children || children) &&
         entry.paint instanceof this.tvg.Scene
       ) {
         for (const previous of entry.childPaints ?? [])
           if (this.parents.get(previous) === entry) this.parents.delete(previous);
         entry.paint.clear();
-        for (const child of children) {
+        const paints = children ?? entry.childPaints ?? [];
+        for (const child of paints) {
           // Native detach happens immediately; the retained TS tree reconciles at
           // frame end. Detach a reused figure from its previous native row first.
           const previous = this.parents.get(child);
@@ -160,8 +170,8 @@ export class WebCanvasAdapter {
           entry.paint.add(child);
           this.parents.set(child, entry);
         }
-        entry.children = [...shown];
-        entry.childPaints = children;
+        entry.children = shown;
+        entry.childPaints = paints;
       }
     }
     if (node.clipper) this.sync(node.clipper);

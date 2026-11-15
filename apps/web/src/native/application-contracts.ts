@@ -114,6 +114,8 @@ export interface Preview {
   setView(camera: Camera): void;
   worldScene(): Scene;
   render(width: number, height: number, seconds: number, hud: false): void;
+  /** The title displays only the world, without preparing an invisible game HUD. */
+  renderTitle?(width: number, height: number, seconds: number): void;
   selectPeople(ids: number[]): void;
   selectedPeople(): readonly number[];
   ambience(): Ambience;

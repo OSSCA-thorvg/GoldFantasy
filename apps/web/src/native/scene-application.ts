@@ -28,6 +28,7 @@ import {
 
 import { Cue, Sound } from '../../../../packages/native-audio/src/sound-types';
 import { gameTheme, reducedMotionPreferred } from './game-theme';
+import { motionPreference, motionPreferences, setMotionPreference } from './motion-preference';
 import { startTitlePlay, type TitlePlay } from './title-session';
 import { drawTitleWordmark } from './title-wordmark';
 import { IntroSaga } from './intro-saga';
@@ -84,6 +85,9 @@ export class SceneApplication implements Application {
   private introTo: Camera = { x: 0, y: 0, zoom: 1 };
   private saga: IntroSaga | undefined;
   private sagaWanted = false;
+  private previewWidth = 0;
+  private previewHeight = 0;
+  private previewDirty = true;
 
   private readonly fonts: NativeFontMetrics;
   private chooseLanguage(next: Locale): void {
@@ -133,6 +137,7 @@ export class SceneApplication implements Application {
     if (this.current !== 'Title') active?.presented?.(pixelRatio);
   }
   invalidatePresentation(): void {
+    this.previewDirty = true;
     this.gameSession?.invalidatePresentation?.();
     this.editorSession?.invalidatePresentation?.();
   }
@@ -162,14 +167,14 @@ export class SceneApplication implements Application {
       if (this.sinceSave >= autosaveInterval || (this.milestoneDue && this.sinceSave >= milestoneSaveGap))
         this.save(autoSlot, true);
     }
-    if (this.current === 'Title' && this.preview) {
-      this.titlePlay?.advance(dt);
+    if (this.current === 'Title' && this.preview && !this.saga && this.intro !== 'Loading') {
+      if (!this.settingsOpen) this.titlePlay?.advance(dt);
       // A run that has ended (or run long) gives way to a fresh world while nobody is starting a game.
-      if (this.titlePlay?.finished() && this.intro === 'None') {
+      if (!this.settingsOpen && this.titlePlay?.finished() && this.intro === 'None') {
         this.preparePreview();
         this.stage();
       }
-      if (this.intro === 'None' && this.titlePlay) {
+      if (!this.settingsOpen && this.intro === 'None' && this.titlePlay) {
         this.preview.setView(this.titlePlay.camera(width, height, dt, reducedMotionPreferred()));
         const subject = this.titlePlay.subject();
         if (subject) {
@@ -177,7 +182,13 @@ export class SceneApplication implements Application {
           if (selected.length !== 1 || selected[0] !== subject.id) this.preview.selectPeople([subject.id]);
         }
       }
-      this.preview.render(width, height, seconds, false);
+      if (!this.settingsOpen || this.previewDirty || width !== this.previewWidth || height !== this.previewHeight) {
+        if (this.preview.renderTitle) this.preview.renderTitle(width, height, seconds);
+        else this.preview.render(width, height, seconds, false);
+        this.previewWidth = width;
+        this.previewHeight = height;
+        this.previewDirty = false;
+      }
       if (this.titleSound) {
         this.titleSound.setAmbience(this.preview.ambience());
         for (const cue of this.preview.takeCues()) this.titleSound.play(cue);
@@ -702,6 +713,7 @@ export class SceneApplication implements Application {
     if (this.settingsOpen) return;
     this.settingsPage = page;
     this.settingsOpen = true;
+    this.previewDirty = true;
     this.message = '';
     const session = this.active();
     if (session) {
@@ -713,6 +725,7 @@ export class SceneApplication implements Application {
   private closeSettings(): void {
     if (!this.settingsOpen) return;
     this.settingsOpen = false;
+    this.previewDirty = true;
     this.overlay.cancelPointer();
     this.overlayPointer = false;
     const session = this.active();
@@ -741,7 +754,9 @@ export class SceneApplication implements Application {
     );
     this.overlay.rect(viewport, { r: 0, g: 0, b: 0, a: 144 });
     const w = Math.min(320, f(width - 32)),
-      h = game ? 316 : 134;
+      h = Math.min(game ? 366 : 184, height - 24),
+      pitch = game ? Math.min(50, (h - 100) / 5) : 50,
+      rowHeight = Math.min(40, pitch - 8);
     const panel = new Rect(f(f(width - w) / 2), f(f(height - h) / 2), w, h);
     this.overlay.control('settings/panel', panel, () => {}, true, false);
     this.overlay.rect(
@@ -763,13 +778,13 @@ export class SceneApplication implements Application {
     this.overlay.line(f(dismiss.x + 9), f(dismiss.y + 9), f(dismiss.x + 19), f(dismiss.y + 19), ink, f(1.5));
     this.overlay.line(f(dismiss.x + 19), f(dismiss.y + 9), f(dismiss.x + 9), f(dismiss.y + 19), ink, f(1.5));
     let y = f(panel.y + 64);
-    this.overlay.text(new Rect(f(panel.x + 24), y, 110, 40), 'Language', theme.text, 13);
+    this.overlay.text(new Rect(f(panel.x + 24), y, 110, rowHeight), 'Language', theme.text, 13);
     const choice = f(f(panel.w - 48 - 118) / locales.length);
     locales.forEach((name, index) =>
       button(
         this.overlay,
         `settings/language/${name}`,
-        new Rect(f(panel.x + 24 + 110 + f((choice + 8) * index)), y, choice, 40),
+        new Rect(f(panel.x + 24 + 110 + f((choice + 8) * index)), y, choice, rowHeight),
         name,
         () => this.chooseLanguage(name),
         ButtonStyle.Default,
@@ -778,12 +793,31 @@ export class SceneApplication implements Application {
         locale() === name,
       ),
     );
-    y = f(y + 50);
+    y = f(y + pitch);
+    this.overlay.text(new Rect(f(panel.x + 24), y, 110, rowHeight), 'Animations', theme.text, 13);
+    const motionWidth = f((panel.w - 48 - 118) / motionPreferences.length);
+    motionPreferences.forEach((value, index) =>
+      button(
+        this.overlay,
+        `settings/motion/${value}`,
+        new Rect(f(panel.x + 24 + 110 + (motionWidth + 8) * index), y, motionWidth, rowHeight),
+        value,
+        () => {
+          setMotionPreference(value);
+          this.invalidatePresentation();
+        },
+        ButtonStyle.Default,
+        true,
+        undefined,
+        motionPreference() === value,
+      ),
+    );
+    y = f(y + pitch);
     if (game) {
       button(
         this.overlay,
         'settings/save',
-        new Rect(f(panel.x + 24), y, f(panel.w - 48), 40),
+        new Rect(f(panel.x + 24), y, f(panel.w - 48), rowHeight),
         'Save',
         () => {
           this.settingsPage = 'Save';
@@ -791,11 +825,11 @@ export class SceneApplication implements Application {
         },
         ButtonStyle.Primary,
       );
-      y = f(y + 50);
+      y = f(y + pitch);
       button(
         this.overlay,
         'settings/load',
-        new Rect(f(panel.x + 24), y, f(panel.w - 48), 40),
+        new Rect(f(panel.x + 24), y, f(panel.w - 48), rowHeight),
         'Load',
         () => {
           this.settingsPage = 'Load';
@@ -804,13 +838,13 @@ export class SceneApplication implements Application {
         ButtonStyle.Default,
         this.savedSlots().length > 0,
       );
-      y = f(y + 50);
+      y = f(y + pitch);
     }
     if (game)
       button(
         this.overlay,
         'settings/title',
-        new Rect(f(panel.x + 24), y, f(panel.w - 48), 40),
+        new Rect(f(panel.x + 24), y, f(panel.w - 48), rowHeight),
         'Back to Title',
         () => {
           this.requested = 'Title';
@@ -818,7 +852,7 @@ export class SceneApplication implements Application {
       );
     if (game && this.message)
       this.overlay.text(
-        new Rect(f(panel.x + 24), f(panel.y + 270), f(panel.w - 48), 24),
+        new Rect(f(panel.x + 24), f(panel.y + panel.h - 42), f(panel.w - 48), 24),
         this.message,
         theme.text,
         12,
@@ -994,8 +1028,9 @@ export class SceneApplication implements Application {
   }
   private stage(): void {
     this.root.remove();
-    if (this.preview) this.root.add(this.preview.worldScene());
+    // Opaque story panels replace the world, so the GPU must not draw it underneath.
     if (this.saga) this.root.add(this.saga.paint);
+    else if (this.preview) this.root.add(this.preview.worldScene());
     this.root.add(this.overlay.scene());
   }
   private advanceIntro(dt: number, width: number, height: number): void {

@@ -15,18 +15,19 @@ try {
     args: ['--mute-audio', '--use-angle=gl', '--enable-gpu', '--ignore-gpu-blocklist', '--autoplay-policy=document-user-activation-required'],
   });
   const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
-  for (const mode of ['worker', 'reduced-motion', 'fallback', 'missing-animation']) {
+  for (const mode of ['worker', 'system-reduced-motion', 'reduced-motion', 'fallback', 'worker-failure', 'missing-animation']) {
     const context = await browser.newContext({
       viewport: { width: 800, height: 500 },
       hasTouch: true,
       isMobile: true,
-      reducedMotion: mode === 'reduced-motion' ? 'reduce' : 'no-preference',
+      reducedMotion: mode.includes('reduced-motion') ? 'reduce' : 'no-preference',
     });
     const page = await context.newPage(),
       errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await page.addInitScript(
-      ({ fallback }) => {
+      ({ fallback, motionOff, workerFailure }) => {
+        if (motionOff) localStorage.setItem('midgard.motion', 'Off');
         window.testAudioContexts = [];
         window.testAudioNodes = [];
         const Original = AudioContext,
@@ -44,8 +45,18 @@ try {
           }
         };
         if (fallback) HTMLCanvasElement.prototype.transferControlToOffscreen = undefined;
+        if (workerFailure) {
+          const Worker = window.Worker;
+          window.Worker = class extends Worker {
+            postMessage(data, ...args) {
+              if (data.kind === 'start')
+                setTimeout(() => this.dispatchEvent(new MessageEvent('message', { data: { kind: 'error', message: 'Test worker failure' } })), 0);
+              else super.postMessage(data, ...args);
+            }
+          };
+        }
       },
-      { fallback: mode === 'fallback' },
+      { fallback: mode === 'fallback', motionOff: mode === 'reduced-motion', workerFailure: mode === 'worker-failure' },
     );
     const cdp = await context.newCDPSession(page);
     const read = async (expression) => {

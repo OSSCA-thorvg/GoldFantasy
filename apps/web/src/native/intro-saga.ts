@@ -158,6 +158,11 @@ export class IntroSaga {
   private ringing: SagaClip[] = [];
   private readonly art: SagaArt = { world: new PictureNode(new Uint8Array(4), 1, 1) };
   private done = false;
+  private width = -1;
+  private height = -1;
+  private posed = false;
+  private posedArt = -1;
+  private collectPending = true;
   readonly paint: Paint;
 
   constructor(
@@ -193,6 +198,8 @@ export class IntroSaga {
     this.time = 0;
     this.spoke = false;
     this.fired = 0;
+    this.posed = false;
+    this.collectPending = true;
     if (this.panel) this.window.remove(this.panel.scene);
     // A long sound, like the giant's fall, rings on under the next panel.
     this.ringing.push(...this.effects);
@@ -222,9 +229,11 @@ export class IntroSaga {
       k = Math.max(0.01, Math.min((width - pad * 2) / sagaWidth, (height - band - pad) / sagaHeight));
     if (this.bed && this.index === sagaBeats.length - 1)
       this.bed.level(bedVolume * Math.max(0, Math.min(1, (length - this.time) / 3)));
-    this.ground.reset().appendRect(0, 0, width, height).fill(8, 8, 14);
-    this.frame
-      .transform([
+    if (width !== this.width || height !== this.height) {
+      this.width = width;
+      this.height = height;
+      this.ground.reset().appendRect(0, 0, width, height).fill(8, 8, 14);
+      this.frame.transform([
         k,
         0,
         (width - sagaWidth * k) / 2,
@@ -234,11 +243,20 @@ export class IntroSaga {
         0,
         0,
         1,
-      ])
-      .opacity(Math.round(255 * Math.max(0, shown)));
-    this.panel?.pose(this.still ? 0.8 : this.time / length, this.still ? 0 : this.clock);
+      ]);
+    }
+    const opacity = Math.round(255 * Math.max(0, shown));
+    if (this.frame.alpha !== opacity) this.frame.opacity(opacity);
+    if (!this.still || !this.posed || this.posedArt !== this.art.world.dataVersion) {
+      this.panel?.pose(this.still ? 0.8 : this.time / length, this.still ? 0 : this.clock);
+      this.posed = true;
+      this.posedArt = this.art.world.dataVersion;
+    }
     this.adapter.sync(this.root);
-    this.adapter.collect([this.root]);
+    if (this.collectPending) {
+      this.adapter.collect([this.root]);
+      this.collectPending = false;
+    }
     return true;
   }
   /** The phrase being spoken and how visible it is, 0..1. */

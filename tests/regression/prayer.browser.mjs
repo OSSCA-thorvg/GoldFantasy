@@ -457,7 +457,7 @@ try {
   await click('prayer-return');
   await page.evaluate(() => prayerProbe.setLocale('ENG'));
   // A reduced-motion rite must still run to the end.
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.evaluate(async () => (await import('/apps/web/src/native/motion-preference.ts')).setMotionPreference('Off'));
   await open('Clear', 12, gifts.Kingly);
   await click('prayer-confirm');
   await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().answer + 0.8));
@@ -465,7 +465,7 @@ try {
   await page.evaluate(() => prayerProbe.advanceTo(prayerProbe.rite().end + 0.1));
   assert.equal((await snapshot()).finished, true);
   await click('prayer-return');
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.evaluate(async () => (await import('/apps/web/src/native/motion-preference.ts')).setMotionPreference('On'));
   const altarHit = await page.evaluate(() => {
     prayerProbe.reset('Clear', 12, false);
     const g = prayerProbe.game;

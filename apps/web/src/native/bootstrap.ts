@@ -10,10 +10,11 @@ import { createCharacterPreview } from '../../../../packages/native-renderer/src
 import { sounds } from '../../../../packages/native-audio/src/sound-library';
 import { BrowserSoundDevice, disposeNativeAudio } from '../../../../packages/native-audio/src/browser-audio';
 import { Town } from '../../../../packages/engine/src/town';
+import { WorldMap } from '../../../../packages/engine/src/world-map';
 import { decodeTown } from '../../../../packages/engine/src/save-game';
 import { designedWorldSeed } from '../../../../packages/engine/src/ymir-born';
 import { GameApp } from './game-app';
-import { GameApplication } from './game-application';
+import { GameApplication, worldSeed } from './game-application';
 import { SceneApplication } from './scene-application';
 import { BuildingFiles } from './building-files';
 import { BrowserFiles } from './browser-files';
@@ -157,7 +158,10 @@ export async function startNativeGame(
     // first frame must not wait for the complete effects sample download.
     await prepareScriptRuntime();
     const services = createNativeServices(tvg, fonts, files, () => host),
-      app = services.createApplication({ ...defaultLaunchOptions(), titleScreen: true, ...options });
+      launch = { ...defaultLaunchOptions(), titleScreen: true, ...options };
+    if (launch.world === 'Random' && launch.seed === undefined) launch.seed = services.randomDevice();
+    await WorldMap.prepare(worldSeed(launch, services));
+    const app = services.createApplication(launch);
     host = new BrowserHost(element, tvg, app, { autoStart });
     let closed = false;
     // Hidden is the last state a mobile browser reliably reports before discarding the tab.

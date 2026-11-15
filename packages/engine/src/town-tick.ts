@@ -89,18 +89,18 @@ function hammerContact(town: TickTown, p: Person, dt: number): void {
 }
 export function dangerNear(town: TickTown, p: Person): boolean {
   const notice = p.ordered ? 6 : p.role === Role.Guest ? 8 : town.raiding() ? 10 : 5;
-  return [...town.monsters(), ...town.wildlife()].some((threat) => {
-    const gap = distance(threat.position, p.position);
+  const dangerous = (threat: ReturnType<TickTown['monsters']>[number]): boolean => {
     if (threat.animal !== null && (!threat.angry || !animalSpec(threat.animal).defends)) return false;
+    if (!(threat.health > 0) || threat.insideLair) return false;
+    const gap = distance(threat.position, p.position);
     return (
-      threat.health > 0 &&
-      !threat.insideLair &&
       gap <= notice &&
       (!threat.giant() || threat.angry) &&
       (threat.raider || threat.angry || gap < f(2.5)) &&
       town.map().revealed(threat.position)
     );
-  });
+  };
+  return town.monsters().some(dangerous) || town.wildlife().some(dangerous);
 }
 export function tick(this: TickTown, dt: number): void {
   this.timberEvents = this.timberEvents.filter((event) => this.time - event.at <= 2);

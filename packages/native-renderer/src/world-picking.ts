@@ -194,34 +194,50 @@ export class WorldPicker {
       current = new Map<string, ResolvedGroundSelectionMarker>(),
       seen = new Set<string>(),
       screen = (p: Point) => s.view.toScreen(project(p.x, p.y), s.viewWidth, s.viewHeight);
-    for (const layer of [s.farmland, s.ornaments, s.objects])
-      for (const paint of layer.children) {
-        const source = pickSource(paint);
-        if (!source?.ref) continue;
-        const ref = source.ref,
-          marker =
-            requested.get(worldObjectKey(ref)) ??
-            (ref.kind === 'tree' ? requested.get(`tree:${ref.id}`) : undefined);
-        if (!marker) continue;
-        seen.add(marker.key);
-        if (
-          !paint.alpha ||
-          !source.body.some((body) => body.alpha > 0) ||
-          (town && !this.eligible(town, source, paint.alpha))
-        )
-          continue;
-        current.set(marker.key, {
-          ...marker,
-          geometry: {
-            foot: screen(source.foot),
-            opacity: paint.alpha,
-            groundOutline: source.groundOutline?.map(screen),
-            ellipse: source.ellipse
-              ? { rx: source.ellipse.rx * s.view.zoom, ry: source.ellipse.ry * s.view.zoom }
-              : undefined,
-          },
-        });
+    const resolve = (paint: PaintNode) => {
+      const source = pickSource(paint);
+      if (!source?.ref) return;
+      const ref = source.ref,
+        marker =
+          requested.get(worldObjectKey(ref)) ??
+          (ref.kind === 'tree' ? requested.get(`tree:${ref.id}`) : undefined);
+      if (!marker) return;
+      seen.add(marker.key);
+      if (
+        !paint.alpha ||
+        !source.body.some((body) => body.alpha > 0) ||
+        (town && !this.eligible(town, source, paint.alpha))
+      )
+        return;
+      current.set(marker.key, {
+        ...marker,
+        geometry: {
+          foot: screen(source.foot),
+          opacity: paint.alpha,
+          groundOutline: source.groundOutline?.map(screen),
+          ellipse: source.ellipse
+            ? { rx: source.ellipse.rx * s.view.zoom, ry: source.ellipse.ry * s.view.zoom }
+            : undefined,
+        },
+      });
+    };
+    // Unit selection is the common case (including the title's followed resident).
+    // Their retained paints are indexed already; do not inspect every tree and building for each ring.
+    let scan = false;
+    for (const marker of markers) {
+      const unit = marker.kind === 'person' || marker.kind === 'monster' || marker.kind === 'animal';
+      if (!unit) {
+        if (marker.kind !== 'road') scan = true;
+        continue;
       }
+      const id = Number(marker.key.slice(marker.key.indexOf(':') + 1)),
+        paint = (marker.kind === 'person' ? s.figures : s.beasts).get(id)?.paint;
+      if (!paint) scan = true;
+      if (paint && s.objects.children.includes(paint)) resolve(paint);
+    }
+    if (scan)
+      for (const layer of [s.farmland, s.ornaments, s.objects])
+        for (const paint of layer.children) resolve(paint);
     if (town && markers.some((marker) => marker.kind === 'road')) {
       for (const span of this.roadSpans(town)) {
         const key = `road:${span.id}`,

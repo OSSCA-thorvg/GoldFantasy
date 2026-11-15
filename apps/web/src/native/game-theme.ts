@@ -1,8 +1,7 @@
 import { FrameStyle, Theme, rgba } from '../../../../packages/native-ui/src';
+import { reducedMotionPreferred } from './motion-preference';
+export { reducedMotionPreferred } from './motion-preference';
 
-export function reducedMotionPreferred(): boolean {
-  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
 export function gameTheme(): Theme {
   const t = Theme.dark();
   t.background = rgba(17, 20, 18);

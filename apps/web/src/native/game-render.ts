@@ -103,6 +103,7 @@ export function render(
   simulate = true,
   maxDelta = 0.25,
   uiSeconds = -1,
+  worldOnly = false,
 ): void {
   this.theme.reducedMotion = this.reducedMotion();
   // The in-game setting, not only the OS preference, stills the water and the world shake.
@@ -270,6 +271,10 @@ export function render(
     this.chosen,
   );
   if (simulate || this.town.isTitleAutoplay()) this.updateSpeech(seconds);
+  if (worldOnly) {
+    this.renderer.setGroundSelection(this.chosen.map((id) => ({ key: `person:${id}`, kind: 'person', hover: false })));
+    return;
+  }
   this.context.begin(this.theme, new Rect(0, 0, width, height), uiSeconds >= 0 ? uiSeconds : seconds);
   if (this.prayer) {
     renderPrayer.call(this, width, height);
@@ -323,6 +328,9 @@ export function render(
     );
   }
   this.context.end();
+}
+export function renderTitle(this: GameRenderApp, width: number, height: number, seconds: number): void {
+  render.call(this, width, height, seconds, false, 0.25, -1, true);
 }
 export function takeCues(this: GameRenderApp): Sound[] {
   let out = this.cues;
