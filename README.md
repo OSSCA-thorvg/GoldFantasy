@@ -10,9 +10,9 @@ A Norse settlement game about building a home, raising a few precious people, an
 
 [Play locally](#play-locally) · [Controls](#controls) · [How it is made](https://ossca-thorvg.github.io/Midgard/docs.html) · [Publish to GitHub Pages](#github-pages) · [ThorVG WebCanvas](https://github.com/thorvg/thorvg.web)
 
-![The giant Ymir opens his eyes in the first scene of the opening](.github/media/midgard-opening.gif)
+![The frost giant Ymir awakens in the first scene of the opening saga](.github/media/midgard-opening.gif)
 
-_The first scene of the opening saga: the giant Ymir opens his eyes. Shown at one and a half times its pace._
+_The frost giant Ymir awakens in the first scene of the opening saga. Shown at 1.5× speed._
 
 </div>
 

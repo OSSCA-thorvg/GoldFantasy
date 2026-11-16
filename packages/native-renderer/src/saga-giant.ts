@@ -1,6 +1,6 @@
 // Ymir for the opening saga: one head and one body for every panel, rigged so mane and beard sway.
-import { SceneNode, type Rgb } from './paint';
-import { oval, pen, shapeOf, type Contour, type Form } from './outline-form';
+import { SceneNode, ShapeNode, type Rgb } from './paint';
+import { mirrored, oval, pen, shapeOf, type Contour, type Form } from './outline-form';
 import { dusk, paintForm } from './form-paint';
 import { darkEye, flat, frost, iceGlint, lock, rime, sagaFinish, scatter, stroke, turn } from './saga-panel';
 
@@ -174,21 +174,32 @@ export function giantHead(): GiantHead {
   for (let i = 0; i < 7; i++) {
     const x = -78 + i * 26,
       drop = 104 + 84 * Math.sin((i / 6) * Math.PI) + 24 * scatter(i, 10);
+    const tuft = strand(
+      scene,
+      lock(x, -56, x + (i - 3) * 5, -56 + drop, 36, i % 2 ? 0.07 : -0.07),
+      x,
+      -56,
+      0.05,
+      2 + i * 0.5,
+      5,
+    );
+    // This root's shaded cap can peek through the outer right lock as a detached chip.
+    if (i === 5) tuft.node.children[0].clip(new ShapeNode().appendRect(x - 64, -50, 128, drop + 64));
+    strands.push(tuft);
+  }
+  // Mirror one moustache half exactly, including its sway about the opposite root.
+  const moustache = lock(6, -84, 108, -50, 30, -0.2);
+  for (const side of [-1, 1])
     strands.push(
       strand(
         scene,
-        lock(x, -56, x + (i - 3) * 5, -56 + drop, 36, i % 2 ? 0.07 : -0.07),
-        x,
-        -56,
-        0.05,
-        2 + i * 0.5,
-        5,
+        side < 0 ? mirrored([moustache])[0] : moustache,
+        side * 6,
+        -84,
+        side * 0.03,
+        1,
+        4,
       ),
-    );
-  }
-  for (const side of [-1, 1])
-    strands.push(
-      strand(scene, lock(side * 6, -84, side * 108, -50, 30, -side * 0.2), side * 6, -84, 0.03, side, 4),
     );
   const head: GiantHead = {
     scene,
