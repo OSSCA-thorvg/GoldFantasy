@@ -8,7 +8,7 @@ A Norse settlement game about building a home, raising a few precious people, an
 
 **Settlement building · Crafting in the world · Army combat · A living world · Creative tools**
 
-[Play locally](#play-locally) · [Controls](#controls) · [How it is made](https://ossca-thorvg.github.io/Midgard/docs.html) · [Publish to GitHub Pages](#github-pages) · [ThorVG WebCanvas](https://github.com/thorvg/thorvg.web)
+[Play locally](#play-locally) · [Controls](#controls) · [How it is made](https://thorvg-community-kr.github.io/Midgard/docs.html) · [Publish to GitHub Pages](#github-pages) · [ThorVG WebCanvas](https://github.com/thorvg/thorvg.web)
 
 ![The frost giant Ymir awakens in the first scene of the opening saga](.github/media/midgard-opening.gif)
 
@@ -188,7 +188,7 @@ The game logic is TypeScript. WebGL is the default renderer; WebGPU can also be 
 
 Every picture above is captured from the actual renderer (see [Rebuilding the README media](#rebuilding-the-readme-media)). Captions say which scenes are prepared and which are sped up.
 
-**[How it is made](https://ossca-thorvg.github.io/Midgard/docs.html)** is a presentation page with sound: the opening, the game loop, how ThorVG is used (the paint tree, optimisation, the shared skeleton and clips, weather and combat effects), the placement and road algorithms, and how AI was used. Its source is [`public/docs.html`](public/docs.html), served at `docs.html` beside the game.
+**[How it is made](https://thorvg-community-kr.github.io/Midgard/docs.html)** is a presentation page with sound: the opening, the game loop, how ThorVG is used (the paint tree, optimisation, the shared skeleton and clips, weather and combat effects), the placement and road algorithms, and how AI was used. Its source is [`public/docs.html`](public/docs.html), served at `docs.html` beside the game.
 
 ## Controls
 
@@ -252,7 +252,7 @@ The [Pages workflow](.github/workflows/pages.yml) builds and deploys `dist/` whe
 
 For the current repository, the site address after a successful deployment is:
 
-**https://ossca-thorvg.github.io/Midgard/**
+**https://thorvg-community-kr.github.io/Midgard/**
 
 The repository was renamed from GoldFantasy to Midgard, so the Pages URL is now `/Midgard/`. Old `/GoldFantasy/` links no longer work. The workflow reads the base path from the Pages configuration so fonts, audio, the audio worklet and WebAssembly load correctly below `/Midgard/`.
 
